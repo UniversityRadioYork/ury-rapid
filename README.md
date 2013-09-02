@@ -10,8 +10,13 @@ Requirements
 
 * Ruby 2.0+
 * A BAPS server (sadly not found outside of URY, really)
+* This also depends on some RubyGems; see `Gemfile`.
 
 Usage
 -----
 
-For now, `ruby main.rb HOSTNAME PORT USERNAME PASSWORD` will invoke the testbed, which doesn't do much.
+The main server (main.rb) isn't yet fully operational, but information on how to use it will pop up here eventually.
+
+### Test program (state dumper)
+
+`ruby state_dumper.rb BAPS-HOSTNAME BAPS-PORT USERNAME PASSWORD` will invoke the state dumper testbed.  This will connect to the specified BAPS server, log in and dump some information to stdout.
