@@ -6,7 +6,10 @@ require "digest"
 
 if __FILE__ == $0
   hostname, port, username, password = ARGV
-  client = BapsClient.new hostname, port
+  client = Bra::BapsClient.new hostname, port
+
+  prog = Bra::StateDumper.new client
+  prog.run
 
   reader = client.reader
   writer = client.writer
