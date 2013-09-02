@@ -5,6 +5,16 @@ __bra__ (BAPS Ruby Abstraction) is a project for creating a system to translate 
 
 This is in very early development.  Expect it not to do a lot.
 
+What this will become
+---------------------
+
+Currently URY use an in-house, proprietary playout system called __BAPS__ to assemble and play out shows.  It has a binary protocol that's somewhat messy, hard to debug and hard to extend.
+
+We want to make a __text protocol__ based system to replace it, so future URYers can understand how the playout system works a bit better.  In order to do that, we need to start small, by building a new API on top of the old server.  This is what __BRA__ will do.
+
+Eventually the BRA API may form the top end of a new, open-source server stack (but who knows?  only time will tell).
+
+
 Requirements
 ------------
 
