@@ -121,15 +121,29 @@ module Bra
     class UnknownResponse < StandardError
     end
 
+    # Public: An interpreter that reads and converts raw command data from the
+    # BAPS server into response messages.
     class Source
+      # Public: Allows access to the welcome message the server returned on
+      # connection.
+      attr_reader :welcome_message
+
+      # Public: Initialises the Source.
+      #
+      # reader - A BapsReader or similar class that implements the BAPS
+      #          meta-protocol.  The reader MUST NOT have been previously
+      #          read from.
       def initialize(reader)
         @reader = reader
 
         @structure_hash = STRUCTURES.inject({}) do |hash, (code, arguments)|
           hash.merge!(code => ResponseType.new(*arguments))
         end
+
+        @welcome_message = reader.string
       end
 
+      # Public: Read and interpret a response from the BAPS server.
       def read_response
         raw_code, skip_bytes = @reader.command
 

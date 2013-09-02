@@ -1,3 +1,5 @@
+require "digest"
+
 module Bra
   # Public: High-level versions of BAPS commands.
   #
