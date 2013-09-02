@@ -1,36 +1,67 @@
-require_relative "baps_client"
-require_relative "commands"
-require_relative "dispatch"
-require_relative "responses"
-require "digest"
+require 'eventmachine'
+require 'thin'
+require_relative 'bapsapiapp'
 
-if __FILE__ == $0
-  hostname, port, username, password = ARGV
-  client = BapsClient.new hostname, port
 
-  reader = client.reader
-  writer = client.writer
-  response_source = Responses::Source.new(reader)
+# This example shows you how to embed Sinatra into your EventMachine
+# application. This is very useful if you're application needs some
+# sort of API interface and you don't want to use EM's provided
+# web-server.
 
-  welcome_message = reader.string
-  puts welcome_message
+def run(opts)
 
-  dispatch = Dispatch.new writer, response_source
-  login = Commands::Login.new(username, password)
-  login.run(dispatch) do |error_code, error_string|
-    if error_code != Commands::Authenticate::Errors::OK
-      p error_string
-      dispatch.stop
-    else
-      dispatch.register(Responses::Playlist::ITEM_DATA) do |response, _|
-        puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
-        puts "       Track: #{response[:name]} Type: #{response[:type]}"
-      end
-      dispatch.register(Responses::Playlist::ITEM_COUNT) do |response, _|
-        puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
+  # Start he reactor
+  EM.run do
+
+    # define some defaults for our app
+    server  = opts[:server] || 'thin'
+    host    = opts[:host]   || '0.0.0.0'
+    port    = opts[:port]   || '8181'
+    web_app = opts[:app]
+
+    # create a base-mapping that our application will set at. If I
+    # have the following routes:
+    #
+    #   get '/hello' do
+    #     'hello!'
+    #   end
+    #
+    #   get '/goodbye' do
+    #     'see ya later!'
+    #   end
+    #
+    # Then I will get the following:
+    #
+    #   mapping: '/'
+    #   routes:
+    #     /hello
+    #     /goodbye
+    #
+    #   mapping: '/api'
+    #   routes:
+    #     /api/hello
+    #     /api/goodbye
+    dispatch = Rack::Builder.app do
+      map '/' do
+        run web_app
       end
     end
-  end
 
-  dispatch.pump_loop
+    # NOTE that we have to use an EM-compatible web-server. There
+    # might be more, but these are some that are currently available.
+    unless ['thin', 'hatetepe', 'goliath'].include? server
+      raise "Need an EM webserver, but #{server} isn't"
+    end
+
+    # Start the web server. Note that you are free to run other tasks
+    # within your EM instance.
+    Rack::Server.start({
+      app:    dispatch,
+      server: server,
+      Host:   host,
+      Port:   port
+    })
+  end
 end
+
+run app: BAPSApiApp.new
