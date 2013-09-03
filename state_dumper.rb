@@ -44,12 +44,27 @@ module Bra
     #
     # Returns nothing.
     def register_dump_functions
-      @dispatch.register(Responses::Playlist::ITEM_DATA) do |response, _|
+      @dispatch.register(Responses::Playlist::ITEM_DATA) do |response|
         puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
         puts "       Track: #{response[:name]} Type: #{response[:type]}"
       end
-      @dispatch.register(Responses::Playlist::ITEM_COUNT) do |response, _|
+      @dispatch.register(Responses::Playlist::ITEM_COUNT) do |response|
         puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
+      end
+      @dispatch.register(Responses::Playback::PLAYING) do |response|
+        puts "[PLAYING] Channel #{response[:subcode]} is playing"
+      end
+      @dispatch.register(Responses::Playback::PAUSED) do |response|
+        puts "[PAUSED] Channel #{response[:subcode]} is paused"
+      end
+      @dispatch.register(Responses::Playback::STOPPED) do |response|
+        puts "[STOPPED] Channel #{response[:subcode]} is stopped"
+      end
+      @dispatch.register(Responses::System::CLIENT_ADD) do |response|
+        puts "[CLIENTCHANGE] Client #{response[:client]} appeared"
+      end
+      @dispatch.register(Responses::System::CLIENT_REMOVE) do |response|
+        puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
       end
     end
   end

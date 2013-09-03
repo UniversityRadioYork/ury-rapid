@@ -9,7 +9,8 @@ module Bra
       @running = false
       @registered_blocks = Hash.new(
         lambda do |response|
-          puts "Unhandled response: 0x#{response[:code].to_s(16)}."
+          hexcode = response[:code].to_s(16)
+          puts "Unhandled response: #{response[:name]} (0x#{hexcode})."
         end
       )
     end

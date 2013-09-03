@@ -1,13 +1,21 @@
 require 'socket'
 
-# Internal: Miscellaneous low-level interface code to the BAPS server.
+# Public: Miscellaneous low-level interface code to the BAPS server.
 module Bra
-  # Internal: Enumeration of the codes used by BAPS to refer to configuration
+  # Public: Enumeration of the codes used by BAPS to refer to configuration
   # parameter types.
   module ConfigTypes
     INT = 0
     STR = 1
     CHOICE = 2
+  end
+
+  # Public: Enumeration of the codes used by BAPS to refer to track types.
+  module TrackTypes
+    NULL = 0
+    FILE = 1
+    LIBRARY = 2
+    TEXT = 3
   end
 
   # Internal: A low-level client implementation for the legacy BAPS
@@ -71,6 +79,21 @@ module Bra
       config_type = uint32
       value = send CONFIG_TYPE_FUNCTIONS[config_type]
       [config_type, value]
+    end
+
+    # Internal: Reads the body of a LOAD command.
+    #
+    # LOAD commands change their format depending on the track type, so we
+    # have to parse them specially.
+    #
+    # Returns a hash with the following keys:
+    #   type: The track type, as a member of TrackTypes.
+    def load_body
+      track_type = uint32
+      title = string
+      body = { type: track_type, title: title }
+      body.merge!({ duration: uint32 }) if track_type == TrackTypes::LIBRARY
+      body
     end
 
     # Internal: Receives and discards a number of bytes.
@@ -156,7 +179,7 @@ module Bra
     end
   end
 
-  # A message to be written to the BAPS server.
+  # Internal: A message to be written to the BAPS server.
   class BapsRequest
     def initialize(command)
       # Format is initially set up for the command and the skip-bytes field.

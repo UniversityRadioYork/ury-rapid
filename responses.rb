@@ -43,6 +43,8 @@ module Bra
     module System
       SEED = 0xE700
       LOGIN = 0xE900
+      CLIENT_ADD = 0xEC00
+      CLIENT_REMOVE = 0xEC80
     end
 
     # Internal: A class representing compiled response types.
@@ -72,7 +74,7 @@ module Bra
       # Creates a response structure for a response returning a configuration
       # setting ID and value.
       def self.config(name)
-        ['ConfigSetting', %i{option_id uint32}, %i{setting config_setting}]
+        [name, %i{option_id uint32}, %i{setting config_setting}]
       end
     end
 
@@ -87,7 +89,7 @@ module Bra
       ],
       Playback::LOADED => [
         'ChannelLoaded',
-        %i{index uint32}, %i{type uint32}, %i{name string}, %i{duration uint32}
+        %i{index uint32}, %i{track load_body}
       ],
       Playback::CUE => [
         'ChannelCue',
@@ -101,7 +103,7 @@ module Bra
       Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
       Playlist::ITEM_DATA => [
         'ItemData',
-        %i{index uint32}, %i{type uint32}, %i{name string}
+        %i{index uint32}, %i{type uint32}, %i{track string}
       ],
       # Config
       Config::OPTION_COUNT => (ResponseType.count 'OptionCount'),
@@ -127,12 +129,8 @@ module Bra
       # System
       System::SEED => ['Seed', %i{seed string}],
       System::LOGIN => ['Login', %i{details string}],
-      # Playlist
-      Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
-      Playlist::ITEM_DATA => [
-        'ItemData',
-        %i{index uint32}, %i{type uint32}, %i{name string}
-      ],
+      System::CLIENT_ADD => ['ClientAdd', %i{client string}],
+      System::CLIENT_REMOVE => ['ClientRemove', %i{client string}]
     }
 
     class UnknownResponse < StandardError
