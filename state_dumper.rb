@@ -1,7 +1,7 @@
-require_relative "baps_client"
-require_relative "commands"
-require_relative "dispatch"
-require_relative "responses"
+require_relative 'baps_client'
+require_relative 'commands'
+require_relative 'dispatch'
+require_relative 'responses'
 
 module Bra
   # Public: A testbed class for demonstrating how Bra's internal BAPS
@@ -24,6 +24,8 @@ module Bra
     end
 
     # Public: Run the StateDumper.
+    #
+    # Returns nothing.
     def run
       login = Commands::Login.new(@username, @password)
       login.run(@dispatch) do |error_code, error_string|
@@ -39,6 +41,8 @@ module Bra
     end
 
     # Public: Register functions for dumping server state with the dispatch.
+    #
+    # Returns nothing.
     def register_dump_functions
       @dispatch.register(Responses::Playlist::ITEM_DATA) do |response, _|
         puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
@@ -51,6 +55,4 @@ module Bra
   end
 end
 
-if __FILE__ == $0
-  Bra::StateDumper.new(*ARGV).run
-end
+Bra::StateDumper.new(*ARGV).run if __FILE__ == $PROGRAM_NAME

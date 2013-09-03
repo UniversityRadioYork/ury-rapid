@@ -1,4 +1,4 @@
-require "digest"
+require 'digest'
 
 module Bra
   # Public: High-level versions of BAPS commands.
@@ -47,7 +47,7 @@ module Bra
       # Returns nothing.
       def run(dispatch)
         BapsRequest.new(Codes::SET_BINARY_MODE).send(dispatch.writer)
-        dispatch.register(Responses::System::SEED) do |response, dispatch|
+        dispatch.register(Responses::System::SEED) do |response|
           p response
           yield response[:seed]
           dispatch.deregister(response[:command])
@@ -94,12 +94,12 @@ module Bra
       # Returns nothing.
       def run(dispatch)
         password_hash = Digest::MD5.hexdigest(@password)
-        response = Digest::MD5.hexdigest(@seed + password_hash)
+        full_hash = Digest::MD5.hexdigest(@seed + password_hash)
 
-        cmd = BapsRequest.new(Codes::LOGIN).string(@username).string(response)
+        cmd = BapsRequest.new(Codes::LOGIN).string(@username).string(full_hash)
         cmd.send(dispatch.writer)
 
-        dispatch.register(Responses::System::LOGIN) do |response, dispatch|
+        dispatch.register(Responses::System::LOGIN) do |response|
           yield response[:subcode], response[:details]
           dispatch.deregister(response[:command])
         end
@@ -149,10 +149,12 @@ module Bra
       #   inside a block itself yielded by the dispatch, and thus may occur
       #   quite some time after this call.
       def run(dispatch, &block)
-        Initiate.new.run(dispatch) { |seed| authenticate dispatch, seed, block }
+        init = Initiate.new
+        init.run(dispatch) { |seed| authenticate dispatch, seed, block }
       end
 
       private
+
       # Internal: Performs the Authenticate leg of the Login procedure.
       #
       # dispatch - The request/response dispatcher to use to send the command
@@ -168,10 +170,7 @@ module Bra
       def authenticate(dispatch, seed, block)
         auth = Authenticate.new(@username, @password, seed)
         auth.run(dispatch) do |code, string|
-          if code == Authenticate::Errors::OK
-            Synchronise.new.run(dispatch)
-          end
-
+          Synchronise.new.run(dispatch) if code == Authenticate::Errors::OK
           block.call code, string
         end
       end

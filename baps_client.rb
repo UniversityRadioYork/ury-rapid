@@ -1,13 +1,10 @@
-require "socket"
+require 'socket'
 
+# Internal:
 module Bra
-  module FormatStrings
-    UINT16 = 'n'
-    UINT32 = 'N'
-    FLOAT32 = 'g'
-    STRING_BODY = 'a'
-  end
 
+  # Internal: Enumeration of the codes used by BAPS to refer to configuration
+  # parameter types.
   module ConfigTypes
     INT = 0
     STR = 1
@@ -54,8 +51,8 @@ module Bra
     #
     # Returns a list containing the following data:
     #   - A 16-bit integer containing the BAPS command code;
-    #   - A 32-bit integer providing the number of bytes following.  This cannot
-    #     be relied upon to be accurate.
+    #   - A 32-bit integer providing the number of bytes following.  This
+    #     cannot be relied upon to be accurate.
     def command
       [uint16, uint32]
     end
@@ -66,19 +63,14 @@ module Bra
     # the format of the config value depends on the preceding config type.
     # As such, it's much easier to treat them as a single element.
     #
-    # Returns a list
+    # Returns a list with the following items:
+    #   - The type of the config setting, as a member of ConfigTypes.
+    #   - The actual config setting itself, as either an integer or a string
+    #     depending on the type.  When the type is CHOICE, this is the ID of
+    #     the selected choice.
     def config_setting
       config_type = uint32
-      value = (
-        case config_type
-        when ConfigTypes::CHOICE
-          uint32
-        when ConfigTypes::INT
-          uint32
-        when ConfigTypes::STR
-          string
-        end
-      )
+      value = send CONFIG_TYPE_FUNCTIONS[config_type]
       [config_type, value]
     end
 
@@ -98,20 +90,31 @@ module Bra
       unpack 4, FormatStrings::UINT32
     end
 
+    # Internal: Reads a 32-bit (single-precision) floating-point number.
     def float32
       unpack 4, FormatStrings::FLOAT32
     end
 
+    # Internal: Reads a Pascal-style length-prefixed string.
     def string
       length = uint32
       @socket.recv length
     end
 
     private
+
     def unpack(num_bytes, unpack_format)
       bytes = @socket.recv num_bytes
       bytes.unpack(unpack_format)[0]
     end
+
+    # Internal: A map of configuration types to the names of BapsReader
+    # functions for reading them.
+    CONFIG_TYPE_FUNCTIONS = {
+      ConfigTypes::CHOICE => :uint32,
+      ConfigTypes::INT => :uint32,
+      ConfigTypes::STR => :string
+    }
   end
 
   # A writing interface to the BAPS protocol.
@@ -164,6 +167,7 @@ module Bra
     end
 
     private
+
     def pack
       ([@command, @num_bytes] + @payloads).pack(@format)
     end
@@ -175,5 +179,16 @@ module Bra
 
       self
     end
+  end
+
+  private
+
+  # Internal: Constants for the various pack/unpack format strings the low
+  # level interfaces use.
+  module FormatStrings
+    UINT16 = 'n'
+    UINT32 = 'N'
+    FLOAT32 = 'g'
+    STRING_BODY = 'a'
   end
 end

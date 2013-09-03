@@ -21,8 +21,7 @@ class BAPSApiApp < Sinatra::Base
     EM.defer do
       sleep 5
     end
-    'I\'m doing work in the background, but I am still free to take 
-requests'
+    "I'm doing work in the background, but I am still free to take requests"
   end
 end
 

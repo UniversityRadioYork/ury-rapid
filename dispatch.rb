@@ -8,7 +8,7 @@ module Bra
       @source = source
       @running = false
       @registered_blocks = Hash.new(
-        lambda do |response, listener|
+        lambda do |response|
           puts "Unhandled response: 0x#{response[:code].to_s(16)}."
         end
       )
@@ -38,11 +38,12 @@ module Bra
     end
 
     private
+
     def pump
       response = @source.read_response
 
       block = @registered_blocks[response[:code]]
-      block.call(response, self)
+      block.call response
     end
   end
 end

@@ -1,5 +1,11 @@
 module Bra
+  # Internal: Classes for dealing with BAPS server responses on a structural
+  # level.
+  #
+  # For raw response reading functionality, see baps_client.
   module Responses
+    # Internal: Response codes for the Playback section of the BAPS command
+    # set.
     module Playback
       PLAYING = 0x0000
       PAUSED = 0x0010
@@ -9,10 +15,16 @@ module Bra
       CUE = 0x0300
       INTRO = 0x0380
     end
+
+    # Internal: Response codes for the Playlist section of the BAPS command
+    # set.
     module Playlist
       ITEM_COUNT = 0x2180
       ITEM_DATA = 0x21C0
     end
+
+    # Internal: Response codes for the Config section of the BAPS command
+    # set.
     module Config
       OPTION_COUNT = 0xB000
       OPTION = 0xB080
@@ -24,11 +36,17 @@ module Bra
       CONFIG_SETTING = 0xB280
       CONFIG_SETTING_INDEXED = 0xB2C0
     end
+
+    # Internal: Response codes for the System section of the BAPS command
+    # set.
     module System
       SEED = 0xE700
       LOGIN = 0xE900
     end
 
+    # Internal: A class representing compiled response types.
+    #
+    # A response type
     class ResponseType
       attr_reader :name
 
@@ -40,7 +58,7 @@ module Bra
       # Reads a response of this response type from the given BAPS reader, and
       # packs it into a hash of response parameters.
       def build(reader)
-        @arguments.inject({:name => @name}) do |response, (name, type)|
+        @arguments.reduce({ name: @name }) do |response, (name, type)|
           response.merge!(name => (reader.send type))
         end
       end
@@ -56,8 +74,6 @@ module Bra
         ['ConfigSetting', %i{option_id uint32}, %i{setting config_setting}]
       end
     end
-
-
 
     STRUCTURES = {
       # Playback
@@ -81,13 +97,13 @@ module Bra
         %i{position uint32}
       ],
       # Playlist
-      Playlist::ITEM_COUNT => (ResponseType::count 'ItemCount'),
+      Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
       Playlist::ITEM_DATA => [
         'ItemData',
         %i{index uint32}, %i{type uint32}, %i{name string}
       ],
       # Config
-      Config::OPTION_COUNT => (ResponseType::count 'OptionCount'),
+      Config::OPTION_COUNT => (ResponseType.count 'OptionCount'),
       Config::OPTION => [
         'Option',
         %i{id uint32}, %i{description string}, %i{type uint32}
@@ -104,14 +120,14 @@ module Bra
         'OptionChoice',
         %i{option_id uint32}, %i{choice_id uint32}, %i{description string}
       ],
-      Config::CONFIG_SETTING_COUNT => ResponseType::count('SettingCount'),
-      Config::CONFIG_SETTING => ResponseType::config('Setting'),
-      Config::CONFIG_SETTING_INDEXED => ResponseType::config('IndexedSetting'),
+      Config::CONFIG_SETTING_COUNT => ResponseType.count('SettingCount'),
+      Config::CONFIG_SETTING => ResponseType.config('Setting'),
+      Config::CONFIG_SETTING_INDEXED => ResponseType.config('IndexedSetting'),
       # System
       System::SEED => ['Seed', %i{seed string}],
       System::LOGIN => ['Login', %i{details string}],
       # Playlist
-      Playlist::ITEM_COUNT => (ResponseType::count 'ItemCount'),
+      Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
       Playlist::ITEM_DATA => [
         'ItemData',
         %i{index uint32}, %i{type uint32}, %i{name string}
@@ -121,14 +137,14 @@ module Bra
     class UnknownResponse < StandardError
     end
 
-    # Public: An interpreter that reads and converts raw command data from the
-    # BAPS server into response messages.
+    # Internal: An interpreter that reads and converts raw command data from
+    # the BAPS server into response messages.
     class Source
-      # Public: Allows access to the welcome message the server returned on
+      # Internal: Allows access to the welcome message the server returned on
       # connection.
       attr_reader :welcome_message
 
-      # Public: Initialises the Source.
+      # Internal: Initialises the Source.
       #
       # reader - A BapsReader or similar class that implements the BAPS
       #          meta-protocol.  The reader MUST NOT have been previously
@@ -136,24 +152,25 @@ module Bra
       def initialize(reader)
         @reader = reader
 
-        @structure_hash = STRUCTURES.inject({}) do |hash, (code, arguments)|
+        @structure_hash = STRUCTURES.reduce({}) do |hash, (code, arguments)|
           hash.merge!(code => ResponseType.new(*arguments))
         end
 
         @welcome_message = reader.string
       end
 
-      # Public: Read and interpret a response from the BAPS server.
+      # Internal: Read and interpret a response from the BAPS server.
       def read_response
-        raw_code, skip_bytes = @reader.command
+        raw_code, _ = @reader.command
 
         code, subcode = raw_code & 0xFFF0, raw_code & 0x000F
 
-        # We could use skip_bytes to skip an unknown message, but BAPS is quite
-        # dodgy at implementing this in places, so we don't do it.
+        # We could use the second return from reader.command to skip an unknown
+        # message, but BAPS is quite dodgy at implementing this in places, so
+        # we don't do it.
         raise UnknownResponse, code.to_s(16) unless @structure_hash.key? code
 
-        response = { :code => code, :subcode => subcode }
+        response = { code: code, subcode: subcode }
         response.merge!(@structure_hash[code].build @reader)
       end
     end
