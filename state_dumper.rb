@@ -59,21 +59,27 @@ module Bra
       puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
       puts "       Track: #{response[:name]} Type: #{response[:type]}"
     end
+
     def item_count(response)
       puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
     end
+
     def playing(response)
       puts "[PLAYING] Channel #{response[:subcode]} is playing"
     end
+
     def paused(response)
       puts "[PAUSED] Channel #{response[:subcode]} is paused"
     end
+
     def stopped(response)
       puts "[STOPPED] Channel #{response[:subcode]} is stopped"
     end
+
     def client_add(response)
       puts "[CLIENTCHANGE] Client #{response[:client]} appeared"
     end
+
     def client_remove(response)
       puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
     end
