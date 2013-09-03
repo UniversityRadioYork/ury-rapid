@@ -91,32 +91,11 @@ def run(opts)
   EM.run do
     server, host, port, web_app = get_options opts
 
-    # create a base-mapping that our application will set at. If I
-    # have the following routes:
-    #
-    #   get '/hello' do
-    #     'hello!'
-    #   end
-    #
-    #   get '/goodbye' do
-    #     'see ya later!'
-    #   end
-    #
-    # Then I will get the following:
-    #
-    #   mapping: '/'
-    #   routes:
-    #     /hello
-    #     /goodbye
-    #
-    #   mapping: '/api'
-    #   routes:
-    #     /api/hello
-    #     /api/goodbye
     dispatch = make_dispatch web_app
-    check_server_em_compatible server
-    start_server dispatch, server, host, port
 
+    check_server_em_compatible server
+
+    start_server dispatch, server, host, port
   end
 end
 
