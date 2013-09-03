@@ -1,8 +1,7 @@
 require 'socket'
 
-# Internal:
+# Internal: Miscellaneous low-level interface code to the BAPS server.
 module Bra
-
   # Internal: Enumeration of the codes used by BAPS to refer to configuration
   # parameter types.
   module ConfigTypes
@@ -98,14 +97,40 @@ module Bra
     # Internal: Reads a Pascal-style length-prefixed string.
     def string
       length = uint32
-      @socket.recv length
+      raw_bytes length
     end
 
     private
 
-    def unpack(num_bytes, unpack_format)
-      bytes = @socket.recv num_bytes
+    # Internal: Reads a given number of bytes and unpacks the result according
+    # to the given format string.
+    #
+    # count         - The number of bytes to read.
+    # unpack_format - The String#unpack format to use when interpreting the
+    #                 contents of the bytes read.
+    #
+    # Returns the unpacked equivalent of the bytes read; the type depends on
+    # unpack_format.
+    def unpack(count, unpack_format)
+      bytes = raw_bytes count
       bytes.unpack(unpack_format)[0]
+    end
+
+    # Internal: Reads a given number of raw bytes.
+    #
+    # count - The number of bytes to read.
+    #
+    # Returns the received bytes as a string.
+    def raw_bytes(count)
+      to_receive = count
+      bytes = ''
+      while 0 < to_receive
+        new_bytes = @socket.recv to_receive
+        to_receive -= new_bytes.length
+        bytes << new_bytes
+      end
+
+      bytes
     end
 
     # Internal: A map of configuration types to the names of BapsReader
@@ -124,7 +149,7 @@ module Bra
     end
 
     def write(bytes)
-      while bytes.length > 0
+      while 0 < bytes.length
         sent = @socket.send(bytes, 0)
         bytes = bytes[sent..-1]
       end
@@ -141,14 +166,17 @@ module Bra
       @command = command
     end
 
+    # Internal: Attaches a 16-bit integer to this request.
     def uint16(payload)
       fixnum 2, FormatStrings::UINT16, payload
     end
 
+    # Internal: Attaches a 32-bit integer to this request.
     def uint32(payload)
       fixnum 4, FormatStrings::UINT32, payload
     end
 
+    # Internal: Attaches a string to this request.
     def string(payload)
       length = payload.length
 
@@ -162,6 +190,8 @@ module Bra
       self
     end
 
+    # Internal: Sends the request to a BapsWriter for sending to the BAPS
+    # client.
     def send(writer)
       writer.write pack
     end

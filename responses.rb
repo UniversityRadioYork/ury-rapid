@@ -8,8 +8,9 @@ module Bra
     # set.
     module Playback
       PLAYING = 0x0000
-      PAUSED = 0x0010
       STOPPED = 0x0080
+      PAUSED = 0x0100
+      POSITION = 0x0180
       VOLUME = 0x0200
       LOADED = 0x0280
       CUE = 0x0300
