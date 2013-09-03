@@ -40,19 +40,77 @@ module Bra
       @dispatch.pump_loop
     end
 
+    private
+
     # Public: Register functions for dumping server state with the dispatch.
     #
     # Returns nothing.
     def register_dump_functions
-      @dispatch.register_response_handlers({
-        Responses::Playlist::ITEM_DATA => method(:item_data),
-        Responses::Playlist::ITEM_COUNT => method(:item_count),
+      functions = [
+        playback_dump_functions,
+        playlist_dump_functions,
+        system_dump_functions
+      ].reduce({}) { |functions, batch| functions.merge! batch }
+
+      @dispatch.register_response_handlers functions
+    end
+
+    # Public: Register playback response handler functions.
+    #
+    # Returns nothing.
+    def playback_dump_functions
+      {
         Responses::Playback::PLAYING => method(:playing),
         Responses::Playback::PAUSED => method(:paused),
         Responses::Playback::STOPPED => method(:stopped),
+        Responses::Playback::POSITION => method(:position),
+        Responses::Playback::CUE => method(:cue),
+        Responses::Playback::INTRO => method(:intro)
+      }
+    end
+
+    # Public: Register playlist response handler functions.
+    #
+    # Returns nothing.
+    def playlist_dump_functions
+      {
+        Responses::Playlist::ITEM_DATA => method(:item_data),
+        Responses::Playlist::ITEM_COUNT => method(:item_count),
+      }
+    end
+
+    # Public: Register system response handler functions.
+    #
+    # Returns nothing.
+    def system_dump_functions
+      {
         Responses::System::CLIENT_ADD => method(:client_add),
         Responses::System::CLIENT_REMOVE => method(:client_remove)
-      })
+      }
+    end
+
+    def playing(response)
+      puts "[PLAYING] Channel #{response[:subcode]} is playing"
+    end
+
+    def paused(response)
+      puts "[PAUSED] Channel #{response[:subcode]} is paused"
+    end
+
+    def stopped(response)
+      puts "[STOPPED] Channel #{response[:subcode]} is stopped"
+    end
+
+    def position(response)
+      puts "[POSITION] Channel #{response[:subcode]} at #{response[:position]}"
+    end
+
+    def cue(response)
+      puts "[CUE] Channel #{response[:subcode]} at #{response[:position]}"
+    end
+
+    def intro(response)
+      puts "[INTRO] Channel #{response[:subcode]} at #{response[:position]}"
     end
 
     def item_data(response)

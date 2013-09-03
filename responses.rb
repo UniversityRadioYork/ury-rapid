@@ -83,22 +83,11 @@ module Bra
       Playback::STOPPED => ['ChannelStopped'],
       Playback::PAUSED => ['ChannelPaused'],
       Playback::PLAYING => ['ChannelPlaying'],
-      Playback::VOLUME => [
-        'ChannelVolume',
-        %i{volume float32}
-      ],
-      Playback::LOADED => [
-        'ChannelLoaded',
-        %i{index uint32}, %i{track load_body}
-      ],
-      Playback::CUE => [
-        'ChannelCue',
-        %i{position uint32}
-      ],
-      Playback::INTRO => [
-        'ChannelIntro',
-        %i{position uint32}
-      ],
+      Playback::VOLUME => ['ChannelVolume', %i{volume float32}],
+      Playback::LOADED => ['Loaded', %i{index uint32}, %i{track load_body}],
+      Playback::POSITION => ['Position', %i{position uint32}],
+      Playback::CUE => ['Cue', %i{position uint32}],
+      Playback::INTRO => ['Intro', %i{position uint32}],
       # Playlist
       Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
       Playlist::ITEM_DATA => [
