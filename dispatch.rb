@@ -21,6 +21,19 @@ module Bra
       self
     end
 
+    # Internal: Registers multiple response handlers at once.
+    #
+    # This is functionally equivalent to mapping the single-command
+    # equivalent over the dictionary.
+    #
+    # handler_hash: A hash mapping response codes to callables.
+    #
+    # Returns this object, for method chaining.
+    def register_response_handlers(handler_hash)
+      @registered_blocks.merge! handler_hash
+      self
+    end
+
     # Deregisters a previously registered block.
     def deregister(command)
       @registered_blocks.delete(command)

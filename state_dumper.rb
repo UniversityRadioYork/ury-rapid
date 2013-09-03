@@ -44,28 +44,38 @@ module Bra
     #
     # Returns nothing.
     def register_dump_functions
-      @dispatch.register(Responses::Playlist::ITEM_DATA) do |response|
-        puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
-        puts "       Track: #{response[:name]} Type: #{response[:type]}"
-      end
-      @dispatch.register(Responses::Playlist::ITEM_COUNT) do |response|
-        puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
-      end
-      @dispatch.register(Responses::Playback::PLAYING) do |response|
-        puts "[PLAYING] Channel #{response[:subcode]} is playing"
-      end
-      @dispatch.register(Responses::Playback::PAUSED) do |response|
-        puts "[PAUSED] Channel #{response[:subcode]} is paused"
-      end
-      @dispatch.register(Responses::Playback::STOPPED) do |response|
-        puts "[STOPPED] Channel #{response[:subcode]} is stopped"
-      end
-      @dispatch.register(Responses::System::CLIENT_ADD) do |response|
-        puts "[CLIENTCHANGE] Client #{response[:client]} appeared"
-      end
-      @dispatch.register(Responses::System::CLIENT_REMOVE) do |response|
-        puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
-      end
+      @dispatch.register_response_handlers({
+        Responses::Playlist::ITEM_DATA => method(:item_data),
+        Responses::Playlist::ITEM_COUNT => method(:item_count),
+        Responses::Playback::PLAYING => method(:playing),
+        Responses::Playback::PAUSED => method(:paused),
+        Responses::Playback::STOPPED => method(:stopped),
+        Responses::System::CLIENT_ADD => method(:client_add),
+        Responses::System::CLIENT_REMOVE => method(:client_remove)
+      })
+    end
+
+    def item_data(response)
+      puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
+      puts "       Track: #{response[:name]} Type: #{response[:type]}"
+    end
+    def item_count(response)
+      puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
+    end
+    def playing(response)
+      puts "[PLAYING] Channel #{response[:subcode]} is playing"
+    end
+    def paused(response)
+      puts "[PAUSED] Channel #{response[:subcode]} is paused"
+    end
+    def stopped(response)
+      puts "[STOPPED] Channel #{response[:subcode]} is stopped"
+    end
+    def client_add(response)
+      puts "[CLIENTCHANGE] Client #{response[:client]} appeared"
+    end
+    def client_remove(response)
+      puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
     end
   end
 end
