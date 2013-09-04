@@ -2,6 +2,7 @@ require_relative 'baps_client'
 require_relative 'commands'
 require_relative 'dispatch'
 require_relative 'responses'
+require 'eventmachine'
 
 module Bra
   # Public: A testbed class for demonstrating how Bra's internal BAPS
@@ -14,11 +15,10 @@ module Bra
     # username - The username with which the login will occur.
     # password - The password with which the login will occur.
     def initialize(hostname, port, username, password)
-      client = BapsClient.new hostname, port
-      reader = client.reader
-      writer = client.writer
-      response_source = Responses::Source.new(reader)
-      @dispatch = Dispatch.new writer, response_source
+      @dispatch = Dispatch.new
+      @parser = Responses::Parser.new @dispatch, (BapsReader.new)
+      @hostname = hostname
+      @port = port
       @username = username
       @password = password
     end
@@ -27,13 +27,18 @@ module Bra
     #
     # Returns nothing.
     def run
-      login = Commands::Login.new(@username, @password)
-      login.run(@dispatch) do |error_code, error_string|
-        if error_code != Commands::Authenticate::Errors::OK
-          p error_string
-          @dispatch.stop
-        else
-          register_dump_functions
+      EM.run do
+        queue = EM::Queue.new
+        client = EM.connect @hostname, @port, BapsClient, @parser, queue
+
+        login = Commands::Login.new(@username, @password)
+        login.run(@dispatch, queue) do |error_code, error_string|
+          if error_code != Commands::Authenticate::Errors::OK
+            p error_string
+            EM.stop
+          else
+            register_dump_functions
+          end
         end
       end
 
@@ -115,7 +120,7 @@ module Bra
 
     def item_data(response)
       puts "[ITEM] Channel: #{response[:subcode]} Index: #{response[:index]}"
-      puts "       Track: #{response[:name]} Type: #{response[:type]}"
+      puts "       Track: #{response[:title]} Type: #{response[:type]}"
     end
 
     def item_count(response)

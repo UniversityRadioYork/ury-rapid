@@ -1,4 +1,5 @@
 require 'socket'
+require 'eventmachine'
 
 # Public: Miscellaneous low-level interface code to the BAPS server.
 module Bra
@@ -18,36 +19,52 @@ module Bra
     TEXT = 3
   end
 
-  # Internal: A low-level client implementation for the legacy BAPS
-  # meta-protocol.
+  # Internal: A client implementation for the legacy BAPS protocol.
   #
-  class BapsClient
-    # Internal: An object which can be used to read data from the BAPS server
-    # in an unstructured manner.
-    attr_reader :reader
+  class BapsClient < EM::Connection
+    # Internal: An object which can be used to parse and distribute responses
+    # from the BAPS server.
+    attr_reader :parser
 
-    # Internal: An object which can be used to write data to the BAPS server.
-    #
-    # Usually BapsRequest objects are used to compose data for this writer.
-    attr_reader :writer
+    # Internal: A queue of requests to send to the server.
+    attr_reader :request_queue
 
-    def initialize(host, port, reader = BapsReader, writer = BapsWriter)
-      @socket = TCPSocket.new host, port
-      @reader = reader.new(@socket)
-      @writer = writer.new(@socket)
+    def initialize(parser, request_queue)
+      @parser = parser
+
+      @request_queue = request_queue
+
+      cb = Proc.new do |msg|
+        send_data(msg)
+        request_queue.pop &cb
+      end
+
+      request_queue.pop &cb
+    end
+
+    # Internal: Read and interpret a response from the BAPS server.
+    def receive_data(data)
+      parser.receive_data data
     end
   end
 
   # Internal: A low-level reading interface to the BAPS meta-protocol.
   #
-  # Since we can't easily predict the exact range of bytes when reading, a
-  # prepared response format similar to BapsRequest won't work.
+  # The BapsReader works by operating on an internal buffer which can have
+  # new data fed to it.
   class BapsReader
     # Internal: Creates a BapsReader.
+    def initialize
+      @buffer = ''
+    end
+
+    # Internal: Adds more data to the internal buffer.
     #
-    # socket - A TCPSocket through which the BapsReader should read data.
-    def initialize(socket)
-      @socket = socket
+    # data - A string of data bytes to add to the processing buffer.
+    #
+    # Returns nothing.
+    def add(data)
+      @buffer << data
     end
 
     # Internal: Reads a command word.
@@ -56,44 +73,13 @@ module Bra
     # BapsReader to read parts of commands, and consider the Responses module
     # for higher level operations on BAPS responses.
     #
-    # Returns a list containing the following data:
+    # Returns nil (if the buffer is empty) or a list containing the following
+    # data:
     #   - A 16-bit integer containing the BAPS command code;
     #   - A 32-bit integer providing the number of bytes following.  This
     #     cannot be relied upon to be accurate.
     def command
-      [uint16, uint32]
-    end
-
-    # Internal: Reads a config setting.
-    #
-    # Config settings are one of the uglier areas of BAPS's meta-protocol, as
-    # the format of the config value depends on the preceding config type.
-    # As such, it's much easier to treat them as a single element.
-    #
-    # Returns a list with the following items:
-    #   - The type of the config setting, as a member of ConfigTypes.
-    #   - The actual config setting itself, as either an integer or a string
-    #     depending on the type.  When the type is CHOICE, this is the ID of
-    #     the selected choice.
-    def config_setting
-      config_type = uint32
-      value = send CONFIG_TYPE_FUNCTIONS[config_type]
-      [config_type, value]
-    end
-
-    # Internal: Reads the body of a LOAD command.
-    #
-    # LOAD commands change their format depending on the track type, so we
-    # have to parse them specially.
-    #
-    # Returns a hash with the following keys:
-    #   type: The track type, as a member of TrackTypes.
-    def load_body
-      track_type = uint32
-      title = string
-      body = { type: track_type, title: title }
-      body.merge!({ duration: uint32 }) if track_type == TrackTypes::LIBRARY
-      body
+      unpack_multi 6, (FormatStrings::UINT16 + FormatStrings::UINT32)
     end
 
     # Internal: Receives and discards a number of bytes.
@@ -120,13 +106,30 @@ module Bra
     # Internal: Reads a Pascal-style length-prefixed string.
     def string
       length = uint32
-      raw_bytes length
+      if length.nil?
+        nil
+      else
+        result = raw_bytes length
+        if result.nil?
+          # We need to put the length back on so the whole string can be read
+          # again when we get enough data.
+          @buffer << ([length].pack FormatStrings::UINT32)
+          nil
+        else
+          puts "STRING: #{result}"
+          result
+        end
+      end
     end
 
     private
 
     # Internal: Reads a given number of bytes and unpacks the result according
     # to the given format string.
+    #
+    # This is for unpacking single items of data; for multiple items see
+    # unpack_multi.
+    #
     #
     # count         - The number of bytes to read.
     # unpack_format - The String#unpack format to use when interpreting the
@@ -135,46 +138,41 @@ module Bra
     # Returns the unpacked equivalent of the bytes read; the type depends on
     # unpack_format.
     def unpack(count, unpack_format)
-      bytes = raw_bytes count
-      bytes.unpack(unpack_format)[0]
+      list = unpack_multi count, unpack_format
+      list.nil? ? nil : list[0]
     end
 
-    # Internal: Reads a given number of raw bytes.
+    # Internal: Reads a given number of bytes and unpacks the results according
+    # to the given format string.
+    #
+    # This is for unpacking multiple items of data; for multiple items see
+    # unpack.
+    #
+    #
+    # count         - The number of bytes to read.
+    # unpack_format - The String#unpack format to use when interpreting the
+    #                 contents of the bytes read.
+    #
+    # Returns the unpacked equivalent of the bytes read, as a list.
+    def unpack_multi(count, unpack_format)
+      bytes = raw_bytes count
+      bytes.nil? ? nil : (bytes.unpack unpack_format)
+    end
+
+    # Internal: Reads a given number of raw bytes from the buffer.
     #
     # count - The number of bytes to read.
     #
-    # Returns the received bytes as a string.
+    # Returns the received bytes as a string, or nil if the number of bytes in
+    # the buffer is less than count.
     def raw_bytes(count)
-      to_receive = count
-      bytes = ''
-      while 0 < to_receive
-        new_bytes = @socket.recv to_receive
-        to_receive -= new_bytes.length
-        bytes << new_bytes
-      end
-
-      bytes
-    end
-
-    # Internal: A map of configuration types to the names of BapsReader
-    # functions for reading them.
-    CONFIG_TYPE_FUNCTIONS = {
-      ConfigTypes::CHOICE => :uint32,
-      ConfigTypes::INT => :uint32,
-      ConfigTypes::STR => :string
-    }
-  end
-
-  # A writing interface to the BAPS protocol.
-  class BapsWriter
-    def initialize(socket)
-      @socket = socket
-    end
-
-    def write(bytes)
-      while 0 < bytes.length
-        sent = @socket.send(bytes, 0)
-        bytes = bytes[sent..-1]
+      buffer_size = @buffer.bytesize
+      if buffer_size < count then
+        nil
+      else
+        result = @buffer.byteslice(0...count)
+        @buffer = @buffer.byteslice(count..buffer_size)
+        result
       end
     end
   end
@@ -213,10 +211,9 @@ module Bra
       self
     end
 
-    # Internal: Sends the request to a BapsWriter for sending to the BAPS
-    # client.
-    def send(writer)
-      writer.write pack
+    # Internal: Sends the request to a request queue.
+    def send(queue)
+      queue.push pack
     end
 
     private

@@ -3,14 +3,15 @@ module Bra
   class Dispatch
     attr_reader :reader, :writer
 
-    def initialize(writer, source)
-      @writer = writer
-      @source = source
-      @running = false
+    def initialize
       @registered_blocks = Hash.new(
         lambda do |response|
-          hexcode = response[:code].to_s(16)
-          puts "Unhandled response: #{response[:name]} (0x#{hexcode})."
+          message = "Unhandled response: #{response[:name]}"
+          if response[:code].is_a?(Numeric) then
+            hexcode = response[:code].to_s(16)
+            message << " (0x#{hexcode})"
+          end
+          puts message
         end
       )
     end
@@ -40,22 +41,8 @@ module Bra
       self
     end
 
-    # Pumps the BAPS server for responses until requested to stop.
-    def pump_loop
-      @running = true
-      pump while @running
-    end
-
-    # Stops the dispatch loop, if this dispatch is currently in a 'pump_loop'.
-    def stop
-      @running = false
-    end
-
-    private
-
-    def pump
-      response = @source.read_response
-
+    # Internal: Dispatches a response to the registered response block.
+    def emit(response)
       block = @registered_blocks[response[:code]]
       block.call response
     end

@@ -42,11 +42,11 @@ module Bra
       #
       # Examples
       #
-      #   Initiate.new.run dispatch { |seed| "The seed is: #{seed} "}
+      #   Initiate.new.run dispatch, queue { |seed| "The seed is: #{seed} "}
       #
       # Returns nothing.
-      def run(dispatch)
-        BapsRequest.new(Codes::SET_BINARY_MODE).send(dispatch.writer)
+      def run(dispatch, queue)
+        BapsRequest.new(Codes::SET_BINARY_MODE).send(queue)
         dispatch.register(Responses::System::SEED) do |response|
           p response
           yield response[:seed]
@@ -92,12 +92,12 @@ module Bra
       #   occur some time after this call.
       #
       # Returns nothing.
-      def run(dispatch)
+      def run(dispatch, queue)
         password_hash = Digest::MD5.hexdigest(@password)
         full_hash = Digest::MD5.hexdigest(@seed + password_hash)
 
         cmd = BapsRequest.new(Codes::LOGIN).string(@username).string(full_hash)
-        cmd.send(dispatch.writer)
+        cmd.send(queue)
 
         dispatch.register(Responses::System::LOGIN) do |response|
           yield response[:subcode], response[:details]
@@ -121,8 +121,8 @@ module Bra
       #            to the BAPS server on which the response should be received.
       #
       # Returns nothing.
-      def run(dispatch)
-        BapsRequest.new(Codes::SYNC).send(dispatch.writer)
+      def run(dispatch, queue)
+        BapsRequest.new(Codes::SYNC).send(queue)
       end
     end
 
@@ -148,9 +148,11 @@ module Bra
       #   string; see Authenticate#run for details.  Note that the yield occurs
       #   inside a block itself yielded by the dispatch, and thus may occur
       #   quite some time after this call.
-      def run(dispatch, &block)
+      def run(dispatch, queue, &block)
         init = Initiate.new
-        init.run(dispatch) { |seed| authenticate dispatch, seed, block }
+        init.run(dispatch, queue) do |seed|
+          authenticate dispatch, queue, seed, block
+        end
       end
 
       private
@@ -167,10 +169,11 @@ module Bra
       #   Authenticate#run for details.
       #
       # Returns nothing.
-      def authenticate(dispatch, seed, block)
+      def authenticate(dispatch, queue, seed, block)
         auth = Authenticate.new(@username, @password, seed)
-        auth.run(dispatch) do |code, string|
-          Synchronise.new.run(dispatch) if code == Authenticate::Errors::OK
+        auth.run(dispatch, queue) do |code, string|
+          is_ok = code == Authenticate::Errors::OK
+          Synchronise.new.run(dispatch, queue) if is_ok
           block.call code, string
         end
       end
