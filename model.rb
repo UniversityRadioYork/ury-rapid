@@ -34,20 +34,63 @@ module Bra
     # Public: Access the channel state for reading.
     attr_reader :state
 
+    # Internal: Initialises a Channel.
+    #
+    # id - The ID number of the channel.
     def initialize(id)
       @id = id
       @items = []
       @state = :stopped
     end
 
-    # Public: Changes the channel model's state.
+    # Public: Change the channel model's state.
     #
     # new_state - The symbol (must be one of :playing, :paused or :stopped)
     #             representing the new state.
+    #
+    # Returns nothing.
     def state=(new_state)
       valid_state = new_state.in? %i(playing paused stopped)
-      @state = new_state if valid_state
       raise 'Not a valid state' unless valid_state
+
+      @state = new_state
     end
+
+    # Public: Add an item to the channel.
+    #
+    # index - The position in the playlist in which this item should be added.
+    # item  - An Item object representing the item to be added.
+    #
+    # Returns nothing.
+    def add_item(index, item)
+      @items[index] = item
+    end
+  end
+
+  # Public: An item in the playout system.
+  class Item
+    # Public: Access the track type.
+    attr_reader :type
+
+    # Public: Access the track name.
+    attr_reader :name
+
+    def initialize(type, name)
+      type = TYPE_SYMBOLS[type] if type.is_a? Numeric
+      valid_type = %i{null library file text}.include? type
+      raise 'Not a valid type' unless valid_type
+
+      @type = type
+      @name = name
+    end
+
+    private
+
+    TYPE_SYMBOLS = {
+      TrackTypes::NULL => :null,
+      TrackTypes::LIBRARY => :library,
+      TrackTypes::FILE => :file,
+      TrackTypes::TEXT => :text
+    }
   end
 end

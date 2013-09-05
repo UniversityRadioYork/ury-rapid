@@ -16,44 +16,57 @@ class BAPSApiApp < Sinatra::Base
     set :threaded, false
   end
 
-  # Request runs on the reactor thread (with threaded set to false)
-  get '/hello' do
-    'Hello World'
-  end
-
   get '/channels' do
     content_type :json
 
-    channels = @model.channels.map &(method :channel_summary)
-    channels.to_json
+    channels = @model.channels
+    summary = channels.map &(method :channel_summary)
+    summary.to_json
   end
 
   get '/channels/:id' do
     content_type :json
 
-    channel = channel_summary @model.channel(id)
+    summary = channel_summary (channel_from params)
+    summary.to_json
   end
 
-  # Request runs on the reactor thread (with threaded set to false)
-  # and returns immediately. The deferred task does not delay the
-  # response from the web-service.
-  get '/delayed-hello' do
-    EM.defer do
-      sleep 5
-    end
-    "I'm doing work in the background, but I am still free to take requests"
+  get '/channels/:id/state' do
+    content_type :json
+
+    channel = channel_from params
+    channel.state.to_json
   end
 
   private
 
+  # Internal: Gets a channel from the request parameters.
+  #
+  # params - The Sinatra parameters hash.
+  #
+  # Returns the channel of the ID specified in the hash.
+  def channel_from(params)
+    @model.channel Integer(params[:id])
+  end
+
   # Internal: Outputs a summary of a channel's state.
   #
   # channel - The channel whose state is to be summarised.
-  def channel_summary channel
+  def channel_summary(channel)
     {
       id: channel.id,
       state: channel.state,
-      items: channel.items
+      items: (channel.items.map &(method :item))
+    }
+  end
+
+  # Internal: Outputs a hash representation of an item.
+  #
+  # item - The item whose hash equivalent is sought.
+  def item(item)
+    {
+      type: item.type,
+      name: item.name
     }
   end
 end

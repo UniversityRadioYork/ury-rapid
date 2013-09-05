@@ -119,7 +119,7 @@ module Bra
       Playlist::ITEM_COUNT => (ResponseType.count 'ItemCount'),
       Playlist::ITEM_DATA => [
         'ItemData',
-        %i{index uint32}, %i{type uint32}, %i{track string}
+        %i{index uint32}, %i{type uint32}, %i{title string}
       ],
       # Config
       Config::OPTION_COUNT => (ResponseType.count 'OptionCount'),
