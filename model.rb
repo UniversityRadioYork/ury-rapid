@@ -50,7 +50,7 @@ module Bra
     #
     # Returns nothing.
     def state=(new_state)
-      valid_state = new_state.in? %i(playing paused stopped)
+      valid_state = %i(playing paused stopped).include? new_state
       raise 'Not a valid state' unless valid_state
 
       @state = new_state
