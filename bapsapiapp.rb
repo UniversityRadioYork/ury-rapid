@@ -20,14 +20,14 @@ class BAPSApiApp < Sinatra::Base
     content_type :json
 
     channels = @model.channels
-    summary = channels.map &(method :channel_summary)
+    summary = channels.map(&(method :channel_summary))
     summary.to_json
   end
 
   get '/channels/:id' do
     content_type :json
 
-    summary = channel_summary (channel_from params)
+    summary = channel_summary(channel_from params)
     summary.to_json
   end
 
@@ -56,7 +56,7 @@ class BAPSApiApp < Sinatra::Base
     {
       id: channel.id,
       state: channel.state,
-      items: (channel.items.map &(method :item))
+      items: (channel.items.map(&(method :item)))
     }
   end
 

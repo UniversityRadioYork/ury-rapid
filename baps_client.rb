@@ -32,7 +32,7 @@ module Bra
     # Returns nothing.
     def start(&block)
       EM.connect @hostname, @port, BapsConnection, @parser, @queue
-      login &block
+      login(&block)
     end
 
     private

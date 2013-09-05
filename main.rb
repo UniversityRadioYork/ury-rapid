@@ -69,23 +69,45 @@ def check_server_em_compatible(server)
 end
 
 def run(model, opts)
-  # Start he reactor
   EM.run do
-    server, host, port, web_app = get_options opts
+    config = YAML.load_file 'config.yml'
 
-    dispatch = make_dispatch web_app
+    setup_server config, opts
+    setup_client config, model
+  end
+end
 
-    check_server_em_compatible server
+# Internal: Initialises the server end of BRA, which handles requests to and
+# responses from the environment.
+#
+# config - The BRA configuration hash.
+# opts   - Server options for Sinatra/Rack.
+#
+# Returns nothing.
+def setup_server(config, opts)
+  server, host, port, web_app = get_options opts
 
-    start_server dispatch, server, host, port
+  dispatch = make_dispatch web_app
 
-    config = YAML::load_file 'config.yml'
-    client_config = config.values_at *%W(hostname port username password)
-    client = Bra::BapsClient.new *client_config
-    client.start do |dispatch, _|
-      controller = Bra::Controller.new model
-      controller.register dispatch
-    end
+  check_server_em_compatible server
+
+  start_server dispatch, server, host, port
+end
+
+# Internal: Initialises the client end of BRA, which handles requests to and
+# responses from the BAPS server.
+#
+# config - The BRA configuration hash.
+# model - The model that the client controls via BAPS responses.
+#
+# Returns nothing.
+def setup_client(config, model)
+  client_config = config.values_at(*%W(hostname port username password))
+
+  client = Bra::BapsClient.new(*client_config)
+  client.start do |dispatch, _|
+    controller = Bra::Controller.new model
+    controller.register dispatch
   end
 end
 

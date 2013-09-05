@@ -61,15 +61,15 @@ module Bra
     private
 
     def playing(response)
-      puts "[PLAYING] Channel #{response[:subcode]} is playing"
+      @model.channel(response[:subcode]).state = :playing
     end
 
     def paused(response)
-      puts "[PAUSED] Channel #{response[:subcode]} is paused"
+      @model.channel(response[:subcode]).state = :paused
     end
 
     def stopped(response)
-      puts "[STOPPED] Channel #{response[:subcode]} is stopped"
+      @model.channel(response[:subcode]).state = :stopped
     end
 
     def position(response)
@@ -85,10 +85,9 @@ module Bra
     end
 
     def item_data(response)
-      p response
-      id, index = response.values_at *%i(subcode index)
-      item_args = response.values_at *%i(type title)
-      item = Item.new *item_args
+      id, index = response.values_at(*%i(subcode index))
+      item_args = response.values_at(*%i(type title))
+      item = Item.new(*item_args)
 
       @model.channel(id).add_item index, item
     end
