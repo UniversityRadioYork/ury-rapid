@@ -3,6 +3,7 @@ require 'thin'
 require 'yaml'
 require_relative 'bapsapiapp'
 require_relative 'baps_client'
+require_relative 'model'
 
 # This example shows you how to embed Sinatra into your EventMachine
 # application. This is very useful if you're application needs some
@@ -30,28 +31,6 @@ end
 #
 # Returns the dispatch.
 def make_dispatch(web_app)
-  # create a base-mapping that our application will set at. If I
-  # have the following routes:
-  #
-  #   get '/hello' do
-  #     'hello!'
-  #   end
-  #
-  #   get '/goodbye' do
-  #     'see ya later!'
-  #   end
-  #
-  # Then I will get the following:
-  #
-  #   mapping: '/'
-  #   routes:
-  #     /hello
-  #     /goodbye
-  #
-  #   mapping: '/api'
-  #   routes:
-  #     /api/hello
-  #     /api/goodbye
   Rack::Builder.app do
     map '/' do
       run web_app
@@ -88,7 +67,7 @@ def check_server_em_compatible(server)
   end
 end
 
-def run(opts)
+def run(model, opts)
   # Start he reactor
   EM.run do
     server, host, port, web_app = get_options opts
@@ -106,4 +85,5 @@ def run(opts)
   end
 end
 
-run app: BAPSApiApp.new
+model = Bra::Model.new
+run model, app: (BAPSApiApp.new model)
