@@ -34,12 +34,12 @@ module Bra
 
       @request_queue = request_queue
 
-      cb = Proc.new do |msg|
+      cb = proc do |msg|
         send_data(msg)
-        request_queue.pop &cb
+        request_queue.pop(&cb)
       end
 
-      request_queue.pop &cb
+      request_queue.pop(&cb)
     end
 
     # Internal: Read and interpret a response from the BAPS server.
@@ -103,25 +103,6 @@ module Bra
       unpack 4, FormatStrings::FLOAT32
     end
 
-    # Internal: Reads a Pascal-style length-prefixed string.
-    def string
-      length = uint32
-      if length.nil?
-        nil
-      else
-        result = raw_bytes length
-        if result.nil?
-          # We need to put the length back on so the whole string can be read
-          # again when we get enough data.
-          @buffer << ([length].pack FormatStrings::UINT32)
-          nil
-        else
-          puts "STRING: #{result}"
-          result
-        end
-      end
-    end
-
     private
 
     # Internal: Reads a given number of bytes and unpacks the result according
@@ -167,7 +148,7 @@ module Bra
     # the buffer is less than count.
     def raw_bytes(count)
       buffer_size = @buffer.bytesize
-      if buffer_size < count then
+      if buffer_size < count
         nil
       else
         result = @buffer.byteslice(0...count)

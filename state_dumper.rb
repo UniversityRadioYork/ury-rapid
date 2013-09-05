@@ -29,23 +29,29 @@ module Bra
     def run
       EM.run do
         queue = EM::Queue.new
-        client = EM.connect @hostname, @port, BapsClient, @parser, queue
-
-        login = Commands::Login.new(@username, @password)
-        login.run(@dispatch, queue) do |error_code, error_string|
-          if error_code != Commands::Authenticate::Errors::OK
-            p error_string
-            EM.stop
-          else
-            register_dump_functions
-          end
-        end
+        EM.connect @hostname, @port, BapsClient, @parser, queue
+        login queue
       end
-
-      @dispatch.pump_loop
     end
 
     private
+
+    # Internal: Logs into the BAPS server and registers the dump functions.
+    #
+    # queue - The requests queue to which requests should be sent.
+    #
+    # Returns nothing.
+    def login(queue)
+      login = Commands::Login.new(@username, @password)
+      login.run(@dispatch, queue) do |error_code, error_string|
+        if error_code != Commands::Authenticate::Errors::OK
+          p error_string
+          EM.stop
+        else
+          register_dump_functions
+        end
+      end
+    end
 
     # Public: Register functions for dumping server state with the dispatch.
     #
@@ -55,7 +61,7 @@ module Bra
         playback_dump_functions,
         playlist_dump_functions,
         system_dump_functions
-      ].reduce({}) { |functions, batch| functions.merge! batch }
+      ].reduce({}) { |a, e| a.merge! e }
 
       @dispatch.register_response_handlers functions
     end

@@ -4,16 +4,8 @@ module Bra
     attr_reader :reader, :writer
 
     def initialize
-      @registered_blocks = Hash.new(
-        lambda do |response|
-          message = "Unhandled response: #{response[:name]}"
-          if response[:code].is_a?(Numeric) then
-            hexcode = response[:code].to_s(16)
-            message << " (0x#{hexcode})"
-          end
-          puts message
-        end
-      )
+      @registered_blocks = Hash.new(method :unhandled_response)
+
     end
 
     # Registers a block as handling a given response from the server.
@@ -45,6 +37,22 @@ module Bra
     def emit(response)
       block = @registered_blocks[response[:code]]
       block.call response
+    end
+
+    private
+
+    # Internal: Default emitter for unhandled responses.
+    #
+    # response - The unhandled response hash.
+    #
+    # Returns nothing.
+    def unhandled_response(response)
+      message = "Unhandled response: #{response[:name]}"
+      if response[:code].is_a?(Numeric)
+        hexcode = response[:code].to_s(16)
+        message << " (0x#{hexcode})"
+      end
+      puts message
     end
   end
 end

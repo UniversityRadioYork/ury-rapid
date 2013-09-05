@@ -152,9 +152,6 @@ module Bra
     class UnknownResponse < StandardError
     end
 
-    # Internal: An EventMachine connection handler that
-
-
     # Internal: An interpreter that reads and converts raw command data from
     # the BAPS server into response messages.
     class Parser
@@ -181,16 +178,14 @@ module Bra
         @reader.add data
 
         sufficient_data = true
-        while sufficient_data
-          sufficient_data = process_next_token
-        end
+        sufficient_data = process_next_token while sufficient_data
       end
 
       # Internal: Attempt to process the top of the buffer as part of a
       # response.
       def process_next_token
-        command if @response == nil
-        word unless @response == nil
+        command if @response.nil?
+        word unless @response.nil?
       end
 
       # Internal: Attempt to scrape a command word off the top of the buffer.
@@ -200,66 +195,63 @@ module Bra
       # Returns a boolean specifying whether there was enough data to process
       #   a command word or not.
       def command
+        # We could use the second return from reader.command to skip an
+        # unknown message, but BAPS is quite dodgy at implementing this in
+        # places, so we don't do it in practice.
         raw_code, _ = @reader.command
-        if raw_code then
-          code, subcode = raw_code & 0xFFF0, raw_code & 0x000F
-
-          # We could use the second return from reader.command to skip an
-          # unknown message, but BAPS is quite dodgy at implementing this in
-          # places, so we don't do it.
-          raise UnknownResponse, code.to_s(16) unless STRUCTURES.key? code
-
-          name, *@expected = STRUCTURES[code]
-          @response = {
-            name: name,
-            code: code,
-            subcode: subcode
-          }
+        if raw_code.nil?
+          false
+        else
+          code, subcode = (raw_code & 0xFFF0), (raw_code & 0x000F)
+          @expected, @response = command_with_code code, subcode
+          true
         end
-
-        !raw_code.nil?
       end
 
-      # Internal: Attempt to scrape an argument word off the top of the buffer.
+      # Internal: Parses and initialises a command whose BAPS code and subcode
+      # are given.
+      #
+      # code    - The response's BAPS command code (a 16-bit integer).
+      # subcode - The subcode (for example, the affected channel number).
+      #
+      # Returns (as a list) the new response and expected arguments list, which
+      # should generally go to @response and @expected respectively.
+      def command_with_code(code, subcode)
+        raise UnknownResponse, code.to_s(16) unless STRUCTURES.key? code
+
+        name, *expected = STRUCTURES[code]
+        response = { name: name, code: code, subcode: subcode }
+
+        [expected, response]
+      end
+
+      # Internal: Attempt to grab an argument word from the reader.
       # If there are no arguments left, the parser is set back into command
       # reading mode and the completed response is sent to the dispatch.
       #
       # Returns a boolean specifying whether there was enough data to process
       #   a data word or not.
       def word
-        if @expected.empty?
-          # We've finished reading the response, so we need to get ready for
-          # the next one.
-          @dispatch.emit @response
-          @response = nil
-
-          true
-        else
-          # We still need to read a word
-          word_description = @expected.shift
-          name, arg_type, *args = word_description
-
-          # Some command words can be read from the buffer directly, whereas
-          # the parser has its own logic for the more complex ones.
-          success = (
-            if respond_to? arg_type
-              send arg_type, name, *args
-            else
-              data = @reader.send arg_type, *args
-              @response[name] = data unless data.nil?
-              !data.nil?
-            end
-          )
-
-          @expected.unshift word_description unless success
-          success
-        end
+        no_more_arguments = @expected.empty?
+        success = finish_response if no_more_arguments
+        success = continue_response unless no_more_arguments
+        success
       end
 
-      # Internal: Reads a string.
+      # Internal: Reads a string argument.
+      #
+      # This does not process the entire string in one go; this method reads
+      # only the string length, and then pushes in a new argument for the
+      # data itself.
+      #
+      # name - The name of the parameter whose argument is being read.
+      #
+      # Returns a boolean specifying whether there was enough data to process
+      #   the string length or not.
       def string(name)
         length = @reader.uint32
         @expected.unshift [name, :raw_bytes, length] unless length.nil?
+
         !length.nil?
       end
 
@@ -280,11 +272,13 @@ module Bra
       #   the config type or not.
       def config_setting(name)
         config_type = @reader.uint32
-        if config_type.nil? then
+        if config_type.nil?
           false
         else
           @expected.unshift [:value, CONFIG_TYPE_MAP[config_type]]
+
           @response[name] = config_type
+
           true
         end
       end
@@ -305,7 +299,7 @@ module Bra
       #   the track type or not.
       def load_body(name)
         track_type = @reader.uint32
-        if track_type.nil? then
+        if track_type.nil?
           false
         else
           # Note that these are in reverse order, as they're being shifted
@@ -314,8 +308,63 @@ module Bra
           @expected.unshift TITLE
 
           @response[name] = track_type
+
           true
         end
+      end
+
+      private
+
+      # Internal: Parses a word with a primitive type.
+      #
+      # A primitive type is one which is implemented in BapsReader, and only
+      # requires one buffer read.  Other types are implemented in terms of
+      # special parser logic on these types, by the Parser itself.
+      #
+      # word_description - A list containing the argument's parameter name,
+      #                    its type symbol, and any other arguments to the
+      #                    primitive type function.
+      #
+      # Returns the argument if it was successfully read, or nil otherwise.
+      #   An unsuccessful read implies that the read should be retried when the
+      #   reader's buffer fills up.
+      def primitive_word(word_description)
+        name, arg_type, *args = word_description
+
+        data = @reader.send arg_type, *args
+        @response[name] = data unless data.nil?
+
+        !data.nil?
+      end
+
+      # Internal: Finishes the current response and creates a clean slate for
+      # the next one to begin.
+      #
+      # Returns true (as in, this method always succeeds at processing data).
+      def finish_response
+        @dispatch.emit @response
+        @response = nil
+        true
+      end
+
+      # Internal: Attempt to grab an argument word from the reader.
+      #
+      # This function expects there to indeed be another argument word.
+      # The caller should ensure this.
+      #
+      # Returns a boolean specifying whether there was enough data to process
+      # a data word or not.
+      def continue_response
+        word_description = @expected.shift
+        name, arg_type, *args = word_description
+
+        # Some command words can be read from the buffer directly, whereas
+        # the parser has its own logic for the more complex ones.
+        success = (send arg_type, name, *args) if respond_to? arg_type
+        success = primitive_word word_description unless respond_to? arg_type
+
+        @expected.unshift word_description unless success
+        success
       end
 
       # Internal: A map of configuration types to their meta-protocol types.
