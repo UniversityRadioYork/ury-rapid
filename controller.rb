@@ -34,7 +34,8 @@ module Bra
         Responses::Playback::STOPPED => method(:stopped),
         Responses::Playback::POSITION => method(:position),
         Responses::Playback::CUE => method(:cue),
-        Responses::Playback::INTRO => method(:intro)
+        Responses::Playback::INTRO => method(:intro),
+        Responses::Playback::LOADED => method(:loaded)
       }
     end
 
@@ -92,20 +93,12 @@ module Bra
       @model.channel(id).add_item index, item
     end
 
+    def loaded(response)
+      puts "loaded #{response}"
+    end
+
     def item_count(response)
       puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
-    end
-
-    def playing(response)
-      puts "[PLAYING] Channel #{response[:subcode]} is playing"
-    end
-
-    def paused(response)
-      puts "[PAUSED] Channel #{response[:subcode]} is paused"
-    end
-
-    def stopped(response)
-      puts "[STOPPED] Channel #{response[:subcode]} is stopped"
     end
 
     def client_add(response)
