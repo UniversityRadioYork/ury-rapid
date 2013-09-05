@@ -1,6 +1,5 @@
 require_relative 'baps_client'
 require_relative 'commands'
-require_relative 'dispatch'
 require_relative 'responses'
 require 'eventmachine'
 
@@ -10,17 +9,12 @@ module Bra
   class StateDumper
     # Public: Initialise a StateDumper.
     #
-    # hostname - The host of the BAPS server to which StateDumper will connect.
+    # host     - The host of the BAPS server to which StateDumper will connect.
     # port     - The port of the BAPS server to which StateDumper will connect.
     # username - The username with which the login will occur.
     # password - The password with which the login will occur.
-    def initialize(hostname, port, username, password)
-      @dispatch = Dispatch.new
-      @parser = Responses::Parser.new @dispatch, (BapsReader.new)
-      @hostname = hostname
-      @port = port
-      @username = username
-      @password = password
+    def initialize(host, port, username, password)
+      @client = BapsClient.new host, port, username, password
     end
 
     # Public: Run the StateDumper.
@@ -28,42 +22,25 @@ module Bra
     # Returns nothing.
     def run
       EM.run do
-        queue = EM::Queue.new
-        EM.connect @hostname, @port, BapsClient, @parser, queue
-        login queue
-      end
-    end
-
-    private
-
-    # Internal: Logs into the BAPS server and registers the dump functions.
-    #
-    # queue - The requests queue to which requests should be sent.
-    #
-    # Returns nothing.
-    def login(queue)
-      login = Commands::Login.new(@username, @password)
-      login.run(@dispatch, queue) do |error_code, error_string|
-        if error_code != Commands::Authenticate::Errors::OK
-          p error_string
-          EM.stop
-        else
-          register_dump_functions
+        @client.start do |dispatch, _|
+          register_dump_functions dispatch
         end
       end
     end
 
     # Public: Register functions for dumping server state with the dispatch.
     #
+    # dispatch - The object to which callbacks for responses can be attached.
+    #
     # Returns nothing.
-    def register_dump_functions
+    def register_dump_functions(dispatch)
       functions = [
         playback_dump_functions,
         playlist_dump_functions,
         system_dump_functions
       ].reduce({}) { |a, e| a.merge! e }
 
-      @dispatch.register_response_handlers functions
+      dispatch.register_response_handlers functions
     end
 
     # Public: Register playback response handler functions.
