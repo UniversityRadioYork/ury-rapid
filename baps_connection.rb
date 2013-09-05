@@ -20,18 +20,9 @@ module Bra
   end
 
   # Internal: A client implementation for the legacy BAPS protocol.
-  #
   class BapsConnection < EM::Connection
-    # Internal: An object which can be used to parse and distribute responses
-    # from the BAPS server.
-    attr_reader :parser
-
-    # Internal: A queue of requests to send to the server.
-    attr_reader :request_queue
-
     def initialize(parser, request_queue)
       @parser = parser
-
       @request_queue = request_queue
 
       cb = proc do |msg|
@@ -44,7 +35,7 @@ module Bra
 
     # Internal: Read and interpret a response from the BAPS server.
     def receive_data(data)
-      parser.receive_data data
+      @parser.receive_data data
     end
   end
 

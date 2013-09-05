@@ -1,6 +1,7 @@
-require_relative 'baps_connection.rb'
-require_relative 'dispatch.rb'
-require_relative 'responses.rb'
+require_relative 'baps_connection'
+require_relative 'commands'
+require_relative 'dispatch'
+require_relative 'responses'
 
 module Bra
   # Public: A high-level representation of a client on the legacy BAPS server.
