@@ -111,7 +111,7 @@ module Bra
       Playback::PAUSED => ['ChannelPaused'],
       Playback::PLAYING => ['ChannelPlaying'],
       Playback::VOLUME => ['ChannelVolume', %i{volume float32}],
-      Playback::LOADED => ['Loaded', %i{index uint32}, %i{track load_body}],
+      Playback::LOADED => ['Loaded', %i{index uint32}, %i{type load_body}],
       Playback::POSITION => ['Position', %i{position uint32}],
       Playback::CUE => ['Cue', %i{position uint32}],
       Playback::INTRO => ['Intro', %i{position uint32}],
@@ -304,7 +304,7 @@ module Bra
         else
           # Note that these are in reverse order, as they're being shifted
           # onto the front.
-          @expected.unshift DURATION if track_type == TrackTypes::LIBRARY
+          @expected.unshift DURATION unless track_type == TrackTypes::NULL
           @expected.unshift TITLE
 
           @response[name] = track_type
