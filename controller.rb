@@ -1,3 +1,5 @@
+require_relative 'baps_codes'
+
 module Bra
   # Internal: An object that responds to BAPS server responses by updating the
   # model.
@@ -29,13 +31,13 @@ module Bra
     # Returns nothing.
     def playback_dump_functions
       {
-        Responses::Playback::PLAYING => method(:playing),
-        Responses::Playback::PAUSED => method(:paused),
-        Responses::Playback::STOPPED => method(:stopped),
-        Responses::Playback::POSITION => method(:position),
-        Responses::Playback::CUE => method(:cue),
-        Responses::Playback::INTRO => method(:intro),
-        Responses::Playback::LOADED => method(:loaded)
+        BapsCodes::Playback::PLAYING => method(:playing),
+        BapsCodes::Playback::PAUSED => method(:paused),
+        BapsCodes::Playback::STOPPED => method(:stopped),
+        BapsCodes::Playback::POSITION => method(:position),
+        BapsCodes::Playback::CUE => method(:cue),
+        BapsCodes::Playback::INTRO => method(:intro),
+        BapsCodes::Playback::LOADED => method(:loaded)
       }
     end
 
@@ -44,8 +46,8 @@ module Bra
     # Returns nothing.
     def playlist_dump_functions
       {
-        Responses::Playlist::ITEM_DATA => method(:item_data),
-        Responses::Playlist::ITEM_COUNT => method(:item_count),
+        BapsCodes::Playlist::ITEM_DATA => method(:item_data),
+        BapsCodes::Playlist::ITEM_COUNT => method(:item_count),
       }
     end
 
@@ -54,8 +56,8 @@ module Bra
     # Returns nothing.
     def system_dump_functions
       {
-        Responses::System::CLIENT_ADD => method(:client_add),
-        Responses::System::CLIENT_REMOVE => method(:client_remove)
+        BapsCodes::System::CLIENT_ADD => method(:client_add),
+        BapsCodes::System::CLIENT_REMOVE => method(:client_remove)
       }
     end
 

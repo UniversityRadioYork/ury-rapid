@@ -1,4 +1,6 @@
+require_relative 'baps_codes'
 require_relative 'baps_connection'
+require_relative 'baps_response_parser'
 require_relative 'commands'
 require_relative 'dispatch'
 require_relative 'responses'
@@ -19,7 +21,7 @@ module Bra
 
       @dispatch = Dispatch.new
       @reader = BapsReader.new
-      @parser = Responses::Parser.new @dispatch, @reader
+      @parser = BapsResponseParser.new @dispatch, @reader
       @queue = EM::Queue.new
     end
 

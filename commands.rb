@@ -6,15 +6,6 @@ module Bra
   # These command classes are intended to be composable and accessible by
   # clients, but translate down into native BAPS command phrases.
   module Commands
-    # Internal: The BAPS command codes used when translating codes down to
-    # BAPS commands.
-    module Codes
-      SET_BINARY_MODE = 0xE600
-      LOGIN = 0xE800
-
-      SYNC = 0xE303
-    end
-
     # Internal: The base class for all Command types.
     class Command
       # Internal: Dummy Run command.
@@ -46,9 +37,8 @@ module Bra
       #
       # Returns nothing.
       def run(dispatch, queue)
-        BapsRequest.new(Codes::SET_BINARY_MODE).send(queue)
-        dispatch.register(Responses::System::SEED) do |response|
-          p response
+        BapsRequest.new(BapsCodes::System::SET_BINARY_MODE).send(queue)
+        dispatch.register(BapsCodes::System::SEED) do |response|
           yield response[:seed]
           dispatch.deregister(response[:command])
         end
@@ -96,10 +86,10 @@ module Bra
         password_hash = Digest::MD5.hexdigest(@password)
         full_hash = Digest::MD5.hexdigest(@seed + password_hash)
 
-        cmd = BapsRequest.new(Codes::LOGIN).string(@username).string(full_hash)
-        cmd.send(queue)
+        cmd = BapsRequest.new(BapsCodes::System::LOGIN)
+        cmd.string(@username).string(full_hash).send(queue)
 
-        dispatch.register(Responses::System::LOGIN) do |response|
+        dispatch.register(BapsCodes::System::LOGIN_RESULT) do |response|
           yield response[:subcode], response[:details]
           dispatch.deregister(response[:command])
         end
@@ -122,7 +112,8 @@ module Bra
       #
       # Returns nothing.
       def run(dispatch, queue)
-        BapsRequest.new(Codes::SYNC).send(queue)
+        # Subcode 3: Synchronise and add to chat
+        BapsRequest.new(BapsCodes::System::SYNC, 3).send(queue)
       end
     end
 

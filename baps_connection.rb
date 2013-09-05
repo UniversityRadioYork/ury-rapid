@@ -151,12 +151,12 @@ module Bra
 
   # Internal: A message to be written to the BAPS server.
   class BapsRequest
-    def initialize(command)
+    def initialize(command, subcode=0)
       # Format is initially set up for the command and the skip-bytes field.
       @format = FormatStrings::UINT16 + FormatStrings::UINT32
       @num_bytes = 0
       @payloads = []
-      @command = command
+      @command = command | subcode
     end
 
     # Internal: Attaches a 16-bit integer to this request.
