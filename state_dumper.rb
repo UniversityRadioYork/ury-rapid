@@ -48,9 +48,9 @@ module Bra
     # Returns nothing.
     def playback_dump_functions
       {
-        Responses::Playback::PLAYING => method(:playing),
-        Responses::Playback::PAUSED => method(:paused),
-        Responses::Playback::STOPPED => method(:stopped),
+        Responses::Playback::PLAY => method(:playing),
+        Responses::Playback::PAUSE => method(:paused),
+        Responses::Playback::STOP => method(:stopped),
         Responses::Playback::POSITION => method(:position),
         Responses::Playback::CUE => method(:cue),
         Responses::Playback::INTRO => method(:intro)

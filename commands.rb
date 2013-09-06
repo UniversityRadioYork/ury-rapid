@@ -17,6 +17,46 @@ module Bra
       end
     end
 
+    # Public: A command that sets the current playback status of a channel.
+    class SetPlayerState
+
+      # Public: Initialises a SetPlayerState command.
+      #
+      # channel - The ID of the channel, as an integer or any coerceable type.
+      # state   - The state (one of :stopped, :paused or :playing); can be a
+      #           string equivalent.
+      def initialize(channel, state)
+        state_symbol = state.is_a?(Symbol) ? state : state.to_sym
+        valid_state = %i(stopped paused playing).include? state_symbol
+        raise 'Not a valid state' unless valid_state
+
+        @state = state_symbol
+        @channel = Integer(channel)
+      end
+
+      # Public: Runs a SetPlayerState command on the given requests queue.
+      #
+      # As this command has no direct return value, it does not need a
+      # dispatch.
+      #
+      # queue - The requests queue to which the BAPS equivalent of this
+      #         command should be sent.
+      #
+      # Returns nothing.
+      def run(queue)
+        BapsRequest.new(CODES[@state], @channel).send(queue)
+      end
+
+      private
+
+      # Internal: Mapping between state symbols and BAPS request codes.
+      CODES = {
+        playing: BapsCodes::Playback::PLAY,
+        paused: BapsCodes::Playback::PAUSE,
+        stopped: BapsCodes::Playback::STOP
+      }
+    end
+
     # Public: A command that initiates communication with the BAPS server.
     #
     # This command is safe to use publicly, but consider using the Login

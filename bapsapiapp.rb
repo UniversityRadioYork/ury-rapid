@@ -4,6 +4,8 @@ require 'json'
 
 # Our simple hello-world app
 class BAPSApiApp < Sinatra::Base
+  use Rack::MethodOverride
+
   def initialize(config, model, queue)
     super()
 
@@ -26,10 +28,10 @@ class BAPSApiApp < Sinatra::Base
       end
     end
 
-    def get_auth?
+    def get_auth
       @auth ||= Rack::Auth::Basic::Request.new(request.env)
 
-      if [@auth.provided?, @auth.basic?, @auth.credentials].all?
+      if @auth.provided? && @auth.basic? && @auth.credentials
         user, password = @auth.credentials
         entry = @config['users'][user]
         if entry.nil? || entry['password'] != password
@@ -93,6 +95,21 @@ class BAPSApiApp < Sinatra::Base
 
     channel = channel_from params
     channel.player.state.to_json
+  end
+
+  put '/channels/:id/player/state/?' do
+    require_permissions! 'SetPlayerState'
+
+    parse_json_from request do |body|
+      if body['state'].is_a?(String)
+        command = Bra::Commands::SetPlayerState.new(params[:id], body['state'])
+        command.run(@queue)
+        { status: :ok }.to_json
+      else
+        status 400
+        'Expected: {"state": "(stopped|started|paused)"}.'
+      end
+    end
   end
 
   get '/channels/:id/player/load_state/?' do
@@ -195,5 +212,22 @@ class BAPSApiApp < Sinatra::Base
       name: item.name
     }
   end
-end
 
+  # Internal: Parses the request body as JSON and throws a 400 status if it
+  # is malformed.
+  #
+  # request - The request whose body is to be parsed.
+  #
+  # Yields the parsed request body.
+  #
+  # Returns the block's return value if the JSON is valid, and JSON
+  #   representing an error message otherwise.
+  def parse_json_from(request)
+    json = JSON.parse(request.body.string)
+  rescue JSON::ParserError
+    status 400
+    { status: :error, error: 'Badly formed JSON.' }.to_json
+  else
+    yield json
+  end
+end

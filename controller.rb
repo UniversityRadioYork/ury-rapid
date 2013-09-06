@@ -31,9 +31,9 @@ module Bra
     # Returns nothing.
     def playback_dump_functions
       {
-        BapsCodes::Playback::PLAYING => method(:playing),
-        BapsCodes::Playback::PAUSED => method(:paused),
-        BapsCodes::Playback::STOPPED => method(:stopped),
+        BapsCodes::Playback::PLAY => method(:playing),
+        BapsCodes::Playback::PAUSE => method(:paused),
+        BapsCodes::Playback::STOP => method(:stopped),
         BapsCodes::Playback::POSITION => method(:position),
         BapsCodes::Playback::CUE => method(:cue),
         BapsCodes::Playback::INTRO => method(:intro),

@@ -4,9 +4,9 @@ module Bra
     # Internal: Response codes for the Playback section of the BAPS command
     # set.
     module Playback
-      PLAYING = 0x0000
-      STOPPED = 0x0080
-      PAUSED = 0x0100
+      PLAY = 0x0000
+      STOP = 0x0080
+      PAUSE = 0x0100
       POSITION = 0x0180
       VOLUME = 0x0200
       LOADED = 0x0280

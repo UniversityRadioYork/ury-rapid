@@ -17,9 +17,9 @@ module Bra
 
     STRUCTURES = {
       # Playback
-      BapsCodes::Playback::STOPPED => ['ChannelStopped'],
-      BapsCodes::Playback::PAUSED => ['ChannelPaused'],
-      BapsCodes::Playback::PLAYING => ['ChannelPlaying'],
+      BapsCodes::Playback::STOP => ['ChannelStopped'],
+      BapsCodes::Playback::PAUSE => ['ChannelPaused'],
+      BapsCodes::Playback::PLAY => ['ChannelPlaying'],
       BapsCodes::Playback::VOLUME => ['ChannelVolume', %i{volume float32}],
       BapsCodes::Playback::LOADED => [
         'Loaded', %i{index uint32}, %i{type load_body}
