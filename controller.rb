@@ -64,28 +64,27 @@ module Bra
     private
 
     def playing(response)
-      @model.channel(response[:subcode]).state = :playing
+      player_from(response).state = :playing
     end
 
     def paused(response)
-      @model.channel(response[:subcode]).state = :paused
+      player_from(response).state = :paused
     end
 
     def stopped(response)
-      @model.channel(response[:subcode]).state = :stopped
+      player_from(response).state = :stopped
     end
 
     def position(response)
-      @model.channel(response[:subcode]).position = response[:position]
+      player_from(response).position = response[:position]
     end
 
     def cue(response)
-      @model.channel(response[:subcode]).cue = response[:position]
-      puts "[CUE] Channel #{response[:subcode]} at #{response[:position]}"
+      player_from(response).cue = response[:position]
     end
 
     def intro(response)
-      @model.channel(response[:subcode]).intro = response[:position]
+      player_from(response).intro = response[:position]
     end
 
     def item_data(response)
@@ -97,7 +96,7 @@ module Bra
     end
 
     def loaded(response)
-      @model.channel(response[:subcode]).loaded = loaded_item response
+      player_from(response).load(*(loaded_item response))
     end
 
     def item_count(response)
@@ -112,20 +111,32 @@ module Bra
       puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
     end
 
-    # Converts an loaded response into an Item or symbol.
+    # Internal: From a response, get the target channel player.
+    #
+    # response - The response whose subcode denotes the correct channel.
+    #
+    # Returns a Player object which represents the requested channel's player
+    #   model.
+    def player_from(response)
+      @model.channel(response[:subcode]).player
+    end
+
+    # Converts an loaded response into a pair of load-state and item.
     #
     # response - The loaded response to convert.
     #
-    # Returns an Item or a symbol (:loading or :load_failed).
+    # Returns a list with the following items:
+    #   - The loading state (:ok, :loading or :failed);
+    #   - Either nil (no loaded item) or an Item representing the loaded item.
     def loaded_item(response)
       if response[:title] == '--LOADING--'
-        :loading
+        [:loading, nil]
       elsif response[:title] == '--LOAD FAILED--'
-        :failed
+        [:failed, nil]
       else
         item_args = response.values_at(:type, :title)
         position response if response.key? :position
-        Item.new(*item_args)
+        [:ok, Item.new(*item_args)]
       end
     end
   end

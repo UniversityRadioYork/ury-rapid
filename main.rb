@@ -68,10 +68,8 @@ def check_server_em_compatible(server)
   end
 end
 
-def run(model, opts)
+def run(model, config, opts)
   EM.run do
-    config = YAML.load_file 'config.yml'
-
     setup_server config, opts
     setup_client config, model
   end
@@ -111,5 +109,6 @@ def setup_client(config, model)
   end
 end
 
+config = config = YAML.load_file 'config.yml'
 model = Bra::Model.new
-run model, app: (BAPSApiApp.new model)
+run model, config, app: (BAPSApiApp.new model, config)
