@@ -76,27 +76,42 @@ module Bra
     end
 
     def position(response)
-      puts "[POSITION] Channel #{response[:subcode]} at #{response[:position]}"
+      @model.channel(response[:subcode]).position = response[:position]
     end
 
     def cue(response)
+      @model.channel(response[:subcode]).cue = response[:position]
       puts "[CUE] Channel #{response[:subcode]} at #{response[:position]}"
     end
 
     def intro(response)
-      puts "[INTRO] Channel #{response[:subcode]} at #{response[:position]}"
+      @model.channel(response[:subcode]).intro = response[:position]
     end
 
     def item_data(response)
-      id, index = response.values_at(*%i(subcode index))
-      item_args = response.values_at(*%i(type title))
+      id, index = response.values_at(:subcode, :index)
+      item_args = response.values_at(:type, :title)
       item = Item.new(*item_args)
 
       @model.channel(id).add_item index, item
     end
 
     def loaded(response)
-      puts "loaded #{response}"
+      # Work around the BAPS server's rather interesting way of specifying
+      # partial loads and load failures.
+      item = (
+        if response[:title] == '--LOADING--'
+          :loading
+        elsif response[:title] == '--LOAD FAILED--'
+          :failed
+        else
+          item_args = response.values_at(:type, :title)
+          position response if response.key? :position
+          Item.new(*item_args)
+        end
+      )
+
+      @model.channel(response[:subcode]).loaded = item
     end
 
     def item_count(response)

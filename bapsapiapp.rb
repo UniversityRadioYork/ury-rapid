@@ -31,11 +31,27 @@ class BAPSApiApp < Sinatra::Base
     summary.to_json
   end
 
+  get '/channels/:id/playlist' do
+    content_type :json
+
+    channel = channel_from params
+    items = channel.items.map(&(method :item))
+    items.to_json
+  end
+
   get '/channels/:id/state' do
     content_type :json
 
     channel = channel_from params
     channel.state.to_json
+  end
+
+  get '/channels/:id/loaded' do
+    content_type :json
+
+    channel = channel_from params
+    item = loaded_item(channel.loaded)
+    item.to_json
   end
 
   private
@@ -56,13 +72,29 @@ class BAPSApiApp < Sinatra::Base
     {
       id: channel.id,
       state: channel.state,
-      items: (channel.items.map(&(method :item)))
+      items: (channel.items.map(&(method :item))),
+      loaded: loaded_item(channel.loaded)
     }
+  end
+
+  # Internal: Outputs a hash or symbolic representation of a loaded item,
+  # depending on the nature of the channel's loading, or nil if no loaded item
+  # exists.
+  #
+  # loaded - The loaded item whose representation is sought.
+  #
+  # Returns a hash representing loaded (if it is a normal item), a symbol
+  #   (one of :loading or :load_failed), or nil if no item is loaded or being
+  #   loaded.
+  def loaded_item(loaded)
+    loaded.is_a?(Bra::Item) ? item(loaded) : loaded
   end
 
   # Internal: Outputs a hash representation of an item.
   #
   # item - The item whose hash equivalent is sought.
+  #
+  # Returns a hash representing item.
   def item(item)
     {
       type: item.type,

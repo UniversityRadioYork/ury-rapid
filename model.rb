@@ -28,11 +28,36 @@ module Bra
     # Public: Access the channel items set for reading.
     attr_reader :items
 
-    # Public: Access the channel items set for writing.
+    # Internal: Access the channel items set for writing.
     attr_writer :items
 
-    # Public: Access the channel state for reading.
+    # Public: Access the channel's currently loaded track for reading.
+    attr_reader :loaded
+
+    # Internal: Access the channel's currently loaded track for writing.
+    attr_writer :loaded
+
+    # Public: Access the channel's current state for reading.
     attr_reader :state
+
+    # Public: Access the channel's current position for reading.
+    attr_reader :position
+
+    # Public: Access the channel's current position for writing.
+    attr_writer :position
+
+    # Public: Access the channel's current cue position for reading.
+    attr_reader :cue
+
+    # Public: Access the channel's current cue position for writing.
+    attr_writer :cue
+
+    # Public: Access the channel's current intro position for reading.
+    attr_reader :intro
+
+    # Public: Access the channel's current intro position for writing.
+    attr_writer :intro
+
 
     # Internal: Initialises a Channel.
     #
@@ -41,6 +66,10 @@ module Bra
       @id = id
       @items = []
       @state = :stopped
+      @cue = 0
+      @intro = 0
+      @position = 0
+      @loaded = nil
     end
 
     # Public: Change the channel model's state.
@@ -56,7 +85,7 @@ module Bra
       @state = new_state
     end
 
-    # Public: Add an item to the channel.
+    # Internal: Add an item to the channel.
     #
     # index - The position in the playlist in which this item should be added.
     # item  - An Item object representing the item to be added.
