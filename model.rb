@@ -37,7 +37,6 @@ module Bra
     # Internal: Access the channel's player model for writing.
     attr_writer :player
 
-
     # Internal: Initialises a Channel.
     #
     # id - The ID number of the channel.
@@ -47,7 +46,6 @@ module Bra
       @player = Player.new
 
     end
-
 
     # Internal: Add an item to the channel.
     #

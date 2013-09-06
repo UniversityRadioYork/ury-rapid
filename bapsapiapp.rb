@@ -23,9 +23,7 @@ class BAPSApiApp < Sinatra::Base
         halt 401, 'Not authorised\n'
       end
 
-      unless credentials & keys == keys
-        halt 403, 'Forbidden\n'
-      end
+      halt(403, 'Forbidden\n') unless (credentials & keys) == keys
     end
 
     def get_auth
@@ -33,12 +31,7 @@ class BAPSApiApp < Sinatra::Base
 
       if @auth.provided? && @auth.basic? && @auth.credentials
         user, password = @auth.credentials
-        entry = @config['users'][user]
-        if entry.nil? || entry['password'] != password
-          nil
-        else
-          entry['privileges']
-        end
+        privileges_for user, password
       else
         nil
       end
@@ -149,6 +142,23 @@ class BAPSApiApp < Sinatra::Base
   end
 
   private
+
+  # Internal: Retrieves the privileges available for a given user and password
+  # combination.
+  #
+  # username - The username given by the user agent.
+  # password - The password given by the user agent.
+  #
+  # Returns the set of privileges granted to this username and password.  If
+  #   the username or password is incorrect, then no privileges are given.
+  def privileges_for(username, password)
+    entry = @config['users'][username]
+    if entry.nil? || entry['password'] != password
+      []
+    else
+      entry['privileges']
+    end
+  end
 
   # Internal: Gets a channel from the request parameters.
   #
