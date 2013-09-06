@@ -4,7 +4,7 @@ require 'json'
 
 # Our simple hello-world app
 class BAPSApiApp < Sinatra::Base
-  def initialize(model, config, queue)
+  def initialize(config, model, queue)
     super()
 
     @model = model

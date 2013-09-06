@@ -13,7 +13,8 @@ module Bra
     # port     - The port of the BAPS server to which this will connect.
     # username - The username with which the login will occur.
     # password - The password with which the login will occur.
-    def initialize(hostname, port, username, password)
+    # queue    - The requests queue that will connect to this client.
+    def initialize(queue, hostname, port, username, password)
       @hostname = hostname
       @port = port
       @username = username
@@ -22,7 +23,7 @@ module Bra
       @dispatch = Dispatch.new
       @reader = BapsReader.new
       @parser = BapsResponseParser.new @dispatch, @reader
-      @queue = EM::Queue.new
+      @queue = queue
     end
 
     # Public: Starts a BAPS connection and logs into it.

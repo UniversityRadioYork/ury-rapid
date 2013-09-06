@@ -68,10 +68,15 @@ def check_server_em_compatible(server)
   end
 end
 
-def run(model, config, opts)
+def run
+  config = YAML.load_file 'config.yml'
+  model = Bra::Model.new
+  queue = EM::Queue.new
+  app = BAPSApiApp.new config, model, queue
+
   EM.run do
-    setup_server config, opts
-    setup_client config, model
+    setup_server config, app
+    setup_client config, model, queue
   end
 end
 
@@ -82,10 +87,10 @@ end
 # opts   - Server options for Sinatra/Rack.
 #
 # Returns nothing.
-def setup_server(config, opts)
-  server, host, port, web_app = get_options opts
+def setup_server(config, app)
+  server, host, port = get_options config
 
-  dispatch = make_dispatch web_app
+  dispatch = make_dispatch app
 
   check_server_em_compatible server
 
@@ -99,16 +104,14 @@ end
 # model - The model that the client controls via BAPS responses.
 #
 # Returns nothing.
-def setup_client(config, model)
+def setup_client(config, model, queue)
   client_config = config.values_at(*%W(hostname port username password))
 
-  client = Bra::BapsClient.new(*client_config)
+  client = Bra::BapsClient.new(queue, *client_config)
   client.start do |dispatch, _|
     controller = Bra::Controller.new model
     controller.register dispatch
   end
 end
 
-config = config = YAML.load_file 'config.yml'
-model = Bra::Model.new
-run model, config, app: (BAPSApiApp.new model, config)
+run if __FILE__ == $PROGRAM_NAME
