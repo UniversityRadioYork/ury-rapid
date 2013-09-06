@@ -58,7 +58,6 @@ module Bra
     # Public: Access the channel's current intro position for writing.
     attr_writer :intro
 
-
     # Internal: Initialises a Channel.
     #
     # id - The ID number of the channel.

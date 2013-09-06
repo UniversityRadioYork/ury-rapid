@@ -97,21 +97,7 @@ module Bra
     end
 
     def loaded(response)
-      # Work around the BAPS server's rather interesting way of specifying
-      # partial loads and load failures.
-      item = (
-        if response[:title] == '--LOADING--'
-          :loading
-        elsif response[:title] == '--LOAD FAILED--'
-          :failed
-        else
-          item_args = response.values_at(:type, :title)
-          position response if response.key? :position
-          Item.new(*item_args)
-        end
-      )
-
-      @model.channel(response[:subcode]).loaded = item
+      @model.channel(response[:subcode]).loaded = loaded_item response
     end
 
     def item_count(response)
@@ -124,6 +110,23 @@ module Bra
 
     def client_remove(response)
       puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
+    end
+
+    # Converts an loaded response into an Item or symbol.
+    #
+    # response - The loaded response to convert.
+    #
+    # Returns an Item or a symbol (:loading or :load_failed).
+    def loaded_item(response)
+      if response[:title] == '--LOADING--'
+        :loading
+      elsif response[:title] == '--LOAD FAILED--'
+        :failed
+      else
+        item_args = response.values_at(:type, :title)
+        position response if response.key? :position
+        Item.new(*item_args)
+      end
     end
   end
 end
