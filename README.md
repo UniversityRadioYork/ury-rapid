@@ -3,6 +3,8 @@ bra
 
 __bra__ (BAPS Ruby Abstraction) is a project for creating a system to translate the binary protocol calls of URY's internal Broadcast and Presenting Suite (BAPS) to and from a more sensible and accessible medium.
 
+More generally, it's about creating a REST API for controlling a radio playback system, which so happens to come pre-plumbed into our own system.
+
 This is in very early development.  Expect it not to do a lot.
 
 What this will become
@@ -19,14 +21,12 @@ Requirements
 ------------
 
 * Ruby 2.0+
-* A BAPS server (sadly not found outside of URY, really)
+* For out-of-the-box usage, a BAPS server (sadly not found outside of URY, really)
 * This also depends on some RubyGems; see `Gemfile`.
 
 Usage
 -----
 
-The main server (main.rb) isn't yet fully operational, but information on how to use it will pop up here eventually.
+`ruby main.rb` (for best results, consider using rerun).
 
-### Test program (state dumper)
-
-`ruby state_dumper.rb BAPS-HOSTNAME BAPS-PORT USERNAME PASSWORD` will invoke the state dumper testbed.  This will connect to the specified BAPS server, log in and dump some information to stdout.
+The main server (main.rb) is configured via a YAML file called `config.yml`.  An example file will be put up eventually, but for now you can probably guess the structure from the code.
