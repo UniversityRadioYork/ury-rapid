@@ -6,6 +6,10 @@ module Bra
   # These command classes are intended to be composable and accessible by
   # clients, but translate down into native BAPS command phrases.
   module Commands
+    # Public: Class for errors caused while handling command parameters.
+    class ParamError < RuntimeError
+    end
+
     # Internal: The base class for all Command types.
     class Command
       # Internal: Dummy Run command.
@@ -28,7 +32,7 @@ module Bra
       def initialize(channel, state)
         state_symbol = state.is_a?(Symbol) ? state : state.to_sym
         valid_state = %i(stopped paused playing).include? state_symbol
-        raise 'Not a valid state' unless valid_state
+        raise ParamError, 'Not a valid state' unless valid_state
 
         @state = state_symbol
         @channel = Integer(channel)

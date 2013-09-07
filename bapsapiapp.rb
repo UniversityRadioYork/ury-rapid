@@ -95,12 +95,18 @@ class BAPSApiApp < Sinatra::Base
 
     parse_json_from request do |body|
       if body['state'].is_a?(String)
-        command = Bra::Commands::SetPlayerState.new(params[:id], body['state'])
+        id, state = params[:id], body['state']
+        begin
+          command = Bra::Commands::SetPlayerState.new id, state
+        rescue Bra::Commands::ParamError => e
+          halt 400, json_error(e.message)
+        end
         command.run(@queue)
         { status: :ok }.to_json
       else
-        status 400
-        'Expected: {"state": "(stopped|started|paused)"}.'
+        halt 400, json_error(
+          'Expected: {"state": "(stopped|started|paused)"}.'
+        )
       end
     end
   end
@@ -125,6 +131,20 @@ class BAPSApiApp < Sinatra::Base
 
     channel = channel_from params
     channel.position.to_json
+  end
+
+  put '/channels/:id/position/?' do
+    require_permissions! 'SetPlayerPosition'
+
+    parse_json_from request do |body|
+      if body['position'].is_a?(Numeric)
+        command = Bra::Commands::SetPlayerState.new(params[:id], body['state'])
+        command.run(@queue)
+        { status: :ok }.to_json
+      else
+        halt 400, json_error('Expected: {"position": (integer)}.')
+      end
+    end
   end
 
   get '/channels/:id/cue/?' do
@@ -230,14 +250,22 @@ class BAPSApiApp < Sinatra::Base
   #
   # Yields the parsed request body.
   #
-  # Returns the block's return value if the JSON is valid, and JSON
-  #   representing an error message otherwise.
+  # Returns the block's return value if the JSON is valid, and nothing
+  #   otherwise (processing is halted).
   def parse_json_from(request)
     json = JSON.parse(request.body.string)
   rescue JSON::ParserError
-    status 400
-    { status: :error, error: 'Badly formed JSON.' }.to_json
+    halt 400, json_error('Badly formed JSON.')
   else
     yield json
+  end
+
+  # Internal: Renders an error message in JSON.
+  #
+  # message - The error message.
+  #
+  # Returns the JSON-padded equivalent.
+  def json_error(message)
+    { status: :error, error: message }.to_json
   end
 end
