@@ -58,7 +58,8 @@ module Bra
     def system_functions
       {
         BapsCodes::System::CLIENT_ADD => method(:client_add),
-        BapsCodes::System::CLIENT_REMOVE => method(:client_remove)
+        BapsCodes::System::CLIENT_REMOVE => method(:client_remove),
+        BapsCodes::System::LOG_MESSAGE => method(:log_message)
       }
     end
 
@@ -117,6 +118,11 @@ module Bra
       puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
     end
 
+    def log_message(response)
+      # TODO: actually log this message
+      puts "[LOG] #{response[:message]}"
+    end
+
     # Internal: From a response, get the target channel player.
     #
     # response - The response whose subcode denotes the correct channel.
@@ -135,10 +141,14 @@ module Bra
     #   - The loading state (:ok, :loading or :failed);
     #   - Either nil (no loaded item) or an Item representing the loaded item.
     def loaded_item(response)
-      if response[:title] == '--LOADING--'
+      # Deal with BAPS's interesting way of encoding load states.
+      case response[:title]
+      when '--LOADING--'
         [:loading, nil]
-      elsif response[:title] == '--LOAD FAILED--'
+      when '--LOAD FAILED--'
         [:failed, nil]
+      when '--NONE--'
+        [:empty, nil]
       else
         item_args = response.values_at(:type, :title)
         position response if response.key? :position

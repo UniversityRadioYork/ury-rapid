@@ -43,6 +43,7 @@ module Bra
       # one.
       WELCOME_MESSAGE = :welcome_message
       SYNC = 0xE300
+      LOG_MESSAGE = 0xE500
       SET_BINARY_MODE = 0xE600
       SEED = 0xE700
       LOGIN = 0xE800

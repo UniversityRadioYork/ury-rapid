@@ -59,7 +59,8 @@ module Bra
       BapsCodes::System::SEED => ['Seed', %i{seed string}],
       BapsCodes::System::LOGIN_RESULT => ['LoginResult', %i{details string}],
       BapsCodes::System::CLIENT_ADD => ['ClientAdd', %i{client string}],
-      BapsCodes::System::CLIENT_REMOVE => ['ClientRemove', %i{client string}]
+      BapsCodes::System::CLIENT_REMOVE => ['ClientRemove', %i{client string}],
+      BapsCodes::System::LOG_MESSAGE => ['LogMessage', %i{message string}]
     }
 
     class UnknownResponse < StandardError
