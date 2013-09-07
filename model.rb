@@ -125,7 +125,7 @@ module Bra
     # Public: Initialises a Player.
     def initialize
       @state = :stopped
-      @load_state = :ok
+      @load_state = :empty
       @cue = 0
       @intro = 0
       @position = 0
@@ -155,7 +155,7 @@ module Bra
       raise "Not a valid item: #{new_item}" unless valid_item
       @item = new_item
 
-      valid_state = %i(ok loading failed).include? new_state
+      valid_state = %i(ok loading failed empty).include? new_state
       raise 'Not a valid state' unless valid_state
       @load_state = new_state
     end
