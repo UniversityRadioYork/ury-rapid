@@ -6,10 +6,10 @@ require 'json'
 class BAPSApiApp < Sinatra::Base
   use Rack::MethodOverride
 
-  def initialize(config, model, queue)
+  def initialize(config, view, queue)
     super()
 
-    @model = model
+    @view = view
     @config = config
     @queue = queue
   end
@@ -46,52 +46,37 @@ class BAPSApiApp < Sinatra::Base
 
   get '/channels/?' do
     content_type :json
-
-    channels = @model.channels
-    summary = channels.map(&(method :channel_summary))
-    summary.to_json
+    @view.channels.to_json
   end
 
   get '/channels/:id/?' do
     content_type :json
-
-    summary = channel_summary(channel_from params)
-    summary.to_json
+    @view.channel_at(params[:id]).to_json
   end
 
   get '/channels/:id/playlist/?' do
     content_type :json
-
-    channel = channel_from params
-    items = channel.items.map(&(method :item))
-    items.to_json
+    @view.playlist_for_channel_at(params[:id]).to_json
   end
 
   get '/channels/:id/playlist/:index/?' do
     content_type :json
-
-    channel = channel_from params
-    single_item = item(channel.items[Integer(params[:index])])
-    single_item.to_json
+    @view.playlist_item_for_channel_at(params[:id], params[:index]).to_json
   end
 
   get '/channels/:id/player/?' do
     content_type :json
-
-    channel = channel_from params
-    summary = player_summary channel.player
-    summary.to_json
+    @view.player_for_channel_at(params[:id]).to_json
   end
 
   get '/channels/:id/player/state/?' do
     content_type :json
-
-    channel = channel_from params
-    channel.player.state.to_json
+    @view.player_state_for_channel_at(params[:id]).to_json
   end
 
   put '/channels/:id/player/state/?' do
     require_permissions! 'SetPlayerState'
+    content_type :json
 
     parse_json_from request do |body|
       if body['state'].is_a?(String)
@@ -113,32 +98,26 @@ class BAPSApiApp < Sinatra::Base
 
   get '/channels/:id/player/load_state/?' do
     content_type :json
-
-    channel = channel_from params
-    channel.player.load_state.to_json
+    @view.player_load_state_for_channel_at(params[:id]).to_json
   end
 
   get '/channels/:id/player/item/?' do
     content_type :json
-
-    channel = channel_from params
-    item = loaded_item(channel.player.item)
-    item.to_json
+    @view.player_item_for_channel_at(params[:id]).to_json
   end
 
-  get '/channels/:id/position/?' do
+  get '/channels/:id/player/position/?' do
     content_type :json
-
-    channel = channel_from params
-    channel.position.to_json
+    @view.player_position_for_channel_at(params[:id]).to_json
   end
 
-  put '/channels/:id/position/?' do
+  put '/channels/:id/player/position/?' do
     require_permissions! 'SetPlayerPosition'
 
     parse_json_from request do |body|
       if body['position'].is_a?(Numeric)
-        command = Bra::Commands::SetPlayerState.new(params[:id], body['state'])
+        id, position = params[:id], body['position']
+        command = Bra::Commands::SetPlayerPosition.new(id, position)
         command.run(@queue)
         { status: :ok }.to_json
       else
@@ -147,18 +126,14 @@ class BAPSApiApp < Sinatra::Base
     end
   end
 
-  get '/channels/:id/cue/?' do
+  get '/channels/:id/player/cue/?' do
     content_type :json
-
-    channel = channel_from params
-    channel.cue.to_json
+    @view.player_cue_for_channel_at(params[:id]).to_json
   end
 
-  get '/channels/:id/intro/?' do
+  get '/channels/:id/player/intro/?' do
     content_type :json
-
-    channel = channel_from params
-    channel.intro.to_json
+    @view.player_intro_for_channel_at(params[:id]).to_json
   end
 
   private
@@ -178,69 +153,6 @@ class BAPSApiApp < Sinatra::Base
     else
       entry['privileges']
     end
-  end
-
-  # Internal: Gets a channel from the request parameters.
-  #
-  # params - The Sinatra parameters hash.
-  #
-  # Returns the channel of the ID specified in the hash.
-  def channel_from(params)
-    @model.channel Integer(params[:id])
-  end
-
-  # Internal: Outputs a summary of a channel's state.
-  #
-  # channel - The channel whose state is to be summarised.
-  #
-  # Returns a hash representing the channel.
-  def channel_summary(channel)
-    {
-      id: channel.id,
-      items: (channel.items.map(&(method :item))),
-      player: player_summary(channel.player)
-    }
-  end
-
-  # Internal: Outputs a summary of a channel's player's state.
-  #
-  # player - The player whose state is to be summarised.
-  #
-  # Returns a hash representing the player.
-  def player_summary(player)
-    {
-      state: player.state,
-      load_state: player.load_state,
-      item: loaded_item(player.item),
-      position: player.position,
-      cue: player.cue,
-      intro: player.intro
-    }
-  end
-
-  # Internal: Outputs a hash or symbolic representation of a loaded item,
-  # depending on the nature of the channel's loading, or nil if no loaded item
-  # exists.
-  #
-  # loaded - The loaded item whose representation is sought.
-  #
-  # Returns a hash representing loaded (if it is a normal item), a symbol
-  #   (one of :loading or :load_failed), or nil if no item is loaded or being
-  #   loaded.
-  def loaded_item(loaded)
-    loaded.is_a?(Bra::Item) ? item(loaded) : loaded
-  end
-
-  # Internal: Outputs a hash representation of an item.
-  #
-  # item - The item whose hash equivalent is sought.
-  #
-  # Returns a hash representing item.
-  def item(item)
-    {
-      type: item.type,
-      name: item.name
-    }
   end
 
   # Internal: Parses the request body as JSON and throws a 400 status if it

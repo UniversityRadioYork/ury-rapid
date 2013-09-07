@@ -23,7 +23,6 @@ module Bra
 
     # Public: A command that sets the current playback status of a channel.
     class SetPlayerState
-
       # Public: Initialises a SetPlayerState command.
       #
       # channel - The ID of the channel, as an integer or any coerceable type.
@@ -59,6 +58,32 @@ module Bra
         paused: BapsCodes::Playback::PAUSE,
         stopped: BapsCodes::Playback::STOP
       }
+    end
+
+    # Public: A command that sets the current playback position of a channel.
+    class SetPlayerPosition
+      # Public: Initialises a SetPlayerPosition command.
+      #
+      # channel - The ID of the channel, as an integer or any coerceable type.
+      # position - The new position, as an integer or any coerceable type.
+      def initialize(channel, position)
+        @channel = Integer(channel)
+        @position = Integer(position)
+      end
+
+      # Public: Runs a SetPlayerPosition command on the given requests queue.
+      #
+      # As this command has no direct return value, it does not need a
+      # dispatch.
+      #
+      # queue - The requests queue to which the BAPS equivalent of this
+      #         command should be sent.
+      #
+      # Returns nothing.
+      def run(queue)
+        command = BapsRequest.new(BapsCodes::Playback::POSITION, @channel)
+        command.uint32(@position).send(queue)
+      end
     end
 
     # Public: A command that initiates communication with the BAPS server.

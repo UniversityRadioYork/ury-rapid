@@ -19,3 +19,4 @@ doc/
 
 # Config and secrets
 config.yml
+test.sh

@@ -4,6 +4,7 @@ require 'yaml'
 require_relative 'bapsapiapp'
 require_relative 'baps_client'
 require_relative 'model'
+require_relative 'view'
 require_relative 'controller'
 
 # This example shows you how to embed Sinatra into your EventMachine
@@ -71,8 +72,9 @@ end
 def run
   config = YAML.load_file 'config.yml'
   model = Bra::Model.new
+  view = Bra::View.new model
   queue = EM::Queue.new
-  app = BAPSApiApp.new config, model, queue
+  app = BAPSApiApp.new config, view, queue
 
   EM.run do
     setup_server config, app
