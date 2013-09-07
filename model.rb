@@ -56,6 +56,13 @@ module Bra
     def add_item(index, item)
       @items[index] = item
     end
+
+    # Internal: Clears the channel's playlist.
+    #
+    # Returns nothing.
+    def clear_playlist
+      @items = []
+    end
   end
 
   # Public: An item in the playout system.

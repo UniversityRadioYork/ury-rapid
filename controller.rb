@@ -18,9 +18,9 @@ module Bra
     # Returns nothing.
     def register(dispatch)
       functions = [
-        playback_dump_functions,
-        playlist_dump_functions,
-        system_dump_functions
+        playback_functions,
+        playlist_functions,
+        system_functions
       ].reduce({}) { |a, e| a.merge! e }
 
       dispatch.register_response_handlers functions
@@ -29,7 +29,7 @@ module Bra
         # Public: Register playback response handler functions.
     #
     # Returns nothing.
-    def playback_dump_functions
+    def playback_functions
       {
         BapsCodes::Playback::PLAY => method(:playing),
         BapsCodes::Playback::PAUSE => method(:paused),
@@ -44,17 +44,18 @@ module Bra
     # Public: Register playlist response handler functions.
     #
     # Returns nothing.
-    def playlist_dump_functions
+    def playlist_functions
       {
         BapsCodes::Playlist::ITEM_DATA => method(:item_data),
         BapsCodes::Playlist::ITEM_COUNT => method(:item_count),
+        BapsCodes::Playlist::RESET => method(:reset)
       }
     end
 
     # Public: Register system response handler functions.
     #
     # Returns nothing.
-    def system_dump_functions
+    def system_functions
       {
         BapsCodes::System::CLIENT_ADD => method(:client_add),
         BapsCodes::System::CLIENT_REMOVE => method(:client_remove)
@@ -93,6 +94,11 @@ module Bra
       item = Item.new(*item_args)
 
       @model.channel(id).add_item index, item
+    end
+
+    def reset(response)
+      id = response[:subcode]
+      @model.channel(id).clear_playlist
     end
 
     def loaded(response)

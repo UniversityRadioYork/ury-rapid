@@ -33,6 +33,7 @@ module Bra
         'ItemData',
         %i{index uint32}, %i{type uint32}, %i{title string}
       ],
+      BapsCodes::Playlist::RESET => ['Reset'],
       # Config
       BapsCodes::Config::OPTION_COUNT => count('OptionCount'),
       BapsCodes::Config::OPTION => [
