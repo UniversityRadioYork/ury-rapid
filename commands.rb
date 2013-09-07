@@ -21,20 +21,47 @@ module Bra
       end
     end
 
+    class ChannelCommand < Command
+      # Internal: Initialises a ChannelCommand.
+      #
+      # channel - The ID of the channel, as an integer or any coercible type.
+      #
+      def initialize(channel)
+        @channel = Integer(channel)
+      end
+    end
+
+    # Public: A command that clears the playlist of a channel.
+    class ClearPlaylist < ChannelCommand
+      # Public: Runs a ClearPlaylist command on the given requests queue.
+      #
+      # As this command has no direct return value, it does not need a
+      # dispatch.
+      #
+      # queue - The requests queue to which the BAPS equivalent of this
+      #         command should be sent.
+      #
+      # Returns nothing.
+      def run(queue)
+        BapsRequest.new(BapsCodes::Playlist::RESET, @channel).send(queue)
+      end
+    end
+
     # Public: A command that sets the current playback status of a channel.
-    class SetPlayerState
+    class SetPlayerState < ChannelCommand
       # Public: Initialises a SetPlayerState command.
       #
-      # channel - The ID of the channel, as an integer or any coerceable type.
+      # channel - The ID of the channel, as an integer or any coercible type.
       # state   - The state (one of :stopped, :paused or :playing); can be a
       #           string equivalent.
       def initialize(channel, state)
+        super channel
+
         state_symbol = state.is_a?(Symbol) ? state : state.to_sym
         valid_state = %i(stopped paused playing).include? state_symbol
         raise ParamError, 'Not a valid state' unless valid_state
 
         @state = state_symbol
-        @channel = Integer(channel)
       end
 
       # Public: Runs a SetPlayerState command on the given requests queue.
@@ -61,13 +88,13 @@ module Bra
     end
 
     # Public: A command that sets the current playback position of a channel.
-    class SetPlayerPosition
+    class SetPlayerPosition < ChannelCommand
       # Public: Initialises a SetPlayerPosition command.
       #
       # channel - The ID of the channel, as an integer or any coerceable type.
       # position - The new position, as an integer or any coerceable type.
       def initialize(channel, position)
-        @channel = Integer(channel)
+        super channel
         @position = Integer(position)
       end
 
