@@ -18,11 +18,11 @@ module Bra
 
     # Public: Create a summary of the channel with the given ID.
     #
-    # id - The channel ID, as an integer starting from 0, or any other type
-    #      that can be coerced to an Integer (for example String).
+    # channel_id - The channel ID, as an integer starting from 0, or any other
+    #              type that can be coerced to an Integer (for example String).
     #
     # Returns a hash representing the channel data.
-    def channel_at(id)
+    def channel_at(channel_id)
       channel raw_channel_at(channel_id)
     end
 
@@ -34,6 +34,18 @@ module Bra
     # Returns a hash representing the channel data.
     def player_for_channel_at(channel_id)
       player raw_channel_at(channel_id).player
+    end
+
+    # Public: Return the player loaded item for the channel with the given ID.
+    #
+    # channel_id - The channel ID, as an integer starting from 0, or any other
+    #              type that can be coerced to an Integer (for example String).
+    #
+    # Returns a hash representing the item (an empty hash if no item is
+    # loaded).
+    def player_item_for_channel_at(channel_id)
+      loaded = raw_channel_at(channel_id).player.item
+      loaded.nil? ? {} : item(loaded)
     end
 
     # Public: Return the player state for the channel with the given ID.
@@ -120,7 +132,7 @@ module Bra
     def channel(channel)
       {
         id: channel.id,
-        items: playlist(channel.items),
+        playlist: playlist(channel.items),
         player: player(channel.player)
       }
     end
