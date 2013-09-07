@@ -166,10 +166,11 @@ module Bra
     #
     # item - The item whose hash equivalent is sought.
     #
-    # Returns a hash representing item.
+    # Returns a hash representing item.  This hash will be empty if item is
+    # nil.
     def item(item)
       if item.nil?
-        nil
+        {}
       else
         {
           type: item.type,
