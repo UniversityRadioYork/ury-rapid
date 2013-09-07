@@ -20,10 +20,10 @@ class BAPSApiApp < Sinatra::Base
       credentials = get_auth
       if credentials.nil?
         headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-        halt 401, 'Not authorised\n'
+        halt 401, json_error('Not authorised.')
       end
 
-      halt(403, 'Forbidden\n') unless (credentials & keys) == keys
+      halt(403, json_error('Forbidden.')) unless (credentials & keys) == keys
     end
 
     def get_auth
@@ -57,6 +57,15 @@ class BAPSApiApp < Sinatra::Base
   get '/channels/:id/playlist/?' do
     content_type :json
     @view.playlist_for_channel_at(params[:id]).to_json
+  end
+
+  delete '/channels/:id/playlist/?' do
+    require_permissions! 'EditPlaylist'
+    content_type :json
+
+    Bra::Commands::ClearPlaylist.new(params[:id]).run(@queue)
+
+    { status: :ok }.to_json
   end
 
   get '/channels/:id/playlist/:index/?' do
