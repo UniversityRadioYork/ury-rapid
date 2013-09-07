@@ -19,6 +19,7 @@ module Bra
     module Playlist
       ITEM_COUNT = 0x2180
       ITEM_DATA = 0x21C0
+      RESET = 0x2280
     end
 
     # Internal: Response codes for the Config section of the BAPS command
