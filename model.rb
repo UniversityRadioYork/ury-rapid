@@ -74,22 +74,13 @@ module Bra
     attr_reader :name
 
     def initialize(type, name)
-      type = TYPE_SYMBOLS[type] if type.is_a? Numeric
-      valid_type = %i{null library file text}.include? type
-      raise 'Not a valid type' unless valid_type
+      valid_type = %i{library file text}.include? type
+      raise "Not a valid type: #{type}" unless valid_type
 
       @type = type
       @name = name
     end
 
-    private
-
-    TYPE_SYMBOLS = {
-      TrackTypes::NULL => :null,
-      TrackTypes::LIBRARY => :library,
-      TrackTypes::FILE => :file,
-      TrackTypes::TEXT => :text
-    }
   end
 
   # Public: A player in the model, which represents a channel's currently

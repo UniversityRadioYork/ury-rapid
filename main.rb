@@ -2,10 +2,10 @@ require 'eventmachine'
 require 'thin'
 require 'yaml'
 require_relative 'bapsapiapp'
-require_relative 'baps_client'
+require_relative 'baps/client'
 require_relative 'model'
 require_relative 'view'
-require_relative 'controller'
+require_relative 'baps/controller'
 
 # This example shows you how to embed Sinatra into your EventMachine
 # application. This is very useful if you're application needs some
@@ -109,9 +109,9 @@ end
 def setup_client(config, model, queue)
   client_config = config.values_at(*%W(hostname port username password))
 
-  client = Bra::BapsClient.new(queue, *client_config)
+  client = Bra::Baps::Client.new(queue, *client_config)
   client.start do |dispatch, _|
-    controller = Bra::Controller.new model
+    controller = Bra::Baps::Controller.new model
     controller.register dispatch
   end
 end
