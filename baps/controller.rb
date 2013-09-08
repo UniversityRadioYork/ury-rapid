@@ -108,15 +108,15 @@ module Bra
       end
 
       def item_count(response)
-        puts "[ITEM#] Channel: #{response[:subcode]} #{response[:count]} items"
+        nil
       end
 
       def client_add(response)
-        puts "[CLIENTCHANGE] Client #{response[:client]} appeared"
+        nil
       end
 
       def client_remove(response)
-        puts "[CLIENTCHANGE] Client #{response[:client]} disappeared"
+        nil
       end
 
       def log_message(response)
