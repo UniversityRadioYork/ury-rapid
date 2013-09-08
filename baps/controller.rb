@@ -2,8 +2,8 @@ require_relative 'codes'
 
 module Bra
   module Baps
-    # Internal: An object that responds to BAPS server responses by updating the
-    # model.
+    # Internal: An object that responds to BAPS server responses by updating
+    # the model.
     class Controller
       # Internal: Initialises the controllers.
       #
@@ -12,7 +12,8 @@ module Bra
         @model = model
       end
 
-      # Internal: Registers the controller's callbacks with a response dispatch.
+      # Internal: Registers the controller's callbacks with a response
+      # dispatch.
       #
       # dispatch - The object sending responses to listeners.
       #
@@ -27,7 +28,7 @@ module Bra
         dispatch.register_response_handlers functions
       end
 
-          # Public: Register playback response handler functions.
+      # Public: Register playback response handler functions.
       #
       # Returns nothing.
       def playback_functions
@@ -134,27 +135,35 @@ module Bra
         @model.channel(response[:subcode]).player
       end
 
-      # Converts an loaded response into a pair of load-state and item.
+      # Internal: Converts an loaded response into a pair of load-state and
+      # item.
       #
       # response - The loaded response to convert.
       #
       # Returns a list with the following items:
-      #   - The loading state (:ok, :loading or :failed);
-      #   - Either nil (no loaded item) or an Item representing the loaded item.
+      #   - The loading state (:ok, :loading, :empty or :failed);
+      #   - Either nil (no loaded item) or an Item representing the loaded
+      #     item.
       def loaded_item(response)
-        # Deal with BAPS's interesting way of encoding load states.
-        case response[:title]
-        when '--LOADING--'
-          [:loading, nil]
-        when '--LOAD FAILED--'
-          [:failed, nil]
-        when '--NONE--'
-          [:empty, nil]
-        else
-          type, title = response.values_at(:type, :title)
-          position response if response.key? :position
-          [:ok, Item.new(track_type_baps_to_bra(type), title)]
-        end
+        type, title, position = response.values_at :type, :title, :position
+        pair = SPECIAL_LOAD_STATES[title]
+        pair ||= normal_loaded_item(type, title, position)
+      end
+
+      # Internal: Processes a normal loaded item response, converting it into
+      # an item and possibly a position change.
+      #
+      # type     - The item type (one of :library, :file or :text).
+      # title    - The title to display for the item.
+      # position - Nil, or the position of the loaded item.
+      #
+      # Returns a list with the following items:
+      #   - The loading state (:ok, :loading, :empty or :failed);
+      #   - Either nil (no loaded item) or an Item representing the loaded
+      #     item.
+      def normal_loaded_item(type, title, position)
+        position response if response.key? :position
+        [:ok, Item.new(track_type_baps_to_bra(type), title)]
       end
 
       # Internal: Converts a BAPS track type to a BRA track type.
@@ -175,6 +184,17 @@ module Bra
           raise "Not a valid track type for conversion: #{type}"
         end
       end
+
+      # Internal: Hash mapping special load state names to pairs of BRA load
+      # states and item representations.
+      #
+      # This is necessary because of the rather odd way in which BAPS signifies
+      # loading states other than :ok (that is, inside the track name!).
+      SPECIAL_LOAD_STATES = {
+        '--LOADING--' => [:loading, nil],
+        '--LOAD FAILED--' => [:failed, nil],
+        '--NONE--' => [:empty, nil]
+      }
     end
   end
 end

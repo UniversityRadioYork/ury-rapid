@@ -1,6 +1,7 @@
 require_relative 'codes'
 require_relative 'connection'
 require_relative 'response_parser'
+require_relative 'reader'
 require_relative 'commands'
 require_relative 'dispatch'
 require_relative 'responses'
@@ -8,7 +9,7 @@ require_relative 'responses'
 module Bra
   module Baps
     # Public: A high-level representation of a client on the legacy BAPS
-    #server.
+    # server.
     class Client
       # Public: Creates a BAPS client.
       # queue    - The requests queue that will connect to this client.
