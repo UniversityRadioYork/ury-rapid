@@ -14,19 +14,19 @@ module Bra
 
       # Internal: Attaches a 16-bit integer to this request.
       def uint16(payload)
-        fixnum 2, FormatStrings::UINT16, payload
+        fixnum(2, FormatStrings::UINT16, payload)
       end
 
       # Internal: Attaches a 32-bit integer to this request.
       def uint32(payload)
-        fixnum 4, FormatStrings::UINT32, payload
+        fixnum(4, FormatStrings::UINT32, payload)
       end
 
       # Internal: Attaches a string to this request.
       def string(payload)
         length = payload.length
 
-        uint32 length
+        uint32(length)
 
         @format << FormatStrings::STRING_BODY
         @format << length.to_s
@@ -38,7 +38,7 @@ module Bra
 
       # Internal: Sends the request to a request queue.
       def to(queue)
-        queue.push pack
+        queue.push(pack)
       end
 
       private
