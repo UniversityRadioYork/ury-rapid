@@ -101,6 +101,12 @@ module Bra
     # Public: Access the player's current position for writing.
     attr_writer :position
 
+    # Public: Access the player's current duration for reading.
+    attr_reader :duration
+
+    # Public: Access the player's current duration for writing.
+    attr_writer :duration
+
     # Public: Access the player's current cue position for reading.
     attr_reader :cue
 
@@ -120,6 +126,7 @@ module Bra
       @cue = 0
       @intro = 0
       @position = 0
+      @duration = 0
       @loaded = nil
     end
 
