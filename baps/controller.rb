@@ -145,24 +145,25 @@ module Bra
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
       def loaded_item(response)
-        type, title, position = response.values_at :type, :title, :position
+        type, title, duration = response.values_at :type, :title, :duration
+        @model.channel(response[:subcode]).duration = duration if duration.nil?
+
         pair = SPECIAL_LOAD_STATES[title]
-        pair ||= normal_loaded_item(type, title, position)
+        pair ||= normal_loaded_item(type, title)
       end
 
       # Internal: Processes a normal loaded item response, converting it into
-      # an item and possibly a position change.
+      # an item and possibly a duration change.
       #
       # type     - The item type (one of :library, :file or :text).
       # title    - The title to display for the item.
-      # position - Nil, or the position of the loaded item.
+      # duration - Nil, or the duration of the loaded item.
       #
       # Returns a list with the following items:
       #   - The loading state (:ok, :loading, :empty or :failed);
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
-      def normal_loaded_item(type, title, position)
-        position response if response.key? :position
+      def normal_loaded_item(type, title)
         [:ok, Item.new(track_type_baps_to_bra(type), title)]
       end
 
@@ -173,16 +174,8 @@ module Bra
       # Returns a symbol (:library, :file or :text) being the BRA equivalent of
       # the BAPS track type.
       def track_type_baps_to_bra(type)
-        case type
-        when Types::Track::LIBRARY
-          :library
-        when Types::Track::FILE
-          :file
-        when Types::Track::TEXT
-          text
-        else
-          raise "Not a valid track type for conversion: #{type}"
-        end
+        raise InvalidTrackType, type unless TRACK_TYPE_MAP.include? type
+        TRACK_TYPE_MAP[type]
       end
 
       # Internal: Hash mapping special load state names to pairs of BRA load
@@ -194,6 +187,13 @@ module Bra
         '--LOADING--' => [:loading, nil],
         '--LOAD FAILED--' => [:failed, nil],
         '--NONE--' => [:empty, nil]
+      }
+
+      # Internal: Hash mapping BAPS track type numbers to BRA symbols.
+      TRACK_TYPE_MAP = {
+        Types::Track::LIBRARY => :library,
+        Types::Track::FILE => :file,
+        Types::Track::TEXT => :text
       }
     end
   end
