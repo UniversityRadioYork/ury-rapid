@@ -20,7 +20,7 @@ class BAPSApiApp < Sinatra::Base
       credentials = get_auth
       if credentials.nil?
         headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-        halt 401, json_error('Not authorised.')
+        halt(401, json_error('Not authorised.'))
       end
 
       halt(403, json_error('Forbidden.')) unless (credentials & keys) == keys
@@ -31,7 +31,7 @@ class BAPSApiApp < Sinatra::Base
 
       if @auth.provided? && @auth.basic? && @auth.credentials
         user, password = @auth.credentials
-        privileges_for user, password
+        privileges_for(user, password)
       else
         nil
       end
@@ -91,7 +91,7 @@ class BAPSApiApp < Sinatra::Base
       if body['state'].is_a?(String)
         id, state = params[:id], body['state']
         begin
-          command = Bra::Commands::SetPlayerState.new id, state
+          command = Bra::Commands::SetPlayerState.new(id, state)
         rescue Bra::Commands::ParamError => e
           halt 400, json_error(e.message)
         end

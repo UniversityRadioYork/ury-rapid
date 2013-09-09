@@ -46,7 +46,7 @@ module Bra
         #
         # Returns nothing.
         def run(queue)
-          Request.new(Codes::Playlist::RESET, @channel).send(queue)
+          Request.new(Codes::Playlist::RESET, @channel).to(queue)
         end
       end
 
@@ -61,8 +61,8 @@ module Bra
           super channel
 
           state_symbol = state.is_a?(Symbol) ? state : state.to_sym
-          valid_state = %i(stopped paused playing).include? state_symbol
-          raise ParamError, 'Not a valid state' unless valid_state
+          valid_state = %i(stopped paused playing).include?(state_symbol)
+          fail(ParamError, 'Not a valid state') unless valid_state
 
           @state = state_symbol
         end
@@ -77,7 +77,7 @@ module Bra
         #
         # Returns nothing.
         def run(queue)
-          Request.new(CODES[@state], @channel).send(queue)
+          Request.new(CODES[@state], @channel).to(queue)
         end
 
         private
@@ -97,7 +97,7 @@ module Bra
         # channel - The ID of the channel, as an integer or any coercible type.
         # position - The new position, as an integer or any coercible type.
         def initialize(channel, position)
-          super channel
+          super(channel)
           @position = Integer(position)
         end
 
@@ -112,7 +112,7 @@ module Bra
         # Returns nothing.
         def run(queue)
           command = Request.new(Codes::Playback::POSITION, @channel)
-          command.uint32(@position).send(queue)
+          command.uint32(@position).to(queue)
         end
       end
 
@@ -137,7 +137,7 @@ module Bra
         #
         # Returns nothing.
         def run(dispatch, queue)
-          Request.new(Codes::System::SET_BINARY_MODE).send(queue)
+          Request.new(Codes::System::SET_BINARY_MODE).to(queue)
           dispatch.register(Codes::System::SEED) do |response|
             yield response[:seed]
             dispatch.deregister(response[:command])
@@ -188,7 +188,7 @@ module Bra
           full_hash = Digest::MD5.hexdigest(@seed + password_hash)
 
           cmd = Request.new(Codes::System::LOGIN)
-          cmd.string(@username).string(full_hash).send(queue)
+          cmd.string(@username).string(full_hash).to(queue)
 
           dispatch.register(Codes::System::LOGIN_RESULT) do |response|
             yield response[:subcode], response[:details]
@@ -215,7 +215,7 @@ module Bra
         # Returns nothing.
         def run(dispatch, queue)
           # Subcode 3: Synchronise and add to chat
-          Request.new(Codes::System::SYNC, 3).send(queue)
+          Request.new(Codes::System::SYNC, 3).to(queue)
         end
       end
 
@@ -245,7 +245,7 @@ module Bra
         def run(dispatch, queue, &block)
           init = Initiate.new
           init.run(dispatch, queue) do |seed|
-            authenticate dispatch, queue, seed, block
+            authenticate(dispatch, queue, seed, block)
           end
         end
 
@@ -269,7 +269,7 @@ module Bra
           auth.run(dispatch, queue) do |code, string|
             is_ok = code == Authenticate::Errors::OK
             Synchronise.new.run(dispatch, queue) if is_ok
-            block.call code, string
+            block.call(code, string)
           end
         end
       end

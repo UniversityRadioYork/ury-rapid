@@ -35,7 +35,7 @@ end
 def make_dispatch(web_app)
   Rack::Builder.app do
     map '/' do
-      run web_app
+      run(web_app)
     end
   end
 end
@@ -64,7 +64,7 @@ end
 # Returns nothing.
 # Raises a string error if the server does not appear to be EM compatible.
 def check_server_em_compatible(server)
-  unless %W{thin hatetepe goliath}.include? server
+  unless %w(thin hatetepe goliath).include?(server)
     raise "Need an EM webserver, but #{server} isn't"
   end
 end
@@ -72,13 +72,13 @@ end
 def run
   config = YAML.load_file 'config.yml'
   model = Bra::Model.new
-  view = Bra::View.new model
+  view = Bra::View.new(model)
   queue = EM::Queue.new
-  app = BAPSApiApp.new config, view, queue
+  app = BAPSApiApp.new(config, view, queue)
 
   EM.run do
-    setup_server config, app
-    setup_client config, model, queue
+    setup_server(config, app)
+    setup_client(config, model, queue)
   end
 end
 
@@ -90,13 +90,13 @@ end
 #
 # Returns nothing.
 def setup_server(config, app)
-  server, host, port = get_options config
+  server, host, port = get_options(config)
 
-  dispatch = make_dispatch app
+  dispatch = make_dispatch(app)
 
-  check_server_em_compatible server
+  check_server_em_compatible(server)
 
-  start_server dispatch, server, host, port
+  start_server(dispatch, server, host, port)
 end
 
 # Internal: Initialises the client end of BRA, which handles requests to and
@@ -107,12 +107,12 @@ end
 #
 # Returns nothing.
 def setup_client(config, model, queue)
-  client_config = config.values_at(*%W(hostname port username password))
+  client_config = config.values_at(*%w(hostname port username password))
 
   client = Bra::Baps::Client.new(queue, *client_config)
   client.start do |dispatch, _|
     controller = Bra::Baps::Controller.new model
-    controller.register dispatch
+    controller.register(dispatch)
   end
 end
 

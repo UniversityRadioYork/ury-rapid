@@ -37,7 +37,7 @@ module Bra
       end
 
       # Internal: Sends the request to a request queue.
-      def send(queue)
+      def to(queue)
         queue.push pack
       end
 

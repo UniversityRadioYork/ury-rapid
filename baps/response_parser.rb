@@ -19,7 +19,7 @@ module Bra
         @reader = reader
 
         # Set up to expect the welcome message
-        @expected = [%i{message string}]
+        @expected = [%i(message string)]
         @response = {
           name: 'WelcomeMessage',
           code: Codes::System::WELCOME_MESSAGE,
@@ -38,8 +38,7 @@ module Bra
       # Internal: Attempt to process the top of the buffer as part of a
       # response.
       def process_next_token
-        command if @response.nil?
-        word unless @response.nil?
+        @response.nil? ? command : word
       end
 
       # Internal: Attempt to scrape a command word off the top of the buffer.
@@ -57,7 +56,7 @@ module Bra
           false
         else
           code, subcode = (raw_code & 0xFFF0), (raw_code & 0x000F)
-          @expected, @response = command_with_code code, subcode
+          @expected, @response = command_with_code(code, subcode)
           true
         end
       end
@@ -72,7 +71,7 @@ module Bra
       # should generally go to @response and @expected respectively.
       def command_with_code(code, subcode)
         responses = Responses::STRUCTURES
-        raise UnknownResponse, code.to_s(16) unless responses.key? code
+        fail(UnknownResponse, code.to_s(16)) unless responses.key?(code)
 
         name, *expected = responses[code]
         response = { name: name, code: code, subcode: subcode }
@@ -87,10 +86,7 @@ module Bra
       # Returns a boolean specifying whether there was enough data to process
       #   a data word or not.
       def word
-        no_more_arguments = @expected.empty?
-        success = finish_response if no_more_arguments
-        success = continue_response unless no_more_arguments
-        success
+        @expected.empty? ? finish_response : continue_response
       end
 
       # Internal: Reads a string argument.
@@ -105,7 +101,7 @@ module Bra
       #   the string length or not.
       def string(name)
         length = @reader.uint32
-        @expected.unshift [name, :raw_bytes, length] unless length.nil?
+        @expected.unshift([name, :raw_bytes, length]) unless length.nil?
 
         !length.nil?
       end
@@ -130,7 +126,7 @@ module Bra
         if config_type.nil?
           false
         else
-          @expected.unshift [:value, CONFIG_TYPE_MAP[config_type]]
+          @expected.unshift([:value, CONFIG_TYPE_MAP[config_type]])
 
           @response[name] = config_type
 
@@ -159,8 +155,8 @@ module Bra
         else
           # Note that these are in reverse order, as they're being shifted
           # onto the front.
-          @expected.unshift DURATION unless track_type == Types::Track::NULL
-          @expected.unshift TITLE
+          @expected.unshift(DURATION) unless track_type == Types::Track::NULL
+          @expected.unshift(TITLE)
 
           @response[name] = track_type
 
@@ -186,7 +182,7 @@ module Bra
       def primitive_word(word_description)
         name, arg_type, *args = word_description
 
-        data = @reader.send arg_type, *args
+        data = @reader.public_send(arg_type, *args)
         @response[name] = data unless data.nil?
 
         !data.nil?
@@ -197,7 +193,7 @@ module Bra
       #
       # Returns true (as in, this method always succeeds at processing data).
       def finish_response
-        @dispatch.emit @response
+        @dispatch.emit(@response)
         @response = nil
         true
       end
@@ -215,10 +211,10 @@ module Bra
 
         # Some command words can be read from the buffer directly, whereas
         # the parser has its own logic for the more complex ones.
-        success = (send arg_type, name, *args) if respond_to? arg_type
-        success = primitive_word word_description unless respond_to? arg_type
+        success = send(arg_type, name, *args) if respond_to? arg_type
+        success = primitive_word(word_description) unless respond_to? arg_type
 
-        @expected.unshift word_description unless success
+        @expected.unshift(word_description) unless success
         success
       end
 
@@ -230,8 +226,8 @@ module Bra
         Types::Config::STR => :string
       }
 
-      DURATION = %i{duration uint32}
-      TITLE = %i{title string}
+      DURATION = %i(duration uint32)
+      TITLE = %i(title string)
     end
   end
 end

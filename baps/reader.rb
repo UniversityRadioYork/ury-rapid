@@ -36,7 +36,7 @@ module Bra
 
       # Internal: Receives and discards a number of bytes.
       def skip(num_bytes)
-        @socket.recv num_bytes
+        @socket.recv(num_bytes)
         nil
       end
 
@@ -55,6 +55,23 @@ module Bra
         unpack 4, FormatStrings::FLOAT32
       end
 
+      # Internal: Reads a given number of raw bytes from the buffer.
+      #
+      # count - The number of bytes to read.
+      #
+      # Returns the received bytes as a string, or nil if the number of bytes
+      #   in the buffer is less than count.
+      def raw_bytes(count)
+        buffer_size = @buffer.bytesize
+        if buffer_size < count
+          nil
+        else
+          result = @buffer.byteslice(0...count)
+          @buffer = @buffer.byteslice(count..buffer_size)
+          result
+        end
+      end
+
       private
 
       # Internal: Reads a given number of bytes and unpacks the result
@@ -71,7 +88,7 @@ module Bra
       # Returns the unpacked equivalent of the bytes read; the type depends on
       #   unpack_format.
       def unpack(count, unpack_format)
-        list = unpack_multi count, unpack_format
+        list = unpack_multi(count, unpack_format)
         list.nil? ? nil : list[0]
       end
 
@@ -88,25 +105,8 @@ module Bra
       #
       # Returns the unpacked equivalent of the bytes read, as a list.
       def unpack_multi(count, unpack_format)
-        bytes = raw_bytes count
-        bytes.nil? ? nil : (bytes.unpack unpack_format)
-      end
-
-      # Internal: Reads a given number of raw bytes from the buffer.
-      #
-      # count - The number of bytes to read.
-      #
-      # Returns the received bytes as a string, or nil if the number of bytes
-      #   in the buffer is less than count.
-      def raw_bytes(count)
-        buffer_size = @buffer.bytesize
-        if buffer_size < count
-          nil
-        else
-          result = @buffer.byteslice(0...count)
-          @buffer = @buffer.byteslice(count..buffer_size)
-          result
-        end
+        bytes = raw_bytes(count)
+        bytes.nil? ? nil : bytes.unpack(unpack_format)
       end
     end
   end
