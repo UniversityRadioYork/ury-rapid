@@ -6,12 +6,12 @@ require 'json'
 class BAPSApiApp < Sinatra::Base
   use Rack::MethodOverride
 
-  def initialize(config, view, queue)
+  def initialize(config, view, commander_maker)
     super()
 
     @view = view
     @config = config
-    @queue = queue
+    @commander = commander_maker.call(method :client_error)
   end
 
   # TODO: Make this protection more granular.
@@ -60,12 +60,11 @@ class BAPSApiApp < Sinatra::Base
   end
 
   delete '/channels/:id/playlist/?' do
-    require_permissions! 'EditPlaylist'
     content_type :json
 
-    Bra::Commands::ClearPlaylist.new(params[:id]).run(@queue)
-
-    { status: :ok }.to_json
+    require_permissions!('EditPlaylist')
+    @commander.run(:ClearPlaylist, params[:id])
+    ok
   end
 
   get '/channels/:id/playlist/:index/?' do
@@ -84,24 +83,12 @@ class BAPSApiApp < Sinatra::Base
   end
 
   put '/channels/:id/player/state/?' do
-    require_permissions! 'SetPlayerState'
     content_type :json
 
-    parse_json_from request do |body|
-      if body['state'].is_a?(String)
-        id, state = params[:id], body['state']
-        begin
-          command = Bra::Commands::SetPlayerState.new(id, state)
-        rescue Bra::Commands::ParamError => e
-          halt 400, json_error(e.message)
-        end
-        command.run(@queue)
-        { status: :ok }.to_json
-      else
-        halt 400, json_error(
-          'Expected: {"state": "(stopped|started|paused)"}.'
-        )
-      end
+    require_permissions!('SetPlayerState')
+    parse_json_from(request) do |body|
+      @commander.run(:SetPlayerState, params[:id], body['state'])
+      ok
     end
   end
 
@@ -121,17 +108,11 @@ class BAPSApiApp < Sinatra::Base
   end
 
   put '/channels/:id/player/position/?' do
-    require_permissions! 'SetPlayerPosition'
+    require_permissions!('SetPlayerPosition')
 
-    parse_json_from request do |body|
-      if body['position'].is_a?(Numeric)
-        id, position = params[:id], body['position']
-        command = Bra::Commands::SetPlayerPosition.new(id, position)
-        command.run(@queue)
-        { status: :ok }.to_json
-      else
-        halt 400, json_error('Expected: {"position": (integer)}.')
-      end
+    parse_json_from(request) do |body|
+      @commander.run(:SetPlayerPosition, params[:id], body['position'])
+      ok
     end
   end
 
@@ -181,6 +162,15 @@ class BAPSApiApp < Sinatra::Base
     yield json
   end
 
+  # Internal: Flags a client error.
+  #
+  # message - The error message.
+  #
+  # Returns nothing.
+  def client_error(message)
+    halt 400, json_error(message)
+  end
+
   # Internal: Renders an error message in JSON.
   #
   # message - The error message.
@@ -188,5 +178,12 @@ class BAPSApiApp < Sinatra::Base
   # Returns the JSON-padded equivalent.
   def json_error(message)
     { status: :error, error: message }.to_json
+  end
+
+  # Internal: Returns a "request sent OK" message.
+  #
+  # Returns some JSON.
+  def ok
+    { status: :ok }.to_json
   end
 end

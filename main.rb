@@ -3,6 +3,8 @@ require 'thin'
 require 'yaml'
 require_relative 'bapsapiapp'
 require_relative 'baps/client'
+require_relative 'baps/commands'
+require_relative 'commander'
 require_relative 'model'
 require_relative 'view'
 require_relative 'baps/controller'
@@ -70,16 +72,29 @@ def check_server_em_compatible(server)
 end
 
 def run
-  config = YAML.load_file 'config.yml'
-  model = Bra::Model.new
-  view = Bra::View.new(model)
-  queue = EM::Queue.new
-  app = BAPSApiApp.new(config, view, queue)
-
+  config = YAML.load_file('config.yml')
+  app, model, queue = make_dependencies(config)
   EM.run do
     setup_server(config, app)
     setup_client(config, model, queue)
   end
+end
+
+# Internal: Instantiates the dependencies for the BRA system.
+#
+# config - The configuration hash from which any settings should be read.
+#
+# Returns a list containing the Sinatra app, the model and the requests queue
+# that should be used for making the cleint and server.
+def make_dependencies(config)
+  model = Bra::Model.new
+  view = Bra::View.new(model)
+  queue = EM::Queue.new
+  commander_maker = lambda do |error_callback|
+    Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)
+  end
+  app = BAPSApiApp.new(config, view, commander_maker)
+  [app, model, queue]
 end
 
 # Internal: Initialises the server end of BRA, which handles requests to and
