@@ -68,15 +68,15 @@ module Bra
       private
 
       def playing(response)
-        player_from(response).state = :playing
+        set_player_state(response, :playing)
       end
 
       def paused(response)
-        player_from(response).state = :paused
+        set_player_state(response, :paused)
       end
 
       def stopped(response)
-        player_from(response).state = :stopped
+        set_player_state(response, :stopped)
       end
 
       def position(response)
@@ -89,6 +89,10 @@ module Bra
 
       def intro(response)
         player_from(response).intro = response[:position]
+      end
+
+      def set_player_state(response, state)
+        @model.set_player_state(response[:subcode], state)
       end
 
       def item_data(response)
@@ -105,7 +109,7 @@ module Bra
       end
 
       def loaded(response)
-        player_from(response).load(*(loaded_item response))
+        player_from(response).load(*(loaded_item(response)))
       end
 
       def item_count(response)
@@ -132,7 +136,7 @@ module Bra
       # Returns a Player object which represents the requested channel's player
       #   model.
       def player_from(response)
-        @model.channel(response[:subcode]).player
+        @model.player(response[:subcode])
       end
 
       # Internal: Converts an loaded response into a pair of load-state and

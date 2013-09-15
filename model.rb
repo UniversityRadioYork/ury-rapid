@@ -27,6 +27,38 @@ module Bra
     def player(number)
       channel(number).player
     end
+
+    # Public: Sets the state of one of the channel players.
+    #
+    # number - The number of the channel (0 onwards).
+    # state  - The new state (one of :playing, :paused or :stopped).
+    #
+    # Returns nothing.
+    def set_player_state(number, state)
+      player(number).state = state
+    end
+
+    # Public: Converts the Model to a hash representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a hash representation of the Model.
+    def to_hash
+      {
+        channels: channels_to_hashes
+      }
+    end
+
+    # Public: Converts this Model's channels to an array of hash
+    # representations.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a hash-array representation of the Channel items stored in this
+    # Model.
+    def channels_to_hashes
+      @channels.map { |channel| channel.to_hash }
+    end
   end
 
   # Public: A channel in the BAPS server state.
@@ -53,7 +85,6 @@ module Bra
       @id = id
       @items = []
       @player = Player.new
-
     end
 
     # Internal: Add an item to the channel.
@@ -71,6 +102,19 @@ module Bra
     # Returns nothing.
     def clear_playlist
       @items = []
+    end
+
+    # Public: Converts the Channel to a hash representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a hash representation of the Channel.
+    def to_hash
+      {
+        id: @id,
+        items: @items.map { |item| item.to_hash },
+        player: @player.to_hash
+      }
     end
   end
 
@@ -90,6 +134,14 @@ module Bra
       @name = name
     end
 
+    # Public: Converts the Item to a hash representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a hash representation of the Item.
+    def to_hash
+      { name: @name, type: @type }
+    end
   end
 
   # Public: A player in the model, which represents a channel's currently
