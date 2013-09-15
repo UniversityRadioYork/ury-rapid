@@ -5,18 +5,27 @@ module Bra
     attr_reader :channels
 
     # Public: Initialise the model.
-    def initialize
+    def initialize(num_channels)
       @channels = []
-      3.times { |i| @channels.push Channel.new(i) }
+      num_channels.times { |i| @channels.push Channel.new(i) }
     end
 
     # Public: Access one of the playback channels.
     #
-    # number - The number of the channel (0-3).
+    # number - The number of the channel (0-(num_channels - 1)).
     #
     # Returns the Channel object.
     def channel(number)
       @channels[number]
+    end
+
+    # Public: Access one of the playback channel players.
+    #
+    # number - The number of the channel (0-(num_channels - 1)).
+    #
+    # Returns the Player object.
+    def player(number)
+      channel(number).player
     end
   end
 
