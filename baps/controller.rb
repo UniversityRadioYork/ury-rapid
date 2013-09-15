@@ -109,7 +109,7 @@ module Bra
       end
 
       def loaded(response)
-        player_from(response).load(*(loaded_item(response)))
+        @model.load_in_player(response[:subcode], *(loaded_item(response)))
       end
 
       def item_count(response)

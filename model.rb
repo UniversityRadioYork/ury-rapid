@@ -38,6 +38,16 @@ module Bra
       player(number).state = state
     end
 
+    # Public: Change the current item and load state for a channel player.
+    #
+    # number    - The number of the channel (0 onwards).
+    # new_state - The symbol (must be one of :ok, :loading or :failed)
+    #             representing the new state.
+    # new_item  - The Item representing the new loaded item.
+    def load_in_player(number, new_state, new_item)
+      player(number).load(new_state, new_item)
+    end
+
     # Public: Converts the Model to a hash representation.
     #
     # This conversion is not reversible and may lose some information.
