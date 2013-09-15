@@ -29,6 +29,17 @@ module Bra
         @queue = queue
       end
 
+      # Public: Starts a BAPS connection, logs into it, and then sets up the
+      # given API controller to handle the responses.
+      #
+      # controller - The controller that should be registered to handle any
+      #              responses coming from this client.
+      #
+      # Returns nothing.
+      def start_with_controller(controller)
+        start { |dispatch| controller.register(dispatch) }
+      end
+
       # Public: Starts a BAPS connection and logs into it.
       #
       # block - An implicit block to be called if the login succeeds.
@@ -37,7 +48,7 @@ module Bra
       #
       # Returns nothing.
       def start(&block)
-        EM.connect @hostname, @port, Connection, @parser, @queue
+        EM.connect(@hostname, @port, Connection, @parser, @queue)
         login(&block)
       end
 
@@ -53,12 +64,12 @@ module Bra
         login.run(@dispatch, @queue) do |error_code, error_string|
           login_succeeded = error_code == Commands::Authenticate::Errors::OK
 
-          die error_code, error_string unless login_succeeded
+          die(error_code, error_string) unless login_succeeded
           yield @dispatch, @queue if login_succeeded
         end
       end
 
-      # Internal: Shuts down the BAPS server if login failed.
+      # Internal: Shuts down the BAPS client if login failed.
       #
       # error_code   - The code of the login error that occurred.  See
       #                Commands::Authenticate::Errors.
@@ -66,7 +77,7 @@ module Bra
       #
       # Returns nothing.
       def die(error_code, error_string)
-        puts "Login failure: #{error_string} (code #{error_code})."
+        puts("Login failure: #{error_string} (code #{error_code}).")
         EM.stop
       end
     end
