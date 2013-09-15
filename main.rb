@@ -1,7 +1,7 @@
 require 'eventmachine'
 require 'thin'
 require 'yaml'
-require_relative 'bapsapiapp'
+require_relative 'server_app'
 require_relative 'baps/client'
 require_relative 'baps/commands'
 require_relative 'commander'
@@ -51,12 +51,7 @@ end
 #
 # Returns nothing.
 def start_server(dispatch, server, host, port)
-  Rack::Server.start({
-    app:    dispatch,
-    server: server,
-    Host:   host,
-    Port:   port
-  })
+  Rack::Server.start({ app: dispatch, server: server, Host: host, Port: port })
 end
 
 # Internal: Makes sure the server supplied can run EventMachine.
@@ -66,9 +61,16 @@ end
 # Returns nothing.
 # Raises a string error if the server does not appear to be EM compatible.
 def check_server_em_compatible(server)
-  unless %w(thin hatetepe goliath).include?(server)
-    raise "Need an EM webserver, but #{server} isn't"
-  end
+  fail("Need an EM server, but #{server} isn't") unless em_compatible?(server)
+end
+
+# Internal: Decides whether the server supplied can run EventMachine.
+#
+# server - The name of the server to check.
+#
+# Returns true if the server is compatible, and false otherwise.
+def em_compatible?(server)
+  %w(thin hatetepe goliath).include?(server)
 end
 
 def run
@@ -85,15 +87,15 @@ end
 # config - The configuration hash from which any settings should be read.
 #
 # Returns a list containing the Sinatra app, the model and the requests queue
-# that should be used for making the cleint and server.
+# that should be used for making the client and server.
 def make_dependencies(config)
-  model = Bra::Model.new
+  model = Bra::Model.new(config['num_channels'])
   view = Bra::View.new(model)
   queue = EM::Queue.new
   commander_maker = lambda do |error_callback|
     Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)
   end
-  app = BAPSApiApp.new(config, view, commander_maker)
+  app = Bra::ServerApp.new(config, view, commander_maker)
   [app, model, queue]
 end
 
@@ -125,10 +127,8 @@ def setup_client(config, model, queue)
   client_config = config.values_at(*%w(hostname port username password))
 
   client = Bra::Baps::Client.new(queue, *client_config)
-  client.start do |dispatch, _|
-    controller = Bra::Baps::Controller.new model
-    controller.register(dispatch)
-  end
+  controller = Bra::Baps::Controller.new(model)
+  client.start_with_controller(controller)
 end
 
 run if __FILE__ == $PROGRAM_NAME
