@@ -9,26 +9,6 @@ require_relative 'model'
 require_relative 'view'
 require_relative 'baps/controller'
 
-# This example shows you how to embed Sinatra into your EventMachine
-# application. This is very useful if you're application needs some
-# sort of API interface and you don't want to use EM's provided
-# web-server.
-
-# Internal: Unpack the options from the options hash.
-#
-# opts - A hash with keys :server, :host, :port and :app.
-#        The first three are optional and will be filled in with defaults.
-#
-# Returns a list [server, host, port, app].
-def get_options(opts)
-  # define some defaults for our app
-  server  = opts[:server] || 'thin'
-  host    = opts[:host]   || '0.0.0.0'
-  port    = opts[:port]   || '8181'
-  web_app = opts[:app]
-  [server, host, port, web_app]
-end
-
 # Internal: Creates the dispatch for the reactor.
 #
 # web_app - The app to map to /.
@@ -107,7 +87,7 @@ end
 #
 # Returns nothing.
 def setup_server(config, app)
-  server, host, port = get_options(config)
+  server, host, port = config['server'].values_at(*%w(rack host port))
 
   dispatch = make_dispatch(app)
 
@@ -124,7 +104,7 @@ end
 #
 # Returns nothing.
 def setup_client(config, model, queue)
-  client_config = config.values_at(*%w(hostname port username password))
+  client_config = config['baps'].values_at(*%w(host port username password))
 
   client = Bra::Baps::Client.new(queue, *client_config)
   controller = Bra::Baps::Controller.new(model)
