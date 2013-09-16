@@ -1,5 +1,7 @@
 %section.channel-playlist
-  %h1=playlist.name
+  - in_channel ||= false
+
+  %h1=in_channel ? "Playlist" : playlist.name
   - unless 0 < playlist.size
     %p No items.
 

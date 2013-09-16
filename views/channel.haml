@@ -1,15 +1,12 @@
 %section.channel{ class: channel.player_state }
+  - in_channel_list ||= false
+
   %h1=channel.name
 
-  = haml(:player, locals: { player: channel.player })
-  = haml(:playlist, locals: { playlist: channel.playlist })
+  = haml(:player, locals: { player: channel.player, in_channel: true })
+  = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
 
-  %nav
-    %h1 Resources
-    %ul
-      %li
-        %a{ href: "/bra/channels" } Channel List
-      %li
-        %a{ href: "/bra/channels/#{channel.id}" } Channel
-      %li
-        %a{ href: "/bra/channels/#{channel.id}/player" } Player
+  - if in_channel_list
+    %a.in{ href: "/bra/channels/#{channel.id}" } In
+  - unless in_channel_list
+    %a.out{ href: "/bra/channels" } Out

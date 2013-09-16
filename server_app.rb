@@ -81,7 +81,7 @@ module Bra
     end
 
     get '/channels/:id/player/state/?' do
-      respond_with :player_state, state: @model.player_state(params[:id])
+      respond_with :player_state, player: @model.player(params[:id])
     end
 
     put '/channels/:id/player/state/?' do

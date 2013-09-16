@@ -1,6 +1,8 @@
 %section.player
-  %h1=player.name
-  = haml :player_state, locals: {state: player.state}
+  - in_channel ||= false
+
+  %h1=in_channel ? "Player" : player.name
+  = haml :player_state, locals: { player: player, in_player: true }
   %p
     = surround "Load state is ", "." do
       %strong= player.load_state
@@ -8,3 +10,8 @@
     %p
       = surround "Playing ", "." do
         %strong= player.item.name
+
+  - if in_channel
+    %a.in{ href: "/bra/channels/#{player.channel_id}/player"} In
+  - unless in_channel
+    %a.out{ href: "/bra/channels/#{player.channel_id}"} Out

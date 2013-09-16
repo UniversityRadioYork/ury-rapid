@@ -1,4 +1,12 @@
-%section.player-state{ class: state }
+%section.player-state{ class: player.state }
+  - in_player ||= false
+
   %p
-    = surround "Currently ", "." do
-      %strong= state
+    - preamble = in_player ? "Currently " : "#{player.name} is currently "
+    = surround preamble, "." do
+      %strong= player.state
+
+  - if in_player
+    %a.in{ href: "/bra/channels/#{player.channel_id}/player/state" } In
+  - unless in_player
+    %a.out{ href: "/bra/channels/#{player.channel_id}/player" } Out
