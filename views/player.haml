@@ -1,8 +1,6 @@
 %section.player
   %h1=player.name
-  %p
-    = surround "Currently ", "." do
-      %strong= player.state
+  = haml :player_state, locals: {state: player.state}
   %p
     = surround "Load state is ", "." do
       %strong= player.load_state
