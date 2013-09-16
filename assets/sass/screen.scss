@@ -1,0 +1,131 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+@import "compass/utilities/general/clearfix";
+
+@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
+@import url('//fonts.googleapis.com/css?family=Comfortaa:700');
+
+$size-padding: 0.6rem;
+$colour-peeling-paper:    #058789;
+$colour-escape:           #e3a72f;
+$colour-puzzle-24000:     #d54b1a;
+$colour-wooden-platforms: #503d2e;
+$colour-lol:              #f0ecc9;
+
+@mixin border {
+    border: 0.2em solid black;
+    padding: $size-padding;
+}
+
+html {
+    font-family: 'Source Sans Pro', helvetica, arial, sans-serif;
+    text-align: center;
+
+    font-size: 16pt;
+
+    strong {
+        font-weight: bold;
+    }
+
+    background-color: $colour-wooden-platforms;
+
+    body {
+        >section, >nav {
+            font-size: 1rem !important;
+            margin: $size-padding !important;
+
+            background-color: $colour-lol;
+            display: inline-block;
+        }
+
+        >header {
+            color: $colour-lol;
+            margin: $size-padding;
+
+            >hgroup {
+                >h1 {
+                    display: inline;
+                    font-size: 3rem;
+                }
+                >h2 {
+                    display: inline;
+                    font-size: 1.2rem;
+                }
+            }
+        }
+
+        >footer {
+            color: $colour-lol;
+            >p.legal {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+
+h1, h2, h3 {
+    font-family: Comfortaa, helvetica, arial, sans-serif;
+    text-align: left;
+}
+
+h1, h2, h3, section, nav, p {
+    margin-bottom: $size-padding;
+    &:last-child {
+        margin-bottom: 0 !important;
+    }
+}
+
+section, nav {
+    @include border;
+
+    font-size: 0.9em;
+}
+
+h1, h2, h3 {
+    font-size: 1.2em;
+}
+
+ol.channels-list {
+    text-align: left;
+    border-collapse: separate;
+    border-spacing: $size-padding;
+
+    display: table;
+    margin: 0 auto;
+
+    >li {
+        display: table-cell;
+    }
+}
+
+ol.playlist-items {
+    @include border;
+
+    background-color: white;
+}
+
+section.channel {
+    @include border;
+
+    >section, >nav, >ol {
+        background-color: $colour-lol;
+    }
+
+    &.playing {
+        background-color: $colour-peeling-paper;
+    }
+    &.paused {
+        background-color: $colour-escape;
+    }
+    &.stopped {
+        background-color: $colour-puzzle-24000;
+    }
+}
+
+nav.resources {
+    clear: both;
+}

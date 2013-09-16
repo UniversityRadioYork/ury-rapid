@@ -13,7 +13,7 @@ module Bra
     #
     # Returns an array of channel representation hashes.
     def channels
-      @model.channels.map(&(method :channel))
+      @model.channels
     end
 
     # Public: Create a summary of the channel with the given ID.
@@ -23,7 +23,7 @@ module Bra
     #
     # Returns a hash representing the channel data.
     def channel_at(channel_id)
-      channel raw_channel_at(channel_id)
+      raw_channel_at(channel_id)
     end
 
     # Public: Create a summary of the player of the channel with the given ID.
@@ -33,7 +33,7 @@ module Bra
     #
     # Returns a hash representing the channel data.
     def player_for_channel_at(channel_id)
-      player raw_channel_at(channel_id).player
+      raw_channel_at(channel_id).player
     end
 
     # Public: Return the player loaded item for the channel with the given ID.

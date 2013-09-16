@@ -1,0 +1,12 @@
+%section.player
+  %h1 Player
+  %p
+    = surround "Currently ", "." do
+      %strong= player.state
+  %p
+    = surround "Load state is ", "." do
+      %strong= player.load_state
+  - if player.load_state == :ok
+    %p
+      = surround "Playing ", "." do
+        %strong= player.item.name

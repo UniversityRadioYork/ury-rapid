@@ -1,10 +1,17 @@
 require 'sinatra/base'
+require 'sinatra/contrib'
 require 'eventmachine'
-require 'json'
+require 'sass/plugin/rack'
 
 module Bra
   class ServerApp < Sinatra::Base
+    register Sinatra::Contrib
     use Rack::MethodOverride
+
+    Sass::Plugin.options[:style] = :compressed
+    use Sass::Plugin::Rack
+
+    respond_to :html, :json, :xml
 
     def initialize(config, view, commander_maker)
       super()
@@ -49,19 +56,13 @@ module Bra
       set :threaded, false
     end
 
-    get '/channels/?' do
-      content_type :json
-      @view.channels.to_json
+    get('/') { respond_with :index }
+    get('/channels/?') { respond_with :channels, channels: @view.channels }
+    get('/channels/:id/?') do
+      respond_with :channel, channel: @view.channel_at(params[:id])
     end
-
-    get '/channels/:id/?' do
-      content_type :json
-      @view.channel_at(params[:id]).to_json
-    end
-
     get '/channels/:id/playlist/?' do
-      content_type :json
-      @view.playlist_for_channel_at(params[:id]).to_json
+      respond_with :playlist, @view.playlist_for_channel_at(params[:id])
     end
 
     delete '/channels/:id/playlist/?' do
@@ -78,8 +79,7 @@ module Bra
     end
 
     get '/channels/:id/player/?' do
-      content_type :json
-      @view.player_for_channel_at(params[:id]).to_json
+      respond_with :player, player: @view.player_for_channel_at(params[:id])
     end
 
     get '/channels/:id/player/state/?' do
@@ -129,6 +129,12 @@ module Bra
     get '/channels/:id/player/intro/?' do
       content_type :json
       @view.player_intro_for_channel_at(params[:id]).to_json
+    end
+
+    get '/stylesheets/*' do
+      content_type 'text/css', :charset => 'utf-8'
+      filename = params[:splat].first
+      send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
 
     private

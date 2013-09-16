@@ -1,0 +1,27 @@
+%section.channel{ class: channel.player_state }
+  %h1 Channel #{channel.id}
+
+  = haml(:player, locals: {player: channel.player})
+
+  %section.channel-playlist
+    %h1 Playlist
+
+    - unless 0 < channel.playlist_size
+      %p No items.
+
+    - if 0 < channel.playlist_size
+      %ol.playlist-items
+        - channel.items.each_with_index do |item, id|
+          %li
+            %a{ href: "/bra/channels/#{channel.id}/playlist/#{id}"}
+              = item.name
+
+  %nav
+    %h1 Resources
+    %ul
+      %li
+        %a{ href: "/bra/channels" } Channel List
+      %li
+        %a{ href: "/bra/channels/#{channel.id}" } Channel
+      %li
+        %a{ href: "/bra/channels/#{channel.id}/player" } Player

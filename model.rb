@@ -107,11 +107,41 @@ module Bra
       @items[index] = item
     end
 
+    # Public: Retrieves the channel's player state.
+    #
+    # Returns the player state.
+    def player_state
+      @player.state
+    end
+
+    # Public: Retrieves the channel's player load state.
+    #
+    # Returns the player load state.
+    def player_load_state
+      @player.load_state
+    end
+
+    # Internal: Returns the number of items in the playlist.
+    #
+    # Returns the playlist item count.
+    def playlist_size
+      @items.size
+    end
+
     # Internal: Clears the channel's playlist.
     #
     # Returns nothing.
     def clear_playlist
       @items = []
+    end
+
+    # Public: Converts the Channel to a JSON representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a JSON representation of the Channel.
+    def to_json
+      to_hash.to_json
     end
 
     # Public: Converts the Channel to a hash representation.
@@ -227,6 +257,31 @@ module Bra
       valid_state = %i(ok loading failed empty).include? new_state
       raise 'Not a valid state' unless valid_state
       @load_state = new_state
+    end
+
+    # Public: Converts the Player to a JSON representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a JSON representation of the Player.
+    def to_json
+      to_hash.to_json
+    end
+
+    # Public: Converts the Player to a hash representation.
+    #
+    # This conversion is not reversible and may lose some information.
+    #
+    # Returns a hash representation of the Player.
+    def to_hash
+      {
+        item: @item.to_hash,
+        position: position,
+        cue: cue,
+        intro: intro,
+        state: state,
+        load_state: load_state
+      }
     end
   end
 end
