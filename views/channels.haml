@@ -4,7 +4,7 @@
   - if 0 < channels.size
     %ol.channels-list
       = list_of(channels) do |channel|
-        = haml(:channel, locals: {channel: channel})
+        = haml :channel, locals: {channel: channel}
   %nav.resources
     %h1 Resources
     %ul
