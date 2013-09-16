@@ -69,7 +69,7 @@ end
 # Returns a list containing the Sinatra app, the model and the requests queue
 # that should be used for making the client and server.
 def make_dependencies(config)
-  model = Bra::Model.new(config['num_channels'])
+  model = Bra::Models::Model.new(config['num_channels'])
   queue = EM::Queue.new
   commander_maker = lambda do |error_callback|
     Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)

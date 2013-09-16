@@ -13,6 +13,31 @@
     = yield
 
     %footer
+      %section.legend
+        %h1 Legend
+        %section.legend-play-state
+          %h1 Play state
+          %span.playing Playing
+          %span.paused Paused
+          %span.stopped Stopped
+        %section.legend-load-state
+          %h1 Load state
+          %span.loading Loading
+          %span.ok Load OK
+          %span.failed Load failed
+          %span.empty Nothing loaded
+        %section.legend-item-type
+          %h1 Item type
+          %span.library Library item
+          %span.file File item
+        %section.legend-links
+          %h1 Links
+          %p
+            Go inside
+            %i.in
+          %p
+            Go outside
+            %i.out
       %p.legal
         Style is Creative Commons BY-NC-SA 3.0.
         = surround "Palette by ", "." do

@@ -81,7 +81,7 @@ module Bra
     end
 
     get '/channels/:id/player/state/?' do
-      respond_with :player_state, player: @model.player(params[:id])
+      respond_with :player_state, state: @model.player_state(params[:id])
     end
 
     put '/channels/:id/player/state/?' do
@@ -95,8 +95,9 @@ module Bra
     end
 
     get '/channels/:id/player/load_state/?' do
-      content_type :json
-      @view.player_load_state_for_channel_at(params[:id]).to_json
+      respond_with :player_load_state, load_state: @model.player_load_state(
+        params[:id]
+      )
     end
 
     get '/channels/:id/player/item/?' do

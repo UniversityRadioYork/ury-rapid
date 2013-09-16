@@ -11,6 +11,8 @@
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
 
 $size-padding: 0.8rem;
+$size-padding-thin: 0.2rem;
+
 $colour-peeling-paper:    #058789;
 $colour-escape:           #E3A72F;
 $colour-puzzle-24000:     #D54B1A;
@@ -21,11 +23,17 @@ $colour-lol:              #F0ECC9;
 $colour-0719mpd:          #DD8CA7;
 $colour-mu-sky:           #BDB8EE;
 
+$colour-kai:              #101F78;
+$colour-black-tulip:      #420943;
+$colour-not-quite-black:  #303030;
+$colour-asian-red:        #A80000;
+
 $border-size: 0.15rem;
 
 @mixin border {
     border: $border-size solid black;
     padding: $size-padding;
+    padding-bottom: 0;
 }
 
 a {
@@ -50,10 +58,11 @@ html {
     background-color: $colour-wooden-platforms;
 
     body {
-        >section, >nav {
+        >section, >nav, >footer>section {
             font-size: 1rem !important;
             margin: $size-padding !important;
 
+            color: black;
             background-color: $colour-lol;
             display: inline-block;
 
@@ -90,11 +99,8 @@ h1, h2, h3 {
     text-align: left;
 }
 
-h1, h2, h3, section, nav, p {
-    margin-top: $size-padding;
-    &:first-child {
-        margin-top: 0 !important;
-    }
+h1, h2, h3, section, nav, p, ol {
+    margin-bottom: $size-padding;
 }
 
 section, nav {
@@ -143,6 +149,28 @@ section.channel {
 .stopped {
     background-color: $colour-puzzle-24000;
 }
+.file {
+    background-color: $colour-0719mpd;
+}
+.library {
+    background-color: $colour-mu-sky;
+}
+.loading {
+    background-color: $colour-black-tulip;
+    color: $colour-lol;
+}
+.ok {
+    background-color: $colour-kai;
+    color: $colour-lol;
+}
+.failed {
+    background-color: $colour-asian-red;
+    color: $colour-lol;
+}
+.empty {
+    background-color: $colour-not-quite-black;
+    color: $colour-lol;
+}
 
 section.item, li.item {
     @include border;
@@ -150,13 +178,11 @@ section.item, li.item {
     >section, >nav, >ol {
         background-color: $colour-lol;
     }
+}
 
-    &.file {
-        background-color: $colour-0719mpd;
-    }
-    &.library {
-        background-color: $colour-mu-sky;
-    }
+li.item {
+    position: relative;
+    padding: $size-padding-thin;
 }
 
 nav.resources {
@@ -165,7 +191,7 @@ nav.resources {
 
 $size-inout: $size-padding * (2 / 3);
 
-a.in, a.out {
+.in, .out {
     position: absolute;
     font-size: 0px;
     border: $border-size solid black;
@@ -175,13 +201,40 @@ a.in, a.out {
     display: block;
 
 }
-a.in {
+.in {
     bottom: 0;
     right: 0;
     border-bottom: 0;
     border-right: 0;
 }
-a.out {
+.out {
     top: -($size-inout);
     left: -($size-inout);
+}
+
+.legend {
+    h1 {
+        display: none;
+    }
+    >section {
+        border: none;
+        padding: 0;
+        text-align: center;
+        &:last-child {
+            margin-bottom: $size-padding;
+        }
+    }
+    p, span {
+        position: relative;
+        @include border;
+        display: inline-block;
+    }
+    p {
+        margin: $size-padding;
+        padding: $size-padding;
+        margin-bottom: 0;
+    }
+    span {
+        padding: $size-padding-thin;
+    }
 }

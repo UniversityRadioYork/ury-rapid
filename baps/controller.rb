@@ -98,7 +98,7 @@ module Bra
       def item_data(response)
         id, index = response.values_at(:subcode, :index)
         type, title = response.values_at(:type, :title)
-        item = Item.new track_type_baps_to_bra(type), title
+        item = Models::Item.new(track_type_baps_to_bra(type), title)
 
         @model.channel(id).add_item index, item
       end
@@ -168,7 +168,7 @@ module Bra
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
       def normal_loaded_item(type, title)
-        [:ok, Item.new(track_type_baps_to_bra(type), title)]
+        [:ok, Models::Item.new(track_type_baps_to_bra(type), title)]
       end
 
       # Internal: Converts a BAPS track type to a BRA track type.
