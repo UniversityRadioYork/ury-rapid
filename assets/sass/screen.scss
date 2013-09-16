@@ -10,7 +10,7 @@
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
 
-$size-padding: 0.6rem;
+$size-padding: 0.8rem;
 $colour-peeling-paper:    #058789;
 $colour-escape:           #E3A72F;
 $colour-puzzle-24000:     #D54B1A;
@@ -21,8 +21,10 @@ $colour-lol:              #F0ECC9;
 $colour-0719mpd:          #DD8CA7;
 $colour-mu-sky:           #BDB8EE;
 
+$border-size: 0.15rem;
+
 @mixin border {
-    border: 0.2em solid black;
+    border: $border-size solid black;
     padding: $size-padding;
 }
 
@@ -89,14 +91,16 @@ h1, h2, h3 {
 }
 
 h1, h2, h3, section, nav, p {
-    margin-bottom: $size-padding;
-    &:last-child {
-        margin-bottom: 0 !important;
+    margin-top: $size-padding;
+    &:first-child {
+        margin-top: 0 !important;
     }
 }
 
 section, nav {
     @include border;
+
+    position: relative;
 
     font-size: 0.9em;
 }
@@ -159,3 +163,25 @@ nav.resources {
     clear: both;
 }
 
+$size-inout: $size-padding * (2 / 3);
+
+a.in, a.out {
+    position: absolute;
+    font-size: 0px;
+    border: $border-size solid black;
+    background-color: $colour-lol;
+    width: $size-inout;
+    height: $size-inout;
+    display: block;
+
+}
+a.in {
+    bottom: 0;
+    right: 0;
+    border-bottom: 0;
+    border-right: 0;
+}
+a.out {
+    top: -($size-inout);
+    left: -($size-inout);
+}
