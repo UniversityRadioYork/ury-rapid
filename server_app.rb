@@ -1,22 +1,19 @@
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'eventmachine'
-require 'sass/plugin/rack'
+require 'json'
 
 module Bra
   class ServerApp < Sinatra::Base
     register Sinatra::Contrib
     use Rack::MethodOverride
 
-    Sass::Plugin.options[:style] = :compressed
-    use Sass::Plugin::Rack
-
     respond_to :html, :json, :xml
 
-    def initialize(config, view, commander_maker)
+    def initialize(config, model, commander_maker)
       super()
 
-      @view = view
+      @model = model
       @config = config
       @commander = commander_maker.call(method :client_error)
     end
@@ -57,12 +54,12 @@ module Bra
     end
 
     get('/') { respond_with :index }
-    get('/channels/?') { respond_with :channels, channels: @view.channels }
+    get('/channels/?') { respond_with :channels, channels: @model.channels }
     get('/channels/:id/?') do
-      respond_with :channel, channel: @view.channel_at(params[:id])
+      respond_with :channel, channel: @model.channel(params[:id])
     end
     get '/channels/:id/playlist/?' do
-      respond_with :playlist, @view.playlist_for_channel_at(params[:id])
+      respond_with :playlist, playlist: @model.playlist(params[:id])
     end
 
     delete '/channels/:id/playlist/?' do
@@ -74,17 +71,17 @@ module Bra
     end
 
     get '/channels/:id/playlist/:index/?' do
-      content_type :json
-      @view.playlist_item_for_channel_at(params[:id], params[:index]).to_json
+      respond_with :item, item: @model.playlist_item(
+        params[:id], params[:index]
+      )
     end
 
     get '/channels/:id/player/?' do
-      respond_with :player, player: @view.player_for_channel_at(params[:id])
+      respond_with :player, player: @model.player(params[:id])
     end
 
     get '/channels/:id/player/state/?' do
-      content_type :json
-      @view.player_state_for_channel_at(params[:id]).to_json
+      respond_with :player_state, state: @model.player_state(params[:id])
     end
 
     put '/channels/:id/player/state/?' do

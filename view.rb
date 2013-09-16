@@ -44,8 +44,7 @@ module Bra
     # Returns a hash representing the item (an empty hash if no item is
     # loaded).
     def player_item_for_channel_at(channel_id)
-      loaded = raw_channel_at(channel_id).player.item
-      loaded.nil? ? {} : item(loaded)
+      raw_channel_at(channel_id).player.item
     end
 
     # Public: Return the player state for the channel with the given ID.
@@ -119,7 +118,7 @@ module Bra
     #
     # Returns an array representing the playlist data
     def playlist_item_for_channel_at(channel_id, index)
-      item(raw_channel_at(channel_id).items[Integer(index)])
+      raw_channel_at(channel_id).items[Integer(index)]
     end
 
     private

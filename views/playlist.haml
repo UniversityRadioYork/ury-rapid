@@ -1,0 +1,11 @@
+%section.channel-playlist
+  %h1=playlist.name
+  - unless 0 < playlist.size
+    %p No items.
+
+  - if 0 < playlist.size
+    %ol.playlist-items
+      - playlist.contents.each_with_index do |item, id|
+        %li.item{ class: item.type }
+          %a{ href: "/bra/channels/#{playlist.channel_id}/playlist/#{id}"}
+            = item.name

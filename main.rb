@@ -70,12 +70,11 @@ end
 # that should be used for making the client and server.
 def make_dependencies(config)
   model = Bra::Model.new(config['num_channels'])
-  view = Bra::View.new(model)
   queue = EM::Queue.new
   commander_maker = lambda do |error_callback|
     Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)
   end
-  app = Bra::ServerApp.new(config, view, commander_maker)
+  app = Bra::ServerApp.new(config, model, commander_maker)
   [app, model, queue]
 end
 

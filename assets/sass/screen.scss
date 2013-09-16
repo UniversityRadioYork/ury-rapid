@@ -5,20 +5,34 @@
 
 @import "compass/reset";
 @import "compass/utilities/general/clearfix";
+@import "compass/typography/links/link-colors";
 
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
 
 $size-padding: 0.6rem;
 $colour-peeling-paper:    #058789;
-$colour-escape:           #e3a72f;
-$colour-puzzle-24000:     #d54b1a;
-$colour-wooden-platforms: #503d2e;
-$colour-lol:              #f0ecc9;
+$colour-escape:           #E3A72F;
+$colour-puzzle-24000:     #D54B1A;
+$colour-wooden-platforms: #503D2E;
+$colour-lol:              #F0ECC9;
+
+// Item type colours
+$colour-0719mpd:          #DD8CA7;
+$colour-mu-sky:           #BDB8EE;
 
 @mixin border {
     border: 0.2em solid black;
     padding: $size-padding;
+}
+
+a {
+    @include link-colors(
+        $colour-peeling-paper,
+        $colour-escape,
+        $colour-escape,
+        $colour-puzzle-24000
+    );
 }
 
 html {
@@ -40,6 +54,8 @@ html {
 
             background-color: $colour-lol;
             display: inline-block;
+
+            text-align: left;
         }
 
         >header {
@@ -85,6 +101,10 @@ section, nav {
     font-size: 0.9em;
 }
 
+nav h1 {
+    display: none;
+}
+
 h1, h2, h3 {
     font-size: 1.2em;
 }
@@ -100,12 +120,6 @@ ol.channels-list {
     >li {
         display: table-cell;
     }
-}
-
-ol.playlist-items {
-    @include border;
-
-    background-color: white;
 }
 
 section.channel {
@@ -126,6 +140,22 @@ section.channel {
     }
 }
 
+section.item, li.item {
+    @include border;
+
+    >section, >nav, >ol {
+        background-color: $colour-lol;
+    }
+
+    &.file {
+        background-color: $colour-0719mpd;
+    }
+    &.library {
+        background-color: $colour-mu-sky;
+    }
+}
+
 nav.resources {
     clear: both;
 }
+
