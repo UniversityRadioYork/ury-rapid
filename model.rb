@@ -71,6 +71,17 @@ module Bra
         channel(number).set_player_state(state)
       end
 
+      # Public: Sets the position of one of the channel player markers.
+      #
+      # number   - The number of the channel (0 onwards).
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      # position - The new position, as a non-negative integer or coercible.
+      #
+      # Returns nothing.
+      def set_player_marker(number, type, position)
+        channel(number).set_player_marker(type, position)
+      end
+
       # Public: Change the current item and load state for a channel player.
       #
       # number    - The number of the channel (0 onwards).

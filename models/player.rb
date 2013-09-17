@@ -17,26 +17,14 @@ module Bra
       # Public: Access the player's current position for reading.
       attr_reader :position
 
-      # Public: Access the player's current position for writing.
-      attr_writer :position
-
       # Public: Access the player's current duration for reading.
       attr_reader :duration
-
-      # Public: Access the player's current duration for writing.
-      attr_writer :duration
 
       # Public: Access the player's current cue position for reading.
       attr_reader :cue
 
-      # Public: Access the player's current cue position for writing.
-      attr_writer :cue
-
       # Public: Access the player's current intro position for reading.
       attr_reader :intro
-
-      # Public: Access the player's current intro position for writing.
-      attr_writer :intro
 
       # Public: Initialises a Player.
       #
@@ -44,16 +32,12 @@ module Bra
       def initialize(channel)
         super('Player', channel)
 
-        @state = PlayerVariable.new(
-          'State', self, :stopped, method(:validate_state)
-        )
-        @load_state = PlayerVariable.new(
-          'Load State', self, :empty, method(:validate_load_state)
-        )
-        @cue = 0
-        @intro = 0
-        @position = 0
-        @duration = 0
+        @state = make_variable('State', :stopped, :validate_state)
+        @load_state = make_variable('Load State', :ok, :validate_load_state)
+        @cue = make_position('Cue')
+        @intro = make_position('Intro')
+        @position = make_position('Position')
+        @duration = make_position('Duration')
         @loaded = nil
       end
 
@@ -71,6 +55,23 @@ module Bra
       # Returns nothing.
       def set_state(new_state)
         @state.value = new_state
+      end
+
+      # Public: Sets the position of one of the player markers.
+      #
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      # position - The new position, as a non-negative integer or coercible.
+      #
+      # Returns nothing.
+      def set_marker(type, position)
+        marker = {
+          cue: @cue,
+          duration: @duration,
+          intro: @intro,
+          position: @position
+        }[type]
+        fail("Unknown marker type: #{type}.") if marker.nil?
+        marker.value = position
       end
 
       # Public: Change the player model's current item and load state.
@@ -120,26 +121,72 @@ module Bra
 
       private
 
+      # Internal: Makes a new player variable.
+      #
+      # name          - The name of the variable.
+      # initial_value - The initial value of the variable.
+      # validator     - A filter that validates and returns new values.
+      #
+      # Returns the PlayerVariable constructed from the above.
+      def make_variable(name, initial_value, validator)
+        PlayerVariable.new(name, self, initial_value, method(validator))
+      end
+
+      # Internal: Makes a new player position variable.
+      #
+      # name          - The name of the variable.
+      #
+      # Returns the PlayerVariable constructed from the above.
+      def make_position(name)
+        make_variable(name, 0, :validate_position)
+      end
+
+      # Internal: Validates an incoming position.
+      #
+      # new_position - The incoming position.
+      #
+      # Returns the validated state nothing.
+      # Raises an exception if the value is invalid.
+      def validate_position(new_position)
+        position_int = Integer(new_position)
+        fail('Position is negative.') if position_int < 0
+        # TODO: Check against duration
+        position_int
+      end
+
       # Internal: Validates an incoming player state.
       #
       # new_state - The incoming player state.
       #
-      # Returns nothing.
+      # Returns the validated state.
       # Raises an exception if the value is invalid.
       def validate_state(new_state)
-        valid_state = %i(playing paused stopped).include?(new_state)
-        fail('Not a valid state') unless valid_state
+        validate_symbol(new_state, %i(playing paused stopped))
       end
 
       # Internal: Validates an incoming player load state.
       #
       # new_state - The incoming player load state.
       #
-      # Returns nothing.
+      # Returns the validated state.
       # Raises an exception if the value is invalid.
       def validate_load_state(new_state)
-        valid_state = %i(ok loading failed empty).include?(new_state)
-        fail('Not a valid load state') unless valid_state
+        validate_symbol(new_state, %i(ok loading failed empty))
+      end
+
+      # Internal: Validates an incoming symbol.
+      #
+      # new_symbol - The incoming symbol.
+      # candidates - A list of allowed symbols.
+      #
+      # Returns the validated symbol.
+      # Raises an exception if the value is invalid.
+      def validate_symbol(new_symbol, candidates)
+        # TODO: convert strings to symbols
+        fail(
+          "Expected one of #{candidates}, got #{new_symbol}"
+        ) unless candidates.include?(new_symbol)
+        new_symbol
       end
 
       # Internal: Change the player model's load state.
@@ -193,7 +240,8 @@ module Bra
       # player        - The Player the variable is attached to.
       # initial_value - The initial value for the PlayerVariable.
       # validator     - A proc that, given a new value, will raise an exception
-      #                 if the value is invalid.  Can be nil.
+      #                 if the value is invalid and return a sanitised version
+      #                 of the value otherwise.  Can be nil.
       def initialize(name, player, initial_value, validator)
         super(name, player)
         @value = initial_value
@@ -201,8 +249,9 @@ module Bra
       end
 
       def value=(new_value)
-        @validator.call(new_value) unless @validator.nil?
-        @value = new_value
+        validated = new_value if @validator.nil?
+        validated = @validator.call(new_value) unless @validator.nil?
+        @value = validated
       end
 
       def to_json

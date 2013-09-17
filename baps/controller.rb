@@ -38,9 +38,9 @@ module Bra
           Codes::Playback::PLAY => set_state_handler(:playing),
           Codes::Playback::PAUSE => set_state_handler(:paused),
           Codes::Playback::STOP => set_state_handler(:stopped),
-          Codes::Playback::POSITION => method(:position),
-          Codes::Playback::CUE => method(:cue),
-          Codes::Playback::INTRO => method(:intro),
+          Codes::Playback::POSITION => set_marker_handler(:position),
+          Codes::Playback::CUE => set_marker_handler(:cue),
+          Codes::Playback::INTRO => set_marker_handler(:intro),
           Codes::Playback::LOADED => method(:loaded)
         }
       end
@@ -78,16 +78,19 @@ module Bra
         ->(response) { @model.set_player_state(response[:subcode], state) }
       end
 
-      def position(response)
-        player_from(response).position = response[:position]
-      end
-
-      def cue(response)
-        player_from(response).cue = response[:position]
-      end
-
-      def intro(response)
-        player_from(response).intro = response[:position]
+      # Internal: Creates a proc that will handle a marker change for the
+      # given marker type.
+      #
+      # type - The marker type of which the proc will set the position.
+      #
+      # Returns a proc that takes a BAPS response and sets the appropriate
+      #   marker of the type provided to this function.
+      def set_marker_handler(type)
+        lambda do |response|
+          @model.set_player_marker(
+            response[:subcode], type, response[:position]
+          )
+        end
       end
 
       def item_data(response)
@@ -95,7 +98,7 @@ module Bra
         type, title = response.values_at(:type, :title)
         item = Models::Item.new(track_type_baps_to_bra(type), title)
 
-        @model.channel(id).add_item index, item
+        @model.channel(id).add_item(index, item)
       end
 
       def reset(response)

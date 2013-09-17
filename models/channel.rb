@@ -96,6 +96,16 @@ module Bra
         @player.set_state(new_state)
       end
 
+      # Public: Sets the position of one of the player markers.
+      #
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      # position - The new position, as a non-negative integer or coercible.
+      #
+      # Returns nothing.
+      def set_player_marker(type, position)
+        @player.set_marker(type, position)
+      end
+
       # Public: Retrieves the channel's player load state.
       #
       # Returns the player load state.
