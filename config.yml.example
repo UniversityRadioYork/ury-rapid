@@ -1,0 +1,21 @@
+baps:
+  host: HOST
+  port: 9999
+  username: USER
+  password: PASS
+
+server:
+  rack: thin
+  host: 0.0.0.0
+  port: 8181
+  root: /bra/
+
+num_channels: 3
+
+users:
+  test:
+    password: TestPassword
+    privileges:
+      - SetPlayerState
+      - SetPlayerPosition
+      - EditPlaylist
