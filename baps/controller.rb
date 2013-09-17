@@ -33,9 +33,9 @@ module Bra
       # Returns nothing.
       def playback_functions
         {
-          Codes::Playback::PLAY => method(:playing),
-          Codes::Playback::PAUSE => method(:paused),
-          Codes::Playback::STOP => method(:stopped),
+          Codes::Playback::PLAY => set_state_handler(:playing),
+          Codes::Playback::PAUSE => set_state_handler(:paused),
+          Codes::Playback::STOP => set_state_handler(:stopped),
           Codes::Playback::POSITION => method(:position),
           Codes::Playback::CUE => method(:cue),
           Codes::Playback::INTRO => method(:intro),
@@ -67,16 +67,15 @@ module Bra
 
       private
 
-      def playing(response)
-        set_player_state(response, :playing)
-      end
-
-      def paused(response)
-        set_player_state(response, :paused)
-      end
-
-      def stopped(response)
-        set_player_state(response, :stopped)
+      # Internal: Creates a proc that will handle a state change for the
+      # given state.
+      #
+      # state - The state that the proc will set players to.
+      #
+      # Returns a proc that takes a BAPS response and sets the appropriate
+      #   player state to that provided to this function.
+      def set_state_handler(state)
+        ->(response) { @model.set_player_state(response[:subcode], state) }
       end
 
       def position(response)
@@ -89,10 +88,6 @@ module Bra
 
       def intro(response)
         player_from(response).intro = response[:position]
-      end
-
-      def set_player_state(response, state)
-        @model.set_player_state(response[:subcode], state)
       end
 
       def item_data(response)
