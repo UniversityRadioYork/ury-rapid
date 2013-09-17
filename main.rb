@@ -14,11 +14,9 @@ require_relative 'baps/controller'
 # web_app - The app to map to /.
 #
 # Returns the dispatch.
-def make_dispatch(web_app)
+def make_dispatch(config, web_app)
   Rack::Builder.app do
-    map '/' do
-      run(web_app)
-    end
+    map(config['server']['root']) { run(web_app) }
   end
 end
 
@@ -88,7 +86,7 @@ end
 def setup_server(config, app)
   server, host, port = config['server'].values_at(*%w(rack host port))
 
-  dispatch = make_dispatch(app)
+  dispatch = make_dispatch(config, app)
 
   check_server_em_compatible(server)
 
