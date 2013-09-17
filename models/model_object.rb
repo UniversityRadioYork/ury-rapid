@@ -20,8 +20,8 @@ module Bra
       # This expects a to_hash method to be defined.
       #
       # Returns the JSON representation of the model object.
-      def to_json
-        to_hash.to_json
+      def to_json(*args)
+        to_hash.to_json(*args)
       end
     end
   end
