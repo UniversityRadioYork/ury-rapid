@@ -246,6 +246,13 @@ module Bra
       def parent_url
         @channel.url
       end
+
+      # Public: Converts the playlist to JSON.
+      #
+      # Returns a JSON representation of the playlist.
+      def to_json(*args)
+        @contents.to_json(*args)
+      end
     end
   end
 end
