@@ -212,6 +212,18 @@ li.item {
     padding: $size-padding-thin;
 }
 
+nav.main-menu {
+    border: none;
+    text-align: center;
+
+    li {
+        @include border;
+
+        display: inline-block;
+        padding: $size-padding;
+    }
+}
+
 nav.resources {
     clear: both;
 }
