@@ -28,7 +28,9 @@ module Bra
         dispatch.register_response_handlers functions
       end
 
-      # Public: Register playback response handler functions.
+      private
+
+      # Internal: Register playback response handler functions.
       #
       # Returns nothing.
       def playback_functions
@@ -43,7 +45,7 @@ module Bra
         }
       end
 
-      # Public: Register playlist response handler functions.
+      # Internal: Register playlist response handler functions.
       #
       # Returns nothing.
       def playlist_functions
@@ -54,7 +56,7 @@ module Bra
         }
       end
 
-      # Public: Register system response handler functions.
+      # Internal: Register system response handler functions.
       #
       # Returns nothing.
       def system_functions
@@ -64,8 +66,6 @@ module Bra
           Codes::System::LOG_MESSAGE => method(:log_message)
         }
       end
-
-      private
 
       # Internal: Creates a proc that will handle a state change for the
       # given state.
