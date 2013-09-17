@@ -100,6 +100,20 @@ module Bra
         }
       end
 
+      # Public: Returns the canonical URL of this player.
+      #
+      # Returns the URL, relative to the API root.
+      def url
+        [@channel.url, 'player'].join('/')
+      end
+
+      # Public: Returns the canonical URL of this player's parent.
+      #
+      # Returns the URL, relative to the API root.
+      def parent_url
+        @channel.url
+      end
+
       private
 
       # Public: Change the player model's load state.

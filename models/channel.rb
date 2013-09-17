@@ -211,6 +211,20 @@ module Bra
       def size
         @contents.size
       end
+
+      # Public: Returns the canonical URL of this playlist.
+      #
+      # Returns the URL, relative to the API root.
+      def url
+        [@channel.url, 'playlist'].join('/')
+      end
+
+      # Public: Returns the canonical URL of this playlist's parent.
+      #
+      # Returns the URL, relative to the API root.
+      def parent_url
+        @channel.url
+      end
     end
   end
 end

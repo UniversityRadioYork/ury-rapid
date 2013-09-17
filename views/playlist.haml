@@ -13,6 +13,6 @@
           %a.in{ href: url("/channels/#{playlist.channel_id}/playlist/#{id}") } In
 
   - if in_channel
-    %a.in{ href: url("/channels/#{playlist.channel_id}/playlist") } In
+    %a.in{ href: url(playlist.url) } In
   - unless in_channel
-    %a.out{ href: url("/channels/#{playlist.channel_id}") } Out
+    %a.out{ href: url(playlist.parent_url) } Out
