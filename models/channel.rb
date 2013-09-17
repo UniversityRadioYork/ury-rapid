@@ -43,14 +43,16 @@ module Bra
 
       # Internal: Initialises a Channel.
       #
-      # id - The ID number of the channel.
-      def initialize(id)
+      # id   - The ID number of the channel.
+      # root - The model root.
+      def initialize(id, root)
         super("Channel #{id}")
 
         @id = id
         @items = []
         @player = Player.new(self)
         @playlist = Playlist.new(self)
+        @root = root
       end
 
       # Internal: Add an item to the channel.
@@ -125,6 +127,20 @@ module Bra
           items: @items.map { |item| item.to_hash },
           player: @player.to_hash
         }
+      end
+
+      # Public: Returns the canonical URL of this channel.
+      #
+      # Returns the URL, relative to the API root.
+      def url
+        [@root.channels_url, @id].join('/')
+      end
+
+      # Public: Returns the canonical URL of this channel's parent.
+      #
+      # Returns the URL, relative to the API root.
+      def parent_url
+        @root.channels_url
       end
     end
 

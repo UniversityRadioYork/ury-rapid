@@ -13,7 +13,7 @@ module Bra
       def initialize(num_channels)
         super('Model')
 
-        @channels = (0...num_channels).map { |i| Channel.new(i) }
+        @channels = (0...num_channels).map { |i| Channel.new(i, self) }
       end
 
       # Public: Access one of the playback channels.
@@ -102,6 +102,20 @@ module Bra
         {
           channels: @channels.map { |channel| channel.to_hash }
         }
+      end
+
+      # Public: Returns the canonical URL of the model root.
+      #
+      # Returns the URL, relative to the API root.
+      def url
+        '/'
+      end
+
+      # Public: Returns the canonical URL of the model channel list.
+      #
+      # Returns the URL, relative to the API root.
+      def channels_url
+        '/channels'
       end
     end
   end
