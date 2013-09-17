@@ -7,6 +7,6 @@
   = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
 
   - if in_channel_list
-    %a.in{ href: "/bra/channels/#{channel.id}" } In
+    %a.in{ href: url("/channels/#{channel.id}") } In
   - unless in_channel_list
-    %a.out{ href: "/bra/channels" } Out
+    %a.out{ href: url("/channels") } Out

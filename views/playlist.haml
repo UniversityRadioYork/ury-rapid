@@ -10,9 +10,9 @@
       - playlist.contents.each_with_index do |item, id|
         %li.item{ class: item.type }
           %span= item.name
-          %a.in{ href: "/bra/channels/#{playlist.channel_id}/playlist/#{id}"} In
+          %a.in{ href: url("/channels/#{playlist.channel_id}/playlist/#{id}") } In
 
   - if in_channel
-    %a.in{ href: "/bra/channels/#{playlist.channel_id}/playlist" } In
+    %a.in{ href: url("/channels/#{playlist.channel_id}/playlist") } In
   - unless in_channel
-    %a.out{ href: "/bra/channels/#{playlist.channel_id}" } Out
+    %a.out{ href: url("/channels/#{playlist.channel_id}") } Out

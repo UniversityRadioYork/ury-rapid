@@ -8,6 +8,6 @@
       %strong= state.value
 
   - if in_player
-    %a.in{ href: "/bra/channels/#{state.player_channel_id}/player/state" } In
+    %a.in{ href: url("/channels/#{state.player_channel_id}/player/state") } In
   - unless in_player
-    %a.out{ href: "/bra/channels/#{state.player_channel_id}/player" } Out
+    %a.out{ href: url("/channels/#{state.player_channel_id}/player") } Out

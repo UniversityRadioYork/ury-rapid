@@ -10,6 +10,6 @@
         %strong= player.item.name
 
   - if in_channel
-    %a.in{ href: "/bra/channels/#{player.channel_id}/player"} In
+    %a.in{ href: url("/channels/#{player.channel_id}/player") } In
   - unless in_channel
-    %a.out{ href: "/bra/channels/#{player.channel_id}"} Out
+    %a.out{ href: url("/channels/#{player.channel_id}") } Out
