@@ -42,10 +42,14 @@ module Bra
       #
       # channel - The channel of the player.
       def initialize(channel)
-        super("Player", channel)
+        super('Player', channel)
 
-        @state = PlayerState.new(self)
-        @load_state = PlayerLoadState.new(self)
+        @state = PlayerVariable.new(
+          'State', self, :stopped, method(:validate_state)
+        )
+        @load_state = PlayerVariable.new(
+          'Load State', self, :empty, method(:validate_load_state)
+        )
         @cue = 0
         @intro = 0
         @position = 0
@@ -116,7 +120,29 @@ module Bra
 
       private
 
-      # Public: Change the player model's load state.
+      # Internal: Validates an incoming player state.
+      #
+      # new_state - The incoming player state.
+      #
+      # Returns nothing.
+      # Raises an exception if the value is invalid.
+      def validate_state(new_state)
+        valid_state = %i(playing paused stopped).include?(new_state)
+        fail('Not a valid state') unless valid_state
+      end
+
+      # Internal: Validates an incoming player load state.
+      #
+      # new_state - The incoming player load state.
+      #
+      # Returns nothing.
+      # Raises an exception if the value is invalid.
+      def validate_load_state(new_state)
+        valid_state = %i(ok loading failed empty).include?(new_state)
+        fail('Not a valid load state') unless valid_state
+      end
+
+      # Internal: Change the player model's load state.
       #
       # new_state - The symbol representing the new state.
       #
@@ -132,7 +158,8 @@ module Bra
         @player = player
       end
 
-      # Internal: Returns the ID of the channel this player component is inside.
+      # Internal: Returns the ID of the channel this player component is
+      # inside.
       #
       # Returns the channel ID.
       def player_channel_id
@@ -148,39 +175,34 @@ module Bra
       end
     end
 
-    class PlayerState < PlayerComponent
+    # Public: A container for a player variable.
+    #
+    # This container exists to make the traversal of the API at the variable
+    # level easier; player variables have a defined parent, so one can deduce
+    # the player to whom the variable belongs from the variable itself.
+    #
+    # Player variables also have validation, so that broken controllers can be
+    # discovered.
+    class PlayerVariable < PlayerComponent
+      # Public: Allows direct read access to the value.
       attr_reader :value
 
-      def initialize(player)
-        super("State", player)
-        @value = :stopped
+      # Internal: Initialises a PlayerVariable.
+      #
+      # name          - The name of the variable.
+      # player        - The Player the variable is attached to.
+      # initial_value - The initial value for the PlayerVariable.
+      # validator     - A proc that, given a new value, will raise an exception
+      #                 if the value is invalid.  Can be nil.
+      def initialize(name, player, initial_value, validator)
+        super(name, player)
+        @value = initial_value
+        @validator = validator
       end
 
-      def value=(new_state)
-        valid_state = %i(playing paused stopped).include? new_state
-        raise 'Not a valid state' unless valid_state
-
-        @value = new_state
-      end
-
-      def to_json
-        @value.to_json
-      end
-    end
-
-    class PlayerLoadState < PlayerComponent
-      attr_reader :value
-
-      def initialize(player)
-        super("Load State", player)
-        @value = :empty
-      end
-
-      def value=(new_state)
-        valid_state = %i(ok loading failed empty).include? new_state
-        raise 'Not a valid load state' unless valid_state
-
-        @value = new_state
+      def value=(new_value)
+        @validator.call(new_value) unless @validator.nil?
+        @value = new_value
       end
 
       def to_json
