@@ -96,6 +96,15 @@ module Bra
         @player.set_state(new_state)
       end
 
+      # Public: Gets the position of one of the player markers.
+      #
+      # type - The marker type (:position, :cue, :intro or :duration).
+      #
+      # Returns the marker position.
+      def player_marker(type)
+        @player.marker(type)
+      end
+
       # Public: Sets the position of one of the player markers.
       #
       # type     - The marker type (:position, :cue, :intro or :duration).

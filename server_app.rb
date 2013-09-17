@@ -104,10 +104,11 @@ module Bra
       @view.player_item_for_channel_at(params[:id]).to_json
     end
 
-    get '/channels/:id/player/position/?' do
-      content_type :json
-      @view.player_position_for_channel_at(params[:id]).to_json
-    end
+    # Markers
+    get('/channels/:id/player/position/?') { marker(params[:id], :position) }
+    get('/channels/:id/player/duration/?') { marker(params[:id], :duration) }
+    get('/channels/:id/player/cue/?'     ) { marker(params[:id], :cue     ) }
+    get('/channels/:id/player/intro/?'   ) { marker(params[:id], :intro   ) }
 
     put '/channels/:id/player/position/?' do
       require_permissions!('SetPlayerPosition')
@@ -118,16 +119,6 @@ module Bra
       end
     end
 
-    get '/channels/:id/player/cue/?' do
-      content_type :json
-      @view.player_cue_for_channel_at(params[:id]).to_json
-    end
-
-    get '/channels/:id/player/intro/?' do
-      content_type :json
-      @view.player_intro_for_channel_at(params[:id]).to_json
-    end
-
     get '/stylesheets/*' do
       content_type 'text/css', charset: 'utf-8'
       filename = params[:splat].first
@@ -135,6 +126,10 @@ module Bra
     end
 
     private
+
+    def marker(number, type)
+      respond_with :player_marker, marker: @model.player_marker(number, type)
+    end
 
     # Internal: Retrieves the privileges available for a given user and
     # password combination.

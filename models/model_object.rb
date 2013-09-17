@@ -5,8 +5,14 @@ module Bra
       # Public: Allows read access to the object's name.
       attr_reader :name
 
-      def initialize(name)
+      # Public: Allows read access to the object's short name.
+      attr_reader :short_name
+
+      def initialize(name, short_name=nil)
+        short_name ||= name
+
         @name = name
+        @short_name = short_name
       end
 
       # Public: Converts a model object to JSON.

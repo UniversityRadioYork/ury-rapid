@@ -6,6 +6,7 @@
 @import "compass/reset";
 @import "compass/utilities/general/clearfix";
 @import "compass/typography/links/link-colors";
+@import "compass/css3";
 
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
@@ -140,6 +141,32 @@ section.channel {
     }
 }
 
+section.player-states,
+section.player-primary-markers,
+section.player-secondary-markers {
+    display: flex;
+
+    border: none;
+    padding: 0;
+    margin-bottom: 0;
+
+    > section {
+        text-align: center;
+
+        display: flex;
+        flex: 1;
+
+        &:not(:first-child) {
+            border-left: 0;
+        }
+
+        >p {
+            margin: 0 auto;
+            margin-bottom: $size-padding;
+        }
+    }
+}
+
 .playing {
     background-color: $colour-peeling-paper;
 }
@@ -200,6 +227,9 @@ $size-inout: $size-padding * (2 / 3);
     height: $size-inout;
     display: block;
 
+    &:hover {
+        background-color: $colour-escape;
+    }
 }
 .in {
     bottom: 0;

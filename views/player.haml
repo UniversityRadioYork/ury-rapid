@@ -2,8 +2,15 @@
   - in_channel ||= false
 
   %h1=in_channel ? "Player" : player.name
-  = haml :player_state, locals: { state: player.state, in_player: true }
-  = haml :player_load_state, locals: { load_state: player.load_state, in_player: true }
+  %section.player-states
+    = haml :player_state, locals: { state: player.state, in_player: true }
+    = haml :player_load_state, locals: { load_state: player.load_state, in_player: true }
+  %section.player-primary-markers
+    = haml :player_marker, locals: { marker: player.marker(:position), in_player: true }
+    = haml :player_marker, locals: { marker: player.marker(:duration), in_player: true }
+  %section.player-secondary-markers
+    = haml :player_marker, locals: { marker: player.marker(:cue), in_player: true }
+    = haml :player_marker, locals: { marker: player.marker(:intro), in_player: true }
   - if player.load_state == :ok
     %p
       = surround "Playing ", "." do

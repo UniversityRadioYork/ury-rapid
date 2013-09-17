@@ -8,6 +8,6 @@
       %strong= load_state.value
 
   - if in_player
-    %a.in{ href: url("/channels/#{load_state.player_channel_id}/player/load_state") } In
+    %a.in{ href: url(load_state.url) } In
   - unless in_player
-    %a.out{ href: url("/channels/#{load_state.player_channel_id}/player") } Out
+    %a.out{ href: url(load_state.parent_url) } Out

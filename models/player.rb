@@ -34,10 +34,11 @@ module Bra
 
         @state = make_variable('State', :stopped, :validate_state)
         @load_state = make_variable('Load State', :ok, :validate_load_state)
-        @cue = make_position('Cue')
-        @intro = make_position('Intro')
-        @position = make_position('Position')
-        @duration = make_position('Duration')
+
+        @markers = %i(cue intro position duration).each_with_object(
+          {}
+        ) { |marker, hash| hash[marker] = make_marker(marker.to_s.capitalize) }
+
         @loaded = nil
       end
 
@@ -57,6 +58,18 @@ module Bra
         @state.value = new_state
       end
 
+      # Public: Gets one of the player markers.
+      #
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      # position - The new position, as a non-negative integer or coercible.
+      #
+      # Returns nothing.
+      def marker(type)
+        marker = @markers[type]
+        fail("Unknown marker type: #{type}.") if marker.nil?
+        marker
+      end
+
       # Public: Sets the position of one of the player markers.
       #
       # type     - The marker type (:position, :cue, :intro or :duration).
@@ -64,14 +77,7 @@ module Bra
       #
       # Returns nothing.
       def set_marker(type, position)
-        marker = {
-          cue: @cue,
-          duration: @duration,
-          intro: @intro,
-          position: @position
-        }[type]
-        fail("Unknown marker type: #{type}.") if marker.nil?
-        marker.value = position
+        marker(type).value = position
       end
 
       # Public: Change the player model's current item and load state.
@@ -97,11 +103,11 @@ module Bra
       def to_hash
         {
           item: @item.to_hash,
-          position: position,
-          cue: cue,
-          intro: intro,
-          state: state,
-          load_state: load_state
+          position: @position.value,
+          cue: @cue.value,
+          intro: @intro.value,
+          state: @state.value,
+          load_state: @load_state.value
         }
       end
 
@@ -132,12 +138,12 @@ module Bra
         PlayerVariable.new(name, self, initial_value, method(validator))
       end
 
-      # Internal: Makes a new player position variable.
+      # Internal: Makes a new player marker variable.
       #
       # name          - The name of the variable.
       #
       # Returns the PlayerVariable constructed from the above.
-      def make_position(name)
+      def make_marker(name)
         make_variable(name, 0, :validate_position)
       end
 
@@ -201,8 +207,9 @@ module Bra
 
     class PlayerComponent < ModelObject
       def initialize(name, player)
-        super("#{name} (#{player.name}")
+        super("#{name}@#{player.name}", name)
         @player = player
+        @url_name = name.downcase.tr(' ', '_')
       end
 
       # Internal: Returns the ID of the channel this player component is
@@ -219,6 +226,14 @@ module Bra
       # Returns the channel name.
       def player_channel_name
         @player.channel_name
+      end
+
+      def url
+        [parent_url, @url_name].join('/')
+      end
+
+      def parent_url
+        @player.url
       end
     end
 

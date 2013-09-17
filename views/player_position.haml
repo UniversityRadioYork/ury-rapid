@@ -1,0 +1,13 @@
+%section.player-position
+  - in_player ||= false
+
+  %p
+    - preamble = "Position is " if in_player
+    - preamble = "#{position.player_channel_name}'s position is " unless in_player
+    = surround preamble, "msec." do
+      %strong= position.value
+
+  - if in_player
+    %a.in{ href: url(position.url) } In
+  - unless in_player
+    %a.out{ href: url(position.parent_url) } Out
