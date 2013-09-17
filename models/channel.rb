@@ -57,7 +57,8 @@ module Bra
 
       # Internal: Add an item to the channel.
       #
-      # index - The position in the playlist in which this item should be added.
+      # index - The position in the playlist in which this item should be
+      #         added.
       # item  - An Item object representing the item to be added.
       #
       # Returns nothing.
@@ -174,14 +175,15 @@ module Bra
       attr_reader :contents
 
       def initialize(channel)
-        super("Playlist", channel)
+        super('Playlist', channel)
 
         @contents = []
       end
 
       # Internal: Add an item to the channel.
       #
-      # index - The position in the playlist in which this item should be added.
+      # index - The position in the playlist in which this item should be
+      #         added.
       # item  - An Item object representing the item to be added.
       #
       # Returns nothing.

@@ -46,7 +46,6 @@ module Bra
       halt(401, json_error('Not authorised.'))
     end
 
-
     # threaded - False: Will take requests on the reactor thread
     #            True:  Will queue request for background thread
     configure do
@@ -130,7 +129,7 @@ module Bra
     end
 
     get '/stylesheets/*' do
-      content_type 'text/css', :charset => 'utf-8'
+      content_type 'text/css', charset: 'utf-8'
       filename = params[:splat].first
       send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
