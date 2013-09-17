@@ -33,7 +33,7 @@ module Bra
         super('Player', channel)
 
         @state = make_variable('State', :stopped, :validate_state)
-        @load_state = make_variable('Load State', :ok, :validate_load_state)
+        @load_state = make_variable('Load State', :empty, :validate_load_state)
 
         @markers = %i(cue intro position duration).each_with_object(
           {}
@@ -95,6 +95,15 @@ module Bra
         set_load_state(new_state)
       end
 
+      # Public: Returns a hash of marker position values.
+      #
+      # Returns a hash mapping marker names to their raw position values.
+      def marker_values
+        @markers.each_with_object({}) do |(key, marker), hash|
+          hash[key] = marker.value
+        end
+      end
+
       # Public: Converts the Player to a hash representation.
       #
       # This conversion is not reversible and may lose some information.
@@ -102,13 +111,10 @@ module Bra
       # Returns a hash representation of the Player.
       def to_hash
         {
-          item: @item.to_hash,
-          position: @position.value,
-          cue: @cue.value,
-          intro: @intro.value,
+          item: (@item.nil? ? nil : @item.to_hash),
           state: @state.value,
           load_state: @load_state.value
-        }
+        }.merge!(marker_values)
       end
 
       # Public: Returns the canonical URL of this player.
