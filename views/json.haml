@@ -1,0 +1,8 @@
+/
+/ json.haml - JSON inspector
+/
+/ item - The object whose JSON should be displayed.
+/
+%section.json
+  %pre.json_code
+    #{ JSON.pretty_generate(item.to_hash) }

@@ -1,5 +1,30 @@
-%section.item{ class: item.type }
-  %h1= item.name
-  %p
-    = surround "Type is ", "." do
-      %strong= item.type
+/
+/ item.haml - Playlist/Player item object
+/
+/ item        - The item to display.
+/ in_playlist - If True, display a condensed item summary for display inside a
+/               playlist or player object.  (Default: false.)
+/
+- in_playlist ||= false
+
+= haml(:json, locals: { item: item }) if request.params.key? "json"
+
+- unless request.params.key? "json"
+  / If we're in the playlist we want a very short item summary...
+  - if in_playlist
+    %strong=item.name
+    (#{item.type})
+
+    %a.in{ href: url(item.url) } In
+
+  / ...otherwise, we want a full standalone section.
+  - unless in_playlist
+    %section.item{ class: item.type }
+      %h1= item.name
+      %p
+        = surround "Type is ", "." do
+          %strong= item.type
+      %p
+        Part of #{item.parent_name}.
+
+      %a.out{ href: url(item.parent_url) } Out

@@ -10,6 +10,7 @@
 
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
+@import url('//fonts.googleapis.com/css?family=Share+Tech+Mono');
 
 $size-padding: 0.8rem;
 $size-padding-thin: 0.2rem;
@@ -279,4 +280,12 @@ $size-inout: $size-padding * (2 / 3);
     span {
         padding: $size-padding-thin;
     }
+}
+
+pre.json_code {
+    @include border;
+
+    background-color: white;
+    font-family: "Share Tech Mono";
+    margin: $size-padding;
 }

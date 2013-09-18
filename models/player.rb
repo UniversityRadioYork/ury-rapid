@@ -131,6 +131,28 @@ module Bra
         @channel.url
       end
 
+      # Internal: Removes an item from the player.
+      #
+      # item - The item to unlink.  This must be the same as the item currently
+      #        loaded.
+      #
+      # Returns nothing.
+      def unlink_item(item)
+        fail("Tried to unlink wrong item from #{name}") unless item == @item
+        item = nil
+      end
+
+      # Internal: Puts an item into the player.
+      #
+      # This does not register the item's parent.
+      #
+      # item - The item to link.
+      #
+      # Returns nothing.
+      def link_item(item)
+        @item = item
+      end
+
       private
 
       # Internal: Makes a new player variable.

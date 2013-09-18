@@ -7,10 +7,9 @@
 
   - if 0 < playlist.size
     %ol.playlist-items
-      - playlist.contents.each_with_index do |item, id|
+      - playlist.contents.each do |item|
         %li.item{ class: item.type }
-          %span= item.name
-          %a.in{ href: url("/channels/#{playlist.channel_id}/playlist/#{id}") } In
+          = haml :item, locals: { item: item, in_playlist: true }
 
   - if in_channel
     %a.in{ href: url(playlist.url) } In
