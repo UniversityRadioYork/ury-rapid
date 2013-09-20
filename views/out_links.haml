@@ -1,0 +1,7 @@
+-#
+  out_links.haml - Links allowing outward inspection of parent items.
+
+  item - The item for which links are to be rendered.
+
+%a.out{ href: url(item.parent_url) } Out
+%a.json{ href: "#{url(item.url)}?json" } JSON

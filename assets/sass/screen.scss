@@ -231,7 +231,7 @@ nav.resources {
 
 $size-inout: $size-padding * (2 / 3);
 
-.in, .out {
+.in, .out, .json {
     position: absolute;
     font-size: 0px;
     border: $border-size solid black;
@@ -246,13 +246,27 @@ $size-inout: $size-padding * (2 / 3);
 }
 .in {
     bottom: 0;
-    right: 0;
+    // Nestle to the left of the JSON link.
+    right: ($size-inout + $border-size);
     border-bottom: 0;
     border-right: 0;
+
+    // For when there isn't a JSON link, which is rare but possible.
+    &:last-child {
+        right: 0;
+    }
 }
 .out {
     top: -($size-inout);
     left: -($size-inout);
+}
+.json {
+    background-color: $colour-kai;
+    border-bottom: 0;
+    border-right: 0;
+    bottom: 0;
+    // This is always the rightmost link in an object box.
+    right: 0;
 }
 
 .legend {
@@ -285,7 +299,9 @@ $size-inout: $size-padding * (2 / 3);
 pre.json_code {
     @include border;
 
+    padding: $size-padding;
+
     background-color: white;
     font-family: "Share Tech Mono";
-    margin: $size-padding;
+    margin-bottom: $size-padding;
 }

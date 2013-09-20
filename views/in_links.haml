@@ -1,0 +1,7 @@
+-#
+  in_links.haml - Links allowing inward inspection of enclosed items.
+
+  item - The item for which links are to be rendered.
+
+%a.in{ href: url(item.url) } In
+%a.json{ href: "#{url(item.url)}?json" } JSON

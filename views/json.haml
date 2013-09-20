@@ -1,8 +1,10 @@
-/
-/ json.haml - JSON inspector
-/
-/ item - The object whose JSON should be displayed.
-/
-%section.json
-  %pre.json_code
-    #{ JSON.pretty_generate(item.to_hash) }
+-#
+  json.haml - JSON inspector
+
+  name - The symbol under which the item appears in the JSON hash.
+  item - The object whose JSON should be displayed.
+
+%section.json_inspector
+  %h1 JSON for #{item.name}
+  %pre.json_code=JSON.pretty_generate({ name => item.to_jsonable })
+  %a.out{ href: url(item.url) } Out

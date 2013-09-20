@@ -282,11 +282,11 @@ module Bra
         @channel.url
       end
 
-      # Public: Converts the playlist to JSON.
+      # Public: Converts the playlist to a JSON-able format.
       #
-      # Returns a JSON representation of the playlist.
-      def to_json(*args)
-        @contents.to_json(*args)
+      # Returns a JSON-ready representation of the playlist.
+      def to_jsonable
+        @contents.map { |item| item.to_jsonable }
       end
 
       # Internal: Removes an item from the playlist.
