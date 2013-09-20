@@ -1,22 +1,28 @@
-%section.player
-  - in_channel ||= false
+-#
+  playlist.haml - Playlist object
 
-  %h1=in_channel ? "Player" : player.name
-  %section.player-states
-    = haml :player_state, locals: { state: player.state, in_player: true }
-    = haml :player_load_state, locals: { load_state: player.load_state, in_player: true }
-  %section.player-primary-markers
-    = haml :player_marker, locals: { marker: player.marker(:position), in_player: true }
-    = haml :player_marker, locals: { marker: player.marker(:duration), in_player: true }
-  %section.player-secondary-markers
-    = haml :player_marker, locals: { marker: player.marker(:cue), in_player: true }
-    = haml :player_marker, locals: { marker: player.marker(:intro), in_player: true }
-  - if player.load_state == :ok
-    %p
-      = surround "Playing ", "." do
-        %strong= player.item.name
+  playlist    - The item to display.
+  in_channel  - If True, display a condensed playlist for display inside a
+                channel object.  (Default: false.)
 
-  - if in_channel
-    %a.in{ href: url(player.url) } In
-  - unless in_channel
-    %a.out{ href: url(player.parent_url) } Out
+- in_channel ||= false
+
+= haml(:json, locals: { name: :player, item: player }) if request.params.key? "json"
+- unless request.params.key? "json"
+  %section.player
+    %h1=in_channel ? "Player" : player.name
+    %section.player-states
+      = haml :player_state, locals: { state: player.state, in_player: true }
+      = haml :player_load_state, locals: { load_state: player.load_state, in_player: true }
+    %section.player-primary-markers
+      - %i(position duration).each do |sym|
+        = haml :player_marker, locals: { symbol: sym, marker: player.marker(sym), in_player: true }
+    %section.player-secondary-markers
+      - %i(cue intro).each do |sym|
+        = haml :player_marker, locals: { symbol: sym, marker: player.marker(sym), in_player: true }
+    - if player.load_state == :ok
+      %p
+        = surround "Playing ", "." do
+          %strong= player.item.name
+
+    = haml(:in_out_links, locals: { item: player, inwards: in_channel })

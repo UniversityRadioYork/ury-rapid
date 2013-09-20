@@ -2,6 +2,132 @@ require_relative 'model_object'
 
 module Bra
   module Models
+    # Public: Wrapper around a list of channels.
+    class ChannelSet < ModelObject
+      # Allows read access to the channels themselves.
+      attr_reader :channels
+
+      # Allows read access to the channel count.
+      attr_reader :channel_count
+
+      def initialize(root, channel_count)
+        super('Channels')
+        @channels = (0...channel_count).map { |i| Channel.new(i, self) }
+        @channel_count = channel_count
+        @root = root
+      end
+
+      def to_jsonable
+        @channels.map { |channel| channel.to_jsonable }
+      end
+
+      # Public: Access one of the playback channels.
+      #
+      # number - The number of the channel (0-(num_channels - 1)).
+      #
+      # Returns the Channel object.
+      def channel(number)
+        @channels[Integer(number)]
+      end
+
+      # Public: Access one of the playback channel players.
+      #
+      # number - The number of the channel (0-(num_channels - 1)).
+      #
+      # Returns the Player object.
+      def player(number)
+        channel(number).player
+      end
+
+      # Public: Access one of the playback channel playlists.
+      #
+      # number - The number of the channel (0-(num_channels - 1)).
+      #
+      # Returns the Playlist object.
+      def playlist(number)
+        channel(number).playlist
+      end
+
+      # Public: Gets the state of one of the channel players.
+      #
+      # number - The number of the channel (0 onwards).
+      #
+      # Returns the state (one of :playing, :paused or :stopped).
+      def player_state(number)
+        channel(number).player_state
+      end
+
+      # Public: Gets the load state of one of the channel players.
+      #
+      # number - The number of the channel (0 onwards).
+      #
+      # Returns the load state.
+      def player_load_state(number)
+        channel(number).player_load_state
+      end
+
+      # Public: Sets the state of one of the channel players.
+      #
+      # number - The number of the channel (0 onwards).
+      # state  - The new state (one of :playing, :paused or :stopped).
+      #
+      # Returns nothing.
+      def set_player_state(number, state)
+        channel(number).set_player_state(state)
+      end
+
+      # Public: Gets the position of one of the player markers.
+      #
+      # number   - The number of the channel (0 onwards).
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      #
+      # Returns the marker position.
+      def player_marker(number, type)
+        channel(number).player_marker(type)
+      end
+
+      # Public: Sets the position of one of the channel player markers.
+      #
+      # number   - The number of the channel (0 onwards).
+      # type     - The marker type (:position, :cue, :intro or :duration).
+      # position - The new position, as a non-negative integer or coercible.
+      #
+      # Returns nothing.
+      def set_player_marker(number, type, position)
+        channel(number).set_player_marker(type, position)
+      end
+
+      # Public: Change the current item and load state for a channel player.
+      #
+      # number    - The number of the channel (0 onwards).
+      # new_state - The symbol (must be one of :ok, :loading or :failed)
+      #             representing the new state.
+      # new_item  - The Item representing the new loaded item.
+      def load_in_player(number, new_state, new_item)
+        channel(number).load_in_player(new_state, new_item)
+      end
+
+      # Public: Return the item at the given index of the playlist for the
+      # channel with the given ID.
+      #
+      # number    - The number of the channel (0 onwards).
+      # index     - The index into the playlist, also as an integer starting
+      #             from 0 or any Integer-coercible type.
+      #
+      # Returns an array representing the playlist data
+      def playlist_item(number, index)
+        channel(number).playlist_item(index)
+      end
+
+      def url
+        [parent_url, 'channels'].join('/')
+      end
+
+      def parent_url
+        @root.url
+      end
+    end
+
     # Internal: An object associated with a BRA channel.
     class ChannelComponent < ModelObject
       # Public: Allows read access to the object's channel.
@@ -44,15 +170,24 @@ module Bra
       # Internal: Initialises a Channel.
       #
       # id   - The ID number of the channel.
-      # root - The model root.
-      def initialize(id, root)
+      # root - The channel set.
+      def initialize(id, channel_set)
         super("Channel #{id}")
 
         @id = id
         @items = []
         @player = Player.new(self)
         @playlist = Playlist.new(self)
-        @root = root
+        @channel_set = channel_set
+      end
+
+      # Internal: Change the current item and load state for a channel player.
+      #
+      # new_state - The symbol (must be one of :ok, :loading or :failed)
+      #             representing the new state.
+      # new_item  - The Item representing the new loaded item.
+      def load_in_player(new_state, new_item)
+        player.load(new_state, new_item)
       end
 
       # Internal: Add an item to the channel.
@@ -144,7 +279,7 @@ module Bra
       def to_hash
         {
           id: @id,
-          items: @items.map { |item| item.to_hash },
+          items: @playlist.content_hashes,
           player: @player.to_hash
         }
       end
@@ -153,76 +288,16 @@ module Bra
       #
       # Returns the URL, relative to the API root.
       def url
-        [@root.channels_url, @id].join('/')
+        [parent_url, @id].join('/')
       end
 
       # Public: Returns the canonical URL of this channel's parent.
       #
       # Returns the URL, relative to the API root.
       def parent_url
-        @root.channels_url
+        @channel_set.url
       end
     end
-
-    # Public: An item in the playout system.
-    class Item < ModelObject
-      # Public: Access the track type.
-      attr_reader :type
-
-      def initialize(type, name)
-        super(name)
-
-        valid_type = %i{library file text}.include? type
-        raise "Not a valid type: #{type}" unless valid_type
-
-        @type = type
-        @parent = nil
-        @index = nil
-      end
-
-      # Public: Moves the Item to a playlist.
-      #
-      # new_parent - The new parent for the Item.
-      # new_index  - The index to move to.  This only makes sense if the
-      #              parent is a Playlist.
-      #
-      # Returns nothing.
-      def move_to(new_parent, new_index=nil)
-        @parent.unlink_item(self) unless @parent.nil?
-
-        new_parent.link_item(self, new_index)
-        @parent = new_parent
-        @index = new_index
-      end
-
-      # Public: Converts the Item to a hash representation.
-      #
-      # This conversion is not reversible and may lose some information.
-      #
-      # Returns a hash representation of the Item.
-      def to_hash
-        { name: @name, type: @type }
-      end
-
-      def url
-        # If we've got an index, then that's where we appear in the URL
-        # structure. If we don't, assume we're the only item child of our
-        # parent, so we're called just 'item'.
-        index_string = @index.to_s unless @index.nil?
-        index_string = 'item' if @index.nil?
-
-        [parent_url, index_string].join('/')
-      end
-
-      def parent_url
-        @parent.url
-      end
-
-      def parent_name
-        @parent.name
-      end
-    end
-
 
     class Playlist < ChannelComponent
       # Internal: Allows read access to the playlist items.
@@ -232,6 +307,13 @@ module Bra
         super('Playlist', channel)
 
         @contents = []
+      end
+
+      # Internal: Produces an array-of-hashes representation of this playlist.
+      #
+      # Returns an array of items represented as hashes.
+      def content_hashes
+        @contents.map { |item| item.to_hash }
       end
 
       # Internal: Add an item to the channel.

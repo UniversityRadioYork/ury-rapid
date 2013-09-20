@@ -240,6 +240,14 @@ module Bra
         @url_name = name.downcase.tr(' ', '_')
       end
 
+      # Internal: Returns the symbol that should be used for the key in any
+      # hashes including this player component.
+      #
+      # Returns the key symbol.
+      def symbol
+        @url_name.intern
+      end
+
       # Internal: Returns the ID of the channel this player component is
       # inside.
       #
@@ -297,8 +305,8 @@ module Bra
         @value = validated
       end
 
-      def to_json
-        @value.to_json
+      def to_jsonable
+        @value
       end
     end
   end

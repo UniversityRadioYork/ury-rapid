@@ -8,10 +8,8 @@
 - in_channel ||= false
 
 = haml(:json, locals: { name: :playlist, item: playlist }) if request.params.key? "json"
-
 - unless request.params.key? "json"
   %section.channel-playlist
-
     %h1=in_channel ? "Playlist" : playlist.name
     - unless 0 < playlist.size
       %p No items.

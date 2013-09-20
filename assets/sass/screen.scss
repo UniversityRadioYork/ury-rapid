@@ -246,15 +246,9 @@ $size-inout: $size-padding * (2 / 3);
 }
 .in {
     bottom: 0;
-    // Nestle to the left of the JSON link.
-    right: ($size-inout + $border-size);
+    right: 0;
     border-bottom: 0;
     border-right: 0;
-
-    // For when there isn't a JSON link, which is rare but possible.
-    &:last-child {
-        right: 0;
-    }
 }
 .out {
     top: -($size-inout);
@@ -262,10 +256,9 @@ $size-inout: $size-padding * (2 / 3);
 }
 .json {
     background-color: $colour-kai;
-    border-bottom: 0;
+    border-top: 0;
     border-right: 0;
-    bottom: 0;
-    // This is always the rightmost link in an object box.
+    top: 0;
     right: 0;
 }
 

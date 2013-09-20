@@ -1,6 +1,7 @@
 require_relative 'models/channel'
 require_relative 'models/model_object'
 require_relative 'models/player'
+require_relative 'models/item'
 
 module Bra
   module Models
@@ -13,7 +14,7 @@ module Bra
       def initialize(num_channels)
         super('Model')
 
-        @channels = (0...num_channels).map { |i| Channel.new(i, self) }
+        @channels = ChannelSet.new(self, num_channels)
       end
 
       # Public: Access one of the playback channels.
@@ -22,7 +23,7 @@ module Bra
       #
       # Returns the Channel object.
       def channel(number)
-        @channels[Integer(number)]
+        channels.channel(Integer(number))
       end
 
       # Public: Access one of the playback channel players.
@@ -31,7 +32,7 @@ module Bra
       #
       # Returns the Player object.
       def player(number)
-        channel(number).player
+        channels.player(number)
       end
 
       # Public: Access one of the playback channel playlists.
@@ -40,7 +41,7 @@ module Bra
       #
       # Returns the Playlist object.
       def playlist(number)
-        channel(number).playlist
+        channels.playlist(number)
       end
 
       # Public: Gets the state of one of the channel players.
@@ -49,7 +50,7 @@ module Bra
       #
       # Returns the state (one of :playing, :paused or :stopped).
       def player_state(number)
-        channel(number).player_state
+        channels.player_state(number)
       end
 
       # Public: Gets the load state of one of the channel players.
@@ -58,7 +59,7 @@ module Bra
       #
       # Returns the load state.
       def player_load_state(number)
-        channel(number).player_load_state
+        channels.player_load_state(number)
       end
 
       # Public: Sets the state of one of the channel players.
@@ -68,7 +69,7 @@ module Bra
       #
       # Returns nothing.
       def set_player_state(number, state)
-        channel(number).set_player_state(state)
+        channels.set_player_state(number, state)
       end
 
       # Public: Gets the position of one of the player markers.
@@ -78,7 +79,7 @@ module Bra
       #
       # Returns the marker position.
       def player_marker(number, type)
-        channel(number).player_marker(type)
+        channels.player_marker(number, type, number)
       end
 
       # Public: Sets the position of one of the channel player markers.
@@ -89,7 +90,7 @@ module Bra
       #
       # Returns nothing.
       def set_player_marker(number, type, position)
-        channel(number).set_player_marker(type, position)
+        channels.set_player_marker(number, type, position)
       end
 
       # Public: Change the current item and load state for a channel player.
@@ -99,7 +100,7 @@ module Bra
       #             representing the new state.
       # new_item  - The Item representing the new loaded item.
       def load_in_player(number, new_state, new_item)
-        player(number).load(new_state, new_item)
+        channels.load_in_player(number, new_state, new_item)
       end
 
       # Public: Return the item at the given index of the playlist for the
@@ -111,7 +112,7 @@ module Bra
       #
       # Returns an array representing the playlist data
       def playlist_item(number, index)
-        playlist(number).item(index)
+        channels.playlist_item(number, index)
       end
 
       # Public: Converts the Model to a hash representation.
@@ -125,18 +126,11 @@ module Bra
         }
       end
 
-      # Public: Returns the canonical URL of the model root.
+      # Public: Returns the canonical URL of the model channel list.
       #
       # Returns the URL, relative to the API root.
       def url
         '/'
-      end
-
-      # Public: Returns the canonical URL of the model channel list.
-      #
-      # Returns the URL, relative to the API root.
-      def channels_url
-        '/channels'
       end
     end
   end

@@ -1,8 +1,15 @@
+-#
+  playlist.haml - Playlist object
+
+  playlist    - The item to display.
+  in_channel  - If True, display a condensed playlist for display inside a
+                channel object.  (Default: false.)
+= haml(:json, locals: { name: :channels, item: playlist }) if request.params.key? "json"
 %section.channels
   %h1 Channels
 
-  - if 0 < channels.size
+  - if 0 < channels.channel_count
     %ol.channels-list
-      = list_of(channels) do |channel|
+      = list_of(channels.channels) do |channel|
         = haml :channel, locals: { channel: channel, in_channel_list: true }
   %a.out{ href: url("/") } Out

@@ -1,12 +1,17 @@
-%section.channel{ class: channel.player_state_value }
-  - in_channel_list ||= false
+-#
+-# channel.haml - Channel object
+-#
+-# channel          - The item to display.
+-# in_channel_list  - If True, display a condensed channel for display inside a
+-#                    channel list object.  (Default: false.)
 
-  %h1=channel.name
+- in_channel_list ||= false
 
-  = haml(:player, locals: { player: channel.player, in_channel: true })
-  = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
+= haml(:json, locals: { name: :channel, item: channel }) if request.params.key? "json"
+- unless request.params.key? "json"
+  %section.channel{ class: channel.player_state_value }
+    %h1=channel.name
 
-  - if in_channel_list
-    %a.in{ href: url(channel.url) } In
-  - unless in_channel_list
-    %a.out{ href: url(channel.parent_url) } Out
+    = haml(:player, locals: { player: channel.player, in_channel: true })
+    = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
+    = haml(:in_out_links, locals: { item: channel, inwards: in_channel_list })
