@@ -6,15 +6,26 @@ require_relative 'models/item'
 module Bra
   module Models
     # Public: A model of the BAPS server state.
-    class Model < ModelObject
-      # Public: Allows access to one of the model's playback channels.
-      attr_reader :channels
-
+    class Model < HashModelObject
       # Public: Initialise the model.
       def initialize(num_channels)
-        super(nil, 'Model')
+        super()
 
-        @channels = ChannelSet.new(self, num_channels)
+        @channels = ChannelSet.new
+        (0...num_channels).each do |i|
+          channel = Channel.new
+          channel.move_to(@channels, i)
+        end
+
+        @channels.move_to(self, :channels)
+      end
+
+      def name
+        'Model'
+      end
+
+      def channels
+        child(:channels)
       end
 
       # Public: Access one of the playback channels.
@@ -115,26 +126,19 @@ module Bra
         channels.playlist_item(number, index)
       end
 
-      # Public: Converts the Model to a hash representation.
-      #
-      # This conversion is not reversible and may lose some information.
-      #
-      # Returns a hash representation of the Model.
-      def to_hash
-        {
-          channels: @channels.map { |channel| channel.to_hash }
-        }
-      end
-
       # Public: Returns the canonical URL of the model channel list.
       #
       # Returns the URL, relative to the API root.
       def url
-        ''
+        resource_name
       end
 
       def parent_url
         fail('Tried to get parent URL of the model root.')
+      end
+
+      def resource_name
+        ''
       end
     end
   end

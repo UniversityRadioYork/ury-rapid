@@ -1,0 +1,17 @@
+-#
+  channel_set.haml - Playlist object
+
+  channel_set    - The item to display.
+  in_channel  - If True, display a condensed channel set for display inside a
+                channel object.  (Default: false.)
+
+= haml(:json, locals: { name: :channel_set, item: channel_set }) if request.params.key? "json"
+- unless request.params.key? "json"
+  %section.channel_set
+    %h1 Channels
+
+    - if 0 < channel_set.channel_count
+      %ol.channels-list
+        = list_of(channel_set.channels) do |channel|
+          = haml :channel, locals: { channel: channel, in_channel_list: true }
+    = haml :out_links, locals: { item: channel_set }

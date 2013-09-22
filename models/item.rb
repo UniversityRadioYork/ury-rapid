@@ -3,7 +3,7 @@ require_relative 'model_object'
 module Bra
   module Models
     # Public: An item in the playout system.
-    class Item < ModelObject
+    class Item < HashModelObject
       # Public: Access the track type.
       attr_reader :type
 
@@ -24,12 +24,13 @@ module Bra
       #              parent is a Playlist.
       #
       # Returns nothing.
-      def move_to(new_parent, new_index=nil)
-        @parent.unlink_item(self) unless @parent.nil?
+      def enqueue(new_parent, new_index=nil)
+        @parent.remove_child(self) unless @parent.nil?
 
-        new_parent.link_item(self, new_index)
-        @parent = new_parent
         @index = new_index
+        @parent = new_parent
+
+        new_parent.add_child(self) unless @parent.nil?
       end
 
       # Public: Converts the Item to a hash representation.

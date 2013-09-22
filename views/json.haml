@@ -6,5 +6,5 @@
 
 %section.json_inspector
   %h1 JSON for #{item.name}
-  %pre.json_code=JSON.pretty_generate({ name => item.to_jsonable })
+  %pre.json_code=JSON.pretty_generate({ item.id => item.to_jsonable })
   %a.out{ href: url(item.url) } Out

@@ -4,15 +4,11 @@ module Bra
   module Models
     # Public: A player in the model, which represents a channel's currently
     # playing song and its state.
-    class Player < ChannelComponent
+    class Player < HashModelObject
+      alias_method :channel_name, :parent_name
+
       # Public: Access the player's current item for reading.
       attr_reader :item
-
-      # Public: Access the player's current state for reading.
-      attr_reader :state
-
-      # Public: Access the player's loading state for reading.
-      attr_reader :load_state
 
       # Public: Access the player's current position for reading.
       attr_reader :position
@@ -29,24 +25,30 @@ module Bra
       # Public: Initialises a Player.
       #
       # channel - The channel of the player.
-      def initialize(channel)
-        super('Player', channel)
+      def initialize
+        super()
 
-        @state = make_variable('State', :stopped, :validate_state)
-        @load_state = make_variable('Load State', :empty, :validate_load_state)
+        make_variable(:state, :stopped, :validate_state)
+        make_variable(:load_state, :empty, :validate_load_state)
 
-        @markers = %i(cue intro position duration).each_with_object(
-          {}
-        ) { |marker, hash| hash[marker] = make_marker(marker.to_s.capitalize) }
+        %i(cue intro position duration).each { |marker| make_marker(marker) }
 
         @loaded = nil
+      end
+
+      def state
+        child(:state)
+      end
+
+      def load_state
+        child(:load_state)
       end
 
       # Public: Retrieves the player's state value.
       #
       # Returns the state value, as a symbol.
       def state_value
-        @state.value
+        state.value
       end
 
       # Public: Change the player model's state.
@@ -65,9 +67,7 @@ module Bra
       #
       # Returns nothing.
       def marker(type)
-        marker = @markers[type]
-        fail("Unknown marker type: #{type}.") if marker.nil?
-        marker
+        child(type)
       end
 
       # Public: Sets the position of one of the player markers.
@@ -104,19 +104,6 @@ module Bra
         end
       end
 
-      # Public: Converts the Player to a hash representation.
-      #
-      # This conversion is not reversible and may lose some information.
-      #
-      # Returns a hash representation of the Player.
-      def to_hash
-        {
-          item: (@item.nil? ? nil : @item.to_hash),
-          state: @state.value,
-          load_state: @load_state.value
-        }.merge!(marker_values)
-      end
-
       def resource_name
         'player'
       end
@@ -147,22 +134,22 @@ module Bra
 
       # Internal: Makes a new player variable.
       #
-      # name          - The name of the variable.
+      # id            - The ID of the variable.
       # initial_value - The initial value of the variable.
       # validator     - A filter that validates and returns new values.
       #
       # Returns the PlayerVariable constructed from the above.
-      def make_variable(name, initial_value, validator)
-        PlayerVariable.new(name, self, initial_value, method(validator))
+      def make_variable(id, initial_value, validator)
+        PlayerVariable.new(initial_value, method(validator)).move_to(self, id)
       end
 
       # Internal: Makes a new player marker variable.
       #
-      # name          - The name of the variable.
+      # id - The ID of the variable.
       #
       # Returns the PlayerVariable constructed from the above.
-      def make_marker(name)
-        make_variable(name, 0, :validate_position)
+      def make_marker(id)
+        make_variable(id, 0, :validate_position)
       end
 
       # Internal: Validates an incoming position.
@@ -223,46 +210,6 @@ module Bra
       end
     end
 
-    class PlayerComponent < ModelObject
-      def initialize(name, player)
-        super(player, "#{name}@#{player.name}", name)
-        @player = player
-        @url_name = name.downcase.tr(' ', '_')
-      end
-
-      # Internal: Returns the symbol that should be used for the key in any
-      # hashes including this player component.
-      #
-      # Returns the key symbol.
-      def symbol
-        @url_name.intern
-      end
-
-      # Internal: Returns the ID of the channel this player component is
-      # inside.
-      #
-      # Returns the channel ID.
-      def player_channel_id
-        @player.channel_id
-      end
-
-      # Internal: Returns the name of the channel this player component is
-      # inside.
-      #
-      # Returns the channel name.
-      def player_channel_name
-        @player.channel_name
-      end
-
-      def resource_name
-        @url_name
-      end
-
-      def parent_url
-        @player.url
-      end
-    end
-
     # Public: A container for a player variable.
     #
     # This container exists to make the traversal of the API at the variable
@@ -271,7 +218,7 @@ module Bra
     #
     # Player variables also have validation, so that broken controllers can be
     # discovered.
-    class PlayerVariable < PlayerComponent
+    class PlayerVariable < ModelObject
       # Public: Allows direct read access to the value.
       attr_reader :value
 
@@ -283,8 +230,8 @@ module Bra
       # validator     - A proc that, given a new value, will raise an exception
       #                 if the value is invalid and return a sanitised version
       #                 of the value otherwise.  Can be nil.
-      def initialize(name, player, initial_value, validator)
-        super(name, player)
+      def initialize(initial_value, validator)
+        super()
         @value = initial_value
         @validator = validator
       end
@@ -297,6 +244,22 @@ module Bra
 
       def to_jsonable
         @value
+      end
+
+      # Internal: Returns the ID of the channel this player component is
+      # inside.
+      #
+      # Returns the channel ID.
+      def player_channel_id
+        parent.channel_id
+      end
+
+      # Internal: Returns the name of the channel this player component is
+      # inside.
+      #
+      # Returns the channel name.
+      def player_channel_name
+        parent.channel_name
       end
     end
   end

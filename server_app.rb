@@ -53,13 +53,31 @@ module Bra
     end
 
     get('/') { respond_with :index }
-    get('/channels/?') { respond_with :channels, channels: @model.channels }
-    get('/channels/:id/?') do
-      respond_with :channel, channel: @model.channel(params[:id])
+    get '/stylesheets/*' do
+      content_type 'text/css', charset: 'utf-8'
+      filename = params[:splat].first
+      send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
-    get '/channels/:id/playlist/?' do
-      respond_with :playlist, playlist: @model.playlist(params[:id])
+    get('/*/?') do
+      resource = @model.find_resource(params[:splat].first)
+
+      if resource.nil?
+        halt(404, json_error('Not found.'))
+      else
+        sym = resource.internal_name
+        p sym
+        respond_with sym, resource.id => resource do |f|
+          f.html { haml(sym, locals: { sym => resource }) }
+        end
+      end
     end
+    # get('/channels/?') { respond_with :channels, channels: @model.channels }
+    # get('/channels/:id/?') do
+    #   respond_with :channel, channel: @model.channel(params[:id])
+    # end
+    # get '/channels/:id/playlist/?' do
+    #   respond_with :playlist, playlist: @model.playlist(params[:id])
+    # end
 
     delete '/channels/:id/playlist/?' do
       content_type :json
@@ -69,19 +87,19 @@ module Bra
       ok
     end
 
-    get '/channels/:id/playlist/:index/?' do
-      respond_with :item, item: @model.playlist_item(
-        params[:id], params[:index]
-      )
-    end
+    # get '/channels/:id/playlist/:index/?' do
+    #   respond_with :item, item: @model.playlist_item(
+    #     params[:id], params[:index]
+    #   )
+    # end
 
-    get '/channels/:id/player/?' do
-      respond_with :player, player: @model.player(params[:id])
-    end
+    # get '/channels/:id/player/?' do
+    #   respond_with :player, player: @model.player(params[:id])
+    # end
 
-    get '/channels/:id/player/state/?' do
-      respond_with :player_state, state: @model.player_state(params[:id])
-    end
+    # get '/channels/:id/player/state/?' do
+    #   respond_with :player_state, state: @model.player_state(params[:id])
+    # end
 
     put '/channels/:id/player/state/?' do
       content_type :json
@@ -93,22 +111,22 @@ module Bra
       end
     end
 
-    get '/channels/:id/player/load_state/?' do
-      respond_with :player_load_state, load_state: @model.player_load_state(
-        params[:id]
-      )
-    end
+    # get '/channels/:id/player/load_state/?' do
+    #   respond_with :player_load_state, load_state: @model.player_load_state(
+    #     params[:id]
+    #   )
+    # end
 
-    get '/channels/:id/player/item/?' do
-      content_type :json
-      @view.player_item_for_channel_at(params[:id]).to_json
-    end
+    # get '/channels/:id/player/item/?' do
+    #   content_type :json
+    #   @view.player_item_for_channel_at(params[:id]).to_json
+    # end
 
     # Markers
-    get('/channels/:id/player/position/?') { marker(params[:id], :position) }
-    get('/channels/:id/player/duration/?') { marker(params[:id], :duration) }
-    get('/channels/:id/player/cue/?'     ) { marker(params[:id], :cue     ) }
-    get('/channels/:id/player/intro/?'   ) { marker(params[:id], :intro   ) }
+    # get('/channels/:id/player/position/?') { marker(params[:id], :position) }
+    # get('/channels/:id/player/duration/?') { marker(params[:id], :duration) }
+    # get('/channels/:id/player/cue/?'     ) { marker(params[:id], :cue     ) }
+    # get('/channels/:id/player/intro/?'   ) { marker(params[:id], :intro   ) }
 
     put '/channels/:id/player/position/?' do
       require_permissions!('SetPlayerPosition')
@@ -119,11 +137,6 @@ module Bra
       end
     end
 
-    get '/stylesheets/*' do
-      content_type 'text/css', charset: 'utf-8'
-      filename = params[:splat].first
-      send_file File.join(settings.root, 'assets', 'stylesheets', filename)
-    end
 
     private
 

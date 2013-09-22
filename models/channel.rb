@@ -3,30 +3,12 @@ require_relative 'model_object'
 module Bra
   module Models
     # Public: Wrapper around a list of channels.
-    class ChannelSet < ModelObject
-      # Allows read access to the channels themselves.
-      attr_reader :channels
+    class ChannelSet < ListModelObject
+      alias_method :channels, :children
+      alias_method :channel, :child
 
-      # Allows read access to the channel count.
-      attr_reader :channel_count
-
-      def initialize(root, channel_count)
-        super(root, 'Channels')
-        @channels = (0...channel_count).map { |i| Channel.new(i, self) }
-        @channel_count = channel_count
-      end
-
-      def to_jsonable
-        @channels.map { |channel| channel.to_jsonable }
-      end
-
-      # Public: Access one of the playback channels.
-      #
-      # number - The number of the channel (0-(num_channels - 1)).
-      #
-      # Returns the Channel object.
-      def channel(number)
-        @channels[Integer(number)]
+      def channel_count
+        children.size
       end
 
       # Public: Access one of the playback channel players.
@@ -117,63 +99,20 @@ module Bra
       def playlist_item(number, index)
         channel(number).playlist_item(index)
       end
-
-      def resource_name
-        'channels'
-      end
-    end
-
-    # Internal: An object associated with a BRA channel.
-    class ChannelComponent < ModelObject
-      # Public: Allows read access to the object's channel.
-      attr_reader :channel
-
-      def initialize(name, channel)
-        super(channel, "#{name} (#{channel.name})")
-        @channel = channel
-      end
-
-      # Public: Retrieve the ID of the player's channel.
-      #
-      # Returns the aforementioned ID.
-      def channel_id
-        @channel.id
-      end
-
-      # Public: Retrieve the name of the player's channel.
-      #
-      # Returns the aforementioned name.
-      def channel_name
-        @channel.name
-      end
     end
 
     # Public: A channel in the BAPS server state.
-    class Channel < ModelObject
-      # Public: Access the channel's ID for reading.
-      attr_reader :id
-
-      # Public: Access the channel items set for reading.
-      attr_reader :items
-
-      # Public: Access the channel's player model for reading.
-      attr_reader :player
-
-      # Public: Access the channel's playlist model for reading.
-      attr_reader :playlist
-
+    class Channel < HashModelObject
       # Internal: Initialises a Channel.
-      #
-      # id   - The ID number of the channel.
-      # root - The channel set.
-      def initialize(id, channel_set)
-        super(channel_set, "Channel #{id}")
+      def initialize
+        super()
 
-        @id = id
-        @items = []
-        @player = Player.new(self)
-        @playlist = Playlist.new(self)
-        @channel_set = channel_set
+        Player.new.move_to(self, :player)
+        Playlist.new.move_to(self, :playlist)
+      end
+
+      def name
+        "Channel #{id}"
       end
 
       # Internal: Change the current item and load state for a channel player.
@@ -185,6 +124,14 @@ module Bra
         player.load(new_state, new_item)
       end
 
+      def player
+        child(:player)
+      end
+
+      def playlist
+        child(:playlist)
+      end
+
       # Internal: Add an item to the channel.
       #
       # index - The position in the playlist in which this item should be
@@ -193,7 +140,7 @@ module Bra
       #
       # Returns nothing.
       def add_item(index, item)
-        @playlist.add_item(index, item)
+        playlist.add_item(index, item)
       end
 
       # Internal: List the items in the channel's playlist.
@@ -203,28 +150,28 @@ module Bra
       # Returns the item at the given index on the playlist, or nil if none
       #   exists.
       def playlist_item(index)
-        @playlist.item(index)
+        playlist.item(index)
       end
 
       # Internal: List the items in the channel's playlist.
       #
       # Returns a list of Item objects in the playlist.
       def playlist_contents
-        @playlist.contents
+        playlist.contents
       end
 
       # Public: Retrieves the channel's player state.
       #
       # Returns the player state.
       def player_state
-        @player.state
+        player.state
       end
 
       # Public: Retrieves the channel's player's state value.
       #
       # Returns the state value, as a symbol.
       def player_state_value
-        @player.state_value
+        player.state_value
       end
 
       # Public: Sets the channel's player state.
@@ -233,7 +180,7 @@ module Bra
       #
       # Returns nothing.
       def set_player_state(new_state)
-        @player.set_state(new_state)
+        player.set_state(new_state)
       end
 
       # Public: Gets the position of one of the player markers.
@@ -242,7 +189,7 @@ module Bra
       #
       # Returns the marker position.
       def player_marker(type)
-        @player.marker(type)
+        player.marker(type)
       end
 
       # Public: Sets the position of one of the player markers.
@@ -252,63 +199,48 @@ module Bra
       #
       # Returns nothing.
       def set_player_marker(type, position)
-        @player.set_marker(type, position)
+        player.set_marker(type, position)
       end
 
       # Public: Retrieves the channel's player load state.
       #
       # Returns the player load state.
       def player_load_state
-        @player.load_state
+        player.load_state
       end
 
       # Internal: Returns the number of items in the playlist.
       #
       # Returns the playlist item count.
       def playlist_size
-        @playlist.size
+        playlist.size
       end
 
       # Internal: Clears the channel's playlist.
       #
       # Returns nothing.
       def clear_playlist
-        @playlist.clear
-      end
-
-      # Public: Converts the Channel to a hash representation.
-      #
-      # This conversion is not reversible and may lose some information.
-      #
-      # Returns a hash representation of the Channel.
-      def to_hash
-        {
-          id: @id,
-          items: @playlist.content_hashes,
-          player: @player.to_hash
-        }
+        playlist.clear
       end
 
       def resource_name
-        @id.to_s
+        id
       end
     end
 
-    class Playlist < ChannelComponent
+    class Playlist < ListModelObject
       # Internal: Allows read access to the playlist items.
       attr_reader :contents
 
-      def initialize(channel)
-        super('Playlist', channel)
-
-        @contents = []
+      def initialize
+        super()
       end
 
       # Internal: Produces an array-of-hashes representation of this playlist.
       #
       # Returns an array of items represented as hashes.
       def content_hashes
-        @contents.map { |item| item.to_hash }
+        children.map { |item| item.to_hash }
       end
 
       # Internal: Add an item to the channel.
@@ -319,7 +251,7 @@ module Bra
       #
       # Returns nothing.
       def add_item(index, item)
-        item.move_to(self, index)
+        item.enqueue(self, index)
       end
 
       # Internal: Retrieves an item in the channel.
@@ -328,7 +260,7 @@ module Bra
       #
       # Returns the Item, or nil if none exists at the given index.
       def item(index)
-        @contents[Integer(index)]
+        child(index)
       end
 
       # Internal: Clears the playlist.
@@ -342,7 +274,7 @@ module Bra
       #
       # Returns the playlist item count.
       def size
-        @contents.size
+        children.size
       end
 
       def resource_name
@@ -353,7 +285,7 @@ module Bra
       #
       # Returns a JSON-ready representation of the playlist.
       def to_jsonable
-        @contents.map { |item| item.to_jsonable }
+        children.map { |item| item.to_jsonable }
       end
 
       # Internal: Removes an item from the playlist.
@@ -363,7 +295,7 @@ module Bra
       #
       # Returns nothing.
       def unlink_item(item)
-        @contents.delete(item)
+        remove_child(item)
       end
 
       # Internal: Puts an item into the playlist.
@@ -375,6 +307,7 @@ module Bra
       #
       # Returns nothing.
       def link_item(item, index)
+        add_child(item)
         @contents[index] = item
       end
     end
