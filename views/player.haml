@@ -12,14 +12,14 @@
   %section.player
     %h1=in_channel ? "Player" : player.name
     %section.player-states
-      = haml :player_state, locals: { state: player.state, in_player: true }
-      = haml :player_load_state, locals: { load_state: player.load_state, in_player: true }
+      = haml :player_variable, locals: { state: player.state, in_player: true }
+      = haml :player_variable, locals: { load_state: player.load_state, in_player: true }
     %section.player-primary-markers
       - %i(position duration).each do |sym|
-        = haml :player_marker, locals: { symbol: sym, marker: player.marker(sym), in_player: true }
+        = haml :player_variable, locals: { marker: player.marker(sym), in_player: true }
     %section.player-secondary-markers
       - %i(cue intro).each do |sym|
-        = haml :player_marker, locals: { symbol: sym, marker: player.marker(sym), in_player: true }
+        = haml :player_variable, locals: { marker: player.marker(sym), in_player: true }
     - if player.load_state == :ok
       %p
         = surround "Playing ", "." do

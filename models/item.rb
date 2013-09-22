@@ -8,13 +8,12 @@ module Bra
       attr_reader :type
 
       def initialize(type, name)
-        super(name)
+        super(nil, name)
 
-        valid_type = %i{library file text}.include? type
+        valid_type = %i(library file text).include? type
         raise "Not a valid type: #{type}" unless valid_type
 
         @type = type
-        @parent = nil
         @index = nil
       end
 
@@ -42,22 +41,11 @@ module Bra
         { name: @name, type: @type }
       end
 
-      def url
+      def resource_name
         # If we've got an index, then that's where we appear in the URL
         # structure. If we don't, assume we're the only item child of our
         # parent, so we're called just 'item'.
-        index_string = @index.to_s unless @index.nil?
-        index_string = 'item' if @index.nil?
-
-        [parent_url, index_string].join('/')
-      end
-
-      def parent_url
-        @parent.url
-      end
-
-      def parent_name
-        @parent.name
+        @index.nil? ? 'item' : @index.to_s
       end
     end
   end

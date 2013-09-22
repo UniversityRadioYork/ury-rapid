@@ -8,9 +8,10 @@ module Bra
       # Public: Allows read access to the object's short name.
       attr_reader :short_name
 
-      def initialize(name, short_name=nil)
+      def initialize(parent, name, short_name=nil)
         short_name ||= name
 
+        @parent = parent
         @name = name
         @short_name = short_name
       end
@@ -33,6 +34,18 @@ module Bra
       # JSON.
       def to_jsonable
         to_hash
+      end
+
+      def url
+        [parent_url, resource_name].join('/')
+      end
+
+      def parent_name
+        @parent.name
+      end
+
+      def parent_url
+        @parent.url
       end
     end
   end

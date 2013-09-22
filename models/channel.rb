@@ -11,10 +11,9 @@ module Bra
       attr_reader :channel_count
 
       def initialize(root, channel_count)
-        super('Channels')
+        super(root, 'Channels')
         @channels = (0...channel_count).map { |i| Channel.new(i, self) }
         @channel_count = channel_count
-        @root = root
       end
 
       def to_jsonable
@@ -119,12 +118,8 @@ module Bra
         channel(number).playlist_item(index)
       end
 
-      def url
-        [parent_url, 'channels'].join('/')
-      end
-
-      def parent_url
-        @root.url
+      def resource_name
+        'channels'
       end
     end
 
@@ -134,7 +129,7 @@ module Bra
       attr_reader :channel
 
       def initialize(name, channel)
-        super("#{name} (#{channel.name})")
+        super(channel, "#{name} (#{channel.name})")
         @channel = channel
       end
 
@@ -172,7 +167,7 @@ module Bra
       # id   - The ID number of the channel.
       # root - The channel set.
       def initialize(id, channel_set)
-        super("Channel #{id}")
+        super(channel_set, "Channel #{id}")
 
         @id = id
         @items = []
@@ -199,6 +194,16 @@ module Bra
       # Returns nothing.
       def add_item(index, item)
         @playlist.add_item(index, item)
+      end
+
+      # Internal: List the items in the channel's playlist.
+      #
+      # index - The index whose item is requested (starting from 0).
+      #
+      # Returns the item at the given index on the playlist, or nil if none
+      #   exists.
+      def playlist_item(index)
+        @playlist.item(index)
       end
 
       # Internal: List the items in the channel's playlist.
@@ -284,18 +289,8 @@ module Bra
         }
       end
 
-      # Public: Returns the canonical URL of this channel.
-      #
-      # Returns the URL, relative to the API root.
-      def url
-        [parent_url, @id].join('/')
-      end
-
-      # Public: Returns the canonical URL of this channel's parent.
-      #
-      # Returns the URL, relative to the API root.
-      def parent_url
-        @channel_set.url
+      def resource_name
+        @id.to_s
       end
     end
 
@@ -350,18 +345,8 @@ module Bra
         @contents.size
       end
 
-      # Public: Returns the canonical URL of this playlist.
-      #
-      # Returns the URL, relative to the API root.
-      def url
-        [@channel.url, 'playlist'].join('/')
-      end
-
-      # Public: Returns the canonical URL of this playlist's parent.
-      #
-      # Returns the URL, relative to the API root.
-      def parent_url
-        @channel.url
+      def resource_name
+        'playlist'
       end
 
       # Public: Converts the playlist to a JSON-able format.

@@ -1,0 +1,22 @@
+-#
+-#  player_variable.haml - Player variable object (generic template).
+-#
+-#  variable   - The item to display.
+-#  in_player  - If True, display a condensed variable for display inside a
+-#               channel object.  (Default: false.)
+-#  suffix     - An optional suffix to add after the value.  (Default: blank.)
+
+- in_player ||= false
+
+- suffix ||= ''
+
+= haml(:json, locals: { name: variable.symbol, item: variable }) if request.params.key? "json"
+- unless request.params.key? "json"
+  %section.player-variable
+    %p
+      - preamble = "#{variable.short_name}: " if in_player
+      - preamble = "#{variable.player_channel_name}: " unless in_player
+      = surround preamble, "." do
+        %strong= variable.value
+
+    = haml(:in_out_links, locals: { item: variable, inwards: in_player })

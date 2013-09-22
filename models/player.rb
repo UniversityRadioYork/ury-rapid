@@ -117,18 +117,8 @@ module Bra
         }.merge!(marker_values)
       end
 
-      # Public: Returns the canonical URL of this player.
-      #
-      # Returns the URL, relative to the API root.
-      def url
-        [@channel.url, 'player'].join('/')
-      end
-
-      # Public: Returns the canonical URL of this player's parent.
-      #
-      # Returns the URL, relative to the API root.
-      def parent_url
-        @channel.url
+      def resource_name
+        'player'
       end
 
       # Internal: Removes an item from the player.
@@ -235,7 +225,7 @@ module Bra
 
     class PlayerComponent < ModelObject
       def initialize(name, player)
-        super("#{name}@#{player.name}", name)
+        super(player, "#{name}@#{player.name}", name)
         @player = player
         @url_name = name.downcase.tr(' ', '_')
       end
@@ -264,8 +254,8 @@ module Bra
         @player.channel_name
       end
 
-      def url
-        [parent_url, @url_name].join('/')
+      def resource_name
+        @url_name
       end
 
       def parent_url

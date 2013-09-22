@@ -12,7 +12,7 @@ module Bra
 
       # Public: Initialise the model.
       def initialize(num_channels)
-        super('Model')
+        super(nil, 'Model')
 
         @channels = ChannelSet.new(self, num_channels)
       end
@@ -79,7 +79,7 @@ module Bra
       #
       # Returns the marker position.
       def player_marker(number, type)
-        channels.player_marker(number, type, number)
+        channels.player_marker(number, type)
       end
 
       # Public: Sets the position of one of the channel player markers.
@@ -130,7 +130,11 @@ module Bra
       #
       # Returns the URL, relative to the API root.
       def url
-        '/'
+        ''
+      end
+
+      def parent_url
+        fail('Tried to get parent URL of the model root.')
       end
     end
   end
