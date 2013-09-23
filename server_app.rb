@@ -59,17 +59,25 @@ module Bra
       send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
     get('/*/?') do
-      resource = @model.find_resource(params[:splat].first)
-
-      if resource.nil?
-        halt(404, json_error('Not found.'))
-      else
+      find(params) do |resource|
         sym = resource.internal_name
         respond_with sym, resource.id => resource do |f|
           f.html { haml(sym, locals: { sym => resource }) }
         end
       end
     end
+
+    def find(params)
+      found = false
+
+      @model.find_resource(params[:splat].first).try do |resource|
+        yield(resource)
+        found = true
+      end
+
+      halt(404, json_error('Not found.')) unless found
+    end
+
     # get('/channels/?') { respond_with :channels, channels: @model.channels }
     # get('/channels/:id/?') do
     #   respond_with :channel, channel: @model.channel(params[:id])
