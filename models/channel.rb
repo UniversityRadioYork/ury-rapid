@@ -229,12 +229,10 @@ module Bra
     end
 
     class Playlist < ListModelObject
-      # Internal: Allows read access to the playlist items.
-      attr_reader :contents
+      alias_method :contents, :children
 
-      def initialize
-        super()
-      end
+      # Internal: Allows read access to the playlist items.
+      attr_reader :children
 
       # Internal: Produces an array-of-hashes representation of this playlist.
       #

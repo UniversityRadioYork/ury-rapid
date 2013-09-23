@@ -10,18 +10,6 @@ module Bra
       # Public: Access the player's current item for reading.
       attr_reader :item
 
-      # Public: Access the player's current position for reading.
-      attr_reader :position
-
-      # Public: Access the player's current duration for reading.
-      attr_reader :duration
-
-      # Public: Access the player's current cue position for reading.
-      attr_reader :cue
-
-      # Public: Access the player's current intro position for reading.
-      attr_reader :intro
-
       # Public: Initialises a Player.
       #
       # channel - The channel of the player.
@@ -57,7 +45,7 @@ module Bra
       #
       # Returns nothing.
       def set_state(new_state)
-        @state.value = new_state
+        child(:state).value = new_state
       end
 
       # Public: Gets one of the player markers.
@@ -206,7 +194,7 @@ module Bra
       #
       # Returns nothing.
       def set_load_state(new_state)
-        @load_state.value = new_state
+        child(:load_state).value = new_state
       end
     end
 
@@ -218,7 +206,7 @@ module Bra
     #
     # Player variables also have validation, so that broken controllers can be
     # discovered.
-    class PlayerVariable < ModelObject
+    class PlayerVariable < SingleModelObject
       # Public: Allows direct read access to the value.
       attr_reader :value
 

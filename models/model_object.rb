@@ -56,6 +56,25 @@ module Bra
         @parent.url
       end
 
+      # Public: Returns this class's internal name, used for things such as
+      # templates and JSON attributes.
+      #
+      # This is different from the resource name in that it is the same for
+      # all objects of the same category.
+      #
+      # Returns the internal name as a symbol.
+      def internal_name
+        self.class.name.demodulize.underscore.intern
+      end
+    end
+
+    # Public: Class for model objects that contain children.
+    #
+    # This should be subclassed to provide the actual child structure (hash,
+    # array, et cetera).
+    class CompositeModelObject < ModelObject
+      attr_reader :children
+
       # Public: Removes a child from this model object.
       #
       # object - The object to remove from this object's children.
@@ -93,22 +112,9 @@ module Bra
           next_level.nil? ? nil : next_level.find_resource(tail)
         end
       end
-
-      # Public: Returns this class's internal name, used for things such as
-      # templates and JSON attributes.
-      #
-      # This is different from the resource name in that it is the same for
-      # all objects of the same category.
-      #
-      # Returns the internal name as a symbol.
-      def internal_name
-        self.class.name.demodulize.underscore.intern
-      end
     end
 
-    class HashModelObject < ModelObject
-      attr_reader :children
-
+    class HashModelObject < CompositeModelObject
       def initialize
         super()
         @children = {}
@@ -116,8 +122,6 @@ module Bra
 
       # Public: Converts a model object to a format that can be rendered to
       # JSON.
-      #
-      # Unless overridden, this expects a to_hash method to be defined.
       #
       # Returns a representation of the model object that can be converted to
       # JSON.
@@ -134,13 +138,10 @@ module Bra
         child
       rescue ArgumentError, TypeError
         nil
-
       end
     end
 
-    class ListModelObject < ModelObject
-      attr_reader :children
-
+    class ListModelObject < CompositeModelObject
       def initialize
         super()
         @children = []
@@ -161,6 +162,29 @@ module Bra
         children[Integer(target_name)]
       rescue ArgumentError, TypeError
         nil
+      end
+    end
+
+    # Class for model objects that do not contain children.
+    class SingleModelObject < ModelObject
+      def children
+        nil
+      end
+
+      def child(_)
+        nil
+      end
+
+      # Public: Attempts to find the resource with the given partial URI in
+      # this object's (nonexistent) children.
+      #
+      # resource - A partial URI that follows this model object's URI to form
+      #            the URI of the resource to locate.  Can be nil, in which
+      #            case this object is returned.
+      #
+      # Returns the object if the resource matches this one, and nil otherwise.
+      def find_resource(resource)
+        resource.nil? ? self : nil
       end
     end
   end

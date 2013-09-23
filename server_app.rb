@@ -65,7 +65,6 @@ module Bra
         halt(404, json_error('Not found.'))
       else
         sym = resource.internal_name
-        p sym
         respond_with sym, resource.id => resource do |f|
           f.html { haml(sym, locals: { sym => resource }) }
         end
@@ -111,23 +110,6 @@ module Bra
       end
     end
 
-    # get '/channels/:id/player/load_state/?' do
-    #   respond_with :player_load_state, load_state: @model.player_load_state(
-    #     params[:id]
-    #   )
-    # end
-
-    # get '/channels/:id/player/item/?' do
-    #   content_type :json
-    #   @view.player_item_for_channel_at(params[:id]).to_json
-    # end
-
-    # Markers
-    # get('/channels/:id/player/position/?') { marker(params[:id], :position) }
-    # get('/channels/:id/player/duration/?') { marker(params[:id], :duration) }
-    # get('/channels/:id/player/cue/?'     ) { marker(params[:id], :cue     ) }
-    # get('/channels/:id/player/intro/?'   ) { marker(params[:id], :intro   ) }
-
     put '/channels/:id/player/position/?' do
       require_permissions!('SetPlayerPosition')
 
@@ -139,10 +121,6 @@ module Bra
 
 
     private
-
-    def marker(number, type)
-      respond_with :player_marker, marker: @model.player_marker(number, type)
-    end
 
     # Internal: Retrieves the privileges available for a given user and
     # password combination.
