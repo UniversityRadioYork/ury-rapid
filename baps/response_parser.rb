@@ -1,3 +1,4 @@
+require 'active_support/core_ext/object/try'
 require_relative 'codes'
 require_relative 'types'
 
@@ -48,17 +49,17 @@ module Bra
       # Returns a boolean specifying whether there was enough data to process
       #   a command word or not.
       def command
+        enough_data = false
         # We could use the second return from reader.command to skip an
         # unknown message, but BAPS is quite dodgy at implementing this in
         # places, so we don't do it in practice.
-        raw_code, _ = @reader.command
-        if raw_code.nil?
-          false
-        else
+        @reader.command.try(:first).try do |raw_code|
           code, subcode = (raw_code & 0xFFF0), (raw_code & 0x000F)
           @expected, @response = command_with_code(code, subcode)
-          true
+          enough_data = true
         end
+
+        enough_data
       end
 
       # Internal: Parses and initialises a command whose BAPS code and subcode
@@ -122,16 +123,15 @@ module Bra
       # Returns a boolean specifying whether there was enough data to process
       #   the config type or not.
       def config_setting(name)
-        config_type = @reader.uint32
-        if config_type.nil?
-          false
-        else
+        enough_data = false
+
+        @reader.uint32.try do |config_type|
           @expected.unshift([:value, CONFIG_TYPE_MAP[config_type]])
-
           @response[name] = config_type
-
-          true
+          enough_data = true
         end
+
+        enough_data
       end
 
       # Internal: Reads the body of a LOAD command.
@@ -149,10 +149,9 @@ module Bra
       # Returns a boolean specifying whether there was enough data to process
       #   the track type or not.
       def load_body(name)
-        track_type = @reader.uint32
-        if track_type.nil?
-          false
-        else
+        enough_data = false
+
+        @reader.uint32.try do |track_type|
           # Note that these are in reverse order, as they're being shifted
           # onto the front.
           @expected.unshift(DURATION) unless track_type == Types::Track::NULL
@@ -160,8 +159,10 @@ module Bra
 
           @response[name] = track_type
 
-          true
+          enough_data = true
         end
+
+        enough_data
       end
 
       private

@@ -1,3 +1,5 @@
+require 'active_support/core_ext/object/try'
+
 module Bra
   module Baps
     # Internal: A low-level reading interface to the BAPS meta-protocol.
@@ -89,7 +91,7 @@ module Bra
       #   unpack_format.
       def unpack(count, unpack_format)
         list = unpack_multi(count, unpack_format)
-        list.nil? ? nil : list[0]
+        list.try(:first)
       end
 
       # Internal: Reads a given number of bytes and unpacks the results
@@ -106,7 +108,7 @@ module Bra
       # Returns the unpacked equivalent of the bytes read, as a list.
       def unpack_multi(count, unpack_format)
         bytes = raw_bytes(count)
-        bytes.nil? ? nil : bytes.unpack(unpack_format)
+        bytes.try(:unpack, unpack_format)
       end
     end
   end
