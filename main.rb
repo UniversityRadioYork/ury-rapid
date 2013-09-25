@@ -1,11 +1,12 @@
 require 'eventmachine'
 require 'thin'
 require 'yaml'
+require 'active_support/core_ext/hash/keys'
 require_relative 'server_app'
 require_relative 'baps/client'
 require_relative 'baps/commands'
 require_relative 'commander'
-require_relative 'model'
+require_relative 'models/creator'
 require_relative 'view'
 require_relative 'baps/controller'
 
@@ -16,7 +17,7 @@ require_relative 'baps/controller'
 # Returns the dispatch.
 def make_dispatch(config, web_app)
   Rack::Builder.app do
-    map(config['server']['root']) { run(web_app) }
+    map(config[:server][:root]) { run(web_app) }
   end
 end
 
@@ -52,7 +53,7 @@ def em_compatible?(server)
 end
 
 def run
-  config = YAML.load_file('config.yml')
+  config = YAML.load_file('config.yml').deep_symbolize_keys!
   app, model, queue = make_dependencies(config)
   EM.run do
     setup_server(config, app)
@@ -67,7 +68,9 @@ end
 # Returns a list containing the Sinatra app, the model and the requests queue
 # that should be used for making the client and server.
 def make_dependencies(config)
-  model = Bra::Models::Model.new(config['num_channels'])
+  model_config = config[:model]
+
+  model = Bra::Models::Creator.new(model_config).create
   queue = EM::Queue.new
   commander_maker = lambda do |error_callback|
     Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)
@@ -84,7 +87,7 @@ end
 #
 # Returns nothing.
 def setup_server(config, app)
-  server, host, port = config['server'].values_at(*%w(rack host port))
+  server, host, port = config[:server].values_at(*%i(rack host port))
 
   dispatch = make_dispatch(config, app)
 
@@ -101,7 +104,7 @@ end
 #
 # Returns nothing.
 def setup_client(config, model, queue)
-  client_config = config['baps'].values_at(*%w(host port username password))
+  client_config = config[:baps].values_at(*%i(host port username password))
 
   client = Bra::Baps::Client.new(queue, *client_config)
   controller = Bra::Baps::Controller.new(model)
