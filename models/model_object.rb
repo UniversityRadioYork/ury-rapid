@@ -47,6 +47,14 @@ module Bra
         @put_handler = block
       end
 
+      # Public: Perform a GET on this model object.
+      #
+      # Returns a hash mapping this object's ID to the object itself.
+      # of its value.
+      def get
+        { id => self }
+      end
+
       # Public: Perform a PUT on this model object.
       #
       # new_body - A hash mapping this object's ID to its new value.

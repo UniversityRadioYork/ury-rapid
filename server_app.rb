@@ -63,7 +63,7 @@ module Bra
         require_permissions!(resource.get_privileges)
 
         sym = resource.internal_name
-        respond_with sym, resource.id => resource do |f|
+        respond_with sym, resource.get do |f|
           f.html { haml(sym, locals: { sym => resource }) }
         end
       end
