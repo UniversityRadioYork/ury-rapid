@@ -1,25 +1,12 @@
-require_relative 'models/channel'
-require_relative 'models/model_object'
-require_relative 'models/player'
-require_relative 'models/item'
+require_relative 'channel'
+require_relative 'model_object'
+require_relative 'player'
+require_relative 'item'
 
 module Bra
   module Models
     # Public: A model of the BAPS server state.
     class Model < HashModelObject
-      # Public: Initialise the model.
-      def initialize(num_channels)
-        super()
-
-        @channels = ChannelSet.new
-        (0...num_channels).each do |i|
-          channel = Channel.new
-          channel.move_to(@channels, i)
-        end
-
-        @channels.move_to(self, :channels)
-      end
-
       def name
         'Model'
       end
@@ -130,14 +117,14 @@ module Bra
       #
       # Returns the URL, relative to the API root.
       def url
-        resource_name
+        id
       end
 
       def parent_url
         fail('Tried to get parent URL of the model root.')
       end
 
-      def resource_name
+      def id
         ''
       end
     end
