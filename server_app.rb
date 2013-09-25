@@ -20,7 +20,7 @@ module Bra
 
     # TODO: Make this protection more granular.
     helpers do
-      def require_permissions!(*keys)
+      def require_permissions!(keys)
         credentials = get_auth
         fail_not_authorised if credentials.nil?
         halt(403, json_error('Forbidden.')) unless (credentials & keys) == keys
@@ -60,12 +60,20 @@ module Bra
     end
     get('/*/?') do
       find(params) do |resource|
+        require_permissions!(resource.get_privileges)
+
         sym = resource.internal_name
         respond_with sym, resource.id => resource do |f|
           f.html { haml(sym, locals: { sym => resource }) }
         end
       end
     end
+    # put('/*/?') do
+    #   find(params) do |resource|
+    #     require_permissions!(resource.put_privileges)
+
+    #   end
+    # end
 
     def find(params)
       found = false
@@ -78,14 +86,6 @@ module Bra
       halt(404, json_error('Not found.')) unless found
     end
 
-    # get('/channels/?') { respond_with :channels, channels: @model.channels }
-    # get('/channels/:id/?') do
-    #   respond_with :channel, channel: @model.channel(params[:id])
-    # end
-    # get '/channels/:id/playlist/?' do
-    #   respond_with :playlist, playlist: @model.playlist(params[:id])
-    # end
-
     delete '/channels/:id/playlist/?' do
       content_type :json
 
@@ -93,20 +93,6 @@ module Bra
       @commander.run(:ClearPlaylist, params[:id])
       ok
     end
-
-    # get '/channels/:id/playlist/:index/?' do
-    #   respond_with :item, item: @model.playlist_item(
-    #     params[:id], params[:index]
-    #   )
-    # end
-
-    # get '/channels/:id/player/?' do
-    #   respond_with :player, player: @model.player(params[:id])
-    # end
-
-    # get '/channels/:id/player/state/?' do
-    #   respond_with :player_state, state: @model.player_state(params[:id])
-    # end
 
     put '/channels/:id/player/state/?' do
       content_type :json
@@ -139,11 +125,11 @@ module Bra
     # Returns the set of privileges granted to this username and password.  If
     #   the username or password is incorrect, then no privileges are given.
     def privileges_for(username, password)
-      entry = @config['users'][username]
-      if entry.nil? || entry['password'] != password
+      entry = @config[:users][username.intern]
+      if entry.nil? || entry[:password] != password
         []
       else
-        entry['privileges']
+        entry[:privileges].map(&:intern)
       end
     end
 
@@ -159,7 +145,7 @@ module Bra
     def parse_json_from(request)
       json = JSON.parse(request.body.string)
     rescue JSON::ParserError
-      halt 400, json_error('Badly formed JSON.')
+      halt(400, json_error('Badly formed JSON.'))
     else
       yield json
     end
@@ -170,7 +156,7 @@ module Bra
     #
     # Returns nothing.
     def client_error(message)
-      halt 400, json_error(message)
+      halt(400, json_error(message))
     end
 
     # Internal: Renders an error message in JSON.

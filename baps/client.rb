@@ -25,7 +25,7 @@ module Bra
 
         @dispatch = Dispatch.new
         @reader = Reader.new
-        @parser = ResponseParser.new @dispatch, @reader
+        @parser = ResponseParser.new(@dispatch, @reader)
         @queue = queue
       end
 

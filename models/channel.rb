@@ -99,18 +99,14 @@ module Bra
       def playlist_item(number, index)
         channel(number).playlist_item(index)
       end
+
+      def get_privileges
+        []
+      end
     end
 
     # Public: A channel in the BAPS server state.
     class Channel < HashModelObject
-      # Internal: Initialises a Channel.
-      def initialize
-        super()
-
-        Player.new.move_to(self, :player)
-        Playlist.new.move_to(self, :playlist)
-      end
-
       def name
         "Channel #{id}"
       end
@@ -223,8 +219,8 @@ module Bra
         playlist.clear
       end
 
-      def resource_name
-        id
+      def get_privileges
+        []
       end
     end
 
@@ -307,6 +303,10 @@ module Bra
       def link_item(item, index)
         add_child(item)
         @contents[index] = item
+      end
+
+      def get_privileges
+        []
       end
     end
   end

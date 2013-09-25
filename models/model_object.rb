@@ -1,4 +1,5 @@
 require 'active_support/core_ext/string/inflections'
+require_relative '../utils/hash'
 
 module Bra
   module Models
@@ -18,21 +19,68 @@ module Bra
 
         @parent = nil
         @id = nil
+
+        @put_handler = ->(new_body) { true }
+        @delete_handler = ->() { true }
+      end
+
+      # Internal: Registers a handler to be called when this object is PUT.
+      #
+      # block - A proc that will be executed before the model is updated.
+      #         It should take one argument, the new value of this object in
+      #         plain-old-data format, and return True if the model should
+      #         update itself (and False otherwise).
+      #
+      # Returns nothing.
+      def register_put_handler(block)
+        @put_handler = block
+      end
+
+      # Internal: Registers a handler to be called when this object is DELETEd.
+      #
+      # block - A proc that will be executed before the model is updated.
+      #         It should take no arguments and return True if the model should
+      #         update itself (and False otherwise).
+      #
+      # Returns nothing.
+      def register_delete_handler(block)
+        @put_handler = block
+      end
+
+      # Public: Perform a PUT on this model object.
+      #
+      # new_body - A hash mapping this object's ID to its new value.
+      #
+      # Returns nothing.
+      def put(new_body)
+        new_body[id].try { |value| put_do(value) if @put_handler.call(value) }
+      end
+
+      # Public: Perform a DELETE on this model object.
+      #
+      # Returns nothing.
+      def delete
+        delete_do if @delete_handler.call
       end
 
       def name
         @id
       end
 
+      # Public: Moves this model object to a new parent with a new ID.
+      #
+      # new_parent - The new parent for this object (can be nil).
+      # new_id     - The new ID under which the object will exist in the
+      #              parent.
+      #
+      # Returns this object, for method chaining.
       def move_to(new_parent, new_id)
         @parent.remove_child(self) unless @parent.nil?
         @parent = new_parent
         @parent.add_child(self, new_id) unless @parent.nil?
         @id = new_id
-      end
 
-      def resource_name
-        @id
+        self
       end
 
       # Public: Converts a model object to compact JSON.
@@ -45,7 +93,7 @@ module Bra
       end
 
       def url
-        [parent_url, resource_name].join('/')
+        [parent_url, id].join('/')
       end
 
       def parent_name
@@ -126,9 +174,7 @@ module Bra
       # Returns a representation of the model object that can be converted to
       # JSON.
       def to_jsonable
-        @children.each_with_object({}) do |(key, value), hash|
-          hash[key] = value.to_jsonable
-        end
+        @children.transform_values { |child| child.to_jsonable }
       end
 
       def child(target_name)

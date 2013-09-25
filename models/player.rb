@@ -1,4 +1,5 @@
 require_relative 'channel'
+require_relative '../utils/hash'
 
 module Bra
   module Models
@@ -9,20 +10,6 @@ module Bra
 
       # Public: Access the player's current item for reading.
       attr_reader :item
-
-      # Public: Initialises a Player.
-      #
-      # channel - The channel of the player.
-      def initialize
-        super()
-
-        make_variable(:state, :stopped, :validate_state)
-        make_variable(:load_state, :empty, :validate_load_state)
-
-        %i(cue intro position duration).each { |marker| make_marker(marker) }
-
-        @loaded = nil
-      end
 
       def state
         child(:state)
@@ -45,7 +32,7 @@ module Bra
       #
       # Returns nothing.
       def set_state(new_state)
-        child(:state).value = new_state
+        state.value = new_state
       end
 
       # Public: Gets one of the player markers.
@@ -87,13 +74,7 @@ module Bra
       #
       # Returns a hash mapping marker names to their raw position values.
       def marker_values
-        @markers.each_with_object({}) do |(key, marker), hash|
-          hash[key] = marker.value
-        end
-      end
-
-      def resource_name
-        'player'
+        @markers.transform_values { |marker| marker.value }
       end
 
       # Internal: Removes an item from the player.
@@ -118,75 +99,11 @@ module Bra
         @item = item
       end
 
+      def get_privileges
+        []
+      end
+
       private
-
-      # Internal: Makes a new player variable.
-      #
-      # id            - The ID of the variable.
-      # initial_value - The initial value of the variable.
-      # validator     - A filter that validates and returns new values.
-      #
-      # Returns the PlayerVariable constructed from the above.
-      def make_variable(id, initial_value, validator)
-        PlayerVariable.new(initial_value, method(validator)).move_to(self, id)
-      end
-
-      # Internal: Makes a new player marker variable.
-      #
-      # id - The ID of the variable.
-      #
-      # Returns the PlayerVariable constructed from the above.
-      def make_marker(id)
-        make_variable(id, 0, :validate_position)
-      end
-
-      # Internal: Validates an incoming position.
-      #
-      # new_position - The incoming position.
-      #
-      # Returns the validated state nothing.
-      # Raises an exception if the value is invalid.
-      def validate_position(new_position)
-        position_int = Integer(new_position)
-        fail('Position is negative.') if position_int < 0
-        # TODO: Check against duration
-        position_int
-      end
-
-      # Internal: Validates an incoming player state.
-      #
-      # new_state - The incoming player state.
-      #
-      # Returns the validated state.
-      # Raises an exception if the value is invalid.
-      def validate_state(new_state)
-        validate_symbol(new_state, %i(playing paused stopped))
-      end
-
-      # Internal: Validates an incoming player load state.
-      #
-      # new_state - The incoming player load state.
-      #
-      # Returns the validated state.
-      # Raises an exception if the value is invalid.
-      def validate_load_state(new_state)
-        validate_symbol(new_state, %i(ok loading failed empty))
-      end
-
-      # Internal: Validates an incoming symbol.
-      #
-      # new_symbol - The incoming symbol.
-      # candidates - A list of allowed symbols.
-      #
-      # Returns the validated symbol.
-      # Raises an exception if the value is invalid.
-      def validate_symbol(new_symbol, candidates)
-        # TODO: convert strings to symbols
-        fail(
-          "Expected one of #{candidates}, got #{new_symbol}"
-        ) unless candidates.include?(new_symbol)
-        new_symbol
-      end
 
       # Internal: Change the player model's load state.
       #
@@ -210,18 +127,35 @@ module Bra
       # Public: Allows direct read access to the value.
       attr_reader :value
 
+      def self.make_state
+        new(:stopped, method(:validate_state), [:SetPlayerState])
+      end
+
+      def self.make_load_state
+        new(:empty, method(:validate_load_state), nil)
+      end
+
+      def self.make_marker
+        new(0, method(:validate_marker), [:SetMarker])
+      end
+
       # Internal: Initialises a PlayerVariable.
       #
-      # name          - The name of the variable.
-      # player        - The Player the variable is attached to.
-      # initial_value - The initial value for the PlayerVariable.
-      # validator     - A proc that, given a new value, will raise an exception
-      #                 if the value is invalid and return a sanitised version
-      #                 of the value otherwise.  Can be nil.
-      def initialize(initial_value, validator)
+      # name            - The name of the variable.
+      # player          - The Player the variable is attached to.
+      # initial_value   - The initial value for the PlayerVariable.
+      # validator       - A proc that, given a new value, will raise an
+      #                   exception if the value is invalid and return a
+      #                   sanitised version of the value otherwise.
+      #                   Can be nil.
+      # edit_privileges - A list of symbols representing privileges required
+      #                   to edit this variable.
+      def initialize(initial_value, validator, edit_privileges)
         super()
+        @initial_value = initial_value
         @value = initial_value
         @validator = validator
+        @edit_privileges = edit_privileges
       end
 
       def value=(new_value)
@@ -233,6 +167,26 @@ module Bra
       def to_jsonable
         @value
       end
+
+      # Public: Handle an attempt to put a new value into the PlayerVariable
+      # from the API.
+      #
+      # new_value - A hash (which should have one item, a mapping from
+      #             this variable's ID to its new value).
+      #
+      # Returns nothing.
+      def put(new_value)
+        @value = new_value[id]
+      end
+
+      # Public: Resets the variable to its default value.
+      #
+      # Returns nothing.
+      def reset
+        @value = initial_value
+      end
+
+      alias_method :delete, :reset
 
       # Internal: Returns the ID of the channel this player component is
       # inside.
@@ -248,6 +202,67 @@ module Bra
       # Returns the channel name.
       def player_channel_name
         parent.channel_name
+      end
+
+      def get_privileges
+        []
+      end
+
+      def put_privileges
+        @edit_privileges
+      end
+
+      alias_method :post_privileges, :put_privileges
+      alias_method :delete_privileges, :put_privileges
+
+      private
+
+      # Internal: Validates an incoming marker.
+      #
+      # new_marker - The incoming marker position.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def self.validate_marker(position)
+        position_int = Integer(position)
+        fail('Position is negative.') if position_int < 0
+        # TODO: Check against duration?
+        position_int
+      end
+
+      # Internal: Validates an incoming player state.
+      #
+      # new_state - The incoming player state.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def self.validate_state(new_state)
+        validate_symbol(new_state, %i(playing paused stopped))
+      end
+
+      # Internal: Validates an incoming player load state.
+      #
+      # new_state - The incoming player load state.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def self.validate_load_state(new_state)
+        validate_symbol(new_state, %i(ok loading failed empty))
+      end
+
+      # Internal: Validates an incoming symbol.
+      #
+      # new_symbol - The incoming symbol.
+      # candidates - A list of allowed symbols.
+      #
+      # Returns the validated symbol.
+      # Raises an exception if the value is invalid.
+      def self.validate_symbol(new_symbol, candidates)
+        # TODO: convert strings to symbols
+        fail(
+          "Expected one of #{candidates}, got #{new_symbol}"
+        ) unless candidates.include?(new_symbol)
+        new_symbol
       end
     end
   end
