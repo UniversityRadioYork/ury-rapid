@@ -20,8 +20,8 @@ module Bra
         @parent = nil
         @id = nil
 
-        @put_handler = ->(new_body) { true }
-        @delete_handler = ->() { true }
+        @put_handler = nil
+        @delete_handler = nil
       end
 
       # Internal: Registers a handler to be called when this object is PUT.
@@ -31,9 +31,10 @@ module Bra
       #         plain-old-data format, and return True if the model should
       #         update itself (and False otherwise).
       #
-      # Returns nothing.
+      # Returns this object, for method chaining purposes.
       def register_put_handler(block)
         @put_handler = block
+        self
       end
 
       # Internal: Registers a handler to be called when this object is DELETEd.
@@ -42,9 +43,10 @@ module Bra
       #         It should take no arguments and return True if the model should
       #         update itself (and False otherwise).
       #
-      # Returns nothing.
+      # Returns this object, for method chaining purposes.
       def register_delete_handler(block)
-        @put_handler = block
+        @delete_handler = block
+        self
       end
 
       # Public: Perform a GET on this model object.
@@ -164,8 +166,7 @@ module Bra
           self
         else
           head, tail = resource.split('/', 2)
-          next_level = child(head)
-          next_level.nil? ? nil : next_level.find_resource(tail)
+          child(head).try { |next_level| next_level.find_resource(tail) }
         end
       end
     end

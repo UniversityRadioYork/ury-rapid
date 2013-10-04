@@ -27,14 +27,13 @@ module Bra
       end
 
       def get_auth
-        @auth ||= Rack::Auth::Basic::Request.new(request.env)
-
-        if @auth.provided? && @auth.basic? && @auth.credentials
-          user, password = @auth.credentials
-          privileges_for(user, password)
-        else
-          nil
+        get_creds(Rack::Auth::Basic::Request.new(request.env)).try do |auth|
+          privileges_for(*auth)
         end
+      end
+
+      def get_creds(auth)
+        auth.credentials if auth.provided? && auth.basic? && auth.credentials
       end
     end
 
@@ -64,6 +63,8 @@ module Bra
 
         sym = resource.internal_name
         respond_with sym, resource.get do |f|
+          # Use the internal name instead of the resource ID.  This is so that
+          # the template knows which local the resource will appear on.
           f.html { haml(sym, locals: { sym => resource }) }
         end
       end
