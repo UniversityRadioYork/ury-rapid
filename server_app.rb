@@ -10,12 +10,11 @@ module Bra
 
     respond_to :html, :json, :xml
 
-    def initialize(config, model, commander_maker)
+    def initialize(config, model)
       super()
 
       @model = model
       @config = config
-      @commander = commander_maker.call(method :client_error)
     end
 
     # TODO: Make this protection more granular.
@@ -69,12 +68,12 @@ module Bra
         end
       end
     end
-    # put('/*/?') do
-    #   find(params) do |resource|
-    #     require_permissions!(resource.put_privileges)
-
-    #   end
-    # end
+    put('/*/?') do
+      find(params) do |resource|
+        require_permissions!(resource.put_privileges)
+	parse_json_from(request, &resource.method(:put))
+      end
+    end
 
     def find(params)
       found = false
@@ -95,24 +94,24 @@ module Bra
       ok
     end
 
-    put '/channels/:id/player/state/?' do
-      content_type :json
-
-      require_permissions!('SetPlayerState')
-      parse_json_from(request) do |body|
-        @commander.run(:SetPlayerState, params[:id], body['state'])
-        ok
-      end
-    end
-
-    put '/channels/:id/player/position/?' do
-      require_permissions!('SetPlayerPosition')
-
-      parse_json_from(request) do |body|
-        @commander.run(:SetPlayerPosition, params[:id], body['position'])
-        ok
-      end
-    end
+#    put '/channels/:id/player/state/?' do
+#      content_type :json
+#
+#      require_permissions!('SetPlayerState')
+#      parse_json_from(request) do |body|
+#        @commander.run(:SetPlayerState, params[:id], body['state'])
+#        ok
+#      end
+#    end
+#
+#    put '/channels/:id/player/position/?' do
+#      require_permissions!('SetPlayerPosition')
+#
+#      parse_json_from(request) do |body|
+#        @commander.run(:SetPlayerPosition, params[:id], body['position'])
+#        ok
+#      end
+#    end
 
 
     private
@@ -124,13 +123,10 @@ module Bra
     # password - The password given by the user agent.
     #
     # Returns the set of privileges granted to this username and password.  If
-    #   the username or password is incorrect, then no privileges are given.
+    #   the username or password is incorrect, then nil is returned.
     def privileges_for(username, password)
-      entry = @config[:users][username.intern]
-      if entry.nil? || entry[:password] != password
-        []
-      else
-        entry[:privileges].map(&:intern)
+      @config[:users][username.intern].try do |entry|
+        entry[:privileges].map(&:intern) if entry[:password] == password
       end
     end
 
@@ -148,7 +144,7 @@ module Bra
     rescue JSON::ParserError
       halt(400, json_error('Badly formed JSON.'))
     else
-      yield json
+      yield json.deep_symbolize_keys!
     end
 
     # Internal: Flags a client error.

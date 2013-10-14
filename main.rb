@@ -5,9 +5,7 @@ require 'active_support/core_ext/hash/keys'
 require_relative 'server_app'
 require_relative 'baps/client'
 require_relative 'baps/commands'
-require_relative 'commander'
 require_relative 'models/creator'
-require_relative 'view'
 require_relative 'baps/controller'
 
 # Internal: Creates the dispatch for the reactor.
@@ -68,14 +66,13 @@ end
 # Returns a list containing the Sinatra app, the model and the requests queue
 # that should be used for making the client and server.
 def make_dependencies(config)
+  queue = EM::Queue.new
+
   model_config = config[:model]
+  model_config.merge!(Bra::Baps::Commands.handlers(queue))
 
   model = Bra::Models::Creator.new(model_config).create
-  queue = EM::Queue.new
-  commander_maker = lambda do |error_callback|
-    Bra::Commander.new(Bra::Baps::Commands, error_callback, queue)
-  end
-  app = Bra::ServerApp.new(config, model, commander_maker)
+  app = Bra::ServerApp.new(config, model)
   [app, model, queue]
 end
 

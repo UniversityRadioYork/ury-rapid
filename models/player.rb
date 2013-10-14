@@ -6,7 +6,9 @@ module Bra
     # Public: A player in the model, which represents a channel's currently
     # playing song and its state.
     class Player < HashModelObject
+      alias_method :channel, :parent
       alias_method :channel_name, :parent_name
+      alias_method :channel_id, :parent_id
 
       # Public: Access the player's current item for reading.
       attr_reader :item
@@ -175,7 +177,7 @@ module Bra
       #             this variable's ID to its new value).
       #
       # Returns nothing.
-      def put(new_value)
+      def put_do(new_value)
         @value = new_value[id]
       end
 
@@ -188,20 +190,11 @@ module Bra
 
       alias_method :delete, :reset
 
-      # Internal: Returns the ID of the channel this player component is
-      # inside.
+      # Internal: Returns the channel this player component is inside.
       #
       # Returns the channel ID.
-      def player_channel_id
-        parent.channel_id
-      end
-
-      # Internal: Returns the name of the channel this player component is
-      # inside.
-      #
-      # Returns the channel name.
-      def player_channel_name
-        parent.channel_name
+      def player_channel
+        parent.channel
       end
 
       def get_privileges

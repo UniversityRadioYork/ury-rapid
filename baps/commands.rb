@@ -27,10 +27,10 @@ module Bra
       class ChannelCommand < Command
         # Internal: Initialises a ChannelCommand.
         #
-        # channel - The ID of the channel, as an integer or any coercible type.
+        # channel - The Channel object.
         #
         def initialize(channel)
-          @channel = Integer(channel)
+          @channel = channel.id
         end
       end
 
@@ -79,6 +79,13 @@ module Bra
         def run(queue)
           Request.new(CODES[@state], @channel).to(queue)
         end
+
+				def self.to_put_handler(queue)
+					proc do |resource, value|
+						self.new(resource.player_channel, value).run(queue)
+						false
+					end
+				end
 
         private
 
@@ -273,6 +280,13 @@ module Bra
           end
         end
       end
+
+			def self.handlers(queue)
+				{
+#					channels_delete: ClearPlaylist.to_handler(queue),
+					player_state_put: SetPlayerState.to_put_handler(queue)
+				}
+			end
     end
   end
 end

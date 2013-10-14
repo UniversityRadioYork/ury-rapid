@@ -23,3 +23,7 @@ doc/
 # Config and secrets
 config.yml
 test.sh
+
+# Backups and swapfiles
+*.sw[a-z]
+*~

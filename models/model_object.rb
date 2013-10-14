@@ -63,7 +63,9 @@ module Bra
       #
       # Returns nothing.
       def put(new_body)
-        new_body[id].try { |value| put_do(value) if @put_handler.call(value) }
+        new_body[id].try do |value|
+					put_do(value) if @put_handler.call(self, value)
+				end
       end
 
       # Public: Perform a DELETE on this model object.
@@ -108,6 +110,10 @@ module Bra
 
       def parent_name
         @parent.name
+      end
+
+      def parent_id
+        @parent.id
       end
 
       def parent_url
