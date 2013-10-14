@@ -7,7 +7,7 @@ class Hash
   def map_to_hash
     each_with_object({}) do |(key, value), hash|
       new_key, new_value = yield(key, value)
-      hash[new key] = new_value
+      hash[new_key] = new_value
     end
   end
 
