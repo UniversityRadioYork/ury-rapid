@@ -44,12 +44,26 @@ module Bra
       halt(401, json_error('Not authorised.'))
     end
 
+    # Internal - Handle CORS headers.
+    #
+    # Such a senseless waste of precious bytes.
+    #
+    # Returns nothing.
+    def cors
+      @config[:server][:cors].each do |header, items|
+        headers "Access-Control-#{header}" => items.join(', ')
+      end
+    end
+
     # threaded - False: Will take requests on the reactor thread
     #            True:  Will queue request for background thread
     configure do
       set :threaded, false
     end
 
+    options('/*/?') do
+      cors
+    end
     get('/') { respond_with :index }
     get '/stylesheets/*' do
       content_type 'text/css', charset: 'utf-8'
@@ -57,6 +71,8 @@ module Bra
       send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
     get('/*/?') do
+      cors
+
       find(params) do |resource|
         require_permissions!(resource.get_privileges)
 
@@ -69,9 +85,11 @@ module Bra
       end
     end
     put('/*/?') do
+      cors
+
       find(params) do |resource|
         require_permissions!(resource.put_privileges)
-	parse_json_from(request, &resource.method(:put))
+        parse_json_from(request, &resource.method(:put))
       end
     end
 
