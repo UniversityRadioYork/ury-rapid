@@ -75,7 +75,9 @@ module Bra
       # Returns a proc that takes a BAPS response and sets the appropriate
       #   player state to that provided to this function.
       def set_state_handler(state)
-        ->(response) { @model.set_player_state(response[:subcode], state) }
+        proc do |response|
+          @model.put_resource(response[:subcode].to_s, state, true)
+        end
       end
 
       # Internal: Creates a proc that will handle a marker change for the
@@ -147,11 +149,12 @@ module Bra
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
       def loaded_item(response)
-        type, title, duration = response.values_at :type, :title, :duration
-        @model.channel(response[:subcode]).duration = duration if duration.nil?
+        type, title, duration = response.values_at(:type, :title, :duration)
+        duration.try { |d| @model.player(response[:subcode]).duration = d }
 
-        pair = SPECIAL_LOAD_STATES[title]
-        pair ||= normal_loaded_item(type, title)
+        load_state = LOAD_STATES[title]
+        item = normal_loaded_item(type, title) if load_state == :ok
+        [load_state, item]
       end
 
       # Internal: Processes a normal loaded item response, converting it into
@@ -180,16 +183,15 @@ module Bra
         TRACK_TYPE_MAP[type]
       end
 
-      # Internal: Hash mapping special load state names to pairs of BRA load
-      # states and item representations.
+      # Internal: Hash mapping item names to BRA load states.
       #
       # This is necessary because of the rather odd way in which BAPS signifies
       # loading states other than :ok (that is, inside the track name!).
-      SPECIAL_LOAD_STATES = {
-        '--LOADING--' => [:loading, nil],
-        '--LOAD FAILED--' => [:failed, nil],
-        '--NONE--' => [:empty, nil]
-      }
+      LOAD_STATES = Hash.new(:ok).merge!({
+        '--LOADING--' => :loading,
+        '--LOAD FAILED--' => :failed,
+        '--NONE--' => :empty
+      })
 
       # Internal: Hash mapping BAPS track type numbers to BRA symbols.
       TRACK_TYPE_MAP = {
