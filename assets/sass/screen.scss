@@ -38,6 +38,10 @@ $border-size: 0.15rem;
     padding-bottom: 0;
 }
 
+@mixin font-normal {
+    font-family: 'Source Sans Pro', helvetica, arial, sans-serif;
+}
+
 a {
     @include link-colors(
         $colour-peeling-paper,
@@ -47,10 +51,11 @@ a {
     );
 }
 
-html {
-    font-family: 'Source Sans Pro', helvetica, arial, sans-serif;
-    text-align: center;
 
+html {
+		@include font-normal;
+
+    text-align: center;
     font-size: 16pt;
 
     strong {
@@ -140,6 +145,20 @@ section.channel {
     >section, >nav, >ol {
         background-color: $colour-lol;
     }
+}
+
+// Nested player variables have some special formatting.
+section>section.player-variable {
+		display: block !important;
+		h1 {
+				@include font-normal;
+				font-weight: bold;
+				font-size: 1em;
+				margin: 0;
+		}
+		p {
+				text-align: right;
+		}
 }
 
 section.player-states,
