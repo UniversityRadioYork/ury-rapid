@@ -8,7 +8,7 @@
 = haml(:json, locals: { name: :channel_set, item: channel_set }) if request.params.key? "json"
 - unless request.params.key? "json"
   %section.channel_set
-    %h1 Channels
+    %h1=channel_set.url
 
     - if 0 < channel_set.channel_count
       %ol.channels-list

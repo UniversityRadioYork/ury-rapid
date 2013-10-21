@@ -14,10 +14,7 @@
 = haml(:json, locals: { name: variable.id, item: variable }) if request.params.key? "json"
 - unless request.params.key? "json"
   %section.player-variable{ class: variable.value }
-    %p
-      - preamble = "#{variable.id}: " if in_player
-      - preamble = "#{variable.player_channel_name}'s #{variable.id}: " unless in_player
-      = surround preamble, "." do
-        %strong= variable.value
+    %h1=in_player ? variable.id : variable.url
+    %p=variable.value
 
     = haml(:in_out_links, locals: { item: variable, inwards: in_player })

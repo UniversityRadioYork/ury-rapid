@@ -12,19 +12,17 @@
 - unless request.params.key? "json"
   -# If we're in the playlist we want a very short item summary...
   - if in_playlist
-    %strong=item.name
-    (#{item.type})
-
+    %span= item.name
     = haml(:in_links, locals: { item: item })
 
   -# ...otherwise, we want a full standalone section.
   - unless in_playlist
     %section.item{ class: item.type }
-      %h1= item.name
-      %p
-        = surround "Type is ", "." do
-          %strong= item.type
-      %p
-        Part of #{item.parent_name}.
+      %h1= item.url
+      %dl
+        %dt Name
+        %dd=item.name
+        %dt Type
+        %dd=item.type
 
       = haml(:out_links, locals: { item: item })

@@ -10,7 +10,7 @@
 = haml(:json, locals: { name: :channel, item: channel }) if request.params.key? "json"
 - unless request.params.key? "json"
   %section.channel{ class: channel.player_state_value }
-    %h1=channel.name
+    %h1=in_channel_list ? channel.id : channel.url
 
     = haml(:player, locals: { player: channel.player, in_channel: true })
     = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
