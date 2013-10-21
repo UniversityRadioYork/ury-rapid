@@ -165,16 +165,68 @@ module Bra
       # resource - A partial URI that follows this model object's URI to form
       #            the URI of the resource to locate.  Can be nil, in which
       #            case this object is returned.
+      # args     - Optional arguments to provide to the block.
+      # block    - An optional block to yield the resource to.
       #
-      # Returns the object if found, and nil otherwise.
-      def find_resource(resource)
+      # Returns as below if no block is provided, or the result of the block
+      #   otherwise.
+      # Yields the object if found, and nil otherwise.
+      def find_resource(resource, *args, &block)
+        block ||= ->(resource){ resource }
+
         if resource.nil?
-          self
+          block.call(self, *args)
         else
           head, tail = resource.split('/', 2)
           child(head).try { |next_level| next_level.find_resource(tail) }
         end
       end
+
+      # Public: GETs the resource with the given partial URI in this object's
+      # children.
+      #
+      # resource - A partial URI that follows this model object's URI to form
+      #            the URI of the resource to locate.  Can be nil, in which
+      #            case this object is returned.
+      #
+      # Returns the GET representation of the object if found, and nil
+      #   otherwise.
+      def get_resource(resource)
+        find_resource(resource, &:get)
+      end
+
+      # Public: PUTs the resource with the given partial URI in this object's
+      # children.
+      #
+      # resource - A partial URI that follows this model object's URI to form
+      #            the URI of the resource to locate.  Can be nil, in which
+      #            case this object is returned.
+      # payload  - A hash containing the payload to PUT into the child
+      #            resource.
+      # raw      - If true, skip the PUT handler for this resource.  This is
+      #            useful when PUTting from the playout system controller, and
+      #            not so useful when PUTting from the client.
+      #
+      # Returns nothing.
+      def put_resource(resource, payload, raw)
+        find_resource(resource, payload, &(raw ? :put_do : :put))
+      end
+
+      # Public: DELETEs the resource with the given partial URI in this object's
+      # children.
+      #
+      # resource - A partial URI that follows this model object's URI to form
+      #            the URI of the resource to locate.  Can be nil, in which
+      #            case this object is returned.
+      # raw      - If true, skip the DELETE handler for this resource.  This is
+      #            useful when deleting from the playout system controller, and
+      #            not so useful when deleting from the client.
+      #
+      # Returns nothing.
+      def delete_resource(resource, raw)
+        find_resource(resource, &(raw ? :delete_do : :delete))
+      end
+
     end
 
     class HashModelObject < CompositeModelObject
