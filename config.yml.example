@@ -9,8 +9,19 @@ server:
   host: 0.0.0.0
   port: 8181
   root: /bra/
+  cors:
+    Allow-Origin:
+      - "https://www.example.com"
+    Allow-Headers:
+      - accept
+      - authorization
+    Allow-Credentials:
+      - "true"
+    Allow-Methods:
+      - "*"
 
-num_channels: 3
+model:
+  num_channels: 3
 
 users:
   test:
