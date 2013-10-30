@@ -212,6 +212,23 @@ module Bra
         find_resource(resource, payload, &(raw ? :put_do : :put))
       end
 
+      # Public: PUTs the resource with the given partial URI in this object's
+      # children, from the perpective of the playout system.
+      #
+      # resource - A partial URI that follows this model object's URI to form
+      #            the URI of the resource to locate.  Can be nil, in which
+      #            case this object is returned.
+      # payload  - A hash containing the payload to PUT into the child
+      #            resource.
+      # raw      - If true, skip the PUT handler for this resource.  This is
+      #            useful when PUTting from the playout system controller, and
+      #            not so useful when PUTting from the client.
+      #
+      # Returns nothing.
+      def put_resource_from_playout(resource, payload)
+        put_resource(resource, payload, true)
+      end
+
       # Public: DELETEs the resource with the given partial URI in this object's
       # children.
       #
