@@ -217,6 +217,7 @@ module Bra
       # Returns the validated state.
       # Raises an exception if the value is invalid.
       def self.validate_marker(position)
+        position ||= 0
         position_int = Integer(position)
         fail('Position is negative.') if position_int < 0
         # TODO: Check against duration?
