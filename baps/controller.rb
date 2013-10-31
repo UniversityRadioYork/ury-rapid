@@ -75,8 +75,11 @@ module Bra
       # Returns a proc that takes a BAPS response and sets the appropriate
       #   player state to that provided to this function.
       def set_state_handler(state)
-        proc do |response|
-          @model.put_resource(response[:subcode].to_s, state, true)
+        lambda do |response|
+          @model.put_resource_from_playout(
+            'channels/#{response[:subcode]}/player/state',
+            state
+          )
         end
       end
 
@@ -89,8 +92,9 @@ module Bra
       #   marker of the type provided to this function.
       def set_marker_handler(type)
         lambda do |response|
-          @model.set_player_marker(
-            response[:subcode], type, response[:position]
+          @model.put_resource_from_playout(
+            'channels/#{response[:subcode]}/player/#{type}',
+            response[:position]
           )
         end
       end
@@ -104,12 +108,16 @@ module Bra
       end
 
       def reset(response)
-        id = response[:subcode]
-        @model.channel(id).clear_playlist
+        @model.delete_resource_from_playout('channels/#{response[:subcode]}')
       end
 
       def loaded(response)
-        @model.load_in_player(response[:subcode], *(loaded_item(response)))
+        loaded_item(response).each do |key, value|
+          @model.put_resource_from_playout(
+            'channels/#{response[:subcode]}/player/#{key}',
+            value
+          )
+        end
       end
 
       def item_count(response)
@@ -150,11 +158,14 @@ module Bra
       #     item.
       def loaded_item(response)
         type, title, duration = response.values_at(:type, :title, :duration)
-        duration.try { |d| @model.player(response[:subcode]).duration = d }
 
         load_state = LOAD_STATES[title]
         item = normal_loaded_item(type, title) if load_state == :ok
-        [load_state, item]
+        {
+          duration: duration,
+          load_state: load_state,
+          item: item
+        }
       end
 
       # Internal: Processes a normal loaded item response, converting it into
@@ -169,7 +180,7 @@ module Bra
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
       def normal_loaded_item(type, title)
-        [:ok, Models::Item.new(track_type_baps_to_bra(type), title)]
+        Models::Item.new(track_type_baps_to_bra(type), title)
       end
 
       # Internal: Converts a BAPS track type to a BRA track type.

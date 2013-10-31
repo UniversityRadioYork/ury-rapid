@@ -44,9 +44,24 @@ module Bra
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
         #
-        # Returns nothing.
+        # Returns false (for usage as a model method handler).
         def run(queue)
           Request.new(Codes::Playlist::RESET, @channel).to(queue)
+          false
+        end
+
+        def self.to_channel_delete_handler(queue)
+          ->(resource) { self.new(resource).run(queue) }
+        end
+
+        def self.to_player_delete_handler(queue)
+          ->(resource) { self.new(resource.player_channel).run(queue) }
+        end
+
+        def self.to_channel_set_delete_handler(queue)
+          lambda do |resource| 
+            resource.channels.each { |channel| self.new(channel).run(queue) }
+          end
         end
       end
 
@@ -283,7 +298,7 @@ module Bra
 
 			def self.handlers(queue)
 				{
-#					channels_delete: ClearPlaylist.to_handler(queue),
+					channels_delete: ClearPlaylist.to_channel_set_delete_handler(queue),
 					player_state_put: SetPlayerState.to_put_handler(queue)
 				}
 			end
