@@ -54,7 +54,7 @@ def run
 
   driver = init_driver(config[:driver])
   model = init_model(config[:model], driver)
-  app = Bra::ServerApp.new(config, model)
+  app = Bra::ServerApp.new(config[:server], model)
 
   EventMachine.run do
     setup_server(config[:server], app)

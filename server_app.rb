@@ -4,6 +4,8 @@ require 'eventmachine'
 require 'json'
 
 module Bra
+  ##
+  # The Sinatra application that powers the server component of bra.
   class ServerApp < Sinatra::Base
     register Sinatra::Contrib
     use Rack::MethodOverride
@@ -50,7 +52,7 @@ module Bra
     #
     # Returns nothing.
     def cors
-      @config[:server][:cors].each do |header, items|
+      @config[:cors].each do |header, items|
         headers "Access-Control-#{header}" => items.join(', ')
       end
     end
