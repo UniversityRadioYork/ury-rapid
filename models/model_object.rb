@@ -165,7 +165,7 @@ module Bra
       # Returns as below if no block is provided, or the result of the block
       #   otherwise.
       # Yields the object if found, and nil otherwise.
-      def find_resource(resource, *args, &block)
+      def find_url(resource, *args, &block)
         # Without a block, just pass the resource through.
         block ||= ->(x){ x }
 
@@ -173,7 +173,7 @@ module Bra
           block.call(self, *args)
         else
           head, tail = resource.split('/', 2)
-          child(head).try { |next_level| next_level.find_resource(tail) }
+          child(head).try { |next_level| next_level.find_url(tail) }
         end
       end
 
@@ -187,7 +187,7 @@ module Bra
       # Returns the GET representation of the object if found, and nil
       #   otherwise.
       def get_resource(resource)
-        find_resource(resource, &:get)
+        find_url(resource, &:get)
       end
 
       alias_method :get_resource_from_playout, :get_resource
@@ -206,7 +206,7 @@ module Bra
       #
       # Returns nothing.
       def put_resource(resource, payload, raw)
-        find_resource(resource, payload, &(raw ? :put_do : :put))
+        find_url(resource, payload, &(raw ? :put_do : :put))
       end
 
       # Public: PUTs the resource with the given partial URI in this object's
@@ -238,7 +238,7 @@ module Bra
       #
       # Returns nothing.
       def delete_resource(resource, raw)
-        find_resource(resource, &(raw ? :delete_do : :delete))
+        find_url(resource, &(raw ? :delete_do : :delete))
       end
 
     end
@@ -316,7 +316,7 @@ module Bra
       #            case this object is returned.
       #
       # Returns the object if the resource matches this one, and nil otherwise.
-      def find_resource(resource)
+      def find_url(resource)
         resource.nil? ? self : nil
       end
     end

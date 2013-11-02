@@ -98,7 +98,7 @@ module Bra
     def find(params)
       found = false
 
-      @model.find_resource(params[:splat].first).try do |resource|
+      @model.find_url(params[:splat].first).try do |resource|
         yield(resource)
         found = true
       end
