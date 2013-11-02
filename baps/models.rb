@@ -57,12 +57,16 @@ module Bra
       # model  - The root of the model to which the BAPS model tree should be
       #          added.
       # config - The config dict from which the BAPS model will be populated.
+      #
+      # Returns the resulting model; the input model may be mutated.
       def self.add_baps_models_to(model, config)
          xbaps = XBaps.new.move_to(model, :x_baps)
          server = Server.new.move_to(xbaps, :server)
          config.each do |key, value|
            Constant.new(value, [:XBapsReadConfig]).move_to(server, key)
          end
+
+         model
       end
     end
   end

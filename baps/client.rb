@@ -36,7 +36,7 @@ module Bra
       #              responses coming from this client.
       #
       # Returns nothing.
-      def start(controller)
+      def run(controller)
         controller.register(@channel)
         EM.connect(@hostname, @port, Connection, @parser, @queue)
         Commands::Initiate.new.run(@queue)

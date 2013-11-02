@@ -3,11 +3,7 @@ require 'thin'
 require 'yaml'
 require 'active_support/core_ext/hash/keys'
 require_relative 'server_app'
-require_relative 'baps/client'
-require_relative 'baps/commands'
-require_relative 'baps/models'
 require_relative 'models/creator'
-require_relative 'baps/controller'
 
 # Internal: Creates the dispatch for the reactor.
 #
@@ -16,7 +12,7 @@ require_relative 'baps/controller'
 # Returns the dispatch.
 def make_dispatch(config, web_app)
   Rack::Builder.app do
-    map(config[:server][:root]) { run(web_app) }
+    map(config[:root]) { run(web_app) }
   end
 end
 
@@ -51,43 +47,59 @@ def em_compatible?(server)
   %w(thin hatetepe goliath).include?(server)
 end
 
+##
+# Runs bra (this is the main function).
 def run
   config = YAML.load_file('config.yml').deep_symbolize_keys!
-  app, model, queue = make_dependencies(config)
-  EM.run do
-    setup_server(config, app)
-    setup_client(config, model, queue)
+
+  driver = init_driver(config[:driver])
+  model = init_model(config[:model], driver)
+  app = Bra::ServerApp.new(config, model)
+
+  EventMachine.run do
+    setup_server(config[:server], app)
+    driver.run(model)
   end
 end
 
-# Internal: Instantiates the dependencies for the BRA system.
+##
+# Find the correct driver from the config, and initialise it.
 #
-# config - The configuration hash from which any settings should be read.
-#
-# Returns a list containing the Sinatra app, the model and the requests queue
-# that should be used for making the client and server.
-def make_dependencies(config)
-  queue = EM::Queue.new
+# The driver is the part of the bra system that interfaces with the playout
+# system.  It runs in bra's EventMachine instance and is wired into the bra
+# model.
+def init_driver(config)
+  driver_module = config[:source]
+  require driver_module
 
-  model_config = config[:model]
-  model_config.merge!(Bra::Baps::Commands.handlers(queue))
-
-  model = Bra::Models::Creator.new(model_config).create
-  Bra::Baps::Models.add_baps_models_to(model, config[:baps])
-
-  app = Bra::ServerApp.new(config, model)
-  [app, model, queue]
+  Driver.new(config)
 end
 
-# Internal: Initialises the server end of BRA, which handles requests to and
+##
+# Create a model from its config and the playout system driver.
+def init_model(init_config, driver)
+  # The model config is created by loading up driver-neutral configuration from
+  # the central YAML file, then passing it to the driver to check for
+  # unsound config (like requesting 3 channels on a single-channel playout) and
+  # to add in driver-specific configuration, like model handlers.
+  full_config = driver.configure_model(init_config)
+
+  # Now we create the driver-neutral model, but the driver might want to add
+  # its own model items into the model space, so we pass the model back to the
+  # driver to post-process.
+  creator = Bra::Models::Creator.new(full_config)
+  driver.process_model(creator.create)
+end
+
+# Internal: Initialises the server end of bra, which handles requests to and
 # responses from the environment.
 #
-# config - The BRA configuration hash.
+# config - The bra server configuration hash.
 # opts   - Server options for Sinatra/Rack.
 #
 # Returns nothing.
 def setup_server(config, app)
-  server, host, port = config[:server].values_at(*%i(rack host port))
+  server, host, port = config.values_at(*%i(rack host port))
 
   dispatch = make_dispatch(config, app)
 
@@ -96,18 +108,14 @@ def setup_server(config, app)
   start_server(dispatch, server, host, port)
 end
 
-# Internal: Initialises the client end of BRA, which handles requests to and
+# Internal: Initialises the client end of bra, which handles requests to and
 # responses from the BAPS server.
 #
-# config - The BRA configuration hash.
+# config - The bra configuration hash.
 # model - The model that the client controls via BAPS responses.
 #
 # Returns nothing.
 def setup_client(config, model, queue)
-  client_config = config[:baps].values_at(*%i(host port username password))
-
-  controller = Bra::Baps::Controller.new(model, queue)
-  client = Bra::Baps::Client.new(queue, *client_config).start(controller)
 end
 
 run if __FILE__ == $PROGRAM_NAME

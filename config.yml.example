@@ -1,17 +1,48 @@
-baps:
-  host: HOST
-  port: 9999
-  username: USER
-  password: PASS
+#
+# |__   __  __
+# |  | |   |  |
+# |__| |   |__|_
+#
+# Configuration File
+#
+# To use this, save it as config.yml in bra's working directory.
+#
 
+#
+# The [driver] is the part of bra that interfaces with the playout system.  It
+# is contained in a separate module space and loaded in by BRA.
+#
+driver:
+  # Specify the module from which the driver is being loaded here.
+  # This can be a relative path or a gem name.
+  source: ./baps/driver
+
+  # Place driver specific configuration here.
+  host: localhost
+  port: 1234
+  username: example
+  password: hunter2
+
+#
+# The [server] is the part of bra that interacts with the clients via HTTP.
+#
 server:
+  # Choose the server Rack will run on here, as well as the host and port on
+  # which it should listen for requests.
   rack: thin
   host: 0.0.0.0
   port: 8181
-  root: /bra/
+
+  # This setting allows you to mount the HTTP server on a subdirectory, which
+  # is useful if you're proxying through to the server in Apache or suchlike.
+  root: /
+
+  # Cross-origin resource sharing config goes in here.
+  # This is in the form of a dictionary mapping X, where "Access-Control-X" is
+  # a CORS header, to a list of values to set for that header.
   cors:
     Allow-Origin:
-      - "https://www.example.com"
+      - "https://ury.org.uk"
     Allow-Headers:
       - accept
       - authorization
@@ -20,13 +51,24 @@ server:
     Allow-Methods:
       - "*"
 
-model:
-  num_channels: 3
+  # This is where users for the server's authentication system can be defined,
+  # and their permissions set.  The [users] section maps usernames to
+  # information about that username.
+  users:
+    god:
+      password: hunter2
+      privileges:
+        - SetPlayerState
+        - SetPlayerPosition
+        - EditPlaylist
+        - XBapsReadConfig
 
-users:
-  test:
-    password: TestPassword
-    privileges:
-      - SetPlayerState
-      - SetPlayerPosition
-      - EditPlaylist
+#
+# The [model] is the part of bra that tracks the playout system's state and
+# allows it to be viewed and manipulated as a collection of objects.
+#
+model:
+  # Set the *desired* number of playout channels here.  If the driver cannot
+  # support this number, it may set a different channel count than that
+  # specified here.
+  num_channels: 3
