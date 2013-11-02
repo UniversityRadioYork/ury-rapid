@@ -7,10 +7,6 @@ module Bra
   module Models
     # Public: A model of the BAPS server state.
     class Model < HashModelObject
-      def name
-        'Model'
-      end
-
       def channels
         child(:channels)
       end
