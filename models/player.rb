@@ -7,7 +7,6 @@ module Bra
     # playing song and its state.
     class Player < HashModelObject
       alias_method :channel, :parent
-      alias_method :channel_name, :parent_name
       alias_method :channel_id, :parent_id
 
       # Public: Access the player's current item for reading.
