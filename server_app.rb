@@ -114,26 +114,6 @@ module Bra
       ok
     end
 
-#    put '/channels/:id/player/state/?' do
-#      content_type :json
-#
-#      require_permissions!('SetPlayerState')
-#      parse_json_from(request) do |body|
-#        @commander.run(:SetPlayerState, params[:id], body['state'])
-#        ok
-#      end
-#    end
-#
-#    put '/channels/:id/player/position/?' do
-#      require_permissions!('SetPlayerPosition')
-#
-#      parse_json_from(request) do |body|
-#        @commander.run(:SetPlayerPosition, params[:id], body['position'])
-#        ok
-#      end
-#    end
-
-
     private
 
     # Internal: Retrieves the privileges available for a given user and

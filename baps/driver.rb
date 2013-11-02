@@ -24,12 +24,12 @@ class Driver
     # it knows where and how to connect to BAPS.
     client_config = config.values_at(*%i(host port username password))
     @client = Bra::Baps::Client.new(@queue, *client_config)
-  end 
+  end
 
   ##
   # Given the initial model configuration, prepare it with driver-specific
   # configuration ready for the model initialisation.
-  # 
+  #
   # This returns its changes, but may or may not mutate the original
   # model_config.
   def configure_model(model_config)
@@ -43,7 +43,7 @@ class Driver
 
   ##
   # Perform post-processing on the finished BRA model root.
-  # 
+  #
   # This returns its changes, but may or may not mutate the original model.
   #
   def process_model(model)
@@ -54,13 +54,13 @@ class Driver
 
   ##
   # Begin running the driver, given the completed BRA model.
-  # 
+  #
   # This function is always run within an EventMachine run block.
   def run(model)
     # The controller receives responses from the BAPS server via the client
     # and reacts on them, either updating the model or sending replies to
-    # the request queue.  
-    # 
+    # the request queue.
+    #
     # We'd make the controller earlier, but we need access to the model,
     # which we only get definitive access to here.
     controller = Bra::Baps::Controller.new(model, @queue)

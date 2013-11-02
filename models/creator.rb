@@ -73,7 +73,7 @@ module Bra
         state = PlayerVariable.make_state.move_to(player, :state)
         register_handlers(state, :player_state_put, :player_state_delete)
 
-        load = PlayerVariable.make_load_state.move_to(player, :load_state)
+        PlayerVariable.make_load_state.move_to(player, :load_state)
         # No handlers for load state, as it's not directly mutatable.
 
         create_player_markers(player)

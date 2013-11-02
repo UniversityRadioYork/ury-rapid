@@ -26,7 +26,7 @@ module Bra
           playlist_functions,
           system_functions
         ].reduce({}) { |a, e| a.merge! e }
-       
+
         channel.subscribe do |response|
           f = functions[response[:code]]
           f.call(response) if f
@@ -212,9 +212,9 @@ module Bra
       end
 
       # Receive a seed from the BAPS server and act upon it.
-      # 
+      #
       # response - The BAPS response containing the seed.
-      # 
+      #
       # Returns nothing.
       def login_seed(response)
         username = @model.find_resource('x_baps/server/username')
@@ -226,15 +226,15 @@ module Bra
       end
 
       # Receive a login response from the server and act upon it.
-      # 
+      #
       # response - The BAPS response containing the login result.
-      # 
+      #
       # Returns nothing.
       def login_result(response)
         code, string = response.values_at(*%i(subcode details))
         is_ok = code == Commands::Authenticate::Errors::OK
         Commands::Synchronise.new.run(@queue) if is_ok
-        unless is_ok then
+        unless is_ok
           puts("BAPS login FAILED: #{string}, code #{code}.")
           EM.stop
         end

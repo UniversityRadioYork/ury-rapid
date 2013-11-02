@@ -30,9 +30,9 @@ module Bra
         { name: @name, type: @type }
       end
 
-			def get_privileges
-				[]
-			end
+      def get_privileges
+        []
+      end
 
       alias_method :to_jsonable, :to_hash
     end

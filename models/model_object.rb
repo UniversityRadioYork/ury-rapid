@@ -15,8 +15,6 @@ module Bra
       attr_reader :parent
 
       def initialize
-        short_name ||= name
-
         @parent = nil
         @id = nil
 
@@ -53,7 +51,7 @@ module Bra
       #
       # Returns a hash mapping this object's ID to the object itself.
       # of its value.
-      def get()
+      def get
         { id => self }
       end
 
@@ -64,8 +62,8 @@ module Bra
       # Returns nothing.
       def put(new_body)
         new_body[id].try do |value|
-					put_do(value) if @put_handler.call(self, value)
-				end
+          put_do(value) if @put_handler.call(self, value)
+        end
       end
 
       # Public: Perform a DELETE on this model object.
@@ -73,10 +71,6 @@ module Bra
       # Returns nothing.
       def delete
         delete_do if @delete_handler.call
-      end
-
-      def name
-        @id
       end
 
       # Public: Moves this model object to a new parent with a new ID.
@@ -172,7 +166,8 @@ module Bra
       #   otherwise.
       # Yields the object if found, and nil otherwise.
       def find_resource(resource, *args, &block)
-        block ||= ->(resource){ resource }
+        # Without a block, just pass the resource through.
+        block ||= ->(x){ x }
 
         if resource.nil?
           block.call(self, *args)
@@ -231,8 +226,8 @@ module Bra
         put_resource(resource, payload, true)
       end
 
-      # Public: DELETEs the resource with the given partial URI in this object's
-      # children.
+      # Public: DELETEs the resource with the given partial URI in this
+      # object's children.
       #
       # resource - A partial URI that follows this model object's URI to form
       #            the URI of the resource to locate.  Can be nil, in which
@@ -248,6 +243,9 @@ module Bra
 
     end
 
+    ##
+    # A model object whose children are arranged as a hash from their IDs to
+    # themselves.
     class HashModelObject < CompositeModelObject
       def initialize
         super()
@@ -273,6 +271,8 @@ module Bra
       end
     end
 
+    ##
+    # A model object whose children form a list.
     class ListModelObject < CompositeModelObject
       def initialize
         super()
@@ -297,7 +297,8 @@ module Bra
       end
     end
 
-    # Class for model objects that do not contain children.
+    ##
+    # A model object that does not have children.
     class SingleModelObject < ModelObject
       def children
         nil

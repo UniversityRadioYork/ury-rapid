@@ -12,6 +12,8 @@ module Bra
 
       # Public: Access the player's current item for reading.
       attr_reader :item
+      attr_writer :item
+      alias_method :link_item, :item=
 
       def state
         child(:state)
@@ -87,18 +89,6 @@ module Bra
       # Returns nothing.
       def unlink_item(item)
         fail("Tried to unlink wrong item from #{name}") unless item == @item
-        item = nil
-      end
-
-      # Internal: Puts an item into the player.
-      #
-      # This does not register the item's parent.
-      #
-      # item - The item to link.
-      #
-      # Returns nothing.
-      def link_item(item)
-        @item = item
       end
 
       def get_privileges
@@ -128,6 +118,12 @@ module Bra
     class PlayerVariable < SingleModelObject
       # Public: Allows direct read access to the value.
       attr_reader :value
+      alias_method :to_jsonable, :value
+
+      attr_reader :edit_privileges
+      alias_method :put_privileges, :edit_privileges
+      alias_method :post_privileges, :edit_privileges
+      alias_method :delete_privileges, :edit_privileges
 
       def self.make_state
         new(:stopped, method(:validate_state), [:SetPlayerState])
@@ -166,10 +162,6 @@ module Bra
         @value = validated
       end
 
-      def to_jsonable
-        @value
-      end
-
       # Public: Handle an attempt to put a new value into the PlayerVariable
       # from the API.
       #
@@ -200,13 +192,6 @@ module Bra
       def get_privileges
         []
       end
-
-      def put_privileges
-        @edit_privileges
-      end
-
-      alias_method :post_privileges, :put_privileges
-      alias_method :delete_privileges, :put_privileges
 
       private
 

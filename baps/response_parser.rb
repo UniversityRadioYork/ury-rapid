@@ -12,7 +12,8 @@ module Bra
     class ResponseParser
       # Internal: Initialises the parser.
       #
-      # channel - An EventMachine channel that should receive parsed responses. 
+      # channel - An EventMachine channel that should receive parsed
+      #           responses.
       # reader  - An object that can convert raw buffered data to BAPS
       #           meta-protocol tokens.
       def initialize(channel, reader)

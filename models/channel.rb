@@ -224,6 +224,8 @@ module Bra
       end
     end
 
+    ##
+    # A channel playlist, consisting of a list of playlist items.
     class Playlist < ListModelObject
       alias_method :contents, :children
 

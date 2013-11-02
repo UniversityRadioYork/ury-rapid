@@ -51,16 +51,16 @@ module Bra
         end
 
         def self.to_channel_delete_handler(queue)
-          ->(resource) { self.new(resource).run(queue) }
+          ->(resource) { new(resource).run(queue) }
         end
 
         def self.to_player_delete_handler(queue)
-          ->(resource) { self.new(resource.player_channel).run(queue) }
+          ->(resource) { new(resource.player_channel).run(queue) }
         end
 
         def self.to_channel_set_delete_handler(queue)
-          lambda do |resource| 
-            resource.channels.each { |channel| self.new(channel).run(queue) }
+          lambda do |resource|
+            resource.channels.each { |channel| new(channel).run(queue) }
           end
         end
       end
@@ -95,12 +95,13 @@ module Bra
           Request.new(CODES[@state], @channel).to(queue)
         end
 
-				def self.to_put_handler(queue)
-					proc do |resource, value|
-						self.new(resource.player_channel, value).run(queue)
-						false
-					end
-				end
+        def self.to_put_handler(queue)
+          proc do |resource, value|
+            new(resource.player_channel, value).run(queue)
+            # Let the model object know it cannot update itself directly.
+            false
+          end
+        end
 
         private
 
@@ -214,12 +215,12 @@ module Bra
         end
       end
 
-			def self.handlers(queue)
-				{
-					channels_delete: ClearPlaylist.to_channel_set_delete_handler(queue),
-					player_state_put: SetPlayerState.to_put_handler(queue)
-				}
-			end
+      def self.handlers(queue)
+        {
+          channels_delete: ClearPlaylist.to_channel_set_delete_handler(queue),
+          player_state_put: SetPlayerState.to_put_handler(queue)
+        }
+      end
     end
   end
 end

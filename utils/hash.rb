@@ -1,3 +1,5 @@
+##
+# Reopening of the Hash class to add utility functions.
 class Hash
   # Public: Like Hash#map, but returns a new Hash.
   #
