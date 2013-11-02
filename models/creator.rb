@@ -8,6 +8,10 @@ module Bra
     #
     # This performs dependency injection and ensures any model modification
     # handlers specified in the options are set up.
+    #
+    # It does not handle driver-specific model additions beyond method hook
+    # registrations; to add new model trees to the model, pass the result of
+    # the model creator to other functions.
     class Creator
       # Public: Initialise a Creator.
       #

@@ -53,7 +53,7 @@ module Bra
       #
       # Returns a hash mapping this object's ID to the object itself.
       # of its value.
-      def get
+      def get()
         { id => self }
       end
 
@@ -195,6 +195,8 @@ module Bra
         find_resource(resource, &:get)
       end
 
+      alias_method :get_resource_from_playout, :get_resource
+
       # Public: PUTs the resource with the given partial URI in this object's
       # children.
       #
@@ -213,7 +215,7 @@ module Bra
       end
 
       # Public: PUTs the resource with the given partial URI in this object's
-      # children, from the perpective of the playout system.
+      # children, from the perspective of the playout system.
       #
       # resource - A partial URI that follows this model object's URI to form
       #            the URI of the resource to locate.  Can be nil, in which

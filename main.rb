@@ -5,6 +5,7 @@ require 'active_support/core_ext/hash/keys'
 require_relative 'server_app'
 require_relative 'baps/client'
 require_relative 'baps/commands'
+require_relative 'baps/models'
 require_relative 'models/creator'
 require_relative 'baps/controller'
 
@@ -72,6 +73,8 @@ def make_dependencies(config)
   model_config.merge!(Bra::Baps::Commands.handlers(queue))
 
   model = Bra::Models::Creator.new(model_config).create
+  Bra::Baps::Models.add_baps_models_to(model, config[:baps])
+
   app = Bra::ServerApp.new(config, model)
   [app, model, queue]
 end
@@ -103,9 +106,8 @@ end
 def setup_client(config, model, queue)
   client_config = config[:baps].values_at(*%i(host port username password))
 
-  client = Bra::Baps::Client.new(queue, *client_config)
-  controller = Bra::Baps::Controller.new(model)
-  client.start_with_controller(controller)
+  controller = Bra::Baps::Controller.new(model, queue)
+  client = Bra::Baps::Client.new(queue, *client_config).start(controller)
 end
 
 run if __FILE__ == $PROGRAM_NAME

@@ -12,11 +12,11 @@ module Bra
     class ResponseParser
       # Internal: Initialises the parser.
       #
-      # dispatch - The target of completed responses.
-      # reader   - An object that can convert raw buffered data to BAPS
-      #            meta-protocol tokens.
-      def initialize(dispatch, reader)
-        @dispatch = dispatch
+      # channel - An EventMachine channel that should receive parsed responses. 
+      # reader  - An object that can convert raw buffered data to BAPS
+      #           meta-protocol tokens.
+      def initialize(channel, reader)
+        @channel = channel
         @reader = reader
 
         # Set up to expect the welcome message
@@ -30,7 +30,7 @@ module Bra
 
       # Internal: Read and interpret a response from the BAPS server.
       def receive_data(data)
-        @reader.add data
+        @reader.add(data)
 
         sufficient_data = true
         sufficient_data = process_next_token while sufficient_data
@@ -194,7 +194,7 @@ module Bra
       #
       # Returns true (as in, this method always succeeds at processing data).
       def finish_response
-        @dispatch.emit(@response)
+        @channel.push(@response)
         @response = nil
         true
       end

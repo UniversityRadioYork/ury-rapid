@@ -1,9 +1,9 @@
+require 'eventmachine'
 require_relative 'codes'
 require_relative 'connection'
 require_relative 'response_parser'
 require_relative 'reader'
 require_relative 'commands'
-require_relative 'dispatch'
 require_relative 'responses'
 
 module Bra
@@ -23,9 +23,9 @@ module Bra
         @username = username
         @password = password
 
-        @dispatch = Dispatch.new
+        @channel = EventMachine::Channel.new
         @reader = Reader.new
-        @parser = ResponseParser.new(@dispatch, @reader)
+        @parser = ResponseParser.new(@channel, @reader)
         @queue = queue
       end
 
@@ -36,49 +36,10 @@ module Bra
       #              responses coming from this client.
       #
       # Returns nothing.
-      def start_with_controller(controller)
-        start { |dispatch| controller.register(dispatch) }
-      end
-
-      # Public: Starts a BAPS connection and logs into it.
-      #
-      # block - An implicit block to be called if the login succeeds.
-      #
-      # Yields (indirectly) the dispatch and queue to the block.
-      #
-      # Returns nothing.
-      def start(&block)
+      def start(controller)
+        controller.register(@channel)
         EM.connect(@hostname, @port, Connection, @parser, @queue)
-        login(&block)
-      end
-
-      private
-
-      # Internal: Logs into the BAPS server and registers the dump functions.
-      #
-      # Yields the dispatch and queue to the block.
-      #
-      # Returns nothing.
-      def login
-        login = Commands::Login.new(@username, @password)
-        login.run(@dispatch, @queue) do |error_code, error_string|
-          login_succeeded = error_code == Commands::Authenticate::Errors::OK
-
-          die(error_code, error_string) unless login_succeeded
-          yield @dispatch, @queue if login_succeeded
-        end
-      end
-
-      # Internal: Shuts down the BAPS client if login failed.
-      #
-      # error_code   - The code of the login error that occurred.  See
-      #                Commands::Authenticate::Errors.
-      # error_string - The server's description of the error that occurred.
-      #
-      # Returns nothing.
-      def die(error_code, error_string)
-        puts("Login failure: #{error_string} (code #{error_code}).")
-        EM.stop
+        Commands::Initiate.new.run(@queue)
       end
     end
   end

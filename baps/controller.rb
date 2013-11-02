@@ -8,8 +8,10 @@ module Bra
       # Internal: Initialises the controllers.
       #
       # model - The Model this Controller will operate on.
-      def initialize(model)
+      # queue - The queue into which BAPS requests should be sent.
+      def initialize(model, queue)
         @model = model
+        @queue = queue
       end
 
       # Internal: Registers the controller's callbacks with a response
@@ -18,17 +20,30 @@ module Bra
       # dispatch - The object sending responses to listeners.
       #
       # Returns nothing.
-      def register(dispatch)
+      def register(channel)
         functions = [
           playback_functions,
           playlist_functions,
           system_functions
         ].reduce({}) { |a, e| a.merge! e }
-
-        dispatch.register_response_handlers functions
+       
+        channel.subscribe do |response|
+          f = functions[response[:code]]
+          f.call(response) if f
+          unhandled(response) unless f
+        end
       end
 
       private
+
+      def unhandled(response)
+        message = "Unhandled response: #{response[:name]}"
+        if response[:code].is_a?(Numeric)
+          hexcode = response[:code].to_s(16)
+          message << " (0x#{hexcode})"
+        end
+        puts(message)
+      end
 
       # Internal: Register playback response handler functions.
       #
@@ -63,7 +78,9 @@ module Bra
         {
           Codes::System::CLIENT_ADD => method(:client_add),
           Codes::System::CLIENT_REMOVE => method(:client_remove),
-          Codes::System::LOG_MESSAGE => method(:log_message)
+          Codes::System::LOG_MESSAGE => method(:log_message),
+          Codes::System::SEED => method(:login_seed),
+          Codes::System::LOGIN_RESULT => method(:login_result)
         }
       end
 
@@ -102,7 +119,7 @@ module Bra
       def item_data(response)
         id, index = response.values_at(:subcode, :index)
         type, title = response.values_at(:type, :title)
-        item = Models::Item.new(track_type_baps_to_bra(type), title)
+        item = Bra::Models::Item.new(track_type_baps_to_bra(type), title)
 
         @model.channel(id).add_item(index, item)
       end
@@ -180,7 +197,7 @@ module Bra
       #   - Either nil (no loaded item) or an Item representing the loaded
       #     item.
       def normal_loaded_item(type, title)
-        Models::Item.new(track_type_baps_to_bra(type), title)
+        Bra::Models::Item.new(track_type_baps_to_bra(type), title)
       end
 
       # Internal: Converts a BAPS track type to a BRA track type.
@@ -192,6 +209,35 @@ module Bra
       def track_type_baps_to_bra(type)
         raise InvalidTrackType, type unless TRACK_TYPE_MAP.include? type
         TRACK_TYPE_MAP[type]
+      end
+
+      # Receive a seed from the BAPS server and act upon it.
+      # 
+      # response - The BAPS response containing the seed.
+      # 
+      # Returns nothing.
+      def login_seed(response)
+        username = @model.find_resource('x_baps/server/username')
+        password = @model.find_resource('x_baps/server/password')
+        seed = response[:seed]
+        # Kurse all SeeDs.  Swarming like lokusts akross generations.
+        #   - Sorceress Ultimecia, Final Fantasy VIII
+        Commands::Authenticate.new(username, password, seed).run(@queue)
+      end
+
+      # Receive a login response from the server and act upon it.
+      # 
+      # response - The BAPS response containing the login result.
+      # 
+      # Returns nothing.
+      def login_result(response)
+        code, string = response.values_at(*%i(subcode details))
+        is_ok = code == Commands::Authenticate::Errors::OK
+        Commands::Synchronise.new.run(@queue) if is_ok
+        unless is_ok then
+          puts("BAPS login FAILED: #{string}, code #{code}.")
+          EM.stop
+        end
       end
 
       # Internal: Hash mapping item names to BRA load states.
