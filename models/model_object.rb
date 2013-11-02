@@ -1,4 +1,5 @@
 require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext/object/try'
 require_relative '../utils/hash'
 
 module Bra
@@ -84,7 +85,7 @@ module Bra
       #
       # Consider using driver_put for code updating the model from the driver.
       def put_do(_)
-        raise 'put_do must be overridden in model objects.'
+        fail("put_do needs overriding for object #{id}, class #{self.class}.")
       end
 
       ##
@@ -92,16 +93,10 @@ module Bra
       #
       # This is a stub; any concrete model objects must override it.
       #
-      # Consider using driver_put for code updating the model from the driver.
+      # Consider using driver_delete for code updating the model from the driver.
       def delete_do
-        raise 'delete_do must be overridden in model objects.'
+        raise "delete_do must be overridden for model object #{id}."
       end
-
-      # The driver_XYZ methods allow the driver to perform modifications to the
-      # model using the same verbs as the server without triggering the usual
-      # handlers.  They are implemented using the _do methods.
-      alias_method :driver_put, :put_do
-      alias_method :driver_delete, :delete_do
 
       # Public: Moves this model object to a new parent with a new ID.
       #
@@ -164,7 +159,7 @@ module Bra
       # object - The object to remove from this object's children.
       #
       def remove_child(object)
-        @children.delete(object.resource_name)
+        @children.delete(object.id)
       end
 
       # Public: Adds a child to this model object.
@@ -191,16 +186,24 @@ module Bra
       # Returns as below if no block is provided, or the result of the block
       #   otherwise.
       # Yields the object if found, and nil otherwise.
-      def find_url(resource, *args, &block)
-        # Without a block, just pass the resource through.
-        block ||= ->(x){ x }
+      def find_url(url, *args)
+        # We're traversing down the URL by repeatedly splitting it into its
+        # head (part before the next /) and tail (part after).  While we still
+        # have a tail, then the URL still needs walking down.
+        head, tail = nil, url.chomp('/')
 
-        if resource.nil?
-          block.call(self, *args)
-        else
-          head, tail = resource.split('/', 2)
-          child(head).try { |next_level| next_level.find_url(tail) }
+        resource = self
+
+        while tail
+          # We need to keep traversing down, as we've still got a tail.
+          head, tail = tail.split('/', 2)
+          resource = resource.child(head)
+          fail("#{resource.id} has no child #{new_head}.") if resource.nil?
         end
+
+        # Once we've exhausted the tail, the resource left should be the one
+        # referred to by the head.
+        yield resource, *args
       end
 
       # Public: GETs the resource with the given partial URI in this object's
@@ -216,9 +219,6 @@ module Bra
         find_url(resource, &:get)
       end
 
-      ##
-      # DELETEs the resource at the given URL relative from this resource,
-      # without triggering any handlers.
       # Public: PUTs the resource with the given partial URI in this object's
       # children.
       #
@@ -230,26 +230,12 @@ module Bra
       #
       # Returns nothing.
       def put_url(resource, payload)
-        find_url(resource, payload, &put)
+        find_url(resource, payload, &:put)
       end
 
       ##
       # PUTs a payload into the resource at the given URL relative from this
       # resource, without triggering any handlers.
-      def driver_put_url(resource, payload)
-        find_url(resource, payload, &driver_put)
-      end
-
-      # Public: PUTs the resource with the given partial URI in this object's
-      # children, from the perspective of the playout system.
-      #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
-      # payload  - A hash containing the payload to PUT into the child
-      #            resource.
-      #
-      # Returns nothing.
       def driver_put_url(resource, payload)
         find_url(resource, payload, &:driver_put)
       end

@@ -93,8 +93,9 @@ module Bra
       #   player state to that provided to this function.
       def set_state_handler(state)
         lambda do |response|
+          puts("State change: #{response[:subcode]} #{state}")
           @model.driver_put_url(
-            'channels/#{response[:subcode]}/player/state',
+            "channels/#{response[:subcode]}/player/state",
             state
           )
         end
@@ -110,7 +111,7 @@ module Bra
       def set_marker_handler(type)
         lambda do |response|
           @model.driver_put_url(
-            'channels/#{response[:subcode]}/player/#{type}',
+            "channels/#{response[:subcode]}/player/#{type}",
             response[:position]
           )
         end
@@ -125,13 +126,13 @@ module Bra
       end
 
       def reset(response)
-        @model.driver_delete_url('channels/#{response[:subcode]}')
+        @model.driver_delete_url("channels/#{response[:subcode]}")
       end
 
       def loaded(response)
         loaded_item(response).each do |key, value|
           @model.driver_put_url(
-            'channels/#{response[:subcode]}/player/#{key}',
+            "channels/#{response[:subcode]}/player/#{key}",
             value
           )
         end
@@ -217,8 +218,8 @@ module Bra
       #
       # Returns nothing.
       def login_seed(response)
-        username = @model.find_url('x_baps/server/username')
-        password = @model.find_url('x_baps/server/password')
+        username = @model.get_url('x_baps/server/username')[:username]
+        password = @model.get_url('x_baps/server/password')[:password]
         seed = response[:seed]
         # Kurse all SeeDs.  Swarming like lokusts akross generations.
         #   - Sorceress Ultimecia, Final Fantasy VIII

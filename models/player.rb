@@ -165,11 +165,14 @@ module Bra
       # from the API.
       #
       # new_value - A hash (which should have one item, a mapping from
-      #             this variable's ID to its new value).
+      #             this variable's ID to its new value), or the new value
+      #             itself.
       #
       # Returns nothing.
       def put_do(new_value)
-        @value = new_value[id]
+        value = new_value[id] if value.is_a?(Hash)
+        value ||= new_value
+        @value = value
       end
 
       # Public: Resets the variable to its default value.
@@ -191,6 +194,12 @@ module Bra
       def get_privileges
         []
       end
+
+      # The driver_XYZ methods allow the driver to perform modifications to the
+      # model using the same verbs as the server without triggering the usual
+      # handlers.  They are implemented using the _do methods.
+      alias_method :driver_put, :put_do
+      alias_method :driver_delete, :delete_do
 
       private
 

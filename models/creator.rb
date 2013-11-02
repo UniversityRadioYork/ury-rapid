@@ -76,6 +76,8 @@ module Bra
         PlayerVariable.make_load_state.move_to(player, :load_state)
         # No handlers for load state, as it's not directly mutatable.
 
+        Item.new(:null, nil).move_to(player, :item)
+
         create_player_markers(player)
       end
 
