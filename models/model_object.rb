@@ -47,31 +47,61 @@ module Bra
         self
       end
 
-      # Public: Perform a GET on this model object.
+      ##
+      # GET this resource.
       #
       # Returns a hash mapping this object's ID to the object itself.
-      # of its value.
       def get
         { id => self }
       end
 
-      # Public: Perform a PUT on this model object.
+      ##
+      # PUT a resource into this model object, using the put handler.
       #
-      # new_body - A hash mapping this object's ID to its new value.
-      #
-      # Returns nothing.
+      # The resource can be a direct instance of this object, or a hash mapping
+      # this object's ID to one.
       def put(new_body)
-        new_body[id].try do |value|
-          put_do(value) if @put_handler.call(self, value)
-        end
+        # Remove any outer hash.
+        value = new_body[id]
+        value ||= new_body
+
+        # Only update the model if the handler allows us to with this given
+        # value.
+        put_do(value) if @put_handler.call(self, value)
       end
 
-      # Public: Perform a DELETE on this model object.
-      #
-      # Returns nothing.
+      ##
+      # DELETE this model object, using the delete handler.
       def delete
+        # Again, only update the model if the handler allows us to.
         delete_do if @delete_handler.call
       end
+
+      ##
+      # PUT a resource to this model object, without using the put handler.
+      #
+      # This is a stub; any concrete model objects must override it.
+      #
+      # Consider using driver_put for code updating the model from the driver.
+      def put_do(_)
+        raise 'put_do must be overridden in model objects.'
+      end
+
+      ##
+      # DELETE this model object, without using the delete  handler.
+      #
+      # This is a stub; any concrete model objects must override it.
+      #
+      # Consider using driver_put for code updating the model from the driver.
+      def delete_do
+        raise 'delete_do must be overridden in model objects.'
+      end
+
+      # The driver_XYZ methods allow the driver to perform modifications to the
+      # model using the same verbs as the server without triggering the usual
+      # handlers.  They are implemented using the _do methods.
+      alias_method :driver_put, :put_do
+      alias_method :driver_delete, :delete_do
 
       # Public: Moves this model object to a new parent with a new ID.
       #
@@ -100,10 +130,6 @@ module Bra
 
       def url
         [parent_url, id].join('/')
-      end
-
-      def parent_name
-        @parent.name
       end
 
       def parent_id
@@ -186,12 +212,13 @@ module Bra
       #
       # Returns the GET representation of the object if found, and nil
       #   otherwise.
-      def get_resource(resource)
+      def get_url(resource)
         find_url(resource, &:get)
       end
 
-      alias_method :get_resource_from_playout, :get_resource
-
+      ##
+      # DELETEs the resource at the given URL relative from this resource,
+      # without triggering any handlers.
       # Public: PUTs the resource with the given partial URI in this object's
       # children.
       #
@@ -200,13 +227,17 @@ module Bra
       #            case this object is returned.
       # payload  - A hash containing the payload to PUT into the child
       #            resource.
-      # raw      - If true, skip the PUT handler for this resource.  This is
-      #            useful when PUTting from the playout system controller, and
-      #            not so useful when PUTting from the client.
       #
       # Returns nothing.
-      def put_resource(resource, payload, raw)
-        find_url(resource, payload, &(raw ? :put_do : :put))
+      def put_url(resource, payload)
+        find_url(resource, payload, &put)
+      end
+
+      ##
+      # PUTs a payload into the resource at the given URL relative from this
+      # resource, without triggering any handlers.
+      def driver_put_url(resource, payload)
+        find_url(resource, payload, &driver_put)
       end
 
       # Public: PUTs the resource with the given partial URI in this object's
@@ -217,30 +248,30 @@ module Bra
       #            case this object is returned.
       # payload  - A hash containing the payload to PUT into the child
       #            resource.
-      # raw      - If true, skip the PUT handler for this resource.  This is
-      #            useful when PUTting from the playout system controller, and
-      #            not so useful when PUTting from the client.
       #
       # Returns nothing.
-      def put_resource_from_playout(resource, payload)
-        put_resource(resource, payload, true)
+      def driver_put_url(resource, payload)
+        find_url(resource, payload, &:driver_put)
       end
 
       # Public: DELETEs the resource with the given partial URI in this
       # object's children.
       #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
-      # raw      - If true, skip the DELETE handler for this resource.  This is
-      #            useful when deleting from the playout system controller, and
-      #            not so useful when deleting from the client.
+      # url - A partial URI that follows this model object's URI to form
+      #       the URI of the resource to locate.  Can be nil, in which
+      #       case this object is returned.
       #
       # Returns nothing.
-      def delete_resource(resource, raw)
-        find_url(resource, &(raw ? :delete_do : :delete))
+      def delete_url(url)
+        find_url(resource, &:delete)
       end
 
+      ##
+      # DELETEs the resource at the given URL relative from this resource,
+      # without triggering any handlers.
+      def driver_delete_url(url)
+        find_url(resource, &:driver_delete)
+      end
     end
 
     ##

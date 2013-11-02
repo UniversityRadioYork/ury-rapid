@@ -93,7 +93,7 @@ module Bra
       #   player state to that provided to this function.
       def set_state_handler(state)
         lambda do |response|
-          @model.put_resource_from_playout(
+          @model.driver_put_url(
             'channels/#{response[:subcode]}/player/state',
             state
           )
@@ -109,7 +109,7 @@ module Bra
       #   marker of the type provided to this function.
       def set_marker_handler(type)
         lambda do |response|
-          @model.put_resource_from_playout(
+          @model.driver_put_url(
             'channels/#{response[:subcode]}/player/#{type}',
             response[:position]
           )
@@ -125,12 +125,12 @@ module Bra
       end
 
       def reset(response)
-        @model.delete_resource_from_playout('channels/#{response[:subcode]}')
+        @model.driver_delete_url('channels/#{response[:subcode]}')
       end
 
       def loaded(response)
         loaded_item(response).each do |key, value|
-          @model.put_resource_from_playout(
+          @model.driver_put_url(
             'channels/#{response[:subcode]}/player/#{key}',
             value
           )
@@ -217,8 +217,8 @@ module Bra
       #
       # Returns nothing.
       def login_seed(response)
-        username = @model.find_resource('x_baps/server/username')
-        password = @model.find_resource('x_baps/server/password')
+        username = @model.find_url('x_baps/server/username')
+        password = @model.find_url('x_baps/server/password')
         seed = response[:seed]
         # Kurse all SeeDs.  Swarming like lokusts akross generations.
         #   - Sorceress Ultimecia, Final Fantasy VIII
