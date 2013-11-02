@@ -108,14 +108,4 @@ def setup_server(config, app)
   start_server(dispatch, server, host, port)
 end
 
-# Internal: Initialises the client end of bra, which handles requests to and
-# responses from the BAPS server.
-#
-# config - The bra configuration hash.
-# model - The model that the client controls via BAPS responses.
-#
-# Returns nothing.
-def setup_client(config, model, queue)
-end
-
 run if __FILE__ == $PROGRAM_NAME
