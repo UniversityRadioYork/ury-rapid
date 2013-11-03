@@ -1,4 +1,5 @@
 require_relative 'channel'
+require_relative 'variable'
 require_relative '../utils/hash'
 
 module Bra
@@ -114,72 +115,18 @@ module Bra
     #
     # Player variables also have validation, so that broken controllers can be
     # discovered.
-    class PlayerVariable < SingleModelObject
-      # Public: Allows direct read access to the value.
-      attr_reader :value
-      alias_method :to_jsonable, :value
-
-      attr_reader :edit_privileges
-      alias_method :put_privileges, :edit_privileges
-      alias_method :post_privileges, :edit_privileges
-      alias_method :delete_privileges, :edit_privileges
-
+    class PlayerVariable < Variable
       def self.make_state
-        new(:stopped, method(:validate_state), [:SetPlayerState])
+        new(:stopped, method(:validate_state), [], [:SetPlayerState])
       end
 
       def self.make_load_state
-        new(:empty, method(:validate_load_state), nil)
+        new(:empty, method(:validate_load_state), [], nil)
       end
 
       def self.make_marker
-        new(0, method(:validate_marker), [:SetMarker])
+        new(0, method(:validate_marker), [], [:SetMarker])
       end
-
-      # Internal: Initialises a PlayerVariable.
-      #
-      # name            - The name of the variable.
-      # player          - The Player the variable is attached to.
-      # initial_value   - The initial value for the PlayerVariable.
-      # validator       - A proc that, given a new value, will raise an
-      #                   exception if the value is invalid and return a
-      #                   sanitised version of the value otherwise.
-      #                   Can be nil.
-      # edit_privileges - A list of symbols representing privileges required
-      #                   to edit this variable.
-      def initialize(initial_value, validator, edit_privileges)
-        super()
-        @initial_value = initial_value
-        @value = initial_value
-        @validator = validator
-        @edit_privileges = edit_privileges
-      end
-
-      def value=(new_value)
-        validated = new_value if @validator.nil?
-        validated = @validator.call(new_value) unless @validator.nil?
-        @value = validated
-      end
-
-      # Handle an attempt to put a new value into the PlayerVariable
-      # from the API.
-      #
-      # @param resource [Object] A hash (which should have one item, a mapping
-      #   from this variable's ID to its new value), or the new value itself.
-      def put_do(resource)
-        value = resource[id] if resource.is_a?(Hash)
-        value = resource unless resource.is_a?(Hash)
-        @value = value
-      end
-
-      # Public: Resets the variable to its default value.
-      #
-      # Returns nothing.
-      def reset
-        @value = initial_value
-      end
-
-      alias_method :delete, :reset
 
       # Internal: Returns the channel this player component is inside.
       #
@@ -193,16 +140,6 @@ module Bra
       def player_channel_id
         parent.channel_id
       end
-
-      def get_privileges
-        []
-      end
-
-      # The driver_XYZ methods allow the driver to perform modifications to the
-      # model using the same verbs as the server without triggering the usual
-      # handlers.  They are implemented using the _do methods.
-      alias_method :driver_put, :put_do
-      alias_method :driver_delete, :delete_do
 
       private
 
@@ -238,21 +175,6 @@ module Bra
       # Raises an exception if the value is invalid.
       def self.validate_load_state(new_state)
         validate_symbol(new_state, %i(ok loading failed empty))
-      end
-
-      # Internal: Validates an incoming symbol.
-      #
-      # new_symbol - The incoming symbol.
-      # candidates - A list of allowed symbols.
-      #
-      # Returns the validated symbol.
-      # Raises an exception if the value is invalid.
-      def self.validate_symbol(new_symbol, candidates)
-        # TODO: convert strings to symbols
-        fail(
-          "Expected one of #{candidates}, got #{new_symbol}"
-        ) unless candidates.include?(new_symbol)
-        new_symbol
       end
     end
   end

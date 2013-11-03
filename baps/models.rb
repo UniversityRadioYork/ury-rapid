@@ -23,29 +23,6 @@ module Bra
         end
       end
 
-      # Internal: A model object containing a constant value.
-      class Constant < Bra::Models::SingleModelObject
-        attr_reader :value, :privileges
-        alias_method :get_privileges, :privileges
-
-        # Internal: Initialise the Constant object.
-        #
-        # value - The value of the constant.
-        def initialize(value, privileges)
-          @value = value
-          @privileges = privileges
-        end
-
-        # Internal: Returns a flat represention of the object.
-        def to_jsonable
-          value
-        end
-
-        def to_s
-          value.to_s
-        end
-      end
-
       # Internal: Constructs and populates the BAPS model set under the given
       # model root.
       #
@@ -61,7 +38,9 @@ module Bra
         xbaps = XBaps.new.move_to(model, :x_baps)
         server = Server.new.move_to(xbaps, :server)
         config.each do |key, value|
-          Constant.new(value, [:XBapsReadConfig]).move_to(server, key)
+          Bra::Models::Constant.new(
+            value, [:XBapsReadConfig]
+          ).move_to(server, key)
         end
 
         model

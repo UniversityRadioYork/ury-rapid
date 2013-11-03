@@ -218,8 +218,8 @@ module Bra
       #
       # Returns nothing.
       def login_seed(response)
-        username = @model.get_url('x_baps/server/username')[:username]
-        password = @model.get_url('x_baps/server/password')[:password]
+        username = @model.find_url('x_baps/server/username', &:value)
+        password = @model.find_url('x_baps/server/password', &:value)
         seed = response[:seed]
         # Kurse all SeeDs.  Swarming like lokusts akross generations.
         #   - Sorceress Ultimecia, Final Fantasy VIII
