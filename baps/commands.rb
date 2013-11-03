@@ -27,10 +27,10 @@ module Bra
       class ChannelCommand < Command
         # Internal: Initialises a ChannelCommand.
         #
-        # channel - The Channel object.
+        # channel - The Channel ID.
         #
         def initialize(channel)
-          @channel = channel.id
+          @channel = channel
         end
       end
 
@@ -67,19 +67,29 @@ module Bra
 
       # Public: A command that sets the current playback status of a channel.
       class SetPlayerState < ChannelCommand
-        # Public: Initialises a SetPlayerState command.
+        ##
+        # Initialises a SetPlayerState command.
+        #
+        # 'from' and 'to' should be the current and desired states of
+        # 'channel', as strings or symbols.
         #
         # channel - The ID of the channel, as an integer or any coercible type.
+        #
         # state   - The state (one of :stopped, :paused or :playing); can be a
         #           string equivalent.
-        def initialize(channel, state)
+        def initialize(channel, from, to)
           super channel
 
-          state_symbol = state.is_a?(Symbol) ? state : state.to_sym
-          valid_state = %i(stopped paused playing).include?(state_symbol)
-          fail(ParamError, 'Not a valid state') unless valid_state
+          # Convert these to symbols, if they are currently strings.
+          from = from.intern
+          to = to.intern
 
-          @state = state_symbol
+          [from, to].each do |sym|
+            valid_state = %i(stopped paused playing).include?(sym)
+            fail(ParamError, 'Not a valid state') unless valid_state
+          end
+
+          @command = CODES[from][to]
         end
 
         # Public: Runs a SetPlayerState command on the given requests queue.
@@ -92,12 +102,27 @@ module Bra
         #
         # Returns nothing.
         def run(queue)
-          Request.new(CODES[@state], @channel).to(queue)
+          Request.new(@command, @channel).to(queue) unless @command.nil?
         end
 
         def self.to_put_handler(queue)
           proc do |resource, value|
-            new(resource.player_channel, value).run(queue)
+            # BAPS is rather interesting in how it interprets the
+            # play/pause/stop commands:
+            #
+            # - PLAY will play the song if it's stopped, or *restart* the song
+            #   if it's paused;
+            # - PAUSE will pause the song if it's playing or if it's stopped,
+            #   but *play* the song if it's paused;
+            # - STOP is fine, it stops and doesn't afraid of anything.
+            #
+            # This is at odds with how BRA sees things, so we can't just map
+            # the states down to their "obvious" commands!
+            new(
+              resource.player_channel_id,
+              resource.value,
+              value
+            ).run(queue)
             # Let the model object know it cannot update itself directly.
             false
           end
@@ -107,9 +132,24 @@ module Bra
 
         # Internal: Mapping between state symbols and BAPS request codes.
         CODES = {
-          playing: Codes::Playback::PLAY,
-          paused: Codes::Playback::PAUSE,
-          stopped: Codes::Playback::STOP
+          playing: {
+            playing: nil,
+            paused: Codes::Playback::PAUSE,
+            stopped: Codes::Playback::STOP
+          },
+          paused: {
+            # The below is not a typo, it's how BAPS works...
+            playing: Codes::Playback::PAUSE,
+            paused: nil,
+            stopped: Codes::Playback::STOP
+          },
+          stopped: {
+            # BAPS allows us to pause while the song is stopped.  This makes
+            # little sense, and bra disallows it, so we ignore it.
+            playing: Codes::Playback::PLAY,
+            paused: nil,
+            stopped: nil
+          }
         }
       end
 
