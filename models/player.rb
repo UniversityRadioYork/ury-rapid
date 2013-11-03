@@ -170,8 +170,9 @@ module Bra
       #
       # Returns nothing.
       def put_do(new_value)
+        value = nil
         value = new_value[id] if value.is_a?(Hash)
-        value ||= new_value
+        value = new_value unless value.is_a?(Hash)
         @value = value
       end
 
@@ -196,7 +197,6 @@ module Bra
       def player_channel_id
         parent.channel_id
       end
-
 
       def get_privileges
         []

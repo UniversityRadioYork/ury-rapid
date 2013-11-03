@@ -48,38 +48,34 @@ module Bra
         self
       end
 
-      ##
-      # GET this resource.
+      # GETs this resource.
       #
       # Returns a hash mapping this object's ID to the object itself.
       def get
         { id => self }
       end
 
-      ##
-      # PUT a resource into this model object, using the put handler.
+      # PUTs a resource into this model object, using the put handler.
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
       def put(new_body)
         # Remove any outer hash.
-        value = new_body[id]
-        value ||= new_body
+        value = new_body[id] if new_item.is_a?(Hash)
+        value = new_body unless new_item.is_a?(Hash)
 
         # Only update the model if the handler allows us to with this given
         # value.
         put_do(value) if @put_handler.call(self, value)
       end
 
-      ##
-      # DELETE this model object, using the delete handler.
+      # DELETEs this model object, using the delete handler.
       def delete
         # Again, only update the model if the handler allows us to.
         delete_do if @delete_handler.call
       end
 
-      ##
-      # PUT a resource to this model object, without using the put handler.
+      # PUTs a resource to this model object, without using the put handler.
       #
       # This is a stub; any concrete model objects must override it.
       #
@@ -88,23 +84,24 @@ module Bra
         fail("put_do needs overriding for object #{id}, class #{self.class}.")
       end
 
-      ##
-      # DELETE this model object, without using the delete  handler.
+      # DELETEs this model object, without using the delete  handler.
       #
       # This is a stub; any concrete model objects must override it.
       #
-      # Consider using driver_delete for code updating the model from the driver.
+      # Consider using driver_delete for code updating the model from the
+      # driver.
       def delete_do
         raise "delete_do must be overridden for model object #{id}."
       end
 
-      # Public: Moves this model object to a new parent with a new ID.
+      # Moves this model object to a new parent with a new ID.
       #
-      # new_parent - The new parent for this object (can be nil).
-      # new_id     - The new ID under which the object will exist in the
-      #              parent.
+      # @param new_parent [ModelObject] The new parent for this object (can be
+      #   nil).
+      # @param new_id [Object]  The new ID under which the object will exist in
+      #   the parent.
       #
-      # Returns this object, for method chaining.
+      # @return [ModelObject] This object, for method chaining.
       def move_to(new_parent, new_id)
         @parent.remove_child(self) unless @parent.nil?
         @parent = new_parent
