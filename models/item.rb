@@ -15,11 +15,16 @@ module Bra
       def initialize(type, name)
         super()
 
+        @type = validate_type(type)
+        @name = name
+      end
+
+      def validate_type(type)
+        type = :null if type.nil?
+        type = type.intern if type.respond_to?(:intern)
         valid_type = %i(library file text null).include? type
         raise "Not a valid type: #{type}" unless valid_type
-
-        @type = type
-        @name = name
+        type
       end
 
       # Public: Converts the Item to a hash representation.
@@ -45,7 +50,10 @@ module Bra
           @type = value[:type]
         elsif value.is_a?(Item)
           @name = value.name
-          @type = value.type
+          @type = validate_type(value.type)
+        elsif value.nil?
+          @name = nil
+          @type = :null
         else
           fail("Unsupported argument to put_do: #{value.class}")
         end
