@@ -122,78 +122,91 @@ module Bra
         self
       end
 
-      # Public: Converts a model object to compact JSON.
+      # Converts a model object to compact JSON.
       #
       # This expects a to_jsonable method to be defined.
       #
-      # Returns the JSON representation of the model object.
+      # @param args [Array] A splat of args to send to the inner to_json calls.
+      #
+      # @return [String] The JSON representation of the model object.
       def to_json(*args)
         to_jsonable.to_json(*args)
       end
 
+      # The canonical URL of this model object.
+      #
+      # This is effectively the result of postfixing this object's ID to the
+      # canonical URL of its parent.
+      #
+      # @return [String] The URL.
       def url
         [parent_url, id].join('/')
       end
 
+      # The ID of this model object's parent.
+      # @return [String] The parent's ID.
       def parent_id
         @parent.id
       end
 
+      # The canonical URL of this model object's parent.
+      # @return [String] The parent's URL.
       def parent_url
         @parent.url
       end
 
-      # Public: Returns this class's internal name, used for things such as
-      # templates and JSON attributes.
+      # Returns this class's internal name, used for things such as templates
+      # and JSON attributes.
       #
       # This is different from the resource name in that it is the same for
       # all objects of the same category.
       #
-      # Returns the internal name as a symbol.
+      # @return [Symbol] The internal name.
       def internal_name
         self.class.name.demodulize.underscore.intern
       end
     end
 
-    # Public: Class for model objects that contain children.
+    # A model object which contains children.
     #
     # This should be subclassed to provide the actual child structure (hash,
     # array, et cetera).
     class CompositeModelObject < ModelObject
       attr_reader :children
 
-      # Public: Removes a child from this model object.
+      # Removes a child from this model object.
       #
-      # object - The object to remove from this object's children.
+      # @param object [ModelObject] The object to remove from this object's
+      #   children.
       #
       def remove_child(object)
         @children.delete(object.id)
       end
 
-      # Public: Adds a child to this model object.
+      # Adds a child to this model object.
       #
-      # object - The object to add to this object's children.  The object's
-      #          resource name must be unique in this object's children.
-      # id     - The ID to register the child under.  Acceptable IDs depend
-      #          on the underlying type of the model object.
-      #
-      # Returns nothing.
+      # @param object [ModelObject] The object to add to this object's
+      #   children.  The object's resource name must be unique in this object's
+      #   children.
+      # @param id [Object] The ID to register the child under.  Acceptable IDs
+      #   depend on the underlying type of the model object.
       def add_child(object, id)
         @children[id] = object
       end
 
-      # Public: Attempts to find the resource with the given partial URI in
-      # this object's children.
+      # Attempts to find the resource with the given partial URL in this
+      # object's children.
       #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
-      # args     - Optional arguments to provide to the block.
-      # block    - An optional block to yield the resource to.
+      # If the resource is found, it will be yielded to the attached block;
+      # otherwise, an exception will be raised.
       #
-      # Returns as below if no block is provided, or the result of the block
-      #   otherwise.
-      # Yields the object if found, and nil otherwise.
+      # @param url [String] A partial URL that follows this model object's URL
+      #   to form the URL of the resource to locate.  Can be nil, in which case
+      #   this object is returned.
+      # @param args [Array] A splat of optional arguments to provide to the block.
+      #
+      # @yieldparam resource [ModelObject] The resource found.
+      # @yieldparam args [Array] The splat from above.
       def find_url(url, *args)
         # We're traversing down the URL by repeatedly splitting it into its
         # head (part before the next /) and tail (part after).  While we still
@@ -214,57 +227,50 @@ module Bra
         yield resource, *args
       end
 
-      # Public: GETs the resource with the given partial URI in this object's
-      # children.
+      # GETs the resource with the given partial URL in this object's children.
       #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
+      # @param url [String]resource - A partial URL that follows this model object's URL to form
+      #            the URL of the resource to locate.  Can be nil, in which
       #            case this object is returned.
       #
       # Returns the GET representation of the object if found, and nil
       #   otherwise.
-      def get_url(resource)
-        find_url(resource, &:get)
+      def get_url(url)
+        find_url(url, &:get)
       end
 
-      # Public: PUTs the resource with the given partial URI in this object's
-      # children.
+      # PUTs the resource with the given partial URL in this object's children.
       #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
-      # payload  - A hash containing the payload to PUT into the child
-      #            resource.
-      #
-      # Returns nothing.
-      def put_url(resource, payload)
-        find_url(resource, payload, &:put)
+      # @param url [String] See #get_url.
+      # @param payload [Object] A payload to PUT into the child resource.  This
+      #   may be a hash mapping the resource's ID to its new value, or the new
+      #   value directly.
+      def put_url(url, payload)
+        find_url(url, payload, &:put)
       end
 
-      ##
       # PUTs a payload into the resource at the given URL relative from this
       # resource, without triggering any handlers.
-      def driver_put_url(resource, payload)
-        find_url(resource, payload, &:driver_put)
+      #
+      # @param (see #put_url)
+      def driver_put_url(url, payload)
+        find_url(url, payload, &:driver_put)
       end
 
-      # Public: DELETEs the resource with the given partial URI in this
-      # object's children.
+      # DELETEs the resource with the given partial URL in this object's
+      # children.
       #
-      # url - A partial URI that follows this model object's URI to form
-      #       the URI of the resource to locate.  Can be nil, in which
-      #       case this object is returned.
-      #
-      # Returns nothing.
+      # @param (see #get_url)
       def delete_url(url)
-        find_url(resource, &:delete)
+        find_url(url, &:delete)
       end
 
-      ##
       # DELETEs the resource at the given URL relative from this resource,
       # without triggering any handlers.
+      #
+      # @param (see #get_url)
       def driver_delete_url(url)
-        find_url(resource, &:driver_delete)
+        find_url(url, &:driver_delete)
       end
     end
 
@@ -322,27 +328,19 @@ module Bra
       end
     end
 
-    ##
     # A model object that does not have children.
     class SingleModelObject < ModelObject
       def children
         nil
       end
 
+      # Responds to any request for a child with nil.
+      #
+      # This is because SingleModelObject has no children.
+      #
+      # @return [NilClass] nil.
       def child(_)
         nil
-      end
-
-      # Public: Attempts to find the resource with the given partial URI in
-      # this object's (nonexistent) children.
-      #
-      # resource - A partial URI that follows this model object's URI to form
-      #            the URI of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
-      #
-      # Returns the object if the resource matches this one, and nil otherwise.
-      def find_url(resource)
-        resource.nil? ? self : nil
       end
     end
   end

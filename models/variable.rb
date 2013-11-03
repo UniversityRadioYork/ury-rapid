@@ -32,6 +32,10 @@ module Bra
         @value.respond_to?(symbol)
       end
 
+      # Converts the Variable to a string.
+      #
+      # This actually just sends the internal value the to_s message instead.
+      #
       # @return [String] The value as a string.
       def to_s
         # This isn't caught by method_missing, as it's defined for Object.
@@ -41,6 +45,10 @@ module Bra
     end
 
     # ModelObjects representing a single mutable variable.
+    #
+    # This adds to Constant the ability to write to the variable, privilege
+    # specification for performing PUT/POST/DELETE, and the ability to validate
+    # model inputs.
     class Variable < Constant
       # Public: Allows direct read access to the value.
       attr_reader :value
