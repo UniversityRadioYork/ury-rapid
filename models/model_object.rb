@@ -70,10 +70,10 @@ module Bra
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
-      def put(new_body)
+      def put(resource)
         # Remove any outer hash.
-        value = new_body[id] if new_item.is_a?(Hash)
-        value = new_body unless new_item.is_a?(Hash)
+        value = resource[id] if resource.is_a?(Hash)
+        value = resource unless resource.is_a?(Hash)
 
         # Only update the model if the handler allows us to with this given
         # value.

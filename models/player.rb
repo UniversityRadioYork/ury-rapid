@@ -161,18 +161,14 @@ module Bra
         @value = validated
       end
 
-      # Public: Handle an attempt to put a new value into the PlayerVariable
+      # Handle an attempt to put a new value into the PlayerVariable
       # from the API.
       #
-      # new_value - A hash (which should have one item, a mapping from
-      #             this variable's ID to its new value), or the new value
-      #             itself.
-      #
-      # Returns nothing.
-      def put_do(new_value)
-        value = nil
-        value = new_value[id] if value.is_a?(Hash)
-        value = new_value unless value.is_a?(Hash)
+      # @param resource [Object] A hash (which should have one item, a mapping
+      #   from this variable's ID to its new value), or the new value itself.
+      def put_do(resource)
+        value = resource[id] if resource.is_a?(Hash)
+        value = resource unless resource.is_a?(Hash)
         @value = value
       end
 
