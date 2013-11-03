@@ -191,6 +191,13 @@ module Bra
         parent.channel
       end
 
+      ##
+      # Returns the ID of this parent's channel.
+      def player_channel_id
+        parent.channel_id
+      end
+
+
       def get_privileges
         []
       end
