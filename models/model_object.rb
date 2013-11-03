@@ -4,7 +4,18 @@ require_relative '../utils/hash'
 
 module Bra
   module Models
-    # Internal: An object in the BRA model.
+    # An object in the bra playout system model.
+    #
+    # ModelObjects are composable entities, each assigned an ID by its parent,
+    # that form a model tree traversable by relative URLs.
+    #
+    # Each ModelObject implements an interface based on the HTTP verbs GET,
+    # PUT, POST and DELETE, both directly and via URL (for accessing objects
+    # further down in the tree from the target).
+    #
+    # With the exception of GET, each verb is further subdivided into a form
+    # that can trigger driver handlers to translate model change requests into
+    # playout server actions, and a 'driver' form that bypasses these handlers.
     class ModelObject
       # Public: Allows access to this model object's current ID.
       attr_reader :id
