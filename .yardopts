@@ -1,0 +1,4 @@
+--markup rdoc
+--title 'bra Documentation'
+--readme README.md
+**/*.rb - *.md
