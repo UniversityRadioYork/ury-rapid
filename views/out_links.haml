@@ -3,5 +3,5 @@
 
   item - The item for which links are to be rendered.
 
-%a.out{ href: url(item.parent_url) } Out
-%a.json{ href: "#{url(item.url)}?json" } JSON
+%a.out{ href: url(resource_url.rpartition('/').first) } Out
+%a.json{ href: "#{url(resource_url)}?json" } JSON

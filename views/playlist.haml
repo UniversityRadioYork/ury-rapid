@@ -5,19 +5,18 @@
   in_channel  - If True, display a condensed playlist for display inside a
                 channel object.  (Default: false.)
 
-- in_channel ||= false
+%section.playlist
+  %h1=inner ? resource_id : resource_url
+  - unless 0 < playlist.size
+    %p No items.
 
-= haml(:json, locals: { name: :playlist, item: playlist }) if request.params.key? "json"
-- unless request.params.key? "json"
-  %section.channel-playlist
-    %h1=in_channel ? playlist.id : playlist.url
-    - unless 0 < playlist.size
-      %p No items.
+  - if 0 < playlist.size
+    %ol.playlist-items
+      - playlist.each_with_index do |item, id|
+        %li.item{ class: item[:type] }
+          = haml(:item, locals: { inner: true,
+                                  item: item,
+                                  resource_id: id,
+                                  resource_url: "#{resource_url}/#{id}" })
 
-    - if 0 < playlist.size
-      %ol.playlist-items
-        - playlist.contents.each do |item|
-          %li.item{ class: item.type }
-            = haml :item, locals: { item: item, in_playlist: true }
-
-    = haml(:in_out_links, locals: { item: playlist, inwards: in_channel })
+  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })

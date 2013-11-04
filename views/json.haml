@@ -1,10 +1,11 @@
 -#
   json.haml - JSON inspector
 
-  name - The symbol under which the item appears in the JSON hash.
-  item - The object whose JSON should be displayed.
+  resource_url - The URL of the resource.
+  resource     - The object whose JSON should be displayed.
 
 %section.json_inspector
-  %h1 JSON for #{item.url}
-  %pre.json_code=JSON.pretty_generate(item.get_flat)
-  %a.out{ href: url(item.url) } Out
+  %h1 JSON for #{resource_url}
+  %pre.json_code=JSON.pretty_generate(resource)
+  %a.out{ href: url(resource_url) } Out
+

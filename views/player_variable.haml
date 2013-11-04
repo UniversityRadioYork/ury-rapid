@@ -6,15 +6,9 @@
 -#               channel object.  (Default: false.)
 -#  suffix     - An optional suffix to add after the value.  (Default: blank.)
 
-- in_player ||= false
-
 -# Shorten this a bit.
-- variable = player_variable
+%section.player-variable{ class: player_variable }
+  %h1=inner ? resource_id : resource_url
+  %p=player_variable
 
-= haml(:json, locals: { name: variable.id, item: variable }) if request.params.key? "json"
-- unless request.params.key? "json"
-  %section.player-variable{ class: variable.value }
-    %h1=in_player ? variable.id : variable.url
-    %p=variable.value
-
-    = haml(:in_out_links, locals: { item: variable, inwards: in_player })
+  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })

@@ -1,8 +1,8 @@
 -#
   in_out_links.haml - Links allowing inward or outward inspection of items.
 
-  item    - The item for which links are to be rendered.
-  inwards - If True, render "in" links; otherwise, render "out" links.
+  item  - The item for which links are to be rendered.
+  inner - If True, render "in" links; otherwise, render "out" links.
 
-= haml(:in_links, locals: { item: item }) if inwards
-= haml(:out_links, locals: { item: item }) unless inwards
+= haml(:in_links, locals: { resource_url: resource_url }) if inner
+= haml(:out_links, locals: { resource_url: resource_url }) unless inner

@@ -1,17 +1,17 @@
 -#
 -# channel.haml - Channel object
 -#
--# channel          - The item to display.
--# in_channel_list  - If True, display a condensed channel for display inside a
--#                    channel list object.  (Default: false.)
+-# channel - The item to display.
+-# inner   - If True, display a condensed channel for display inside a
+-#           channel list object.  (Default: false.)
 
-- in_channel_list ||= false
+%section.channel{ class: channel[:player][:state] }
+  %h1=inner ? resource_id : resource_url
 
-= haml(:json, locals: { name: :channel, item: channel }) if request.params.key? "json"
-- unless request.params.key? "json"
-  %section.channel{ class: channel.player_state_value }
-    %h1=in_channel_list ? channel.id : channel.url
-
-    = haml(:player, locals: { player: channel.player, in_channel: true })
-    = haml(:playlist, locals: { playlist: channel.playlist, in_channel: true })
-    = haml(:in_out_links, locals: { item: channel, inwards: in_channel_list })
+  - channel.each do |id, child|
+    = haml(id,
+           locals: { inner: true,
+                     resource_id: id,
+                     resource_url: "#{resource_url}/#{id}",
+                     id => child })
+  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })

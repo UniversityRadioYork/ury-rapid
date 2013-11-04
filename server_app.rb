@@ -101,7 +101,18 @@ module Bra
         respond_with sym, resource.get(privs) do |f|
           # Use the internal name instead of the resource ID.  This is so that
           # the template knows which local the resource will appear on.
-          f.html { haml(sym, locals: { sym => resource }) }
+          f.html do
+            haml(
+              :object,
+              locals: {
+                resource_url: resource.url,
+                resource_id: resource.id,
+                resource_type: resource.internal_name,
+                resource: resource.get(privs),
+                inner: false
+              }
+            )
+          end
         end
       end
     end

@@ -12,8 +12,10 @@
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
 @import url('//fonts.googleapis.com/css?family=Share+Tech+Mono');
 
+$size-border: 0.15rem;
 $size-padding: 0.8rem;
 $size-padding-thin: 0.2rem;
+$size-inout: $size-padding * (2 / 3);
 
 $colour-peeling-paper:    #058789;
 $colour-escape:           #E3A72F;
@@ -30,10 +32,8 @@ $colour-black-tulip:      #420943;
 $colour-not-quite-black:  #303030;
 $colour-asian-red:        #A80000;
 
-$border-size: 0.15rem;
-
 @mixin border {
-    border: $border-size solid black;
+    border: $size-border solid black;
     padding: $size-padding;
     padding-bottom: 0;
 }
@@ -74,6 +74,7 @@ html {
             display: inline-block;
 
             text-align: left;
+            max-width: 90%;
         }
 
         >header {
@@ -131,19 +132,36 @@ ol.channels-list {
     border-collapse: separate;
     border-spacing: $size-padding;
 
-    display: table;
+    display: flex;
+    flex: 1;
+    align-items: stretch;
     margin: 0 auto;
 
     >li {
-        display: table-cell;
+        display: flex;
+        flex-direction: column;
+
+        flex: 1;
+        // Remove duplicate borders.
+        &:not(:first-child)>section {
+            border-left: 0;
+        }
     }
 }
 
 section.channel {
     @include border;
 
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
     >section, >nav, >ol {
         background-color: $colour-lol;
+    }
+
+    >section.playlist {
+        flex: 1;
     }
 }
 
@@ -214,12 +232,12 @@ section.player-secondary-markers {
     background-color: $colour-asian-red;
     color: $colour-lol;
 }
-.empty {
+.empty, .null {
     background-color: $colour-not-quite-black;
     color: $colour-lol;
 }
 
-section.item, li.item {
+.item {
     @include border;
 
     >section, >nav, >ol {
@@ -227,9 +245,29 @@ section.item, li.item {
     }
 }
 
-li.item {
-    position: relative;
-    padding: $size-padding-thin;
+//p.item>span {
+//    padding-bottom: $size-padding;
+//        display: block;
+//    }
+//}
+li.item, p.item {
+  position: relative;
+  padding: $size-padding-thin;
+  padding-right: ($size-padding-thin + $size-inout);
+
+  // Stop line-breaking and force an ellipsis instead.
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+ol.playlist-items {
+    // Prevent duplicate borders.
+    li {
+        &:not(:first-child) {
+            border-top: 0;
+        }
+    }
 }
 
 nav.main-menu {
@@ -248,12 +286,10 @@ nav.resources {
     clear: both;
 }
 
-$size-inout: $size-padding * (2 / 3);
-
 .in, .out, .json {
     position: absolute;
     font-size: 0px;
-    border: $border-size solid black;
+    border: $size-border solid black;
     background-color: $colour-lol;
     width: $size-inout;
     height: $size-inout;

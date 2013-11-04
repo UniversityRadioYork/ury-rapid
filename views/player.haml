@@ -1,28 +1,29 @@
 -#
-  playlist.haml - Playlist object
+-# player.haml - Player object
+-#
+-# player - The item to display.
+-# inner  - If True, display a condensed player for display inside a
+-#          channel object.  (Default: false.)
 
-  playlist    - The item to display.
-  in_channel  - If True, display a condensed playlist for display inside a
-                channel object.  (Default: false.)
+- var_groups = { "states" => %i{state load_state},
+                 "primary-markers" => %i{position duration},
+                 "secondary-markers" => %i{cue intro} }
 
-- in_channel ||= false
+%section.player
+  %h1=inner ? resource_id : resource_url
+  - var_groups.each do |group, syms|
+    %section{class: "player-#{group}"}
+      - syms.each do |sym|
+        = haml(:player_variable,
+               locals: { inner: true,
+                         resource_id: sym,
+                         resource_url: "#{resource_url}/#{sym}",
+                         player_variable: player[sym] })
+  %p.item{ class: player[:item][:type]}
+    = haml(:item,
+           locals: { inner: true,
+                     resource_id: :item,
+                     resource_url: "#{resource_url}/item",
+                     item: player[:item] })
 
-= haml(:json, locals: { name: :player, item: player }) if request.params.key? "json"
-- unless request.params.key? "json"
-  %section.player
-    %h1=in_channel ? player.id : player.url
-    %section.player-states
-      = haml :player_variable, locals: { player_variable: player.state, in_player: true }
-      = haml :player_variable, locals: { player_variable: player.load_state, in_player: true }
-    %section.player-primary-markers
-      - %i(position duration).each do |sym|
-        = haml :player_variable, locals: { player_variable: player.marker(sym), in_player: true }
-    %section.player-secondary-markers
-      - %i(cue intro).each do |sym|
-        = haml :player_variable, locals: { player_variable: player.marker(sym), in_player: true }
-    - if player.load_state == :ok
-      %p
-        = surround "Playing ", "." do
-          %strong= player.item.name
-
-    = haml(:in_out_links, locals: { item: player, inwards: in_channel })
+  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })
