@@ -30,7 +30,7 @@ module Bra
       #   HTTP exception shall be thrown if the user privileges don't match up.
       #
       # @return [Array] An array of privilege symbols.
-      def privileges(requisites=[])
+      def privileges(requisites = [])
         get_auth.tap do |credentials|
           fail_not_authorised if credentials.nil?
           forbidden unless priv_ok?(credentials, requisites)

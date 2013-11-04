@@ -41,7 +41,8 @@ module Bra
       # @param url [String] A partial URL that follows this model object's URL
       #   to form the URL of the resource to locate.  Can be nil, in which case
       #   this object is returned.
-      # @param args [Array] A splat of optional arguments to provide to the block.
+      # @param args [Array] A splat of optional arguments to provide to the
+      #   block.
       #
       # @yieldparam resource [ModelObject] The resource found.
       # @yieldparam args [Array] The splat from above.
@@ -67,9 +68,9 @@ module Bra
 
       # GETs the resource with the given partial URL in this object's children.
       #
-      # @param url [String] A partial URL that follows this model object's URL to form
-      #   the URL of the resource to locate.  Can be nil, in which case this
-      #   object is returned.
+      # @param url [String] A partial URL that follows this model object's URL
+      #   to form the URL of the resource to locate.  Can be nil, in which case
+      #   this object is returned.
       # @param privileges [Array] A set of privileges to check to see if the
       #   GET can be done.
       # @param mode [Symbol] See #get.
@@ -138,10 +139,10 @@ module Bra
       #   May be nil, in which case no privilege checking is done.
       #
       # @return [Hash] A flat representation of this object.
-      def get_flat(privileges=[]) 
+      def get_flat(privileges = [])
         ( @children
           .select           { |_, child| child.can_get_with?(privileges) }
-          .transform_values { |child|    child.get_flat     (privileges) }
+          .transform_values { |child|    child.get_flat(privileges)      }
         ) if can_get_with?(privileges)
       end
 
@@ -175,10 +176,10 @@ module Bra
       #   May be nil, in which case no privilege checking is done.
       #
       # @return [Array] A flat representation of this object.
-      def get_flat(privileges=[]) 
+      def get_flat(privileges = [])
         ( @children
           .select { |child| child.can_get_with?(privileges) }
-          .map    { |child| child.get_flat     (privileges) }
+          .map    { |child| child.get_flat(privileges)      }
         ) if can_get_with?(privileges)
       end
 

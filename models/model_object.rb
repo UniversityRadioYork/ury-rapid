@@ -77,8 +77,8 @@ module Bra
         elsif requisites.nil?
           false
         else
-          # Check the set intersection (the candidates that are also requisites)
-          # contains every requisite.
+          # Check the set intersection (the candidates that are also
+          # requisites) contains every requisite.
           (candidates & requisites) == requisites
         end
       end
@@ -109,32 +109,41 @@ module Bra
       end
 
       # GETs this model object.
-      # 
+      #
       # A GET is the retrieval of a flattened representation of a model object.
       # See #get_flat (defined differently for different model objects) for
       # information on what constitutes a flattened representation.
       #
       # @param privileges [Array] An array of GET privileges the caller has.
       #   May be nil, in which case no privilege checking is done.
-      #
       # @param mode [Symbol] Either :wrap, in which case the result will be
       #   wrapped in a hash mapping the object's ID to the flattened
       #   representation, or :nowrap, in which case only the flattened value is
       #   returned.  By default, :wrap is used.
       #
       # @return [Object] A flat representation of this object.
-      def get(privileges=[], mode=:wrap)
-        if can_get_with?(privileges)
-          value = get_flat(privileges)
-          # TODO: Flatten non-plain-old-data values.
-          case mode
-          when :wrap
-            { id => value }
-          when :nowrap
-            value
-          else
-            fail("Unknown get_flat mode: #{mode}")
-          end
+      def get(privileges = [], mode = :wrap)
+        wrap(get_flat(privileges), mode) if can_get_with?(privileges)
+      end
+
+      # Wraps a GET response according to its wrap mode.
+      #
+      # @param value [Object] The value to wrap (or not).
+      # @param mode [Symbol] Either :wrap, in which case the result will be
+      #   wrapped in a hash mapping the object's ID to the flattened
+      #   representation, or :nowrap, in which case only the flattened value is
+      #   returned.  By default, :wrap is used.
+      #
+      # @return [Object] The (potentially) wrapped value.
+      def wrap(response, mode)
+        # TODO(mattbw): Flatten non-plain-old-data values?
+        case mode
+        when :wrap
+          { id => value }
+        when :nowrap
+          value
+        else
+          fail("Unknown get_flat mode: #{mode}")
         end
       end
 
@@ -143,7 +152,7 @@ module Bra
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
       def put(privileges, resource)
-        fail("Insufficient privileges.") unless can_put_with?(privileges) 
+        fail('Insufficient privileges.') unless can_put_with?(privileges)
 
         # Remove any outer hash.
         value = resource[id] if resource.is_a?(Hash)
@@ -156,7 +165,7 @@ module Bra
 
       # DELETEs this model object, using the delete handler.
       def delete(privileges)
-        fail("Insufficient privileges.") unless can_delete_with?(privileges) 
+        fail('Insufficient privileges.') unless can_delete_with?(privileges)
 
         # Again, only update the model if the handler allows us to.
         delete_do if @delete_handler.call(self)
@@ -171,7 +180,7 @@ module Bra
         fail("put_do needs overriding for object #{id}, class #{self.class}.")
       end
 
-      # DELETEs this model object, without using the delete  handler.
+      # DELETEs this model object, without using the delete handler.
       #
       # This is a stub; any concrete model objects must override it.
       #
@@ -259,7 +268,7 @@ module Bra
       #   May be nil, in which case no privilege checking is done.
       #
       # @return [Object] A flat representation of this object.
-      def get_flat(privileges=[]) 
+      def get_flat(privileges = [])
         flat if can_get_with?(privileges)
       end
     end
