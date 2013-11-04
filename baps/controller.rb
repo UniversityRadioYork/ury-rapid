@@ -93,7 +93,6 @@ module Bra
       #   player state to that provided to this function.
       def set_state_handler(state)
         lambda do |response|
-          puts("State change: #{response[:subcode]} #{state}")
           @model.driver_put_url(
             "channels/#{response[:subcode]}/player/state",
             state
