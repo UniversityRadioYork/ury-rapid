@@ -32,7 +32,7 @@ module Bra
       # This conversion is not reversible and may lose some information.
       #
       # Returns a hash representation of the Item.
-      def to_hash
+      def flat
         { name: @name, type: @type }
       end
 
@@ -100,7 +100,6 @@ module Bra
         self
       end
 
-      alias_method :to_jsonable, :to_hash
       # The driver_XYZ methods allow the driver to perform modifications to the
       # model using the same verbs as the server without triggering the usual
       # handlers.  They are implemented using the _do methods.

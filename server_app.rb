@@ -21,10 +21,29 @@ module Bra
 
     # TODO: Make this protection more granular.
     helpers do
-      def require_permissions!(keys)
-        credentials = get_auth
-        fail_not_authorised if credentials.nil?
-        halt(403, json_error('Forbidden.')) unless (credentials & keys) == keys
+      # Gets the set of privileges the user has.
+      #
+      # This also fails with HTTP 401 if the user does not exist, or with HTTP
+      # 403 if the set does not include the requested privileges.
+      #
+      # @param requisites [Array] An optional array of required privileges; a
+      #   HTTP exception shall be thrown if the user privileges don't match up.
+      #
+      # @return [Array] An array of privilege symbols.
+      def privileges(requisites=[])
+        get_auth.tap do |credentials|
+          fail_not_authorised if credentials.nil?
+          forbidden unless priv_ok?(credentials, requisites)
+        end
+      end
+
+      # Raises HTTP 403 Forbidden.
+      def forbidden
+        halt(403, json_error('Forbidden.'))
+      end
+
+      def priv_ok?(candidates, requisites)
+        (candidates & requisites) == requisites
       end
 
       def get_auth
@@ -76,10 +95,10 @@ module Bra
       cors
 
       find(params) do |resource|
-        require_permissions!(resource.get_privileges)
+        privs = privileges(resource.get_privileges)
 
         sym = resource.internal_name
-        respond_with sym, resource.get do |f|
+        respond_with sym, resource.get(privs) do |f|
           # Use the internal name instead of the resource ID.  This is so that
           # the template knows which local the resource will appear on.
           f.html { haml(sym, locals: { sym => resource }) }
@@ -90,9 +109,14 @@ module Bra
       cors
 
       find(params) do |resource|
-        require_permissions!(resource.put_privileges)
-        parse_json_from(request, &resource.method(:put))
+        privs = privileges
+        parse_json_from(request) { |payload| resource.put(privs, payload) }
       end
+    end
+    delete('/*/?') do
+      cors
+
+      find(params) { |resource| resource.delete(privileges) }
     end
 
     def find(params)

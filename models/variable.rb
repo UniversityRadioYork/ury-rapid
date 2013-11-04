@@ -8,8 +8,8 @@ module Bra
     class Constant < SingleModelObject
       attr_reader :value, :get_privileges
 
-      # The flat representation of a Constant is just its value.
-      alias_method :to_jsonable, :value
+      # The flat representation of a Constant is its value.
+      alias_method :flat, :value
 
       # Initialises the Constant object.
       #
@@ -32,7 +32,7 @@ module Bra
         @value.respond_to?(symbol)
       end
 
-      # Converts the Variable to a string.
+      # Converts the Constant to a string.
       #
       # This actually just sends the internal value the to_s message instead.
       #

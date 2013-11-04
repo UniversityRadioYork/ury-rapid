@@ -34,6 +34,56 @@ module Bra
         @delete_handler = nil
       end
 
+      # Tests if the given privileges are sufficient for GETting this
+      # object.
+      #
+      # @param candidates [Array] A set of privileges to check for
+      #   authorisation.  This can be nil, in which case the check will always
+      #   succeed.  In order to fail all checks, pass the empty list [].
+      # @return [Boolean] true if the privileges are sufficient; false
+      #   otherwise.
+      def can_get_with?(candidates)
+        check_privilege(candidates, get_privileges)
+      end
+
+      # Tests if the given privileges are sufficient for PUTting this
+      # object.
+      #
+      # @param (see #can_get_with?)
+      # @return (see #can_get_with?)
+      def can_put_with?(candidates)
+        check_privilege(candidates, put_privileges)
+      end
+
+      # Tests if the given privileges are sufficient for DELETEing this
+      # object.
+      #
+      # @param (see #can_get_with?)
+      # @return (see #can_get_with?)
+      def can_delete_with?(candidates)
+        check_privilege(candidates, delete_privileges)
+      end
+
+      # Checks a set of candidate privileges against another set to see if they
+      # match.
+      #
+      # @param candidates [Array] The candidate privileges.  If nil, treat as
+      #   if all privileges are candidate privileges.
+      # @param requisites [Array] The required privileges.  If nil, reject all
+      #   candidates values except nil.
+      # @return (see #can_get_with?)
+      def check_privilege(candidates, requisites)
+        if candidates.nil?
+          true
+        elsif requisites.nil?
+          false
+        else
+          # Check the set intersection (the candidates that are also requisites)
+          # contains every requisite.
+          (candidates & requisites) == requisites
+        end
+      end
+
       # Internal: Registers a handler to be called when this object is PUT.
       #
       # block - A proc that will be executed before the model is updated.
@@ -59,18 +109,43 @@ module Bra
         self
       end
 
-      # GETs this resource.
+      # GETs this model object.
+      # 
+      # A GET is the retrieval of a flattened representation of a model object.
+      # See #get_flat (defined differently for different model objects) for
+      # information on what constitutes a flattened representation.
       #
-      # Returns a hash mapping this object's ID to the object itself.
-      def get
-        { id => self }
+      # @param privileges [Array] An array of GET privileges the caller has.
+      #   May be nil, in which case no privilege checking is done.
+      #
+      # @param mode [Symbol] Either :wrap, in which case the result will be
+      #   wrapped in a hash mapping the object's ID to the flattened
+      #   representation, or :nowrap, in which case only the flattened value is
+      #   returned.  By default, :wrap is used.
+      #
+      # @return [Object] A flat representation of this object.
+      def get(privileges=[], mode=:wrap)
+        if can_get_with?(privileges)
+          value = get_flat(privileges)
+          # TODO: Flatten non-plain-old-data values.
+          case mode
+          when :wrap
+            { id => value }
+          when :nowrap
+            value
+          else
+            fail("Unknown get_flat mode: #{mode}")
+          end
+        end
       end
 
       # PUTs a resource into this model object, using the put handler.
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
-      def put(resource)
+      def put(privileges, resource)
+        fail("Insufficient privileges.") unless can_put_with?(privileges) 
+
         # Remove any outer hash.
         value = resource[id] if resource.is_a?(Hash)
         value = resource unless resource.is_a?(Hash)
@@ -81,7 +156,9 @@ module Bra
       end
 
       # DELETEs this model object, using the delete handler.
-      def delete
+      def delete(privileges)
+        fail("Insufficient privileges.") unless can_delete_with?(privileges) 
+
         # Again, only update the model if the handler allows us to.
         delete_do if @delete_handler.call
       end
@@ -120,17 +197,6 @@ module Bra
         @id = new_id
 
         self
-      end
-
-      # Converts a model object to compact JSON.
-      #
-      # This expects a to_jsonable method to be defined.
-      #
-      # @param args [Array] A splat of args to send to the inner to_json calls.
-      #
-      # @return [String] The JSON representation of the model object.
-      def to_json(*args)
-        to_jsonable.to_json(*args)
       end
 
       # The canonical URL of this model object.
@@ -229,24 +295,29 @@ module Bra
 
       # GETs the resource with the given partial URL in this object's children.
       #
-      # @param url [String]resource - A partial URL that follows this model object's URL to form
-      #            the URL of the resource to locate.  Can be nil, in which
-      #            case this object is returned.
+      # @param url [String] A partial URL that follows this model object's URL to form
+      #   the URL of the resource to locate.  Can be nil, in which case this
+      #   object is returned.
+      # @param privileges [Array] A set of privileges to check to see if the
+      #   GET can be done.
+      # @param mode [Symbol] See #get.
       #
-      # Returns the GET representation of the object if found, and nil
+      # @return the GET representation of the object if found, and nil
       #   otherwise.
-      def get_url(url)
-        find_url(url, &:get)
+      def get_url(url, privileges, mode)
+        find_url(url, privileges, mode, &:resource)
       end
 
       # PUTs the resource with the given partial URL in this object's children.
       #
       # @param url [String] See #get_url.
+      # @param privileges [Array] - A set of privileges to check to see if the
+      #   GET can be done.
       # @param payload [Object] A payload to PUT into the child resource.  This
       #   may be a hash mapping the resource's ID to its new value, or the new
       #   value directly.
-      def put_url(url, payload)
-        find_url(url, payload, &:put)
+      def put_url(url, privileges, payload)
+        find_url(url, privileges, payload, &:put)
       end
 
       # PUTs a payload into the resource at the given URL relative from this
@@ -261,8 +332,8 @@ module Bra
       # children.
       #
       # @param (see #get_url)
-      def delete_url(url)
-        find_url(url, &:delete)
+      def delete_url(url, privileges)
+        find_url(url, privileges, &:delete)
       end
 
       # DELETEs the resource at the given URL relative from this resource,
@@ -283,18 +354,28 @@ module Bra
         @children = {}
       end
 
-      # Public: Converts a model object to a format that can be rendered to
-      # JSON.
+      # Converts this model object to a "flat" representation.
       #
-      # Returns a representation of the model object that can be converted to
-      # JSON.
-      def to_jsonable
-        @children.transform_values { |child| child.to_jsonable }
+      # Flat representations contain only primitive objects (integers, strings,
+      # etc.) and lists and hashes.
+      #
+      # In a flat representation, children requiring privileges the caller does
+      # not have are hidden.
+      #
+      # @param privileges [Array] An array of GET privileges the caller has.
+      #   May be nil, in which case no privilege checking is done.
+      #
+      # @return [Hash] A flat representation of this object.
+      def get_flat(privileges=[]) 
+        ( @children
+          .select           { |_, child| child.can_get_with?(privileges) }
+          .transform_values { |child|    child.get_flat     (privileges) }
+        ) if can_get_with?(privileges)
       end
 
       def child(target_name)
         child = children[target_name]
-        child = children[target_name.intern] if child.nil?
+        child = children[target_name.intern]   if child.nil?
         child = children[Integer(target_name)] if child.nil?
         child
       rescue ArgumentError, TypeError
@@ -310,15 +391,23 @@ module Bra
         @children = []
       end
 
-      # Public: Converts a model object to a format that can be rendered to
-      # JSON.
+      # Converts this model object to a "flat" representation.
       #
-      # Unless overridden, this expects a to_hash method to be defined.
+      # Flat representations contain only primitive objects (integers, strings,
+      # etc.) and lists and hashes.
       #
-      # Returns a representation of the model object that can be converted to
-      # JSON.
-      def to_jsonable
-        children.map { |child| child.to_jsonable }
+      # In a flat representation, children requiring privileges the caller does
+      # not have are hidden.
+      #
+      # @param privileges [Array] An array of GET privileges the caller has.
+      #   May be nil, in which case no privilege checking is done.
+      #
+      # @return [Array] A flat representation of this object.
+      def get_flat(privileges=[]) 
+        ( @children
+          .select { |child| child.can_get_with?(privileges) }
+          .map    { |child| child.get_flat     (privileges) }
+        ) if can_get_with?(privileges)
       end
 
       def child(target_name)
@@ -341,6 +430,22 @@ module Bra
       # @return [NilClass] nil.
       def child(_)
         nil
+      end
+
+      # Converts this model object to a "flat" representation.
+      #
+      # Flat representations contain only primitive objects (integers, strings,
+      # etc.) and lists and hashes.
+      #
+      # For a SingleModelObject, the default implementation of this is to call
+      # a no-arguments method 'flat' which can be overridden by subclasses.
+      #
+      # @param privileges [Array] An array of GET privileges the caller has.
+      #   May be nil, in which case no privilege checking is done.
+      #
+      # @return [Object] A flat representation of this object.
+      def get_flat(privileges=[]) 
+        flat if can_get_with?(privileges)
       end
     end
   end
