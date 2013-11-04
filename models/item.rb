@@ -95,7 +95,7 @@ module Bra
       # @return (see #set_from_hash)
       def clear
         @name = nil
-        @type = null
+        @type = :null
 
         self
       end
