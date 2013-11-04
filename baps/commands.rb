@@ -92,6 +92,16 @@ module Bra
           @command = CODES[from][to]
         end
 
+        # Creates a new SetPlayerState, populating the channel ID and
+        # from-state from a player state model object.
+        def self.from_model(object, to)
+          new(
+            object.player_channel_id,
+            object.value,
+            to
+          )
+        end
+
         # Public: Runs a SetPlayerState command on the given requests queue.
         #
         # As this command has no direct return value, it does not need a
@@ -100,32 +110,29 @@ module Bra
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
         #
-        # Returns nothing.
+        # @return [Boolean] false (for use in handlers).
         def run(queue)
           Request.new(@command, @channel).to(queue) unless @command.nil?
+          false
+        end
+
+        def self.to_delete_handler(queue)
+          ->(object) { from_model(object, object.initial_value).run(queue) }
         end
 
         def self.to_put_handler(queue)
-          proc do |resource, value|
-            # BAPS is rather interesting in how it interprets the
-            # play/pause/stop commands:
-            #
-            # - PLAY will play the song if it's stopped, or *restart* the song
-            #   if it's paused;
-            # - PAUSE will pause the song if it's playing or if it's stopped,
-            #   but *play* the song if it's paused;
-            # - STOP is fine, it stops and doesn't afraid of anything.
-            #
-            # This is at odds with how BRA sees things, so we can't just map
-            # the states down to their "obvious" commands!
-            new(
-              resource.player_channel_id,
-              resource.value,
-              value
-            ).run(queue)
-            # Let the model object know it cannot update itself directly.
-            false
-          end
+          # BAPS is rather interesting in how it interprets the
+          # play/pause/stop commands:
+          #
+          # - PLAY will play the song if it's stopped, or *restart* the song if
+          #   it's paused;
+          # - PAUSE will pause the song if it's playing or if it's stopped, but
+          #   *play* the song if it's paused;
+          # - STOP is fine, it stops and doesn't afraid of anything.
+          #
+          # This is at odds with how BRA sees things, so we can't just map the
+          # states down to their "obvious" commands!
+          ->(object, new_state) { from_model(object, new_state).run(queue) }
         end
 
         private
@@ -258,7 +265,8 @@ module Bra
       def self.handlers(queue)
         {
           channels_delete: ClearPlaylist.to_channel_set_delete_handler(queue),
-          player_state_put: SetPlayerState.to_put_handler(queue)
+          player_state_put: SetPlayerState.to_put_handler(queue),
+          player_state_delete: SetPlayerState.to_delete_handler(queue)
         }
       end
     end

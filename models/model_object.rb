@@ -160,7 +160,7 @@ module Bra
         fail("Insufficient privileges.") unless can_delete_with?(privileges) 
 
         # Again, only update the model if the handler allows us to.
-        delete_do if @delete_handler.call
+        delete_do if @delete_handler.call(self)
       end
 
       # PUTs a resource to this model object, without using the put handler.

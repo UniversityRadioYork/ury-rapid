@@ -50,8 +50,8 @@ module Bra
     # specification for performing PUT/POST/DELETE, and the ability to validate
     # model inputs.
     class Variable < Constant
-      # Public: Allows direct read access to the value.
-      attr_reader :value
+      # Public: Allows direct read access to the initial value.
+      attr_reader :initial_value
 
       attr_reader :edit_privileges
       alias_method :put_privileges, :edit_privileges
@@ -113,7 +113,7 @@ module Bra
         @value = initial_value
       end
 
-      alias_method :delete, :reset
+      alias_method :delete_do, :reset
 
       # The driver_XYZ methods allow the driver to perform modifications to the
       # model using the same verbs as the server without triggering the usual
