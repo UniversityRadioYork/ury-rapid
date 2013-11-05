@@ -92,12 +92,7 @@ module Bra
       # Returns a proc that takes a BAPS response and sets the appropriate
       #   player state to that provided to this function.
       def set_state_handler(state)
-        lambda do |response|
-          @model.driver_put_url(
-            "channels/#{response[:subcode]}/player/state",
-            state
-          )
-        end
+        ->(r) { @model.driver_put_url(player_url(r, 'state'), state) }
       end
 
       # Internal: Creates a proc that will handle a marker change for the
@@ -108,12 +103,7 @@ module Bra
       # Returns a proc that takes a BAPS response and sets the appropriate
       #   marker of the type provided to this function.
       def set_marker_handler(type)
-        lambda do |response|
-          @model.driver_put_url(
-            "channels/#{response[:subcode]}/player/#{type}",
-            response[:position]
-          )
-        end
+        ->(r) { @model.driver_put_url(player_url(r, type), r[:position]) }
       end
 
       def item_data(response)
@@ -130,38 +120,26 @@ module Bra
 
       def loaded(response)
         loaded_item(response).each do |key, value|
-          @model.driver_put_url(
-            "channels/#{response[:subcode]}/player/#{key}",
-            value
-          )
+          @model.driver_put_url(player_url(response, key), value)
         end
       end
 
-      def item_count(response)
-        nil
+      # Intentionally ignores the response.
+      # 
+      # @param _ [Hash] The (ignored) response.
+      #
+      # @return [NilClass] nil.
+      def nop(_)
+          nil
       end
 
-      def client_add(response)
-        nil
-      end
-
-      def client_remove(response)
-        nil
-      end
+      alias_method :item_count, :nop
+      alias_method :client_add, :nop
+      alias_method :client_remove, :nop
 
       def log_message(response)
         # TODO: actually log this message
         puts "[LOG] #{response[:message]}"
-      end
-
-      # Internal: From a response, get the target channel player.
-      #
-      # response - The response whose subcode denotes the correct channel.
-      #
-      # Returns a Player object which represents the requested channel's player
-      #   model.
-      def player_from(response)
-        @model.player(response[:subcode])
       end
 
       # Internal: Converts an loaded response into a pair of load-state and
@@ -207,9 +185,11 @@ module Bra
       # Returns a symbol (:library, :file or :text) being the BRA equivalent of
       # the BAPS track type.
       def track_type_baps_to_bra(type)
-        raise InvalidTrackType, type unless TRACK_TYPE_MAP.include? type
+        fail(InvalidTrackType, type) unless TRACK_TYPE_MAP.include? type
         TRACK_TYPE_MAP[type]
       end
+
+      InvalidTrackType = Class.new(RuntimeError)
 
       # Receive a seed from the BAPS server and act upon it.
       #
@@ -238,6 +218,18 @@ module Bra
           puts("BAPS login FAILED: #{string}, code #{code}.")
           EM.stop
         end
+      end
+
+      # Generates an URL to a channel player, given a BAPS response whose
+      # subcode is the target channel.
+      #
+      # @param response [Hash] The response mentioning the channel to use.
+      # @param args [Array] A splat of additional model object IDs to form a
+      #   sub-URL of the player URL; optional.
+      #
+      # @return [String] The full model URL.
+      def player_url(response, *args)
+        ['channels', response[:subcode], 'player', *args].join('/')
       end
 
       # Internal: Hash mapping item names to BRA load states.

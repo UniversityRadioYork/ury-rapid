@@ -135,7 +135,7 @@ module Bra
       #   returned.  By default, :wrap is used.
       #
       # @return [Object] The (potentially) wrapped value.
-      def wrap(response, mode)
+      def wrap(value, mode)
         # TODO(mattbw): Flatten non-plain-old-data values?
         case mode
         when :wrap

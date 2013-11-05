@@ -72,13 +72,12 @@ module Bra
       # Returns (as a list) the new response and expected arguments list, which
       # should generally go to @response and @expected respectively.
       def command_with_code(code, subcode)
-        responses = Responses::STRUCTURES
-        fail(UnknownResponse, code.to_s(16)) unless responses.key?(code)
+        structure = Responses::STRUCTURES[code]
+        fail(UnknownResponse, code.to_s(16)) if structure.nil?
 
-        name, *expected = responses[code]
-        response = { name: name, code: code, subcode: subcode }
+        response = { name: Codes.code_symbol(code), code: code, subcode: subcode }
 
-        [expected, response]
+        [structure, response]
       end
 
       # Internal: Attempt to grab an argument word from the reader.

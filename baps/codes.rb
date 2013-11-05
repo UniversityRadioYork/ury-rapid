@@ -2,6 +2,31 @@ module Bra
   module Baps
     # Internal: Internal BAPS codes for requests and responses.
     module Codes
+      # Given a BAPS code, return a vaguely descriptive textual description of
+      # it.
+      #
+      # @param code [Integer] One of the codes from Bra::Baps::Codes.
+      #
+      # @return [String] The (semi) human-readable name for the BAPS code.
+      def self.code_symbol(code)
+        # Assume that the only constants defined in Codes are code groups...
+        submodules = constants.map(&method(:const_get))
+        # ...and the only constants defined in code groups are codes, and they
+        # are disjoint.
+        found = nil
+        submodules.each do |submodule|
+          consts = submodule.constants
+          unless found
+            found = (
+              consts.find { |name| submodule.const_get(name) == code }
+              .try { |name| "#{submodule.to_s}::#{name}" }
+            )
+          end
+        end
+        fail("Unknown code number: #{code.to_s(16)}") unless found
+        found
+      end
+
       # Internal: Response codes for the Playback section of the BAPS command
       # set.
       module Playback
@@ -18,6 +43,7 @@ module Bra
       # Internal: Response codes for the Playlist section of the BAPS command
       # set.
       module Playlist
+        DELETE_ITEM = 0x2080
         ITEM_COUNT = 0x2180
         ITEM_DATA = 0x21C0
         RESET = 0x2280
