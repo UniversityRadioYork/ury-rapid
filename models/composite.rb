@@ -58,7 +58,7 @@ module Bra
           # We need to keep traversing down, as we've still got a tail.
           head, tail = tail.split('/', 2)
           resource = resource.child(head)
-          fail("#{resource.id} has no child #{new_head}.") if resource.nil?
+          fail("resource has no child resource.") if resource.nil?
         end
 
         # Once we've exhausted the tail, the resource left should be the one
