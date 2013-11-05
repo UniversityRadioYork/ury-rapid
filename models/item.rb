@@ -57,6 +57,10 @@ module Bra
         fail("Unsupported argument to put_do: #{value.class}") unless done
       end
 
+      def delete_do
+        parent.remove_child(self)
+      end
+
       # Sets the item's properties from a hash.
       #
       # The hash should have keys 'value' and 'type', which may be symbols or

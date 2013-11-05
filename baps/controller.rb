@@ -65,6 +65,7 @@ module Bra
       # Returns nothing.
       def playlist_functions
         {
+          Codes::Playlist::DELETE_ITEM => method(:delete_item),
           Codes::Playlist::ITEM_DATA => method(:item_data),
           Codes::Playlist::ITEM_COUNT => method(:item_count),
           Codes::Playlist::RESET => method(:reset)
@@ -104,6 +105,20 @@ module Bra
       #   marker of the type provided to this function.
       def set_marker_handler(type)
         ->(r) { @model.driver_put_url(player_url(r, type), r[:position]) }
+      end
+
+      # Deletes the item identified by the response.
+      #
+      # The response structure must have keys:
+      #
+      # - :subcode (channel index, starting from 0)
+      # - :index (playlist index, starting from 0)
+      #
+      # @param response [Hash] A response structure.
+      def delete_item(response)
+        id, index = response.values_at(:subcode, :index)
+
+        @model.driver_delete_url("channels/#{id}/playlist/#{index}")
       end
 
       def item_data(response)

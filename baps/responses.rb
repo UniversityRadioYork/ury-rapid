@@ -11,6 +11,7 @@ module Bra
       CONFIG  = [ %i{option_id uint32}, %i{setting config_setting} ]
       MARKER  = [ %i{position uint32} ]
       OPTION  = [ %i{id uint32}, %i{description string}, %i{type uint32} ]
+      INDEX   = [ %i{index uint32} ]
 
       # Creates a structure with one string argument.
       # 
@@ -32,6 +33,7 @@ module Bra
         Codes::Playback::CUE      => MARKER,
         Codes::Playback::INTRO    => MARKER,
       # Playlist
+        Codes::Playlist::DELETE_ITEM => INDEX,
         Codes::Playlist::ITEM_COUNT => COUNT,
         Codes::Playlist::ITEM_DATA => [
           %i{index uint32}, %i{type uint32}, %i{title string}

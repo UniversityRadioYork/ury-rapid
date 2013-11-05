@@ -18,7 +18,8 @@ module Bra
       #   children.
       #
       def remove_child(object)
-        @children.delete(object.id)
+        fail('Implementations of CompositeModelObject need to implement this.')
+        @children.delete(object)
       end
 
       # Adds a child to this model object.
@@ -127,6 +128,15 @@ module Bra
         @children = {}
       end
 
+      # Removes a child from this model object.
+      #
+      # @param object [ModelObject] The object to remove from this object's
+      #   children.
+      #
+      def remove_child(object)
+        @children.delete(object.id)
+      end
+
       # Converts this model object to a "flat" representation.
       #
       # Flat representations contain only primitive objects (integers, strings,
@@ -162,6 +172,15 @@ module Bra
       def initialize
         super()
         @children = []
+      end
+
+      # Removes a child from this model object.
+      #
+      # @param object [ModelObject] The object to remove from this object's
+      #   children.
+      #
+      def remove_child(object)
+        @children.delete_at(object.id)
       end
 
       # Converts this model object to a "flat" representation.
