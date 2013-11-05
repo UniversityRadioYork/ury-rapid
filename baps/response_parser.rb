@@ -72,7 +72,7 @@ module Bra
       # Returns (as a list) the new response and expected arguments list, which
       # should generally go to @response and @expected respectively.
       def command_with_code(code, subcode)
-        structure = Responses::STRUCTURES[code]
+        structure = Responses::STRUCTURES[code].clone
         fail(UnknownResponse, code.to_s(16)) if structure.nil?
 
         response = { name: Codes.code_symbol(code), code: code, subcode: subcode }
