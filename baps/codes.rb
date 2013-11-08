@@ -1,9 +1,22 @@
 module Bra
   module Baps
-    # Internal: Internal BAPS codes for requests and responses.
+    # Internal BAPS codes for requests and responses.
+    #
+    # Also includes methods for handling them.
+    #
+    # The BAPS codes are segmented, both in the concrete code space and in this
+    # module, into various groups.
     module Codes
-      # Given a BAPS code, return a vaguely descriptive textual description of
-      # it.
+      # Given a BAPS code, return a vaguely descriptive textual description
+      #
+      # This is mainly intended for debugging and logging purposes, and is
+      # wholly inadequate for user-facing code.  You have been warned!
+      #
+      # @api semipublic
+      #
+      # @example Find the name of a BAPS code.
+      #   Bra::Baps::Codes.code_symbol(Bra::Baps::Codes::Playback::PLAY)
+      #   #=> "Bra::Baps::Codes::Playback::PLAY"
       #
       # @param code [Integer] One of the codes from Bra::Baps::Codes.
       #
@@ -27,8 +40,7 @@ module Bra
         found
       end
 
-      # Internal: Response codes for the Playback section of the BAPS command
-      # set.
+      # Response codes for the Playback section of the BAPS command set
       module Playback
         PLAY = 0x0000
         STOP = 0x0080
@@ -40,8 +52,7 @@ module Bra
         INTRO = 0x0380
       end
 
-      # Internal: Response codes for the Playlist section of the BAPS command
-      # set.
+      # Response codes for the Playlist section of the BAPS command set
       module Playlist
         DELETE_ITEM = 0x2080
         ITEM_COUNT = 0x2180
@@ -49,8 +60,7 @@ module Bra
         RESET = 0x2280
       end
 
-      # Internal: Response codes for the Config section of the BAPS command
-      # set.
+      # Response codes for the Config section of the BAPS command set
       module Config
         OPTION_COUNT = 0xB000
         OPTION = 0xB080
@@ -63,8 +73,7 @@ module Bra
         CONFIG_SETTING_INDEXED = 0xB2C0
       end
 
-      # Internal: Response codes for the System section of the BAPS command
-      # set.
+      # Response codes for the System section of the BAPS command set
       module System
         # The welcome message isn't a real command, but we want to treat it
         # like one.

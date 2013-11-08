@@ -4,11 +4,11 @@ require_relative 'commands'
 require_relative 'controller'
 require_relative 'models'
 
-##
 # The top-level driver interface for the BAPS BRA driver.
 class Driver
-  ##
   # Initialise the driver given its driver configuration.
+  #
+  # @param config [Hash]
   def initialize(config)
     # We'll need this config later when we're post-processing the model.
     @config = config
