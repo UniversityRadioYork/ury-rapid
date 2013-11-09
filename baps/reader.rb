@@ -16,7 +16,7 @@ module Bra
       #
       # data - A string of data bytes to add to the processing buffer.
       #
-      # Returns nothing.
+      # @return [void]
       def add(data)
         @buffer << data
       end

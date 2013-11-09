@@ -34,7 +34,7 @@ module Bra
       #
       # new_state - The symbol representing the new state.
       #
-      # Returns nothing.
+      # @return [void]
       def set_state(new_state)
         state.value = new_state
       end
@@ -44,7 +44,7 @@ module Bra
       # type     - The marker type (:position, :cue, :intro or :duration).
       # position - The new position, as a non-negative integer or coercible.
       #
-      # Returns nothing.
+      # @return [void]
       def marker(type)
         child(type)
       end
@@ -54,7 +54,7 @@ module Bra
       # type     - The marker type (:position, :cue, :intro or :duration).
       # position - The new position, as a non-negative integer or coercible.
       #
-      # Returns nothing.
+      # @return [void]
       def set_marker(type, position)
         marker(type).value = position
       end
@@ -86,7 +86,7 @@ module Bra
       # item - The item to unlink.  This must be the same as the item currently
       #        loaded.
       #
-      # Returns nothing.
+      # @return [void]
       def unlink_item(item)
         fail("Tried to unlink wrong item from #{name}") unless item == @item
       end
@@ -101,7 +101,7 @@ module Bra
       #
       # new_state - The symbol representing the new state.
       #
-      # Returns nothing.
+      # @return [void]
       def set_load_state(new_state)
         child(:load_state).value = new_state
       end

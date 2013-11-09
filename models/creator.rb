@@ -105,7 +105,7 @@ module Bra
       # put      - The handler to call when the resource is PUT.
       # delete   - The handler to call when the resource is DELETEd.
       #
-      # Returns nothing.
+      # @return [void]
       def register_handlers(resource, put, delete)
         resource.register_put_handler(
           @options[put]

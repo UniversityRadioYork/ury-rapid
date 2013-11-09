@@ -177,7 +177,7 @@ module Bra
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
         #
-        # Returns nothing.
+        # @return [void]
         def run(queue)
           command = Request.new(Codes::Playback::POSITION, @channel)
           command.uint32(@position).to(queue)
@@ -194,7 +194,7 @@ module Bra
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
         #
-        # Returns nothing.
+        # @return [void]
         def run(queue)
           Request.new(Codes::System::SET_BINARY_MODE).to(queue)
         end
@@ -230,7 +230,7 @@ module Bra
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
         #
-        # Returns nothing.
+        # @return [void]
         def run(queue)
           password_hash = Digest::MD5.hexdigest(@password)
           full_hash = Digest::MD5.hexdigest(@seed + password_hash)
@@ -253,7 +253,7 @@ module Bra
         #
         # queue - The queue to which requests should be sent.
         #
-        # Returns nothing.
+        # @return [void]
         def run(queue)
           # Subcode 3: Synchronise and add to chat
           Request.new(Codes::System::SYNC, 3).to(queue)

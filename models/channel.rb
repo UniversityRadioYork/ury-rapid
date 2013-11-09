@@ -52,7 +52,7 @@ module Bra
       # number - The number of the channel (0 onwards).
       # state  - The new state (one of :playing, :paused or :stopped).
       #
-      # Returns nothing.
+      # @return [void]
       def set_player_state(number, state)
         channel(number).set_player_state(state)
       end
@@ -73,7 +73,7 @@ module Bra
       # type     - The marker type (:position, :cue, :intro or :duration).
       # position - The new position, as a non-negative integer or coercible.
       #
-      # Returns nothing.
+      # @return [void]
       def set_player_marker(number, type, position)
         channel(number).set_player_marker(type, position)
       end
@@ -134,7 +134,7 @@ module Bra
       #         added.
       # item  - An Item object representing the item to be added.
       #
-      # Returns nothing.
+      # @return [void]
       def add_item(index, item)
         playlist.add_item(index, item)
       end
@@ -174,7 +174,7 @@ module Bra
       #
       # new_state - The new state to use.
       #
-      # Returns nothing.
+      # @return [void]
       def set_player_state(new_state)
         player.set_state(new_state)
       end
@@ -193,7 +193,7 @@ module Bra
       # type     - The marker type (:position, :cue, :intro or :duration).
       # position - The new position, as a non-negative integer or coercible.
       #
-      # Returns nothing.
+      # @return [void]
       def set_player_marker(type, position)
         player.set_marker(type, position)
       end
@@ -214,7 +214,7 @@ module Bra
 
       # Internal: Clears the channel's playlist.
       #
-      # Returns nothing.
+      # @return [void]
       def clear_playlist
         playlist.clear
       end
@@ -245,7 +245,7 @@ module Bra
       #         added.
       # item  - An Item object representing the item to be added.
       #
-      # Returns nothing.
+      # @return [void]
       def add_item(index, item)
         item.enqueue(self, index)
       end
@@ -261,7 +261,7 @@ module Bra
 
       # Internal: Clears the playlist.
       #
-      # Returns nothing.
+      # @return [void]
       def clear
         @contents = []
       end
@@ -289,7 +289,7 @@ module Bra
       # item - The item to unlink.  This must be the same as the item currently
       #        loaded.
       #
-      # Returns nothing.
+      # @return [void]
       def unlink_item(item)
         remove_child(item)
       end
@@ -301,7 +301,7 @@ module Bra
       # item  - The item to link.
       # index - The index to link the item into.
       #
-      # Returns nothing.
+      # @return [void]
       def link_item(item, index)
         add_child(item)
         @contents[index] = item

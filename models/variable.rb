@@ -108,7 +108,7 @@ module Bra
 
       # Public: Resets the variable to its default value.
       #
-      # Returns nothing.
+      # @return [void]
       def reset
         @value = initial_value
       end
