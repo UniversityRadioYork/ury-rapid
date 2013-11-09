@@ -52,7 +52,7 @@ module Bra
       #
       # This starts a BAPS connection, logs into it, and then sets up the given
       # API controller to handle the responses.
-      # 
+      #
       # @api semipublic
       #
       # @example Running a client with a controller.

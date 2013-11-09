@@ -1,7 +1,10 @@
 module Bra
-  # Public: General exceptions thrown by BRA.
+  # General exceptions thrown by bra.
   module Exceptions
-    # Public: Exception generated when a command is incorrectly invoked.
+    # Exception generated when a command is incorrectly invoked.
     CommandError = Class.new(RuntimeError)
+
+    # Exception generated when a resource cannot be found by its URL.
+    MissingResourceError = Class.new(RuntimeError)
   end
 end

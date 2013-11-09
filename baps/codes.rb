@@ -27,15 +27,7 @@ module Bra
         # ...and the only constants defined in code groups are codes, and they
         # are disjoint.
         found = nil
-        submodules.each do |submodule|
-          consts = submodule.constants
-          unless found
-            found = (
-              consts.find { |name| submodule.const_get(name) == code }
-              .try { |name| "#{submodule.to_s}::#{name}" }
-            )
-          end
-        end
+        submodules.each { |s| found = find_code_in(s, code) unless found }
         fail("Unknown code number: #{code.to_s(16)}") unless found
         found
       end
@@ -86,6 +78,26 @@ module Bra
         LOGIN_RESULT = 0xE900
         CLIENT_ADD = 0xEC00
         CLIENT_REMOVE = 0xEC80
+      end
+
+      private
+
+      # Attempts to find the name of a BAPS code in a submodule
+      #
+      # @api private
+      #
+      # @param submodule [Module] The submodule to search for the BAPS code's
+      #   name.
+      # @param code [Integer] One of the codes from Bra::Baps::Codes.
+      #
+      # @return [String] The (semi) human-readable name for the BAPS code.
+      #
+      def self.find_code_in(submodule, code)
+        (
+          submodule.constants
+            .find { |name| submodule.const_get(name) == code }
+            .try  { |name| "#{submodule.to_s}::#{name}" }
+        )
       end
     end
   end

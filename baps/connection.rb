@@ -19,7 +19,7 @@ module Bra
 
       # Internal: Read and interpret a response from the BAPS server.
       def receive_data(data)
-        @parser.receive_data data
+        @parser.receive_data(data)
       end
     end
   end

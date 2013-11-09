@@ -12,21 +12,37 @@ module Bra
     # parameters in order of receipt and their corresponding names in the
     # response hashes produced by the ResponseParser.
     module Responses
-      # Pre-defined stock response structures.
+
+      private
+
+      # Creates a structure with one string argument.
+      #
+      # @api private
+      #
+      # @param arg_name [Symbol] The name of the string argument.
+      #
+      # @return [Array] The response structure.
+      def self.string(arg_name)
+        [[arg_name, :string]]
+      end
+
+      public
+
+     # Pre-defined stock response structures.
       NO_ARGS = []
-      COUNT   = [ %i{count uint32} ]
-      CONFIG  = [ %i{option_id uint32}, %i{setting config_setting} ]
-      MARKER  = [ %i{position uint32} ]
-      OPTION  = [ %i{id uint32}, %i{description string}, %i{type uint32} ]
-      INDEX   = [ %i{index uint32} ]
+      COUNT   = [%i{count uint32}]
+      CONFIG  = [%i{option_id uint32}, %i{setting config_setting}]
+      MARKER  = [%i{position uint32}]
+      OPTION  = [%i{id uint32}, %i{description string}, %i{type uint32}]
+      INDEX   = [%i{index uint32}]
 
       STRUCTURES = {
       # Playback
-        Codes::Playback::STOP     => NO_ARGS, 
+        Codes::Playback::STOP     => NO_ARGS,
         Codes::Playback::PAUSE    => NO_ARGS,
         Codes::Playback::PLAY     => NO_ARGS,
-        Codes::Playback::VOLUME   => [ %i{volume float32} ],
-        Codes::Playback::LOADED   => [ %i{index uint32}, %i{type load_body} ],
+        Codes::Playback::VOLUME   => [%i{volume float32}],
+        Codes::Playback::LOADED   => [%i{index uint32}, %i{type load_body}],
         Codes::Playback::POSITION => MARKER,
         Codes::Playback::CUE      => MARKER,
         Codes::Playback::INTRO    => MARKER,
@@ -63,21 +79,6 @@ module Bra
 
       class UnknownResponse < StandardError
       end
-
-      private
-
-      # Creates a structure with one string argument.
-      #
-      # @api private
-      # 
-      # @param arg_name [Symbol] The name of the string argument.
-      #
-      # @return [Array] The response structure.
-      def self.string(arg_name)
-        [ [arg_name, :string] ]
-      end
-
-
     end
   end
 end

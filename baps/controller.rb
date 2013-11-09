@@ -208,12 +208,12 @@ module Bra
       # Intentionally ignores the response
       #
       # @api private
-      # 
+      #
       # @param _ [Hash] The (ignored) response.
       #
       # @return void
       def nop(_)
-          nil
+        nil
       end
 
       alias_method :item_count, :nop
