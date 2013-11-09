@@ -6,14 +6,14 @@ require_relative 'model_object'
 
 module Bra
   module Models
-    # A model object which contains children.
+    # A model object which contains children
     #
     # This should be subclassed to provide the actual child structure (hash,
     # array, et cetera).
     class CompositeModelObject < ModelObject
       attr_reader :children
 
-      # Removes a child from this model object.
+      # Removes a child from this model object
       #
       # @param object [ModelObject] The object to remove from this object's
       #   children.
@@ -22,7 +22,7 @@ module Bra
         fail('Implementations of CompositeModelObject need to implement this.')
       end
 
-      # Adds a child to this model object.
+      # Adds a child to this model object
       #
       # @param object [ModelObject] The object to add to this object's
       #   children.  The object's resource name must be unique in this object's
@@ -67,7 +67,7 @@ module Bra
         yield resource, *args
       end
 
-      # GETs the resource with the given partial URL in this object's children.
+      # GETs the resource with the given partial URL in this object's children
       #
       # @param url [String] A partial URL that follows this model object's URL
       #   to form the URL of the resource to locate.  Can be nil, in which case
@@ -82,7 +82,7 @@ module Bra
         find_url(url, privileges, mode, &:resource)
       end
 
-      # PUTs the resource with the given partial URL in this object's children.
+      # PUTs a resource with the given URL relative from this resource
       #
       # @param url [String] See #get_url.
       # @param privileges [Array] - A set of privileges to check to see if the
@@ -90,12 +90,13 @@ module Bra
       # @param payload [Object] A payload to PUT into the child resource.  This
       #   may be a hash mapping the resource's ID to its new value, or the new
       #   value directly.
+      #
+      # @return void
       def put_url(url, privileges, payload)
         find_url(url, privileges, payload, &:put)
       end
 
-      # PUTs a payload into the resource at the given URL relative from this
-      # resource, without triggering any handlers.
+      # As #put_url, but intended for driver usage
       #
       # @param (see #put_url)
       def driver_put_url(url, payload)

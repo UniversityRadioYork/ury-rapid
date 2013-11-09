@@ -37,7 +37,11 @@ module Bra
 
       # Read and interpret a response from the BAPS server
       #
-      # @api private
+      # @api semipublic
+      #
+      # @example Sending data to a ResponseParser
+      #   rp = ResponseParser.new(channel, reader)
+      #   rp.receive_data("data")
       #
       # @param data [String] Raw data from the server, as a byte-string.
       #
