@@ -30,13 +30,18 @@ module Bra
         # Set up to expect the welcome message
         @expected = [%i(message string)]
         @response = {
-          name: 'WelcomeMessage',
           code: Codes::System::WELCOME_MESSAGE,
           subcode: 0
         }
       end
 
       # Read and interpret a response from the BAPS server
+      #
+      # @api private
+      #
+      # @param data [String] Raw data from the server, as a byte-string.
+      #
+      # @return void
       def receive_data(data)
         @reader.add(data)
 
@@ -47,6 +52,11 @@ module Bra
       private
 
       # Attempt to process the top of the buffer as part of a response
+      #
+      # @api private
+      #
+      # @return [Boolean] Whether there was enough data to process a command
+      #   word or not.
       def process_next_token
         @response.nil? ? command : word
       end
@@ -55,6 +65,8 @@ module Bra
       #
       # If successful, the parser then interprets the word and sets up to
       # parse the rest of the command phrase.
+      #
+      # @api private
       #
       # @return [Boolean] Whether there was enough data to process a command
       #   word or not.
@@ -74,10 +86,14 @@ module Bra
 
       # Parses and initialises a command whose BAPS code and subcode are given
       #
-      # code    - The response's BAPS command code (a 16-bit integer).
-      # subcode - The subcode (for example, the affected channel number).
+      # @api private
       #
-      # @return [Array]  The new response and expected arguments list, which
+      # @param code [Fixnum] The response's BAPS command code (a 16-bit
+      #   integer).
+      # @param subcode [Fixnum] The subcode (for example, the affected channel
+      #   number).
+      #
+      # @return [Array] The new response and expected arguments list, which
       #   should generally go to @response and @expected respectively.
       def command_with_code(code, subcode)
         structure = Responses::STRUCTURES[code].try(:clone)
@@ -94,6 +110,8 @@ module Bra
       # If there are no arguments left, the parser is set back into command
       # reading mode and the completed response is sent to the dispatch.
       #
+      # @api private
+      #
       # @return [Boolean] Whether or not there was enough data to process a
       #   data word.
       def word
@@ -106,7 +124,10 @@ module Bra
       # only the string length, and then pushes in a new argument for the
       # data itself.
       #
-      # name - The name of the parameter whose argument is being read.
+      # @api private
+      #
+      # @param name [Symbol] The name of the parameter whose argument is being
+      #   read.
       #
       # @return [Boolean] Whether or not there was enough data to process a
       #   data word.
@@ -127,8 +148,10 @@ module Bra
       # This command only parses the setting type itself; it pushes the
       # correct type for the value into @expected as the next argument.
       #
-      # name - The name (as a symbol) of the argument to which the config
-      #        type is bound.
+      # @api private
+      #
+      # @param name [Symbol] The name of the argument to which the config
+      #   type is bound.
       #
       # @return [Boolean] Whether or not there was enough data to process a
       #   data word.
@@ -153,8 +176,10 @@ module Bra
       # correct arguments for each item type into @expected as the arguments
       # immediately following this one.
       #
-      # name - The name (as a symbol) of the argument to which the track
-      #        type is bound.
+      # @api private
+      #
+      # @param name [Symbol] The name of the argument to which the track
+      #   type is bound.
       #
       # @return [Boolean] Whether or not there was enough data to process a
       #   data word.
@@ -183,15 +208,16 @@ module Bra
       # requires one buffer read.  Other types are implemented in terms of
       # special parser logic on these types, by the Parser itself.
       #
-      # word_description - A list containing the argument's parameter name,
-      #                    its type symbol, and any other arguments to the
-      #                    primitive type function.
+      # @api private
+      #
+      # @param parameter [Array] The argument's parameter name, its type
+      #   symbol, and any other arguments to the primitive type function.
       #
       # @return [Object] The argument if it was successfully read, or nil
       #   otherwise.  An unsuccessful read implies that the read should be
       #   retried when the reader's buffer fills up.
-      def primitive_word(word_description)
-        name, arg_type, *args = word_description
+      def primitive(parameter)
+        name, arg_type, *args = parameter
 
         data = @reader.public_send(arg_type, *args)
         @response[name] = data unless data.nil?
@@ -200,6 +226,8 @@ module Bra
       end
 
       # Finishes a response and creates a clean slate for the next one to begin
+      #
+      # @api private
       #
       # @return [Boolean] true (as in, this method always succeeds at
       #   processing data).
@@ -214,6 +242,8 @@ module Bra
       # This function expects there to indeed be another argument word.
       # The caller should ensure this.
       #
+      # @api private
+      #
       # @return [Boolean] Whether or not there was enough data to process a
       #   data word.
       def continue_response
@@ -223,7 +253,7 @@ module Bra
         # Some command words can be read from the buffer directly, whereas
         # the parser has its own logic for the more complex ones.
         own_type = respond_to?(type, true)
-        success = own_type ? send(type, name, *args) : primitive_word(parameter)
+        success = own_type ? send(type, name, *args) : primitive(parameter)
 
         @expected.unshift(parameter) unless success
         success
