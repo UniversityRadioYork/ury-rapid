@@ -75,7 +75,6 @@ def init_driver(config)
   Driver.new(config)
 end
 
-##
 # Create a model from its config and the playout system driver.
 def init_model(init_config, driver)
   # The model config is created by loading up driver-neutral configuration from
@@ -91,11 +90,12 @@ def init_model(init_config, driver)
   driver.process_model(creator.create)
 end
 
-# Internal: Initialises the server end of bra, which handles requests to and
-# responses from the environment.
+# Initialises the server end of bra
 #
-# config - The bra server configuration hash.
-# opts   - Server options for Sinatra/Rack.
+# This handles requests to and responses from the environment.
+#
+# @param config [Hash] The bra server configuration.
+# @param app [ServerApp] The server application.
 #
 # @return [void]
 def setup_server(config, app)
