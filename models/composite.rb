@@ -102,6 +102,8 @@ module Bra
       # As #put_url, but intended for driver usage
       #
       # @param (see #put_url)
+      #
+      # @return [void]
       def driver_put_url(url, payload)
         find_url(url, payload, &:driver_put)
       end
@@ -110,6 +112,8 @@ module Bra
       # children.
       #
       # @param (see #get_url)
+      #
+      # @return [void]
       def delete_url(url, privileges)
         find_url(url, privileges, &:delete)
       end
@@ -118,6 +122,8 @@ module Bra
       # without triggering any handlers.
       #
       # @param (see #get_url)
+      #
+      # @return [void]
       def driver_delete_url(url)
         find_url(url, &:driver_delete)
       end
@@ -136,7 +142,7 @@ module Bra
       #
       # @param id [ModelObject] The ID of the child object to remove.
       #
-      # @return null
+      # @return [void]
       def remove_child(id)
         @children.delete(id)
       end
@@ -160,18 +166,20 @@ module Bra
         ) if can_get_with?(privileges)
       end
 
-      def child(target_name)
-        child = children[target_name]
-        child = children[target_name.intern]   if child.nil?
-        child = children[Integer(target_name)] if child.nil?
+      def child(id)
+        child = children[id]
+        child = children[id.intern]   if child.nil? && id.respond_to?(:intern)
+        child = children[Integer(id)] if child.nil?
         child
       rescue ArgumentError, TypeError
         nil
       end
     end
 
-    ##
     # A model object whose children form a list.
+    #
+    # A ListModelObject stores its children in an Array, with the object IDs 
+    # being the numeric indices into that Array.
     class ListModelObject < CompositeModelObject
       def initialize
         super()
@@ -187,7 +195,7 @@ module Bra
         @children.delete_at(id)
       end
 
-      # Converts this model object to a "flat" representation.
+      # Converts this model object to a "flat" representation
       #
       # Flat representations contain only primitive objects (integers, strings,
       # etc.) and lists and hashes.
@@ -206,8 +214,17 @@ module Bra
         ) if can_get_with?(privileges)
       end
 
-      def child(target_name)
-        children[Integer(target_name)]
+      # Finds the child with the given ID
+      #
+      # @api semipublic
+      #
+      # @example Find the child with ID 3.
+      #   lmo = ListModelObject.new
+      #   lmo.add_child("Spruce", 3)
+      #   lmo.child(3)
+      #   #=> "Spruce"
+      def child(id)
+        children[Integer(id)]
       rescue ArgumentError, TypeError
         nil
       end
