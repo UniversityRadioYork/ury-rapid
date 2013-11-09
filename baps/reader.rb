@@ -77,8 +77,7 @@ module Bra
 
       private
 
-      # Internal: Reads a given number of bytes and unpacks the result
-      # according to the given format string.
+      # Reads a given number of bytes and unpacks one item from them
       #
       # This is for unpacking single items of data; for multiple items see
       # unpack_multi.
@@ -88,15 +87,14 @@ module Bra
       # unpack_format - The String#unpack format to use when interpreting the
       #                 contents of the bytes read.
       #
-      # Returns the unpacked equivalent of the bytes read; the type depends on
-      #   unpack_format.
+      # @return [Object] The unpacked equivalent of the bytes read; the type
+      #   depends on unpack_format.
       def unpack(count, unpack_format)
         list = unpack_multi(count, unpack_format)
         list.try(:first)
       end
 
-      # Internal: Reads a given number of bytes and unpacks the results
-      # according to the given format string.
+      # Reads a given number of bytes and unpacks multiple items from them
       #
       # This is for unpacking multiple items of data; for multiple items see
       # unpack.
@@ -106,7 +104,7 @@ module Bra
       # unpack_format - The String#unpack format to use when interpreting the
       #                 contents of the bytes read.
       #
-      # Returns the unpacked equivalent of the bytes read, as a list.
+      # @return [Array] The unpacked equivalent of the bytes read.
       def unpack_multi(count, unpack_format)
         bytes = raw_bytes(count)
         bytes.try(:unpack, unpack_format)
