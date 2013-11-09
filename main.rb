@@ -23,7 +23,7 @@ end
 # host     - The hostname of the server.
 # port     - The port on which the server will be started.
 #
-# Returns nothing.
+# @return [void]
 def start_server(dispatch, server, host, port)
   Rack::Server.start({ app: dispatch, server: server, Host: host, Port: port })
 end
@@ -32,7 +32,7 @@ end
 #
 # server - The name of the server to check.
 #
-# Returns nothing.
+# @return [void]
 # Raises a string error if the server does not appear to be EM compatible.
 def check_server_em_compatible(server)
   fail("Need an EM server, but #{server} isn't") unless em_compatible?(server)
@@ -97,7 +97,7 @@ end
 # config - The bra server configuration hash.
 # opts   - Server options for Sinatra/Rack.
 #
-# Returns nothing.
+# @return [void]
 def setup_server(config, app)
   server, host, port = config.values_at(*%i(rack host port))
 

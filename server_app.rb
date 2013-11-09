@@ -59,7 +59,7 @@ module Bra
 
     # Internal - Fails with a HTTP Not Authorised status.
     #
-    # Returns nothing.
+    # @return [void]
     def fail_not_authorised
       headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
       halt(401, json_error('Not authorised.'))
@@ -69,7 +69,7 @@ module Bra
     #
     # Such a senseless waste of precious bytes.
     #
-    # Returns nothing.
+    # @return [void]
     def cors
       @config[:cors].each do |header, items|
         headers "Access-Control-#{header}" => items.join(', ')
@@ -181,7 +181,7 @@ module Bra
     #
     # message - The error message.
     #
-    # Returns nothing.
+    # @return [void]
     def client_error(message)
       halt(400, json_error(message))
     end
