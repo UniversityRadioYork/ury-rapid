@@ -40,7 +40,7 @@ module Bra
       # @param channel [Channel] The source channel for responses coming from
       #   BAPS's chat system.
       #
-      # @return void
+      # @return [void]
       def register(channel)
         functions = [
           playback_functions,
@@ -63,7 +63,7 @@ module Bra
       #
       # @param response [Hash] A response hash.
       #
-      # @return void
+      # @return [void]
       def unhandled(response)
         message = "Unhandled response: #{response[:name]}"
         if response[:code].is_a?(Numeric)
@@ -158,7 +158,7 @@ module Bra
       #
       # @param response [Hash] A response structure.
       #
-      # @return void
+      # @return [void]
       def delete_item(response)
         id, index = response.values_at(:subcode, :index)
 
@@ -171,7 +171,7 @@ module Bra
       #
       # @param response [Hash] A BAPS response containing the item.
       #
-      # @return void
+      # @return [void]
       def item_data(response)
         id, index = response.values_at(:subcode, :index)
         type, title = response.values_at(:type, :title)
@@ -187,7 +187,7 @@ module Bra
       # @param response [Hash] A response whose subcode is the channel to
       #   reset.
       #
-      # @return void
+      # @return [void]
       def reset(response)
         @model.driver_delete_url("channels/#{response[:subcode]}")
       end
@@ -198,7 +198,7 @@ module Bra
       #
       # @param response [Hash] A BAPS response containing the item.
       #
-      # @return void
+      # @return [void]
       def loaded(response)
         loaded_item(response).each do |key, value|
           @model.driver_put_url(player_url(response, key), value)
@@ -211,7 +211,7 @@ module Bra
       #
       # @param _ [Hash] The (ignored) response.
       #
-      # @return void
+      # @return [void]
       def nop(_)
         nil
       end
@@ -226,7 +226,7 @@ module Bra
       #
       # @param response [Hash] The response containing the internal message.
       #
-      # @return void
+      # @return [void]
       def log_message(response)
         # TODO: actually log this message
         puts "[LOG] #{response[:message]}"
@@ -294,7 +294,7 @@ module Bra
       #
       # @param response [Hash] The BAPS response containing the seed.
       #
-      # @return void
+      # @return [void]
       def login_seed(response)
         username = @model.find_url('x_baps/server/username', &:value)
         password = @model.find_url('x_baps/server/password', &:value)
@@ -310,7 +310,7 @@ module Bra
       #
       # @param response [Hash] The BAPS response containing the login result.
       #
-      # @return void
+      # @return [void]
       def login_result(response)
         code, string = response.values_at(*%i(subcode details))
         is_ok = code == Commands::Authenticate::Errors::OK

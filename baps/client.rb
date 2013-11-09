@@ -66,7 +66,7 @@ module Bra
       # @param controller [Controller] The controller that should be registered
       #   to handle any responses coming from this client.
       #
-      # @return void
+      # @return [void]
       def run(controller)
         controller.register(@channel)
         EM.connect(@hostname, @port, Connection, @parser, @queue)

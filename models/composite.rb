@@ -91,7 +91,7 @@ module Bra
       #   may be a hash mapping the resource's ID to its new value, or the new
       #   value directly.
       #
-      # @return void
+      # @return [void]
       def put_url(url, privileges, payload)
         find_url(url, privileges, payload, &:put)
       end

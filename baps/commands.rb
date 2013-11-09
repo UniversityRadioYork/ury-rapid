@@ -18,7 +18,7 @@ module Bra
         #
         # @param _ [Object] Ignored.
         #
-        # @return void
+        # @return [void]
         def run(_)
         end
       end

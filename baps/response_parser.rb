@@ -45,7 +45,7 @@ module Bra
       #
       # @param data [String] Raw data from the server, as a byte-string.
       #
-      # @return void
+      # @return [void]
       def receive_data(data)
         @reader.add(data)
 
