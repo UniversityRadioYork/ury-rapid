@@ -131,14 +131,9 @@ module Bra
     end
 
     def find(params)
-      found = false
-
-      @model.find_url(params[:splat].first) do |resource|
-        yield(resource)
-        found = true
-      end
-
-      halt(404, json_error('Not found.')) unless found
+      @model.find_url(params[:splat].first) { |resource| yield(resource) }
+    rescue Exceptions::MissingResourceError
+      halt(404, json_error('Not found.'))
     end
 
     delete '/channels/:id/playlist/?' do
