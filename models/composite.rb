@@ -17,6 +17,7 @@ module Bra
       #
       # @param id [ModelObject] The ID of the child to remove.
       #
+      # @return [void]
       def remove_child(id)
         fail('Implementations of CompositeModelObject need to implement this.')
       end
@@ -28,12 +29,13 @@ module Bra
       #   children.
       # @param id [Object] The ID to register the child under.  Acceptable IDs
       #   depend on the underlying type of the model object.
+      # 
+      # @return [void]
       def add_child(object, id)
         @children[id] = object
       end
 
-      # Attempts to find the resource with the given partial URL in this
-      # object's children.
+      # Attempts to find a child resource with the given partial URL
       #
       # If the resource is found, it will be yielded to the attached block;
       # otherwise, an exception will be raised.
@@ -46,6 +48,8 @@ module Bra
       #
       # @yieldparam resource [ModelObject] The resource found.
       # @yieldparam args [Array] The splat from above.
+      #
+      # @return [void]
       def find_url(url, *args)
         # We're traversing down the URL by repeatedly splitting it into its
         # head (part before the next /) and tail (part after).  While we still
@@ -75,7 +79,7 @@ module Bra
       #   GET can be done.
       # @param mode [Symbol] See #get.
       #
-      # @return the GET representation of the object if found, and nil
+      # @return [Object] the GET representation of the object if found, and nil
       #   otherwise.
       def get_url(url, privileges, mode)
         find_url(url, privileges, mode, &:resource)
