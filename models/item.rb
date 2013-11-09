@@ -3,13 +3,13 @@ require_relative 'model_object'
 
 module Bra
   module Models
-    # Public: An item in the playout system.
+    # An item in the playout system.
     class Item < SingleModelObject
       alias_method :enqueue, :move_to
 
       attr_reader :name
 
-      # Public: Access the track type.
+      # Access the track type.
       attr_reader :type
 
       def initialize(type, name)
@@ -27,11 +27,11 @@ module Bra
         type
       end
 
-      # Public: Converts the Item to a hash representation.
+      # Converts the Item to a flat representation
       #
       # This conversion is not reversible and may lose some information.
       #
-      # Returns a hash representation of the Item.
+      # @return [Hash] A flat representation of the Item.
       def flat
         { name: @name, type: @type }
       end
@@ -57,6 +57,9 @@ module Bra
         fail("Unsupported argument to put_do: #{value.class}") unless done
       end
 
+      # Performs a DELETE on this object
+      #
+      # @return [void]
       def delete_do
         parent.remove_child(id)
       end
