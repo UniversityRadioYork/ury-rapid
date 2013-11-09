@@ -58,7 +58,7 @@ module Bra
       end
 
       def delete_do
-        parent.remove_child(self)
+        parent.remove_child(id)
       end
 
       # Sets the item's properties from a hash.

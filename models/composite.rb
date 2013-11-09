@@ -15,10 +15,9 @@ module Bra
 
       # Removes a child from this model object
       #
-      # @param object [ModelObject] The object to remove from this object's
-      #   children.
+      # @param id [ModelObject] The ID of the child to remove.
       #
-      def remove_child(object)
+      def remove_child(id)
         fail('Implementations of CompositeModelObject need to implement this.')
       end
 
@@ -129,13 +128,13 @@ module Bra
         @children = {}
       end
 
-      # Removes a child from this model object.
+      # Removes a child from this model object by ID
       #
-      # @param object [ModelObject] The object to remove from this object's
-      #   children.
+      # @param id [ModelObject] The ID of the child object to remove.
       #
-      def remove_child(object)
-        @children.delete(object.id)
+      # @return null
+      def remove_child(id)
+        @children.delete(id)
       end
 
       # Converts this model object to a "flat" representation.
@@ -175,13 +174,13 @@ module Bra
         @children = []
       end
 
-      # Removes a child from this model object.
+      # Removes a child from this model object
       #
-      # @param object [ModelObject] The object to remove from this object's
-      #   children.
+      # @param id [Fixnum] The index of the child object to remove.
       #
-      def remove_child(object)
-        @children.delete_at(object.id)
+      # @return [void]
+      def remove_child(id)
+        @children.delete_at(id)
       end
 
       # Converts this model object to a "flat" representation.
