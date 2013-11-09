@@ -3,29 +3,29 @@ require_relative 'request'
 
 module Bra
   module Baps
-    # Public: High-level versions of BAPS commands.
+    # High-level versions of BAPS commands
     #
     # These command classes are intended to be composable and accessible by
     # clients, but translate down into native BAPS command phrases.
     module Commands
-      # Public: Class for errors caused while handling command parameters.
+      # Class for errors caused while handling command parameters
       class ParamError < RuntimeError
       end
 
-      # Internal: The base class for all Command types.
+      # The base class for all Command types
       class Command
-        # Internal: Dummy Run command.
+        # Dummy Run command
         #
-        # _ - Ignored.
+        # @param _ [Object] Ignored.
         #
-        # Returns nothing.
+        # @return void
         def run(_)
         end
       end
 
-      # Public: A command that operates upon a channel.
+      # A command that operates upon a channel.
       class ChannelCommand < Command
-        # Internal: Initialises a ChannelCommand.
+        # Initialises a ChannelCommand.
         #
         # channel - The Channel ID.
         #
@@ -34,9 +34,9 @@ module Bra
         end
       end
 
-      # Public: A command that clears the playlist of a channel.
+      # A command that clears the playlist of a channel.
       class ClearPlaylist < ChannelCommand
-        # Public: Runs a ClearPlaylist command on the given requests queue.
+        # Runs a ClearPlaylist command on the given requests queue.
         #
         # As this command has no direct return value, it does not need a
         # dispatch.
@@ -65,7 +65,7 @@ module Bra
         end
       end
 
-      # Public: A command that sets the current playback status of a channel.
+      # A command that sets the current playback status of a channel.
       class SetPlayerState < ChannelCommand
         ##
         # Initialises a SetPlayerState command.
@@ -94,15 +94,13 @@ module Bra
 
         # Creates a new SetPlayerState, populating the channel ID and
         # from-state from a player state model object.
+        #
+        # @return [SetPlayerState] The constructed command.
         def self.from_model(object, to)
-          new(
-            object.player_channel_id,
-            object.value,
-            to
-          )
+          new(object.player_channel_id, object.value, to)
         end
 
-        # Public: Runs a SetPlayerState command on the given requests queue.
+        # Runs a SetPlayerState command on the given requests queue.
         #
         # As this command has no direct return value, it does not need a
         # dispatch.
@@ -137,7 +135,7 @@ module Bra
 
         private
 
-        # Internal: Mapping between state symbols and BAPS request codes.
+        # Mapping between state symbols and BAPS request codes.
         CODES = {
           playing: {
             playing: nil,
@@ -160,9 +158,9 @@ module Bra
         }
       end
 
-      # Public: A command that sets the current playback position of a channel.
+      # A command that sets the current playback position of a channel.
       class SetPlayerPosition < ChannelCommand
-        # Public: Initialises a SetPlayerPosition command.
+        # Initialises a SetPlayerPosition command.
         #
         # channel - The ID of the channel, as an integer or any coercible type.
         # position - The new position, as an integer or any coercible type.
@@ -171,7 +169,7 @@ module Bra
           @position = Integer(position)
         end
 
-        # Public: Runs a SetPlayerPosition command on the given requests queue.
+        # Runs a SetPlayerPosition command on the given requests queue.
         #
         # As this command has no direct return value, it does not need a
         # dispatch.
@@ -186,12 +184,12 @@ module Bra
         end
       end
 
-      # Public: A command that initiates communication with the BAPS server.
+      # A command that initiates communication with the BAPS server.
       #
       # This command is safe to use publicly, but consider using the Login
       # command instead.
       class Initiate < Command
-        # Public: Sends an Initiate command to the given queue.
+        # Sends an Initiate command to the given queue.
         #
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
@@ -202,12 +200,12 @@ module Bra
         end
       end
 
-      # Public: A command that authenticates to the BAPS server.
+      # A command that authenticates to the BAPS server.
       #
       # This command is safe to use publicly, but consider using the Login
       # command instead.
       class Authenticate < Command
-        # Public: Error codes returned by the BAPS server upon authentication.
+        # Error codes returned by the BAPS server upon authentication.
         module Errors
           OK = 0
           INCORRECT_USER = 1
@@ -215,7 +213,7 @@ module Bra
           INCORRECT_PASSWORD = 3
         end
 
-        # Public: Initialise an Authenticate command.
+        # Initialise an Authenticate command.
         #
         # username - The password to use to authenticate to the BAPS server.
         # password - The (plaintext) password to use to authenticate to the
@@ -227,7 +225,7 @@ module Bra
           @seed = seed
         end
 
-        # Public: Runs an Authenticate command on the given dispatcher.
+        # Runs an Authenticate command on the given dispatcher.
         #
         # queue - The requests queue to which the BAPS equivalent of this
         #         command should be sent.
@@ -242,13 +240,13 @@ module Bra
         end
       end
 
-      # Public: Sets the BAPS server to send broadcast messages, as well as
+      # Sets the BAPS server to send broadcast messages, as well as
       # making it forward the current server state to us.
       #
       # This command is safe to use publicly, but consider using the Login
       # command instead.
       class Synchronise < Command
-        # Public: Runs a Synchronise command on the given dispatcher.
+        # Runs a Synchronise command on the given dispatcher.
         #
         # This command takes no blocks, but will generate a very high number of
         # requests from the server.

@@ -15,7 +15,7 @@ module Bra
 
       private
 
-      # Creates a structure with one string argument.
+      # Creates a structure with one string argument
       #
       # @api private
       #

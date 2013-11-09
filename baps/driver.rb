@@ -4,11 +4,11 @@ require_relative 'commands'
 require_relative 'controller'
 require_relative 'models'
 
-# The top-level driver interface for the BAPS BRA driver.
+# The top-level driver interface for the BAPS BRA driver
 class Driver
-  # Initialise the driver given its driver configuration.
+  # Initialise the driver given its driver configuration
   #
-  # @param config [Hash]
+  # @param config [Hash] The configuration hash for the driver.
   def initialize(config)
     # We'll need this config later when we're post-processing the model.
     @config = config
@@ -26,12 +26,12 @@ class Driver
     @client = Bra::Baps::Client.new(@queue, *client_config)
   end
 
-  ##
-  # Given the initial model configuration, prepare it with driver-specific
-  # configuration ready for the model initialisation.
+  # Prepare model configuration with driver specifics ready for initialisation
   #
   # This returns its changes, but may or may not mutate the original
   # model_config.
+  #
+  # @return [Hash] The prepared configuration.
   def configure_model(model_config)
     # Add in the BAPS-specific model handlers, so that model actions
     # trigger BAPS commands.
@@ -41,8 +41,7 @@ class Driver
     model_config.merge!(Bra::Baps::Commands.handlers(@queue))
   end
 
-  ##
-  # Perform post-processing on the finished BRA model root.
+  # Perform post-processing on the finished bra model root
   #
   # This returns its changes, but may or may not mutate the original model.
   #
@@ -52,8 +51,7 @@ class Driver
     Bra::Baps::Models.add_baps_models_to(model, @config)
   end
 
-  ##
-  # Begin running the driver, given the completed BRA model.
+  # Begin running the driver, given the completed bra model
   #
   # This function is always run within an EventMachine run block.
   def run(model)

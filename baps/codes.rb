@@ -1,6 +1,6 @@
 module Bra
   module Baps
-    # Internal BAPS codes for requests and responses.
+    # Internal BAPS codes for requests and responses
     #
     # Also includes methods for handling them.
     #
