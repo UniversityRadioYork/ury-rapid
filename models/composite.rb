@@ -10,7 +10,13 @@ module Bra
     #
     # This should be subclassed to provide the actual child structure (hash,
     # array, et cetera).
+    #
+    # CompositeModelObjects should export the Enumerable interface, which
+    # forwards to the children container.
     class CompositeModelObject < ModelObject
+      extend Forwardable
+      include Enumerable
+
       attr_reader :children
 
       # Removes a child from this model object
@@ -133,6 +139,10 @@ module Bra
     # A model object whose children are arranged as a hash from their IDs to
     # themselves.
     class HashModelObject < CompositeModelObject
+      # In order to retain the same API between CompositeModelObjects, we use
+      # #each_value here.
+      def_delegator :@children, :each_value, :each
+
       def initialize
         super()
         @children = {}
@@ -147,7 +157,7 @@ module Bra
         @children.delete(id)
       end
 
-      # Converts this model object to a "flat" representation.
+      # Converts this model object to a "flat" representation
       #
       # Flat representations contain only primitive objects (integers, strings,
       # etc.) and lists and hashes.
@@ -166,6 +176,21 @@ module Bra
         ) if can_get_with?(privileges)
       end
 
+      # Finds the child with the given ID
+      #
+      # @api semipublic
+      #
+      # @example Find the child with ID :flub.
+      #   hmo = HashModelObject.new
+      #   hmo.add_child("Goose", :flub)
+      #   hmo.child(:flub)
+      #   #=> "Goose"
+      #
+      # @param id [Object] The ID of the child to find.  This may be the exact
+      #   ID, a String equivalent of a Symbol ID, or an object convertable to
+      #   Integer for an integral ID.
+      #
+      # @return [Object] The child, or nil if it was not found.
       def child(id)
         child = children[id]
         child = children[id.intern]   if child.nil? && id.respond_to?(:intern)
@@ -176,11 +201,14 @@ module Bra
       end
     end
 
-    # A model object whose children form a list.
+    # A model object whose children form a list
     #
     # A ListModelObject stores its children in an Array, with the object IDs 
     # being the numeric indices into that Array.
     class ListModelObject < CompositeModelObject
+      # Implement the Enumerable API on the list's children.
+      def_delegator :@children, :each
+
       def initialize
         super()
         @children = []
@@ -223,6 +251,11 @@ module Bra
       #   lmo.add_child("Spruce", 3)
       #   lmo.child(3)
       #   #=> "Spruce"
+      #
+      # @param id [Object] The ID of the child to find.  This may be the exact
+      #   ID or an object convertable to Integer.
+      #
+      # @return [Object] The child, or nil if it was not found.
       def child(id)
         children[Integer(id)]
       rescue ArgumentError, TypeError

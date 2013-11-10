@@ -74,6 +74,28 @@ describe Bra::Models::HashModelObject do
       end
     end
   end
+  describe '#each' do
+    context 'with a block' do
+      it 'runs it on each child' do
+        count = 0
+        hmo.add_child(:marx, :karl)
+        hmo.add_child(:engels, :friedrich)
+        hmo.add_child(:lenin, :vladimir)
+        hmo.each do |child|
+          expect(hmo.children.values).to include(child)
+          count += 1
+        end
+        # The child's ID won't necessarily be the one we've put it in here
+        # at.
+        expect(count).to eq(3)
+      end
+    end
+    context 'without a block' do
+      it 'returns an enumerator' do
+        expect(hmo.each.is_a?(Enumerator)).to be_true
+      end
+    end
+  end
 end
 
 describe Bra::Models::ListModelObject do
@@ -143,4 +165,27 @@ describe Bra::Models::ListModelObject do
       end
     end
   end
+  describe '#each' do
+    context 'with a block' do
+      it 'runs it on each child' do
+        count = 0
+        lmo.add_child(:marx, 0)
+        lmo.add_child(:engels, 1)
+        lmo.add_child(:lenin, 2)
+        lmo.each do |child|
+          expect(lmo.children).to include(child)
+          count += 1
+        end
+        # The child's ID won't necessarily be the one we've put it in here
+        # at.
+        expect(count).to eq(3)
+      end
+    end
+    context 'without a block' do
+      it 'returns an enumerator' do
+        expect(lmo.each.is_a?(Enumerator)).to be_true
+      end
+    end
+  end
+
 end
