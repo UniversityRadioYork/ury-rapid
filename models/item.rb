@@ -62,9 +62,11 @@ module Bra
       # @return [void]
       def delete_do
         parent.remove_child(id)
+        @parent = nil
+        @id = nil
       end
 
-      # Sets the item's properties from a hash.
+      # Sets the item's properties from a hash
       #
       # The hash should have keys 'value' and 'type', which may be symbols or
       # strings.

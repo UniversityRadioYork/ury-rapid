@@ -133,9 +133,18 @@ module Bra
       def driver_delete_url(url)
         find_url(url, &:driver_delete)
       end
+
+      # Default implementation of DELETE on composite model objects
+      #
+      # This instructs the composite's children to delete themselves.
+      #
+      # @return [void]
+      def delete_do
+        each.to_a.each(&:delete_do)
+        clear
+      end
     end
 
-    ##
     # A model object whose children are arranged as a hash from their IDs to
     # themselves.
     class HashModelObject < CompositeModelObject
@@ -211,6 +220,13 @@ module Bra
 
       def initialize
         super()
+        @children = []
+      end
+
+      # Clears the ListModelObject
+      #
+      # @return [void]
+      def clear
         @children = []
       end
 
