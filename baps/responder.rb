@@ -189,7 +189,7 @@ module Bra
       #
       # @return [void]
       def reset(response)
-        @model.driver_delete_url("channels/#{response[:subcode]}")
+        @model.driver_delete_url("channels/#{response[:subcode]}/playlist")
       end
 
       # Loads an item into a channel player
