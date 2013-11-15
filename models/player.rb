@@ -128,6 +128,18 @@ module Bra
         new(0, method(:validate_marker), [], [:SetMarker])
       end
 
+      # Sets the handler target for this player variable
+      #
+      # This makes the target player_ID for player variables.
+      #
+      # @api semipublic
+      #
+      # @return [Symbol] The name under which any handlers for this player
+      #  variable must be registered.
+      def handler_target
+        "player_#{id}".intern
+      end
+
       # Internal: Returns the channel this player component is inside.
       #
       # Returns the channel ID.
@@ -141,11 +153,9 @@ module Bra
         parent.channel_id
       end
 
-      private
-
-      # Internal: Validates an incoming marker.
+      # Validates an incoming marker
       #
-      # new_marker - The incoming marker position.
+      # @param new_marker [Integer] The incoming marker position.
       #
       # Returns the validated state.
       # Raises an exception if the value is invalid.
@@ -157,9 +167,9 @@ module Bra
         position_int
       end
 
-      # Internal: Validates an incoming player state.
+      # Validates an incoming player state
       #
-      # new_state - The incoming player state.
+      # @param new_state [Symbol] The incoming player state.
       #
       # Returns the validated state.
       # Raises an exception if the value is invalid.
@@ -167,9 +177,9 @@ module Bra
         validate_symbol(new_state, %i(playing paused stopped))
       end
 
-      # Internal: Validates an incoming player load state.
+      # Validates an incoming player load state
       #
-      # new_state - The incoming player load state.
+      # @param new_state [Symbol] The incoming player load state.
       #
       # Returns the validated state.
       # Raises an exception if the value is invalid.

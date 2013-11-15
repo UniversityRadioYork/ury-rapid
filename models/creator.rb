@@ -29,18 +29,12 @@ module Bra
 
       private
 
-      def create_component(cclass, child_maker, registrar)
-        cclass.new.tap(&method(child_maker)).tap(&method(registrar))
+      def create_a(cclass, child_maker)
+        cclass.new.tap(&method(child_maker)).tap(&method(:register_handlers))
       end
 
       def create_channel_set(model)
-        create_component(
-          ChannelSet, :create_channels, :register_channel_set_handlers
-        ).move_to(model, :channels)
-      end
-
-      def register_channel_set_handlers(channel_set)
-        register_handlers(channel_set, :channels_put, :channels_delete)
+        create_a(ChannelSet, :create_channels).move_to(model, :channels)
       end
 
       def create_channels(channel_set)
@@ -49,9 +43,7 @@ module Bra
       end
 
       def create_channel(channel_set, index)
-        create_component(
-          Channel, :create_channel_children, :register_channel_handlers
-        ).move_to(channel_set, index)
+        create_a(Channel, :create_channel_children).move_to(channel_set, index)
       end
 
       def create_channel_children(channel)
@@ -59,30 +51,20 @@ module Bra
         create_playlist(channel)
       end
 
-      def register_channel_handlers(channel)
-        register_handlers(channel, :channel_put, :channel_delete)
-      end
-
       def create_player(channel)
-        create_component(
-          Player, :create_player_children, :register_player_handlers
-        ).move_to(channel, :player)
+        create_a(Player, :create_player_children).move_to(channel, :player)
       end
 
       def create_player_children(player)
         state = PlayerVariable.make_state.move_to(player, :state)
-        register_handlers(state, :player_state_put, :player_state_delete)
+        register_handlers(state)
 
         PlayerVariable.make_load_state.move_to(player, :load_state)
-        # No handlers for load state, as it's not directly mutatable.
+        # No handlers for load state, as it's not directly mutable.
 
         Item.new(:null, nil).move_to(player, :item)
 
         create_player_markers(player)
-      end
-
-      def register_player_handlers(player)
-        register_handlers(player, :player_put, :player_delete)
       end
 
       def create_player_markers(player)
@@ -91,27 +73,28 @@ module Bra
 
       def create_player_marker(player, marker)
         marker = PlayerVariable.make_marker.move_to(player, marker)
-        register_handlers(marker, :marker_put, :marker_delete)
+        register_handlers(marker)
       end
 
       def create_playlist(channel)
         playlist = Playlist.new.move_to(channel, :playlist)
-        register_handlers(playlist, :playlist_put, :playlist_delete)
+        register_handlers(playlist)
       end
 
-      # Internal: Attaches HTTP method handlers to a model resource.
+      # Attaches HTTP method handlers to a model resource
       #
-      # resource - The resource to whom the handlers will be attached.
-      # put      - The handler to call when the resource is PUT.
-      # delete   - The handler to call when the resource is DELETEd.
+      # The attached handlers will be @options[NAME][METHOD], where NAME is the
+      #   handler_target of the object.
+      #
+      # @param object [ModelObject] The resource to which the handlers will
+      #   be attached.
       #
       # @return [void]
-      def register_handlers(resource, put, delete)
-        resource.register_put_handler(
-          @options[put]
-        ).register_delete_handler(
-          @options[delete]
-        )
+      def register_handlers(object)
+        handler = @options[object.handler_target]
+        object.register_handler(handler) unless handler.nil?
+        puts("No handler for target #{object.handler_target}.") if handler.nil?
+        @options[object.handler_target].try(&object.method(:register_handler))
       end
 
       MARKERS = %i(cue position intro duration)

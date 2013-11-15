@@ -83,28 +83,16 @@ module Bra
         end
       end
 
-      # Internal: Registers a handler to be called when this object is PUT.
+      # Registers a handler to be used when this object is modified
       #
-      # block - A proc that will be executed before the model is updated.
-      #         It should take one argument, the new value of this object in
-      #         plain-old-data format, and return True if the model should
-      #         update itself (and False otherwise).
+      # @param handler [Object] A handler object.  This may contain the methods
+      #   put and delete, which handle PUTs and DELETEs respectively.  These
+      #   methods shall return true if the model should update itself, and
+      #   false if the model should wait until instructed by the driver.
       #
-      # Returns this object, for method chaining purposes.
-      def register_put_handler(block)
-        @put_handler = block
-        self
-      end
-
-      # Internal: Registers a handler to be called when this object is DELETEd.
-      #
-      # block - A proc that will be executed before the model is updated.
-      #         It should take no arguments and return True if the model should
-      #         update itself (and False otherwise).
-      #
-      # Returns this object, for method chaining purposes.
-      def register_delete_handler(block)
-        @delete_handler = block
+      # @return [ModelObject] This object, for method chaining purposes.
+      def register_handler(handler)
+        @handler = handler
         self
       end
 
@@ -147,6 +135,23 @@ module Bra
         end
       end
 
+      # POSTs a resource inside this model object, using the put handler.
+      #
+      # The resource can be a direct instance of this object, or a hash mapping
+      # this object's ID to one.
+      def post(privileges, resource)
+        fail('Insufficient privileges.') unless can_put_with?(privileges)
+
+        # Don't remove any outer hash; the hash is used in post_do to decide
+        # where to post the item.
+        #value = resource[id] if resource.is_a?(Hash)
+        #value = resource unless resource.is_a?(Hash)
+
+        # Only update the model if the handler allows us to with this given
+        # value.
+        post_do(value) if @handler.post(self, value)
+      end
+
       # PUTs a resource into this model object, using the put handler.
       #
       # The resource can be a direct instance of this object, or a hash mapping
@@ -160,7 +165,7 @@ module Bra
 
         # Only update the model if the handler allows us to with this given
         # value.
-        put_do(value) if @put_handler.call(self, value)
+        put_do(value) if @handler.put(self, value)
       end
 
       # DELETEs this model object, using the delete handler.
@@ -168,7 +173,7 @@ module Bra
         fail('Insufficient privileges.') unless can_delete_with?(privileges)
 
         # Again, only update the model if the handler allows us to.
-        delete_do if @delete_handler.call(self)
+        delete_do if @handler.delete(self)
       end
 
       # PUTs a resource to this model object, without using the put handler.
@@ -229,14 +234,21 @@ module Bra
         @parent.url
       end
 
-      # Returns this class's internal name, used for things such as templates
-      # and JSON attributes.
+      # The name under which this object's handlers are defined
       #
-      # This is different from the resource name in that it is the same for
-      # all objects of the same category.
+      # Usually this will be class name, stripped of its module prefix and
+      # converted to a lowercase_underscore symbol.  This may be overridden for
+      # objects with the same class but different handlers (for example, 
+      # variables).
       #
-      # @return [Symbol] The internal name.
-      def internal_name
+      # @api semipublic
+      #
+      # @example Get the handler target.
+      #   ModelObject.new.handler_target
+      #   #=> model_object
+      #
+      # @return [Symbol] The handler target.
+      def handler_target
         self.class.name.demodulize.underscore.intern
       end
     end

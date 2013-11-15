@@ -50,9 +50,6 @@ module Bra
 
       # Runs the client
       #
-      # This starts a BAPS connection, logs into it, and then sets up the given
-      # API responder to handle the responses.
-      #
       # @api semipublic
       #
       # @example Running a client with a responder.
@@ -70,7 +67,6 @@ module Bra
       def run(responder)
         responder.register(@channel)
         EM.connect(@hostname, @port, Connection, @parser, @queue)
-        Commands::Initiate.new.run(@queue)
       end
     end
   end

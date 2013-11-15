@@ -20,11 +20,11 @@ module Bra
       #   responder = Responder.new(model, queue)
       #
       # @param model [Model] The Model this Responder will operate on.
-      # @param queue [Queue] The queue into which outgoing BAPS requests should
-      # be sent.
-      def initialize(model, queue)
+      # @param requester [Requester] The Requester via which this Responder can
+      #   send BAPS login requests.
+      def initialize(model, requester)
         @model = model
-        @queue = queue
+        @requester = requester
       end
 
       # Registers the responder's callbacks with a incoming responses channel
@@ -177,7 +177,7 @@ module Bra
         type, title = response.values_at(:type, :title)
         item = Bra::Models::Item.new(track_type_baps_to_bra(type), title)
 
-        @model.channel(id).add_item(index, item)
+        @model.driver_post_url("channels/#{id}/playlist/", { index => item })
       end
 
       # Resets a channel playlist
@@ -288,6 +288,14 @@ module Bra
 
       InvalidTrackType = Class.new(RuntimeError)
 
+      # TODO(mattbw): Move these somewhere more relevant?
+      module LoginErrors
+        OK = 0
+        INCORRECT_USER = 1
+        EMPTY_USER = 2
+        INCORRECT_PASSWORD = 3
+      end
+
       # Receives a seed from the BAPS server and acts upon it
       #
       # @api private
@@ -301,7 +309,7 @@ module Bra
         seed = response[:seed]
         # Kurse all SeeDs.  Swarming like lokusts akross generations.
         #   - Sorceress Ultimecia, Final Fantasy VIII
-        Commands::Authenticate.new(username, password, seed).run(@queue)
+        @requester.login_authenticate(username, password, seed) if seed
       end
 
       # Receives a login response from the server and acts upon it
@@ -313,11 +321,11 @@ module Bra
       # @return [void]
       def login_result(response)
         code, string = response.values_at(*%i(subcode details))
-        is_ok = code == Commands::Authenticate::Errors::OK
-        Commands::Synchronise.new.run(@queue) if is_ok
+        is_ok = code == LoginErrors::OK
+        @requester.login_synchronise if is_ok
         unless is_ok
           puts("BAPS login FAILED: #{string}, code #{code}.")
-          EM.stop
+          EventMachine.stop
         end
       end
 

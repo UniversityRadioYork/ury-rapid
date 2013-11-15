@@ -97,7 +97,7 @@ module Bra
       find(params) do |resource|
         privs = privileges(resource.get_privileges)
 
-        sym = resource.internal_name
+        sym = resource.class.name.demodulize.underscore.intern
         respond_with sym, resource.get(privs) do |f|
           # Use the internal name instead of the resource ID.  This is so that
           # the template knows which local the resource will appear on.
@@ -107,7 +107,7 @@ module Bra
               locals: {
                 resource_url: resource.url,
                 resource_id: resource.id,
-                resource_type: resource.internal_name,
+                resource_type: sym,
                 resource: resource.get(privs),
                 inner: false
               }
