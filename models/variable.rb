@@ -1,3 +1,5 @@
+require_relative 'model_object'
+
 module Bra
   module Models
     # A model object containing a constant value.
@@ -6,6 +8,8 @@ module Bra
     # treat it as a ModelObject while allowing any methods Constant doesn't
     # define to be responded to by the value.
     class Constant < SingleModelObject
+      extend Forwardable
+
       attr_reader :value, :get_privileges
 
       # The flat representation of a Constant is its value.
@@ -28,20 +32,11 @@ module Bra
       end
 
       # Override respond_to_missing? to redirect it to the value.
-      def self.respond_to_missing?(symbol)
-        @value.respond_to?(symbol)
+      def self.respond_to_missing?(symbol, include_all)
+        @value.respond_to?(symbol, include_all)
       end
 
-      # Converts the Constant to a string.
-      #
-      # This actually just sends the internal value the to_s message instead.
-      #
-      # @return [String] The value as a string.
-      def to_s
-        # This isn't caught by method_missing, as it's defined for Object.
-        # Thanks, Obama!
-        @value.to_s
-      end
+      def_delegator :@value, :to_s
     end
 
     # ModelObjects representing a single mutable variable.
@@ -82,13 +77,27 @@ module Bra
       # get_privileges
       # edit_privileges - A list of symbols representing privileges required
       #                   to edit this variable.
-      def initialize(initial_value, validator, get_privileges, edit_privileges)
+      # @param handler_target [Symbol] The name under which this variable's
+      #   handlers are defined; if nil, use the default (see
+      #   ModelObject#handler_target).
+      def initialize(
+        initial_value, validator, get_privileges, edit_privileges,
+        handler_target = nil
+      )
         super(initial_value, get_privileges)
         @initial_value = initial_value
         @validator = validator
         @edit_privileges = edit_privileges
+        @handler_target = handler_target
       end
 
+      # The name under which this object's handlers are defined
+      #
+      # @return (see Bra::Models::ModelObject#handler_target)
+      def handler_target
+        @handler_target.nil? ? super() : @handler_target
+      end
+      
       def value=(new_value)
         validated = new_value if @validator.nil?
         validated = @validator.call(new_value) unless @validator.nil?
