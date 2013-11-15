@@ -1,7 +1,7 @@
 require 'eventmachine'
 require_relative 'client'
 require_relative 'commands'
-require_relative 'controller'
+require_relative 'responder'
 require_relative 'models'
 
 # The top-level driver interface for the BAPS BRA driver
@@ -55,17 +55,17 @@ class Driver
   #
   # This function is always run within an EventMachine run block.
   def run(model)
-    # The controller receives responses from the BAPS server via the client
+    # The responder receives responses from the BAPS server via the client
     # and reacts on them, either updating the model or sending replies to
     # the request queue.
     #
-    # We'd make the controller earlier, but we need access to the model,
+    # We'd make the responder earlier, but we need access to the model,
     # which we only get definitive access to here.
-    controller = Bra::Baps::Controller.new(model, @queue)
+    responder = Bra::Baps::Responder.new(model, @queue)
 
-    # Now we can run the client, passing it the controller so it can send
+    # Now we can run the client, passing it the responder so it can send
     # BAPS responses to it.  The client will get BAPS requests sent to it
     # via the queue, thus completing the communication paths.
-    @client.run(controller)
+    @client.run(responder)
   end
 end

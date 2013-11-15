@@ -2,24 +2,24 @@ require_relative 'codes'
 
 module Bra
   module Baps
-    # An object that responds to BAPS server responses by updating the model.
+    # An object that responds to BAPS server responses by updating the model
     #
-    # The controller subscribes to a response parser's output channel, and
+    # The responder subscribes to a response parser's output channel, and
     # responds to incoming responses from that channel by firing methods that
     # update the model to reflect the exposed state of the BAPS server.
     #
-    # The BAPS controller also has the ability to respond directly to the BAPS
+    # The BAPS responder also has the ability to respond directly to the BAPS
     # server by sending requests to the outgoing requests queue.  This is used,
     # for example, to complete the BAPS login procedure.
-    class Controller
-      # Initialises the controller
+    class Responder
+      # Initialises the responder
       #
       # @api semipublic
       #
-      # @example Initialise a controller
-      #   controller = Controller.new(model, queue)
+      # @example Initialise a responder
+      #   responder = Responder.new(model, queue)
       #
-      # @param model [Model] The Model this Controller will operate on.
+      # @param model [Model] The Model this Responder will operate on.
       # @param queue [Queue] The queue into which outgoing BAPS requests should
       # be sent.
       def initialize(model, queue)
@@ -27,15 +27,15 @@ module Bra
         @queue = queue
       end
 
-      # Registers the controller's callbacks with a incoming responses channel
+      # Registers the responder's callbacks with a incoming responses channel
       #
       # @api semipublic
       #
       # @example Register an EventMachine channel
-      #   controller = Controller.new(model, queue)
+      #   responder = Responder.new(model, queue)
       #   channel = EventMachine::Channel.new
       #   # Attach channel to rest of BAPS here
-      #   controller.register(channel)
+      #   responder.register(channel)
       #
       # @param channel [Channel] The source channel for responses coming from
       #   BAPS's chat system.
@@ -57,7 +57,7 @@ module Bra
 
       private
 
-      # Logs a response with no controller handling function
+      # Logs a response with no responder handling function
       #
       # @api private
       #

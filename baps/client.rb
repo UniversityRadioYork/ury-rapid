@@ -12,7 +12,7 @@ module Bra
     #
     # The BAPS driver connects to the BAPS server as a regular client on TCP
     # sockets.  The actual reading and writing is done by objects controlled by
-    # the Client, which attaches to an input controller and output queue.
+    # the Client, which attaches to an input responder and output queue.
     class Client
       # Creates a BAPS client
       #
@@ -51,24 +51,24 @@ module Bra
       # Runs the client
       #
       # This starts a BAPS connection, logs into it, and then sets up the given
-      # API controller to handle the responses.
+      # API responder to handle the responses.
       #
       # @api semipublic
       #
-      # @example Running a client with a controller.
-      #   controller = Controller.new(model, queue)
+      # @example Running a client with a responder.
+      #   responder = Responder.new(model, queue)
       #   EventMachine.run do
       #     # ...
-      #     client.run(controller)
+      #     client.run(responder)
       #     # ...
       #   end
       #
-      # @param controller [Controller] The controller that should be registered
+      # @param responder [Responder] The controller that should be registered
       #   to handle any responses coming from this client.
       #
       # @return [void]
-      def run(controller)
-        controller.register(@channel)
+      def run(responder)
+        responder.register(@channel)
         EM.connect(@hostname, @port, Connection, @parser, @queue)
         Commands::Initiate.new.run(@queue)
       end
