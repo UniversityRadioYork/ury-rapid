@@ -12,19 +12,20 @@ module Bra
       # Access the track type.
       attr_reader :type
 
+      # Creates a new Item.
+      #
+      # @api semipublic
+      # 
+      # @example Create a library track item.
+      #   Item.new(:library, 'Islands In The Stream'
+      #
+      # @param type [Symbol] The Item type: one of :library, :file or :text.
+      # @param name [String] The display name of the Item.
       def initialize(type, name)
         super()
 
         @type = validate_type(type)
         @name = name
-      end
-
-      def validate_type(type)
-        type = :null if type.nil?
-        type = type.intern if type.respond_to?(:intern)
-        valid_type = %i(library file text null).include? type
-        raise "Not a valid type: #{type}" unless valid_type
-        type
       end
 
       # Converts the Item to a flat representation
@@ -85,7 +86,7 @@ module Bra
         self
       end
 
-      # Sets the item's properties from an existing item.
+      # Sets the item's properties from an existing item
       #
       # @param item [Item] The Item whose values are to be copied into this
       #   Item.
@@ -98,8 +99,7 @@ module Bra
         self
       end
 
-      ##
-      # Clears the item, setting it to a null item.
+      # Clears the item, setting it to a null item
       #
       # @return (see #set_from_hash)
       def clear
@@ -114,6 +114,16 @@ module Bra
       # handlers.  They are implemented using the _do methods.
       alias_method :driver_put, :put_do
       alias_method :driver_delete, :delete_do
+
+      private
+
+      def validate_type(type)
+        type = :null if type.nil?
+        type = type.intern if type.respond_to?(:intern)
+        valid_type = %i(library file text null).include? type
+        raise "Not a valid type: #{type}" unless valid_type
+        type
+      end
     end
   end
 end

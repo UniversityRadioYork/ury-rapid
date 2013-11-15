@@ -25,18 +25,18 @@ module Bra
 
       # A command that operates upon a channel.
       class ChannelCommand < Command
-        # Initialises a ChannelCommand.
+        # Initialises a ChannelCommand
         #
-        # channel - The Channel ID.
+        # @param id [Integer] The Channel ID.
         #
-        def initialize(channel)
-          @channel = channel
+        def initialize(id)
+          @channel = id
         end
       end
 
       # A command that clears the playlist of a channel.
       class ClearPlaylist < ChannelCommand
-        # Runs a ClearPlaylist command on the given requests queue.
+        # Runs a ClearPlaylist command on the given requests queue
         #
         # As this command has no direct return value, it does not need a
         # dispatch.
@@ -51,24 +51,23 @@ module Bra
         end
 
         def self.to_channel_delete_handler(queue)
-          ->(resource) { new(resource).run(queue) }
+          ->(resource) { new(resource.id).run(queue) }
         end
 
         def self.to_player_delete_handler(queue)
-          ->(resource) { new(resource.player_channel).run(queue) }
+          ->(resource) { new(resource.parent_id).run(queue) }
         end
 
         def self.to_channel_set_delete_handler(queue)
           lambda do |resource|
-            resource.channels.each { |channel| new(channel).run(queue) }
+            resource.channels.each { |channel| new(channel_id).run(queue) }
           end
         end
       end
 
-      # A command that sets the current playback status of a channel.
+      # A command that sets the current playback status of a channel
       class SetPlayerState < ChannelCommand
-        ##
-        # Initialises a SetPlayerState command.
+        # Initialises a SetPlayerState command
         #
         # 'from' and 'to' should be the current and desired states of
         # 'channel', as strings or symbols.

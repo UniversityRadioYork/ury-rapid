@@ -31,6 +31,16 @@ describe Bra::Models::Item do
       end
     end
   end
+  describe '#set_from_item' do
+    context 'given a valid Item' do
+      it 'sets the contents of the Item to those in the other Item' do
+        new_item = Bra::Models::Item.new(:file, 'URY 1')
+        item.set_from_item(new_item)
+        expect(item.name).to eq('URY 1')
+        expect(item.type).to eq(:file)
+      end
+    end
+  end
   describe '#delete_do' do
     context 'when the Item is in a parent object' do
       it 'removes the Item from that object' do

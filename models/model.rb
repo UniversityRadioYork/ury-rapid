@@ -7,6 +7,8 @@ module Bra
   module Models
     # Public: A model of the BAPS server state.
     class Model < HashModelObject
+      extend Forwardable
+
       def channels
         child(:channels)
       end
@@ -20,51 +22,11 @@ module Bra
         channels.channel(Integer(number))
       end
 
-      # Public: Access one of the playback channel players.
-      #
-      # number - The number of the channel (0-(num_channels - 1)).
-      #
-      # Returns the Player object.
-      def player(number)
-        channels.player(number)
-      end
-
-      # Public: Access one of the playback channel playlists.
-      #
-      # number - The number of the channel (0-(num_channels - 1)).
-      #
-      # Returns the Playlist object.
-      def playlist(number)
-        channels.playlist(number)
-      end
-
-      # Public: Gets the state of one of the channel players.
-      #
-      # number - The number of the channel (0 onwards).
-      #
-      # Returns the state (one of :playing, :paused or :stopped).
-      def player_state(number)
-        channels.player_state(number)
-      end
-
-      # Public: Gets the load state of one of the channel players.
-      #
-      # number - The number of the channel (0 onwards).
-      #
-      # Returns the load state.
-      def player_load_state(number)
-        channels.player_load_state(number)
-      end
-
-      # Public: Gets the position of one of the player markers.
-      #
-      # number   - The number of the channel (0 onwards).
-      # type     - The marker type (:position, :cue, :intro or :duration).
-      #
-      # Returns the marker position.
-      def player_marker(number, type)
-        channels.player_marker(number, type)
-      end
+      def_delegator :channels, :player 
+      def_delegator :channels, :playlist
+      def_delegator :channels, :player_state
+      def_delegator :channels, :player_load_state
+      def_delegator :channels, :player_marker
 
       # Public: Change the current item and load state for a channel player.
       #
