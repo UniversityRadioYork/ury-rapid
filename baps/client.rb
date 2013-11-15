@@ -3,7 +3,6 @@ require_relative 'codes'
 require_relative 'connection'
 require_relative 'response_parser'
 require_relative 'reader'
-require_relative 'commands'
 require_relative 'responses'
 
 module Bra

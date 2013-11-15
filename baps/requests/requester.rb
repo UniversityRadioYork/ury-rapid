@@ -1,4 +1,5 @@
 require 'digest'
+require_relative 'request'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.

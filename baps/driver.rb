@@ -1,6 +1,5 @@
 require 'eventmachine'
 require_relative 'client'
-require_relative 'commands'
 require_relative 'responder'
 require_relative 'requests/requester'
 require_relative 'models'
