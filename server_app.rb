@@ -91,6 +91,11 @@ module Bra
       filename = params[:splat].first
       send_file File.join(settings.root, 'assets', 'stylesheets', filename)
     end
+    get '/scripts/*' do
+      content_type 'text/javascript', charset: 'utf-8'
+      filename = params[:splat].first
+      send_file File.join(settings.root, 'assets', 'scripts', filename)
+    end
     get('/*/?') do
       cors
 

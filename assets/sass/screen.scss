@@ -32,6 +32,12 @@ $colour-black-tulip:      #420943;
 $colour-not-quite-black:  #303030;
 $colour-asian-red:        #A80000;
 
+// Semantic colour names
+$colour-outer-fg:           $colour-lol;
+$colour-outer-bg:           $colour-wooden-platforms;
+$colour-container-bg:       $colour-lol;
+$colour-container-fg:       black;
+
 @mixin border {
     border: $size-border solid black;
     padding: $size-padding;
@@ -40,6 +46,10 @@ $colour-asian-red:        #A80000;
 
 @mixin font-normal {
     font-family: 'Source Sans Pro', helvetica, arial, sans-serif;
+}
+
+@mixin font-title {
+    font-family: Comfortaa, helvetica, arial, sans-serif;
 }
 
 a {
@@ -62,15 +72,16 @@ html {
         font-weight: bold;
     }
 
-    background-color: $colour-wooden-platforms;
+    background-color: $colour-outer-bg;
+    color: $colour-outer-fg;
 
     body {
         >section, >nav, >footer>section {
             font-size: 1rem !important;
             margin: $size-padding !important;
 
-            color: black;
-            background-color: $colour-lol;
+            color: $colour-container-fg;
+            background-color: $colour-container-bg;
             display: inline-block;
 
             text-align: left;
@@ -103,7 +114,7 @@ html {
 }
 
 h1, h2, h3 {
-    font-family: Comfortaa, helvetica, arial, sans-serif;
+    @include font-title;
     text-align: left;
 }
 
@@ -352,4 +363,51 @@ pre.json_code {
     background-color: white;
     font-family: "Share Tech Mono";
     margin-bottom: $size-padding;
+}
+
+// Toolbar
+#toolbar {
+    border: none;
+    border-bottom: $size-padding-thin solid $colour-outer-fg;
+    background: transparent;
+    color: $colour-outer-fg;
+    margin: $size-padding;
+    padding: 0;
+    padding-bottom: $size-padding-thin;
+    display: flex;
+    align-items: center;
+
+    h1, .toolbar-button {
+        @include font-title;
+        font-size: 1.1rem;
+        vertical-align: middle;
+        margin: 0;
+    }
+
+    h1 {
+        flex: 3;
+        display: inline;
+        text-align: left;
+    }
+    label {
+        flex: 2;
+        text-align: right;
+        margin-right: $size-padding-thin;
+    }
+    #toolbar-data {
+        flex: 6;
+        margin-right: $size-padding-thin;
+    }
+    .toolbar-button {
+        flex: 1;
+        cursor: pointer;
+        padding: $size-padding-thin;
+
+        background-color: $colour-container-bg;
+        text-align: center;
+
+        &:not(:first-child) {
+            margin-right: $size-padding-thin;
+        }
+    }
 }
