@@ -59,8 +59,8 @@ module Bra
           # There is no reason other than efficiency for this to be a mutating
           # action - if needs be, .clone or reduce the model_config.
           handlers.each do |handler|
-            puts "Registering handler #{handler.name} for #{handler::TARGET}"
-            model_config[handler::TARGET] = handler.new(self)
+            puts "Registering handler #{handler.name} for #{handler::TARGETS}"
+            handler::TARGETS.each { |t| model_config[t] = handler.new(self) }
           end
           # We still need to return the hash, even though we've mutated the
           # existing one.

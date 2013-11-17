@@ -6,8 +6,8 @@ module Bra
       module Handlers
         # Handler for playlist
         class Playlist < Handler
-          # The handler target matched by this handler.
-          TARGET = :playlist
+          # The handler targets matched by this handler.
+          TARGETS = [:playlist]
 
           # Requests a playlist be DELETEd via the BAPS server
           # 

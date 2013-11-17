@@ -6,8 +6,8 @@ module Bra
       module Handlers
         # Handler for player position changes.
         class Position < VariableHandler
-          # The handler target matched by this handler.
-          TARGET = :player_position
+          # The handler targets matched by this handler.
+          TARGETS = [:player_position]
 
           # Requests a PUT on the given player position via the BAPS server
           #
@@ -37,8 +37,8 @@ module Bra
 
         # Handler for state changes.
         class StateHandler < VariableHandler
-          # The handler target matched by this handler.
-          TARGET = :player_state
+          # The handler targets matched by this handler.
+          TARGETS = [:player_state]
 
           # Requests a PUT on the given player state via the BAPS server
           #
