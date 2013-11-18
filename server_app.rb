@@ -129,6 +129,14 @@ module Bra
         parse_json_from(request) { |payload| resource.put(privs, payload) }
       end
     end
+    post('/*/?') do
+      cors
+
+      find(params) do |resource|
+        privs = privileges
+        parse_json_from(request) { |payload| resource.post(privs, payload) }
+      end
+    end
     delete('/*/?') do
       cors
 

@@ -139,6 +139,8 @@ module Bra
         [:EditPlaylist]
       end
 
+      alias_method :post_privileges, :delete_privileges
+
       # POSTs a new Item into this Playlist.
       #
       # In order to request a specific index for the item, wrap the Item in a

@@ -54,6 +54,15 @@ module Bra
         check_privilege(candidates, put_privileges)
       end
 
+      # Tests if the given privileges are sufficient for POSTing this
+      # object.
+      #
+      # @param (see #can_get_with?)
+      # @return (see #can_get_with?)
+      def can_post_with?(candidates)
+        check_privilege(candidates, post_privileges)
+      end
+
       # Tests if the given privileges are sufficient for DELETEing this
       # object.
       #
@@ -135,12 +144,12 @@ module Bra
         end
       end
 
-      # POSTs a resource inside this model object, using the put handler.
+      # POSTs a resource inside this model object, using the post handler
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
-      def post(privileges, resource)
-        fail('Insufficient privileges.') unless can_put_with?(privileges)
+      def post(privileges, value)
+        fail('Insufficient privileges.') unless can_post_with?(privileges)
 
         # Don't remove any outer hash; the hash is used in post_do to decide
         # where to post the item.

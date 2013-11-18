@@ -46,6 +46,7 @@ module Bra
 
       # Response codes for the Playlist section of the BAPS command set
       module Playlist
+        ADD_ITEM = 0x2000
         DELETE_ITEM = 0x2080
         ITEM_COUNT = 0x2180
         ITEM_DATA = 0x21C0
