@@ -39,7 +39,7 @@ module Bra
         PAUSE = 0x0100
         POSITION = 0x0180
         VOLUME = 0x0200
-        LOADED = 0x0280
+        LOAD = 0x0280
         CUE = 0x0300
         INTRO = 0x0380
       end

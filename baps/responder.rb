@@ -87,7 +87,7 @@ module Bra
           Codes::Playback::POSITION => set_marker_handler(:position),
           Codes::Playback::CUE => set_marker_handler(:cue),
           Codes::Playback::INTRO => set_marker_handler(:intro),
-          Codes::Playback::LOADED => method(:loaded)
+          Codes::Playback::LOAD => method(:loaded)
         }
       end
 

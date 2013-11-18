@@ -15,14 +15,6 @@ module Bra
       attr_writer :item
       alias_method :link_item, :item=
 
-      def state
-        child(:state)
-      end
-
-      def load_state
-        child(:load_state)
-      end
-
       # Public: Retrieves the player's state value.
       #
       # Returns the state value, as a symbol.
@@ -94,6 +86,11 @@ module Bra
       def get_privileges
         []
       end
+
+      def put_privileges
+        [:EditPlayer]
+      end
+      alias_method :post_privileges, :put_privileges
 
       private
 

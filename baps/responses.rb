@@ -42,7 +42,7 @@ module Bra
         Codes::Playback::PAUSE    => NO_ARGS,
         Codes::Playback::PLAY     => NO_ARGS,
         Codes::Playback::VOLUME   => [%i{volume float32}],
-        Codes::Playback::LOADED   => [%i{index uint32}, %i{type load_body}],
+        Codes::Playback::LOAD     => [%i{index uint32}, %i{type load_body}],
         Codes::Playback::POSITION => MARKER,
         Codes::Playback::CUE      => MARKER,
         Codes::Playback::INTRO    => MARKER,

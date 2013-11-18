@@ -4,6 +4,29 @@ module Bra
   module Baps
     module Requests
       module Handlers
+        # Handler for channel players.
+        class Player < Handler
+          TARGETS = [:player]
+
+          def post(object, payload)
+            # TODO(mattbw): Cases other than {"item": ...}
+            item = payload[:item]
+            if item.is_a?(String)
+              protocol, url = item.split('://')
+              case protocol
+              when 'playlist'
+                send(
+                  Request
+                  .new(Codes::Playback::LOAD, object.channel_id)
+                  .uint32(url.to_i)
+                )
+              else
+                fail("Unsupported protocol: #{protocol}")
+              end
+            end
+          end
+        end
+
         # Handler for player position changes.
         class Position < VariableHandler
           # The handler targets matched by this handler.
