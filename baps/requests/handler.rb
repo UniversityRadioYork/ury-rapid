@@ -23,6 +23,57 @@ module Bra
           @parent = parent
         end
 
+        # Splits a URL or pseudo-URL into its protocol and body
+        #
+        # This is useful when handling PUTs or POSTs where the body is a
+        # reference to another resource.
+        #
+        # No URL parsing is done on the body, to allow 'pseudo-URL' schemes
+        # where the body is parsed in a non-standard manner.
+        #
+        # @api semipublic
+        #
+        # @example Splitting an HTTP URL.
+        #   Handler.split_url('http://example.com')
+        #   #=> ['http', 'example.com']
+        #
+        # @param url [String] The URL, or pseudo-URL, to split.  Must be a
+        #   string of the form 'PROTOCOL://BODY', where PROTOCOL and BODY are
+        #   any substring (PROTOCOL must not contain '://').
+        #
+        # @return [Array] A tuple containing the downcased protocol and
+        #   unprocessed body.
+        def self.split_url(url)
+          protocol, body = url.split('://', 2)
+          [protocol.downcase, body]
+        end
+
+        # Yields the protocol and body of an object if it is a URL
+        #
+        # This is useful when handling PUTs or POSTs where the body may be a
+        # reference to another resource.
+        #
+        # @api semipublic
+        #
+        # @example Handling a PUT/POST body that may be a URL.
+        #   Handler.handle_url('http://example.com') { |protocol, url| nil }
+        #   #=> true
+        #   Handler.handle_url(3) { |protocol, url| nil }
+        #   #=> false
+        #
+        # @param body [String] An object that may be a URL or pseudo-URL.  If
+        #   it is a string, it will be handled and the URL yielded to the
+        #   block.
+        #
+        # @yieldparam [String] The protocol of the URL.
+        # @yieldparam [String] The body of the URL.
+        #
+        # @return [Boolean] true if the body was a URL and was handled; false
+        #   otherwise.
+        def self.handle_url(body)
+          body.is_a?(String).tap { |isstr| yield *split_url(body) if isstr }
+        end
+
         protected
 
         # Sends a request to the parent requester

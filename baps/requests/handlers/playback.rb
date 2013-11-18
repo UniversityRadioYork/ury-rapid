@@ -11,8 +11,7 @@ module Bra
           def post(object, payload)
             # TODO(mattbw): Cases other than {"item": ...}
             item = payload[:item]
-            if item.is_a?(String)
-              protocol, url = item.split('://')
+            self.class.handle_url(item) do |protocol, url|
               case protocol
               when 'playlist'
                 send(
@@ -24,6 +23,9 @@ module Bra
                 fail("Unsupported protocol: #{protocol}")
               end
             end
+
+            false
+
           end
         end
 

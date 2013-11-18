@@ -38,8 +38,7 @@ module Bra
 
             channel_id = object.channel_id
 
-            if item.is_a?(String)
-              protocol, url = item.split('://')
+            self.class.handle_url(item) do |protocol, url|
               # TODO(mattbw): Other protocols
               case protocol.downcase
               when 'x-baps-libraryitem'
@@ -50,6 +49,8 @@ module Bra
                 fail("Unknown protocol: #{protocol}")
               end
             end
+
+            false
           end
 
           private
