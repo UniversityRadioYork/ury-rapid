@@ -16,6 +16,7 @@ module Bra
         FILE = 1
         LIBRARY = 2
         TEXT = 3
+        SPECIFIC_ITEM = 4
       end
     end
   end

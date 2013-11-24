@@ -55,4 +55,22 @@ describe Bra::Baps::Requests::Handler do
       end
     end
   end
+
+  describe '.flatten_post' do
+    context 'with a hash mapping an ID to an object' do
+      it 'returns a tuple of that ID and that object' do
+        expect(handler.class.flatten_post({ spoo: 10 }, :default)).to eq(
+          [:spoo, 10]
+        )
+      end
+    end
+    context 'with a non-hash object' do
+      it 'returns a tuple of the default ID and that object' do
+        expect(handler.class.flatten_post(10, :default)).to eq(
+          [:default, 10]
+        )
+      end
+    end
+    # TODO(mattbw): Hashes not mapping one key to one value.
+  end
 end

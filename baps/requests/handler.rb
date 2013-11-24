@@ -82,12 +82,32 @@ module Bra
         #
         # @example Sending a request.
         #   request = Bra::Baps::Requests::Request.new(0)
-        #   subrequester.send(request)
+        #   handler.send(request)
         #
         # @param request [Request] A BAPS request in need of sending.
         #
         # @return [void]
         def_delegator(:@parent, :send)
+
+        # Flattens a POST payload into an item and target ID
+        #
+        # @api semipublic
+        #
+        # @example Flattening a hash mapping an ID to an item.
+        #   handler.flatten_post({ spoo: 10 }, :default)
+        #   #=> [:spoo, 10]
+        # @example Flattening a direct object to an item.
+        #   handler.flatten_post(10, :default)
+        #   #=> [:default, 10]
+        #
+        # @param payload [Object] The payload to flatten, if it is a Hash.
+        # @param default_id [Object] The ID to use if the payload is a direct
+        #   object (not a Hash).
+        #
+        # @return [Array] A tuple of the target ID and direct object.
+        def self.flatten_post(payload, default_id)
+          payload.is_a?(Hash) ? payload.flatten : [default_id, payload]
+        end
       end
 
       # Extension of Handler implementing default behaviour for Variables.
