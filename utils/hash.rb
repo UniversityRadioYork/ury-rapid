@@ -20,4 +20,13 @@ class Hash
   def transform_values
     map_to_hash { |key, value| [key, yield(value)] }
   end
+
+  # Creates a new Hash with the given contents and default block
+  #
+  # @param contents [Hash] A hash containing the desired initial mapping.
+  #
+  # @return [Hash] A new hash with the given contents and default block.
+  def self.new_with_default_block(contents, &block)
+    new(&block).merge!(contents)
+  end
 end
