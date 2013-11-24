@@ -45,7 +45,61 @@ module Bra
         #   unprocessed body.
         def self.split_url(url)
           protocol, body = url.split('://', 2)
-          [protocol.downcase, body]
+          [protocol.downcase.intern, body]
+        end
+
+        # Splits a PUT or POST hash into its type and body
+        #
+        # This is useful when handling PUTs or POSTs where the body may be
+        # interpreted in different ways depending on its type.
+        #
+        # @api semipublic
+        #
+        # @example Splitting an hash with a type.
+        #   Handler.split_type({ type: 'foo', bar: 6 })
+        #   #=> [:foo, { bar: 6}]
+        #
+        # @param hash [Hash] The hash to split.  This must contain as a key
+        #   the symbol :type.
+        #
+        # @return [Array] A tuple containing the downcased type symbol and
+        #   unprocessed body.
+        def self.split_hash(hash)
+          body = hash.clone
+          type = body.delete(:type).downcase.intern
+          [type, body]
+        end
+
+        # Yields the type and body of an object if it is a hash
+        #
+        # This is useful when handling PUTs or POSTs where the body is a
+        # direct representation, but should be interpreted in different ways
+        # depending on its type.
+        #
+        # @api semipublic
+        #
+        # @example Handling a PUT/POST body that may be a URL.
+        #   Handler.handle_hash({ type: :foo, a: 3 }) { |protocol, url| nil }
+        #   #=> true
+        #   Handler.handle_hash({ a: 3 }) { |protocol, url| nil }
+        #   #=> false
+        #   Handler.handle_hash(3) { |protocol, url| nil }
+        #   #=> false
+        # @example Splitting an HTTP URL.
+        #   Handler.split_url('http://example.com')
+        #   #=> ['http', 'example.com']
+        #
+        # @param body [Object] The body to handle, if it is a hash.
+        #
+        # @yieldparam [Symbol] The type of the hash, downcased and symbolised.
+        # @yieldparam [Hash] The body of the hash.
+        #
+        # @return [Boolean] true if the body was a hash and was handled; false
+        #   otherwise.
+        def self.handle_hash(body)
+          is_valid = body.is_a?(Hash) && body.key?(:type)
+          yield *split_hash(body) if is_valid
+          is_valid
         end
 
         # Yields the protocol and body of an object if it is a URL
