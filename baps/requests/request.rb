@@ -18,26 +18,18 @@ module Bra
         end
 
         # Internal: Attaches a 16-bit integer to this request.
-        def uint16(payload)
-          fixnum(2, FormatStrings::UINT16, payload)
+        def uint16(*payloads)
+          fixnums(2, FormatStrings::UINT16, payloads)
         end
 
         # Internal: Attaches a 32-bit integer to this request.
-        def uint32(payload)
-          fixnum(4, FormatStrings::UINT32, payload)
+        def uint32(*payloads)
+          fixnums(4, FormatStrings::UINT32, payloads)
         end
 
-        # Internal: Attaches a string to this request.
-        def string(payload)
-          length = payload.length
-
-          uint32(length)
-
-          @format << FormatStrings::STRING_BODY
-          @format << length.to_s
-          @num_bytes += length
-          @payloads << payload
-
+        # Adds strings to this request
+        def string(*strings)
+          strings.each(&method(:single_string))
           self
         end
 
@@ -48,16 +40,30 @@ module Bra
 
         private
 
+        def single_string(string)
+          length = string.length
+
+          uint32(length)
+
+          @format << FormatStrings::STRING_BODY
+          @format << length.to_s
+          @num_bytes += length
+          @payloads << string
+        end
+
         def pack
           ([@command, @num_bytes] + @payloads).pack(@format)
+        end
+
+        def fixnums(num_bytes, format_string, nums)
+          nums.each { |num| fixnum(num_bytes, format_string, num) }
+          self
         end
 
         def fixnum(num_bytes, format_string, payload)
           @format << format_string
           @num_bytes += num_bytes
           @payloads << payload
-
-          self
         end
       end
     end

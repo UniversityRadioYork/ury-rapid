@@ -16,6 +16,7 @@ end
 
 describe Bra::Baps::Requests::Request do
   let(:request) { Bra::Baps::Requests::Request.new(100, 3) }
+  let(:request_two) { Bra::Baps::Requests::Request.new(100, 3) }
   let(:queue) { MockQueue.new }
   let(:header) { MockQueue.new }
 
@@ -32,6 +33,15 @@ describe Bra::Baps::Requests::Request do
         )
       end
     end
+    context 'with multiple 16-bit integers' do
+      it 'behaves as if each had been added separately' do
+        request.uint16(1).uint16(100).uint16(65536).to(queue)
+        request_two.uint16(1, 100, 65536).to(queue)
+        a = queue.pop
+        b = queue.pop
+        expect(a).to eq(b)
+      end
+    end
   end
 
   describe '#uint32' do
@@ -45,6 +55,15 @@ describe Bra::Baps::Requests::Request do
             Bra::Baps::FormatStrings::UINT32
           )
         )
+      end
+    end
+    context 'with multiple 32-bit integers' do
+      it 'behaves as if each had been added separately' do
+        request.uint32(1).uint32(100).uint32(65536).to(queue)
+        request_two.uint32(1, 100, 65536).to(queue)
+        a = queue.pop
+        b = queue.pop
+        expect(a).to eq(b)
       end
     end
   end
@@ -64,6 +83,15 @@ describe Bra::Baps::Requests::Request do
             Bra::Baps::FormatStrings::STRING_BODY + size.to_s
           )
         )
+      end
+    end
+    context 'with multiple strings' do
+      it 'behaves as if each had been added separately' do
+        request.string('tom').string('and').string('jerry').to(queue)
+        request_two.string('tom', 'and', 'jerry').to(queue)
+        a = queue.pop
+        b = queue.pop
+        expect(a).to eq(b)
       end
     end
   end
