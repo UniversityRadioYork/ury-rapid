@@ -1,38 +1,66 @@
-require_relative '../handler'
+require_relative '../../../driver_common/requests/handler'
+require_relative '../../../driver_common/requests/poster'
 
 module Bra
   module Baps
     module Requests
       module Handlers
-        # Handler for channel players.
-        class Player < Handler
+        # Handler for channel players
+        class Player < Bra::DriverCommon::Requests::Handler
+          # The handler targets matched by this handler.
           TARGETS = [:player]
 
           def post(object, payload)
-            # TODO(mattbw): Cases other than {"item": ...}
-            item = payload[:item]
-            self.class.handle_url(item) do |protocol, url|
-              case protocol
-              when 'playlist'
-                send(
-                  Request
-                  .new(Codes::Playback::LOAD, object.channel_id)
-                  .uint32(url.to_i)
-                )
-              else
-                fail("Unsupported protocol: #{protocol}")
-              end
-            end
+            PlayerPoster.post(payload, self, object)
+          end
+        end
 
-            false
+        class PlayerPoster < Bra::DriverCommon::Requests::Poster
+          def self.forward_if_id(id)
+            id != :item
+          end
 
+          def post_forward
+            @payload.id == :item ? false : super()
+          end
+
+          def post_url(protocol, url)
+            # TODO(mattbw): IDs other than :item.
+            item_from_playlist_url(url)     if     protocol == :playlist
+            unsupported_protocol(protocol)  unless protocol == :playlist
+          end
+
+          def post_hash(type, hash)
+            # TODO(mattbw): IDs other than :item.
+            item_from_playlist_hash(hash)   if     type == :playlist
+            unsupported_protocol(type)      unless type == :playlist
+          end
+
+          private
+
+          def channel_id
+            @object.channel_id
+          end
+
+          def item_from_playlist_hash(hash)
+            # TODO(mattbw): Non-local loads?
+            # TODO(mattbw): Non-existent indices.
+            item_from_local_playlist(hash[:index].to_i)
+          end
+
+          def item_from_playlist_url(url)
+            item_from_local_playlist(url.to_i)
+          end
+
+          def item_from_local_playlist(index)
+            request(Request.new(Codes::Playback::LOAD, channel_id).uint32(index))
           end
         end
 
         # Handler for player position changes.
-        class Position < VariableHandler
+        class Marker < Bra::DriverCommon::Requests::VariableHandler
           # The handler targets matched by this handler.
-          TARGETS = [:player_position]
+          TARGETS = [:player_position, :player_cue, :player_intro]
 
           # Requests a PUT on the given player position via the BAPS server
           #
@@ -48,20 +76,43 @@ module Bra
           # @param new_position [Integer] The intended new player position.
           # 
           # @return [Boolean] false, to instruct the model not to update itself.
-          def put(object, new_position)
-            channel_id = object.player_channel_id
-            send(
-              Request
-              .new(Codes::Playback::POSITION, channel_id)
-              .uint32(Integer(new_position))
-            )
-
-            false
+          def put(object, payload)
+            MarkerPoster.post(payload, self, object)
           end
         end
 
+        # Object that performs the POSTing and PUTting of a playback marker
+        class MarkerPoster < Bra::DriverCommon::Requests::Poster
+          def post_integer(integer)
+            p target_to_code
+            p channel_id
+            p integer
+            request(
+              Request
+              .new(target_to_code, channel_id)
+              .uint32(integer)
+            )
+          end
+
+          private
+
+          def channel_id
+            @object.player_channel_id
+          end
+
+          def target_to_code
+            TARGET_CODES[@object.handler_target]
+          end
+
+          TARGET_CODES = {
+            player_position: Codes::Playback::POSITION,
+            player_cue:      Codes::Playback::CUE,
+            player_intro:    Codes::Playback::INTRO
+          }
+        end
+
         # Handler for state changes.
-        class StateHandler < VariableHandler
+        class StateHandler < Bra::DriverCommon::Requests::VariableHandler
           # The handler targets matched by this handler.
           TARGETS = [:player_state]
 
@@ -80,13 +131,15 @@ module Bra
           #   string, in which case the string is converted to a symbol.
           # 
           # @return [Boolean] false, to instruct the model not to update itself.
-          def put(object, new_state)
+          def put(object, payload)
             channel_id = object.player_channel_id
-            code_for_state(object.value, new_state).try do |command|
-              send(Request.new(command, channel_id))
-            end
-
-            false
+            payload.process(
+              string: proc do |new_state|
+                code_for_state(object.value, new_state).try do |command|
+                  request(Request.new(command, channel_id))
+                end
+              end
+            )
           end
 
           private

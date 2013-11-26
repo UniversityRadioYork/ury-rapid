@@ -72,13 +72,13 @@ module Bra
         # @api semipublic
         #
         # @example Send a request.
-        #   requester.send(Bra::Baps::Requests::Request.new(0)
+        #   requester.request(Bra::Baps::Requests::Request.new(0)
         #
-        # @param request [Request] The request to send.
+        # @param request_obj [Request] The request to send.
         #
         # @return [void]
-        def send(request)
-          request.to(@queue)
+        def request(request_obj)
+          request_obj.to(@queue)
         end
 
         # TODO(mattbw): Perhaps move these login commands elsewhere.
@@ -89,7 +89,7 @@ module Bra
         #
         # @return [void]
         def login_initiate
-          send(Request.new(Codes::System::SET_BINARY_MODE))
+          request(Request.new(Codes::System::SET_BINARY_MODE))
         end
 
         # Sends credentials to the BAPS server to further log-in
@@ -112,7 +112,7 @@ module Bra
           password_hash = Digest::MD5.hexdigest(password.to_s)
           full_hash = Digest::MD5.hexdigest(seed + password_hash)
 
-          send(
+          request(
             Request
             .new(Codes::System::LOGIN)
             .string(username.to_s)
@@ -127,7 +127,7 @@ module Bra
         # @return [void]
         def login_synchronise
           # Subcode 3: Synchronise and add to chat.
-          send(Request.new(Codes::System::SYNC, 3))
+          request(Request.new(Codes::System::SYNC, 3))
         end
 
         private

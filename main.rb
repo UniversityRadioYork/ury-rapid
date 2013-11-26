@@ -4,6 +4,7 @@ require 'yaml'
 require 'active_support/core_ext/hash/keys'
 require_relative 'server_app'
 require_relative 'models/creator'
+require_relative 'common/config_authenticator'
 
 # Internal: Creates the dispatch for the reactor.
 #
@@ -28,7 +29,7 @@ def start_server(dispatch, server, host, port)
   Rack::Server.start({ app: dispatch, server: server, Host: host, Port: port })
 end
 
-# Internal: Makes sure the server supplied can run EventMachine.
+# Makes sure the server supplied can run EventMachine
 #
 # server - The name of the server to check.
 #
@@ -38,7 +39,7 @@ def check_server_em_compatible(server)
   fail("Need an EM server, but #{server} isn't") unless em_compatible?(server)
 end
 
-# Internal: Decides whether the server supplied can run EventMachine.
+# Decides whether the server supplied can run EventMachine
 #
 # server - The name of the server to check.
 #
@@ -47,14 +48,16 @@ def em_compatible?(server)
   %w(thin hatetepe goliath).include?(server)
 end
 
-##
-# Runs bra (this is the main function).
+# Runs bra (this is the main function)
 def run
   config = YAML.load_file('config.yml').deep_symbolize_keys!
 
   driver = init_driver(config[:driver])
   model = init_model(config[:model], driver)
-  app = Bra::ServerApp.new(config[:server], model)
+  app = Bra::ServerApp.new(
+    config[:server], model,
+    Bra::Common::ConfigAuthenticator.new(config[:server][:users])
+  )
 
   EventMachine.run do
     setup_server(config[:server], app)
@@ -62,8 +65,7 @@ def run
   end
 end
 
-##
-# Find the correct driver from the config, and initialise it.
+# Find the correct driver from the config, and initialise it
 #
 # The driver is the part of the bra system that interfaces with the playout
 # system.  It runs in bra's EventMachine instance and is wired into the bra

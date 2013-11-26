@@ -1,4 +1,5 @@
-require_relative '../handler'
+require_relative '../../../driver_common/requests/handler'
+require_relative '../../../driver_common/requests/poster'
 
 module Bra
   module Baps
@@ -8,13 +9,9 @@ module Bra
         #
         # This handler also targets channels and channel sets, because these
         # all have similar DELETE semantics.
-        class Playlist < Handler
+        class Playlist < Bra::DriverCommon::Requests::Handler
           # The handler targets matched by this handler.
           TARGETS = [:playlist, :channel, :channel_set]
-          PROTOCOLS = Hash.new{ |h, k| unknown_protocol(h, k) }.merge!({
-            'x-baps-libraryitem' => :libraryitem,
-            'x-baps-file' => :file
-          })
 
           # Requests a playlist be DELETEd via the BAPS server
           # 
@@ -35,60 +32,8 @@ module Bra
           # TODO(mattbw): PUT
 
           def post(object, payload)
-            # TODO(mattbw): Handle :channel and :channel_set properly
             fail('FIXME') unless object.handler_target == :playlist
-            index, item = self.class.flatten_post(payload)
-
-            channel_id = object.channel_id
-            if item.is_a?(Hash)
-              specificlibraryitem(channel_id, item)
-            else
-              self.class.handle_url(item) do |protocol, url|
-                method(PROTOCOLS[protocol.downcase]).call(channel_id, url)
-              end
-            end
-
-            false
-          end
-
-          private
-
-          def unknown_protocol(protocol)
-            fail("Unknown protocol: #{protocol}")
-          end
-
-          def libraryitem(channel_id, url)
-            send(
-              Request
-              .new(Codes::Playlist::ADD_ITEM, channel_id)
-              .uint32(Types::Track::LIBRARY)
-              .uint32(url.to_i)
-            )
-          end
-
-          def specificlibraryitem(channel_id, item)
-            send(
-              Request
-              .new(Codes::Playlist::ADD_ITEM, channel_id)
-              .uint32(Types::Track::SPECIFIC_ITEM)
-              .uint32(item[:record_id].to_i)
-              .uint32(item[:track_id].to_i)
-              .string(item[:title])
-              .string(item[:artist])
-            )
-          end
-
-
-          def file(channel_id, url)
-            directory, filename = url.split('/', 2)
-
-            send(
-              Request
-              .new(Codes::Playlist::ADD_ITEM, channel_id)
-              .uint32(Types::Track::FILE)
-              .uint32(directory.to_i)
-              .string(filename)
-            )
+            PlaylistPoster.post(payload, self, object)
           end
 
           # Resets a playlist given its channel ID.
@@ -99,7 +44,67 @@ module Bra
           #
           # @return [void]
           def reset(id)
-            send(Request.new(Codes::Playlist::RESET, id))
+            request(Request.new(Codes::Playlist::RESET, id))
+          end
+        end
+
+        # Object that performs the POSTing of a playlist item.
+        class PlaylistPoster < Bra::DriverCommon::Requests::Poster
+          URL_PROTOCOLS = Hash.new_with_default_block({
+            x_baps_file: :file_from_url
+          }) { |h, k| unknown_protocol(k) }
+          HASH_PROTOCOLS = Hash.new_with_default_block({
+            x_baps_file:   :file_from_hash,
+            x_baps_direct: :direct
+          }) { |h, k| unknown_protocol(k) }
+
+          def post_url(protocol, url)
+            method(URL_PROTOCOLS[protocol]).call(url)
+          end
+
+          def post_hash(type, item)
+            method(HASH_PROTOCOLS[type]).call(item)
+          end
+
+          # Given a payload, decides whether to forward it elsewhere
+          #
+          # @return [Boolean] false.
+          def post_forward
+            false
+          end
+
+          private
+
+          def channel_id
+            @object.channel_id
+          end
+
+          def add_item_request(type)
+            Request.new(Codes::Playlist::ADD_ITEM, channel_id).uint32(type)
+          end
+
+          def direct(item)
+            request(
+              add_item_request(Types::Track::SPECIFIC_ITEM)
+              .uint32(item[:record_id].to_i, item[:track_id].to_i)
+              .string(item[:title], item[:artist])
+            )
+          end
+
+          def file_from_hash(hash)
+            file(*(hash.values_at(:directory, :filename)))
+          end
+
+          def file_from_url(url)
+            file(*(url.split('/', 2)))
+          end
+
+          def file(directory, filename)
+            request(
+              add_item_request(Types::Track::FILE)
+              .uint32(directory.to_i)
+              .string(filename)
+            )
           end
         end
       end

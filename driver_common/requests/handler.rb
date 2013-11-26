@@ -1,10 +1,12 @@
 module Bra
-  module Baps
+  module DriverCommon
     module Requests
-      # Abstract class for handlers for a given model object.
+      # Abstract class for handlers for a given model object
       #
-      # DO NOT put this class in the Handlers module.  This will cause the BAPS
-      # driver to attempt to register it as a handler, which will fail.
+      # Handlers are installed on model objects so that, when the server
+      # attempts to modify the model object, the handler translates it into a
+      # playout system command to perform the actual playout system event the
+      # model change represents.
       class Handler
         extend Forwardable
 
@@ -23,111 +25,6 @@ module Bra
           @parent = parent
         end
 
-        # Splits a URL or pseudo-URL into its protocol and body
-        #
-        # This is useful when handling PUTs or POSTs where the body is a
-        # reference to another resource.
-        #
-        # No URL parsing is done on the body, to allow 'pseudo-URL' schemes
-        # where the body is parsed in a non-standard manner.
-        #
-        # @api semipublic
-        #
-        # @example Splitting an HTTP URL.
-        #   Handler.split_url('http://example.com')
-        #   #=> ['http', 'example.com']
-        #
-        # @param url [String] The URL, or pseudo-URL, to split.  Must be a
-        #   string of the form 'PROTOCOL://BODY', where PROTOCOL and BODY are
-        #   any substring (PROTOCOL must not contain '://').
-        #
-        # @return [Array] A tuple containing the downcased protocol and
-        #   unprocessed body.
-        def self.split_url(url)
-          protocol, body = url.split('://', 2)
-          [protocol.downcase.intern, body]
-        end
-
-        # Splits a PUT or POST hash into its type and body
-        #
-        # This is useful when handling PUTs or POSTs where the body may be
-        # interpreted in different ways depending on its type.
-        #
-        # @api semipublic
-        #
-        # @example Splitting an hash with a type.
-        #   Handler.split_type({ type: 'foo', bar: 6 })
-        #   #=> [:foo, { bar: 6}]
-        #
-        # @param hash [Hash] The hash to split.  This must contain as a key
-        #   the symbol :type.
-        #
-        # @return [Array] A tuple containing the downcased type symbol and
-        #   unprocessed body.
-        def self.split_hash(hash)
-          body = hash.clone
-          type = body.delete(:type).downcase.intern
-          [type, body]
-        end
-
-        # Yields the type and body of an object if it is a hash
-        #
-        # This is useful when handling PUTs or POSTs where the body is a
-        # direct representation, but should be interpreted in different ways
-        # depending on its type.
-        #
-        # @api semipublic
-        #
-        # @example Handling a PUT/POST body that may be a URL.
-        #   Handler.handle_hash({ type: :foo, a: 3 }) { |protocol, url| nil }
-        #   #=> true
-        #   Handler.handle_hash({ a: 3 }) { |protocol, url| nil }
-        #   #=> false
-        #   Handler.handle_hash(3) { |protocol, url| nil }
-        #   #=> false
-        # @example Splitting an HTTP URL.
-        #   Handler.split_url('http://example.com')
-        #   #=> ['http', 'example.com']
-        #
-        # @param body [Object] The body to handle, if it is a hash.
-        #
-        # @yieldparam [Symbol] The type of the hash, downcased and symbolised.
-        # @yieldparam [Hash] The body of the hash.
-        #
-        # @return [Boolean] true if the body was a hash and was handled; false
-        #   otherwise.
-        def self.handle_hash(body)
-          is_valid = body.is_a?(Hash) && body.key?(:type)
-          yield *split_hash(body) if is_valid
-          is_valid
-        end
-
-        # Yields the protocol and body of an object if it is a URL
-        #
-        # This is useful when handling PUTs or POSTs where the body may be a
-        # reference to another resource.
-        #
-        # @api semipublic
-        #
-        # @example Handling a PUT/POST body that may be a URL.
-        #   Handler.handle_url('http://example.com') { |protocol, url| nil }
-        #   #=> true
-        #   Handler.handle_url(3) { |protocol, url| nil }
-        #   #=> false
-        #
-        # @param body [String] An object that may be a URL or pseudo-URL.  If
-        #   it is a string, it will be handled and the URL yielded to the
-        #   block.
-        #
-        # @yieldparam [String] The protocol of the URL.
-        # @yieldparam [String] The body of the URL.
-        #
-        # @return [Boolean] true if the body was a URL and was handled; false
-        #   otherwise.
-        def self.handle_url(body)
-          body.is_a?(String).tap { |isstr| yield *split_url(body) if isstr }
-        end
-
         protected
 
         # Sends a request to the parent requester
@@ -141,27 +38,7 @@ module Bra
         # @param request [Request] A BAPS request in need of sending.
         #
         # @return [void]
-        def_delegator(:@parent, :send)
-
-        # Flattens a POST payload into an item and target ID
-        #
-        # @api semipublic
-        #
-        # @example Flattening a hash mapping an ID to an item.
-        #   handler.flatten_post({ spoo: 10 }, :default)
-        #   #=> [:spoo, 10]
-        # @example Flattening a direct object to an item.
-        #   handler.flatten_post(10, :default)
-        #   #=> [:default, 10]
-        #
-        # @param payload [Object] The payload to flatten, if it is a Hash.
-        # @param default_id [Object] The ID to use if the payload is a direct
-        #   object (not a Hash).
-        #
-        # @return [Array] A tuple of the target ID and direct object.
-        def self.flatten_post(payload, default_id)
-          payload.is_a?(Hash) ? payload.flatten : [default_id, payload]
-        end
+        def_delegator(:@parent, :request)
       end
 
       # Extension of Handler implementing default behaviour for Variables.

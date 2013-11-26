@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'sinatra/contrib'
 require 'eventmachine'
 require 'json'
+require_relative 'common/payload'
 
 module Bra
   ##
@@ -12,60 +13,60 @@ module Bra
 
     respond_to :html, :json, :xml
 
-    def initialize(config, model)
+    def initialize(config, model, authenticator)
       super()
 
       @model = model
       @config = config
+      @authenticator = authenticator
     end
 
     # TODO: Make this protection more granular.
     helpers do
-      # Gets the set of privileges the user has.
+      # Gets the set of privileges the user has
       #
-      # This also fails with HTTP 401 if the user does not exist, or with HTTP
-      # 403 if the set does not include the requested privileges.
+      # This fails with HTTP 401 if the user does not exist.
       #
       # @param requisites [Array] An optional array of required privileges; a
       #   HTTP exception shall be thrown if the user privileges don't match up.
       #
       # @return [Array] An array of privilege symbols.
-      def privileges(requisites = [])
-        get_auth.tap do |credentials|
-          fail_not_authorised if credentials.nil?
-          forbidden unless priv_ok?(credentials, requisites)
-        end
+      def privilege_set
+        credentials = get_credentials(rack_auth)
+        @authenticator.authenticate(*credentials)
+      rescue Bra::Exceptions::AuthenticationFailure
+        not_authorised
       end
 
-      # Raises HTTP 403 Forbidden.
+      def rack_auth
+        Rack::Auth::Basic::Request.new(request.env)
+      end
+
+      def get_credentials(auth)
+        fail(Bra::Exceptions::AuthenticationFailure) unless has_credentials?(auth)
+        auth.credentials
+      end
+
+      def has_credentials?(auth)
+        auth.provided? && auth.basic? && auth.credentials
+      end
+
+      # Fails with a HTTP 403 Forbidden status.
+      # @return [void]
       def forbidden
         halt(403, json_error('Forbidden.'))
       end
 
-      def priv_ok?(candidates, requisites)
-        (candidates & requisites) == requisites
-      end
-
-      def get_auth
-        get_creds(Rack::Auth::Basic::Request.new(request.env)).try do |auth|
-          privileges_for(*auth)
-        end
-      end
-
-      def get_creds(auth)
-        auth.credentials if auth.provided? && auth.basic? && auth.credentials
+      # Fails with a HTTP 401 Not Authorised status.
+      #
+      # @return [void]
+      def not_authorised
+        headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+        halt(401, json_error('Not authorised.'))
       end
     end
 
-    # Internal - Fails with a HTTP Not Authorised status.
-    #
-    # @return [void]
-    def fail_not_authorised
-      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-      halt(401, json_error('Not authorised.'))
-    end
-
-    # Internal - Handle CORS headers.
+    # Handle CORS headers
     #
     # Such a senseless waste of precious bytes.
     #
@@ -99,48 +100,52 @@ module Bra
     get('/*/?') do
       cors
 
-      find(params) do |resource|
-        privs = privileges(resource.get_privileges)
+      begin
+        find(params) do |resource|
+          get_repr = resource.get(privilege_set)
 
-        sym = resource.class.name.demodulize.underscore.intern
-        respond_with sym, resource.get(privs) do |f|
-          # Use the internal name instead of the resource ID.  This is so that
-          # the template knows which local the resource will appear on.
-          f.html do
-            haml(
-              :object,
-              locals: {
-                resource_url: resource.url,
-                resource_id: resource.id,
-                resource_type: sym,
-                resource: resource.get(privs),
-                inner: false
-              }
-            )
+          sym = resource.class.name.demodulize.underscore.intern
+          respond_with sym, get_repr do |f|
+            f.html do
+              haml(
+                :object,
+                locals: {
+                  resource_url: resource.url,
+                  resource_id: resource.id,
+                  resource_type: sym,
+                  resource: get_repr,
+                  inner: false
+                }
+              )
+            end
           end
         end
+      rescue Bra::Exceptions::InsufficientPrivilegeError
+        forbidden
       end
     end
-    put('/*/?') do
+    put('/*/?') { payload_action(:put) }
+    post('/*/?') { payload_action(:post) }
+
+    def payload_action(action)
       cors
 
-      find(params) do |resource|
-        privs = privileges
-        parse_json_from(request) { |payload| resource.put(privs, payload) }
+      find(params) do |target|
+        payload = make_payload(action, privilege_set, request, target)
+        target.send(action, payload)
       end
+    rescue Bra::Exceptions::InsufficientPrivilegeError
+      forbidden
     end
-    post('/*/?') do
-      cors
 
-      find(params) do |resource|
-        privs = privileges
-        parse_json_from(request) { |payload| resource.post(privs, payload) }
-      end
-    end
     delete('/*/?') do
       cors
 
-      find(params) { |resource| resource.delete(privileges) }
+      begin
+        find(params) { |resource| resource.delete(privilege_set) }
+      rescue Bra::Exceptions::InsufficientPrivilegeError
+        forbidden
+      end
     end
 
     def find(params)
@@ -159,21 +164,15 @@ module Bra
 
     private
 
-    # Internal: Retrieves the privileges available for a given user and
-    # password combination.
-    #
-    # username - The username given by the user agent.
-    # password - The password given by the user agent.
-    #
-    # Returns the set of privileges granted to this username and password.  If
-    #   the username or password is incorrect, then nil is returned.
-    def privileges_for(username, password)
-      @config[:users][username.intern].try do |entry|
-        entry[:privileges].map(&:intern) if entry[:password] == password
-      end
+    def make_payload(action, privilege_set, request, target)
+      raw_payload = parse_json_from(request.body.string)
+      Bra::Common::Payload.new(
+        raw_payload, privilege_set,
+        (action == :put ? target.id : target.default_id)
+      )
     end
 
-    # Internal: Parses the request body as JSON and throws a 400 status if it
+    # Parses the request body as JSON and throws a 400 status if it
     # is malformed.
     #
     # request - The request whose body is to be parsed.
@@ -182,12 +181,12 @@ module Bra
     #
     # Returns the block's return value if the JSON is valid, and nothing
     #   otherwise (processing is halted).
-    def parse_json_from(request)
+    def parse_json_from(string)
       json = JSON.parse(request.body.string)
     rescue JSON::ParserError
       halt(400, json_error('Badly formed JSON.'))
     else
-      yield json.deep_symbolize_keys!
+      json.deep_symbolize_keys!
     end
 
     # Internal: Flags a client error.

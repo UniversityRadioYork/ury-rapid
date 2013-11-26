@@ -28,68 +28,7 @@ module Bra
       def initialize
         @parent = nil
         @id = nil
-
-        @put_handler = nil
-        @delete_handler = nil
-      end
-
-      # Tests if the given privileges are sufficient for GETting this
-      # object.
-      #
-      # @param candidates [Array] A set of privileges to check for
-      #   authorisation.  This can be nil, in which case the check will always
-      #   succeed.  In order to fail all checks, pass the empty list [].
-      # @return [Boolean] true if the privileges are sufficient; false
-      #   otherwise.
-      def can_get_with?(candidates)
-        check_privilege(candidates, get_privileges)
-      end
-
-      # Tests if the given privileges are sufficient for PUTting this
-      # object.
-      #
-      # @param (see #can_get_with?)
-      # @return (see #can_get_with?)
-      def can_put_with?(candidates)
-        check_privilege(candidates, put_privileges)
-      end
-
-      # Tests if the given privileges are sufficient for POSTing this
-      # object.
-      #
-      # @param (see #can_get_with?)
-      # @return (see #can_get_with?)
-      def can_post_with?(candidates)
-        check_privilege(candidates, post_privileges)
-      end
-
-      # Tests if the given privileges are sufficient for DELETEing this
-      # object.
-      #
-      # @param (see #can_get_with?)
-      # @return (see #can_get_with?)
-      def can_delete_with?(candidates)
-        check_privilege(candidates, delete_privileges)
-      end
-
-      # Checks a set of candidate privileges against another set to see if they
-      # match.
-      #
-      # @param candidates [Array] The candidate privileges.  If nil, treat as
-      #   if all privileges are candidate privileges.
-      # @param requisites [Array] The required privileges.  If nil, reject all
-      #   candidates values except nil.
-      # @return (see #can_get_with?)
-      def check_privilege(candidates, requisites)
-        if candidates.nil?
-          true
-        elsif requisites.nil?
-          false
-        else
-          # Check the set intersection (the candidates that are also
-          # requisites) contains every requisite.
-          (candidates & requisites) == requisites
-        end
+        @handler = nil
       end
 
       # Registers a handler to be used when this object is modified
@@ -105,22 +44,32 @@ module Bra
         self
       end
 
-      # GETs this model object.
+      # Fails if an operation cannot proceed on this model object
+      def fail_if_cannot(operation, privilege_set)
+        privilege_set.require(handler_target, operation)
+      end
+
+      # Checks whether an operation can proceed on this model object
+      def can?(operation, privilege_set)
+        privilege_set.has?(handler_target, operation)
+      end
+
+      # GETs this model object
       #
       # A GET is the retrieval of a flattened representation of a model object.
       # See #get_flat (defined differently for different model objects) for
       # information on what constitutes a flattened representation.
       #
-      # @param privileges [Array] An array of GET privileges the caller has.
-      #   May be nil, in which case no privilege checking is done.
+      # @param privileges [PrivilegeSet] The set of privileges the client has.
       # @param mode [Symbol] Either :wrap, in which case the result will be
       #   wrapped in a hash mapping the object's ID to the flattened
       #   representation, or :nowrap, in which case only the flattened value is
       #   returned.  By default, :wrap is used.
       #
       # @return [Object] A flat representation of this object.
-      def get(privileges = [], mode = :wrap)
-        wrap(get_flat(privileges), mode) if can_get_with?(privileges)
+      def get(privileges, mode = :wrap)
+        fail_if_cannot(:get, privileges)
+        wrap(get_flat(privileges), mode)
       end
 
       # Wraps a GET response according to its wrap mode.
@@ -148,41 +97,22 @@ module Bra
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
-      def post(privileges, value)
-        fail('Insufficient privileges.') unless can_post_with?(privileges)
-
-        # Don't remove any outer hash; the hash is used in post_do to decide
-        # where to post the item.
-        #value = resource[id] if resource.is_a?(Hash)
-        #value = resource unless resource.is_a?(Hash)
-
-        # Only update the model if the handler allows us to with this given
-        # value.
-        post_do(value) if @handler.post(self, value)
+      def post(payload)
+        payload_action(:post, payload)
       end
 
       # PUTs a resource into this model object, using the put handler.
       #
       # The resource can be a direct instance of this object, or a hash mapping
       # this object's ID to one.
-      def put(privileges, resource)
-        fail('Insufficient privileges.') unless can_put_with?(privileges)
-
-        # Remove any outer hash.
-        value = resource[id] if resource.is_a?(Hash)
-        value = resource unless resource.is_a?(Hash)
-
-        # Only update the model if the handler allows us to with this given
-        # value.
-        put_do(value) if @handler.put(self, value)
+      def put(payload)
+        payload_action(:put, payload)
       end
 
       # DELETEs this model object, using the delete handler.
       def delete(privileges)
-        fail('Insufficient privileges.') unless can_delete_with?(privileges)
-
-        # Again, only update the model if the handler allows us to.
-        delete_do if @handler.delete(self)
+        fail_if_cannot(:delete, privileges)
+        @handler.delete(self)
       end
 
       # PUTs a resource to this model object, without using the put handler.
@@ -260,6 +190,18 @@ module Bra
       def handler_target
         self.class.name.demodulize.underscore.intern
       end
+
+      # Returns the default ID to give to POST payloads
+      def default_id
+        nil
+      end
+
+      private
+
+      def payload_action(action, payload)
+        fail_if_cannot(action, payload.privilege_set)
+        @handler.send(action, self, payload)
+      end
     end
 
     # A model object that does not have children.
@@ -290,7 +232,7 @@ module Bra
       #
       # @return [Object] A flat representation of this object.
       def get_flat(privileges = [])
-        flat if can_get_with?(privileges)
+        flat if can?(:get, privileges)
       end
     end
   end

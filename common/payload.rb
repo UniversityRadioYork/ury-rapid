@@ -1,6 +1,6 @@
 module Bra
-  module DriverCommon
-    # An object that takes a payload sent to the server and processes it
+  module Common
+    # A wrapper around a PUT/POST payload
     #
     # Payloads come in multiple formats:
     # - A URL payload, which specifies where the resource desired can be
@@ -10,24 +10,29 @@ module Bra
     # - A hash mapping an ID to one of the above, thus directly specifying
     #   where in the model structure the new resource should go.
     #
-    # This object takes a raw payload from the server and decides which form
-    # of payload it is, then spits out a normalised form of the payload so
-    # that the handling objects can interpret it.
-    class PayloadProcessor
+    # This object takes a raw payload from the server, alongside the privileges
+    # granted to the client sending it is; decides which form of payload it is;
+    # then spits out a normalised form of the payload so that the handling
+    # objects can interpret it.
+    class Payload
       PROTOCOL_SPLITTER = '://'
 
-      def initialize(payload, default_id=nil, forward_proc=nil)
+      attr_accessor :privilege_set
+      attr_accessor :id
+
+      def initialize(payload, privilege_set, default_id=nil)
         @default_id = default_id
         @payload = payload
-        @index, @item = flatten_payload
-        @forward_proc = forward_proc
+        @privilege_set = privilege_set
+        @id, @item = flatten_payload
       end
 
       def process(options)
         (
-          (handle_forward(&options[:forward]) if options.key?(:forward)) ||
           (handle_hash(&options[:hash])       if options.key?(:hash))    ||
           (handle_url(&options[:url])         if options.key?(:url))     ||
+          (handle_string(&options[:string])   if options.key?(:string))  ||
+          (handle_integer(&options[:integer]) if options.key?(:integer)) ||
           fail("Unknown payload type: #{@item}")
         )
       end
@@ -58,29 +63,12 @@ module Bra
       #
       # @api private
       #
-      # @param hash [Hash] The hash to split.  If this contain as a key
-      #   the symbol :type, the value of :type will be returned as type;
-      #   otherwise, the type will be nil.
-      #
       # @return [Array] A tuple containing the downcased type symbol and
       #   unprocessed body.
       def split_hash
         body = @item.clone
         type = body.delete(:type).downcase.intern
         [type, body]
-      end
-
-      # Attempts to forward a payload somewhere else
-      #
-      # This is useful when handling POSTS that translate into PUTs on the
-      # original object's children.  For example, a POST of a state to
-      # channels/0/player should become a PUT to channels/0/player/state.
-      #
-      # @api private
-      #
-      # @return [Boolean] true if the payload was forwarded; false otherwise.
-      def handle_forward
-        is_valid_forward?.tap { |valid| yield(@index, @item) if valid }
       end
 
       # Yields the protocol and body of an object if it is a URL
@@ -90,10 +78,6 @@ module Bra
       #
       # @api private
       #
-      # @param body [String] An object that may be a URL or pseudo-URL.  If
-      #   it is a string, it will be handled and the URL yielded to the
-      #   block.
-      #
       # @yieldparam [String] The protocol of the URL.
       # @yieldparam [String] The body of the URL.
       #
@@ -101,6 +85,30 @@ module Bra
       #   otherwise.
       def handle_url
         is_valid_url?.tap { |valid| yield *split_url if valid }
+      end
+
+      # Yields the protocol and body of an object if it is a raw string
+      #
+      # @api private
+      #
+      # @yieldparam [String] The string object.
+      #
+      # @return [Boolean] true if the body was a string and was handled; false
+      #   otherwise.
+      def handle_string
+        is_valid_string?.tap { |valid| yield @item.to_s if valid }
+      end
+
+      # Yields the protocol and body of an object if it is an integer
+      #
+      # @api private
+      #
+      # @yieldparam [String] The string object.
+      #
+      # @return [Boolean] true if the body was an integer and was handled;
+      #   false otherwise.
+      def handle_integer
+        is_valid_integer?.tap { |valid| yield @item.to_i if valid }
       end
 
       # Yields the type and body of an object if it is a hash
@@ -135,8 +143,19 @@ module Bra
 
       # Whether the payload is a valid URL or pseudo-URL
       def is_valid_url?
-        @item.is_a?(String) && @item.include?(PROTOCOL_SPLITTER)
+        is_valid_string? && @item.include?(PROTOCOL_SPLITTER)
       end
+
+      # Whether the payload is a valid plain string
+      def is_valid_string?
+        @item.is_a?(String)
+      end
+
+      # Whether the payload is a valid integer
+      def is_valid_integer?
+        @item.respond_to?(:to_i)
+      end
+
 
       # Flattens a payload into an item and target ID
       #

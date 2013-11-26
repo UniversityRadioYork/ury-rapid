@@ -203,9 +203,9 @@ module Bra
       # @return [Hash] A flat representation of this object.
       def get_flat(privileges = [])
         ( @children
-          .select           { |_, child| child.can_get_with?(privileges) }
+          .select           { |_, child| child.can?(:get, privileges)    }
           .transform_values { |child|    child.get_flat(privileges)      }
-        ) if can_get_with?(privileges)
+        ) if can?(:get, privileges)
       end
 
       # Finds the child with the given ID
@@ -276,9 +276,9 @@ module Bra
       # @return [Array] A flat representation of this object.
       def get_flat(privileges = [])
         ( @children
-          .select { |child| child.can_get_with?(privileges) }
+          .select { |child| child.can?(:get, privileges)    }
           .map    { |child| child.get_flat(privileges)      }
-        ) if can_get_with?(privileges)
+        ) if can?(:get, privileges)
       end
 
       # Finds the child with the given ID
