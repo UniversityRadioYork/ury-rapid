@@ -14,10 +14,10 @@ module Bra
           TARGETS = [:playlist, :channel, :channel_set]
 
           # Requests a playlist be DELETEd via the BAPS server
-          # 
+          #
           # This resets the playlist.
           def delete(object)
-            case object.handler_target 
+            case object.handler_target
             when :playlist
               reset(object.channel_id)
             when :channel

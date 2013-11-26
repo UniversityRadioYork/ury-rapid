@@ -10,7 +10,8 @@ module Bra
       # slightly higher in level than the raw bytes sent to the requests queue.
       class Request
         def initialize(command, subcode = 0)
-          # Format is initially set up for the command and the skip-bytes field.
+          # Format is initially set up for the command and the skip-bytes
+          # field.
           @format = FormatStrings::UINT16 + FormatStrings::UINT32
           @num_bytes = 0
           @payloads = []

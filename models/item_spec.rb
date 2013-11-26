@@ -9,7 +9,9 @@ describe Bra::Models::Item do
   # She looks like a sugar in a plum, plum plum!
   describe '#flat' do
     it 'flattens the Item into a hash representation' do
-      expect(item.flat).to eq({ name: 'Brown Girl In The Ring', type: :library })
+      expect(item.flat).to eq(
+        { name: 'Brown Girl In The Ring', type: :library }
+      )
     end
   end
   describe '#name' do

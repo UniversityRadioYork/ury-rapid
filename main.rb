@@ -48,16 +48,18 @@ def em_compatible?(server)
   %w(thin hatetepe goliath).include?(server)
 end
 
+# Creates the authenticator for the server
+def authenticator(config)
+  Bra::Common::ConfigAuthenticator.new(config[:server][:users])
+end
+
 # Runs bra (this is the main function)
 def run
   config = YAML.load_file('config.yml').deep_symbolize_keys!
 
   driver = init_driver(config[:driver])
   model = init_model(config[:model], driver)
-  app = Bra::ServerApp.new(
-    config[:server], model,
-    Bra::Common::ConfigAuthenticator.new(config[:server][:users])
-  )
+  app = Bra::ServerApp.new(config[:server], model, authenticator(config))
 
   EventMachine.run do
     setup_server(config[:server], app)

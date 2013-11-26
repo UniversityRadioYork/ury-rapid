@@ -15,7 +15,7 @@ module Bra
       # Creates a new Item.
       #
       # @api semipublic
-      # 
+      #
       # @example Create a library track item.
       #   Item.new(:library, 'Islands In The Stream'
       #

@@ -54,10 +54,10 @@ module Bra
         #
         # @example DELETE a Variable
         #   variable_handler.delete(variable)
-        # 
+        #
         # @param variable [Variable] A model object representing a mutable
         #   variable.
-        # 
+        #
         # @return (see #put)
         def delete(variable)
           put(variable, variable.initial_value)

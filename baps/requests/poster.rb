@@ -58,7 +58,7 @@ module Bra
           pp = Bra::DriverCommon::PayloadProcessor.new(
             post_payload, default_id, method(:forward_if_id)
           )
-          self.new(pp, *args).run
+          new(pp, *args).run
         end
 
         def self.unknown_protocol(protocol)

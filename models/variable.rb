@@ -97,7 +97,7 @@ module Bra
       def handler_target
         @handler_target.nil? ? super() : @handler_target
       end
-      
+
       def value=(new_value)
         validated = new_value if @validator.nil?
         validated = @validator.call(new_value) unless @validator.nil?

@@ -14,11 +14,10 @@ module Bra
       # @example Create a privilege set with some privileges.
       #   PrivilegeSet.new({channel_set: [:get, :put]})
       # @example Create a privilege set with all privileges.
-      #   PrivilegeSet.new(:god_mode) 
+      #   PrivilegeSet.new(:god_mode)
       def initialize(privileges)
-        @privileges = privileges.deep_symbolize_keys.transform_values do |privlist|
-          privlist.is_a?(Array) ? privlist.map(&:to_sym) : privlist.to_sym
-        end
+        @privileges = privileges
+        intern_privileges
       end
 
       # Requires a certain privilege on a certain target
@@ -44,8 +43,17 @@ module Bra
       def has?(target, privilege)
         PrivilegeChecker.new(target, privilege, @privileges).check?
       end
+
+      private
+
+      def intern_privileges
+        privileges.deep_symbolize_keys.transform_values do |privlist|
+          privlist.is_a?(Array) ? privlist.map(&:to_sym) : privlist.to_sym
+        end
+      end
     end
-    
+
+    # A method object for checking privileges.
     class PrivilegeChecker
       def initialize(target, privilege, privileges)
         @target = target.intern

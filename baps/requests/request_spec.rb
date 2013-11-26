@@ -13,7 +13,6 @@ class MockQueue
   def_delegator :@contents, :shift, :pop
 end
 
-
 describe Bra::Baps::Requests::Request do
   let(:request) { Bra::Baps::Requests::Request.new(100, 3) }
   let(:request_two) { Bra::Baps::Requests::Request.new(100, 3) }

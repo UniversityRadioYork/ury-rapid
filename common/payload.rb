@@ -20,7 +20,7 @@ module Bra
       attr_accessor :privilege_set
       attr_accessor :id
 
-      def initialize(payload, privilege_set, default_id=nil)
+      def initialize(payload, privilege_set, default_id = nil)
         @default_id = default_id
         @payload = payload
         @privilege_set = privilege_set
@@ -84,7 +84,7 @@ module Bra
       # @return [Boolean] true if the body was a URL and was handled; false
       #   otherwise.
       def handle_url
-        is_valid_url?.tap { |valid| yield *split_url if valid }
+        is_valid_url?.tap { |valid| yield(*split_url) if valid }
       end
 
       # Yields the protocol and body of an object if it is a raw string
@@ -125,7 +125,7 @@ module Bra
       # @return [Boolean] true if the body was a hash and was handled; false
       #   otherwise.
       def handle_hash
-        is_valid_hash?.tap { |valid| yield *split_hash if valid }
+        is_valid_hash?.tap { |valid| yield(*split_hash) if valid }
       end
 
       # Whether the payload should be forwarded to the handler intact
@@ -155,7 +155,6 @@ module Bra
       def is_valid_integer?
         @item.respond_to?(:to_i)
       end
-
 
       # Flattens a payload into an item and target ID
       #

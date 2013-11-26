@@ -22,7 +22,7 @@ module Bra
         channels.channel(Integer(number))
       end
 
-      def_delegator :channels, :player 
+      def_delegator :channels, :player
       def_delegator :channels, :playlist
       def_delegator :channels, :player_state
       def_delegator :channels, :player_load_state

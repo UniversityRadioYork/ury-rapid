@@ -15,11 +15,8 @@ module Bra
           end
         end
 
+        # A method object that handles POSTs to the Player for BAPS
         class PlayerPoster < Bra::DriverCommon::Requests::Poster
-          def self.forward_if_id(id)
-            id != :item
-          end
-
           def post_forward
             @payload.id == :item ? false : super()
           end
@@ -53,7 +50,9 @@ module Bra
           end
 
           def item_from_local_playlist(index)
-            request(Request.new(Codes::Playback::LOAD, channel_id).uint32(index))
+            request(
+              Request.new(Codes::Playback::LOAD, channel_id).uint32(index)
+            )
           end
         end
 
@@ -71,11 +70,11 @@ module Bra
           #
           # @example Set player state to playing via BAPS.
           #   playback_requester.put_state(state, :playing)
-          # 
+          #
           # @param object [PlayerVariable] A player position model object.
           # @param new_position [Integer] The intended new player position.
-          # 
-          # @return [Boolean] false, to instruct the model not to update itself.
+          #
+          # @return [void]
           def put(object, payload)
             MarkerPoster.post(payload, self, object)
           end
@@ -84,14 +83,7 @@ module Bra
         # Object that performs the POSTing and PUTting of a playback marker
         class MarkerPoster < Bra::DriverCommon::Requests::Poster
           def post_integer(integer)
-            p target_to_code
-            p channel_id
-            p integer
-            request(
-              Request
-              .new(target_to_code, channel_id)
-              .uint32(integer)
-            )
+            request(Request .new(target_to_code, channel_id) .uint32(integer))
           end
 
           private
@@ -125,24 +117,30 @@ module Bra
           #
           # @example Set player state to playing via BAPS.
           #   playback_requester.put_state(state, :playing)
-          # 
+          #
           # @param object [PlayerState] A player state model object.
           # @param new_state [Symbol] The intended new player state.  May be a
           #   string, in which case the string is converted to a symbol.
-          # 
-          # @return [Boolean] false, to instruct the model not to update itself.
+          #
+          # @return [void]
           def put(object, payload)
-            channel_id = object.player_channel_id
-            payload.process(
-              string: proc do |new_state|
-                code_for_state(object.value, new_state).try do |command|
-                  request(Request.new(command, channel_id))
-                end
-              end
-            )
+            StatePoster.post(payload, self, object)
+          end
+        end
+
+        # Object that performs the POSTing and PUTting of a playback marker
+        class StatePoster < Bra::DriverCommon::Requests::Poster
+          def post_string(new_state)
+            code_for_state(object.value, new_state).try do |command|
+              request(Request.new(command, channel_id))
+            end
           end
 
           private
+
+          def channel_id
+            @object.player_channel_id
+          end
 
           # Converts a state change to a BAPS command code
           #
@@ -158,7 +156,9 @@ module Bra
             from = from.intern
             to = to.intern
 
-            [from, to].each(&Bra::Models::PlayerVariable.method(:validate_state))
+            [from, to].each(
+              &Bra::Models::PlayerVariable.method(:validate_state)
+            )
             CODES[from][to]
           end
 

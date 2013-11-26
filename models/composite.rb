@@ -35,7 +35,7 @@ module Bra
       #   children.
       # @param id [Object] The ID to register the child under.  Acceptable IDs
       #   depend on the underlying type of the model object.
-      # 
+      #
       # @return [void]
       def add_child(object, id)
         @children[id] = object
@@ -119,9 +119,9 @@ module Bra
       # @param url [String] See #get_url.
       # @param privileges [Array] - A set of privileges to check to see if the
       #   GET can be done.
-      # @param payload [Object] A payload to POST into the child resource.  This
-      #   may be a hash mapping the resource's ID to its new value, or the new
-      #   value directly.
+      # @param payload [Object] A payload to POST into the child resource.
+      #   This may be a hash mapping the resource's ID to its new value, or the
+      #   new value directly.
       #
       # @return [void]
       def post_url(url, privileges, payload)
@@ -235,7 +235,7 @@ module Bra
 
     # A model object whose children form a list
     #
-    # A ListModelObject stores its children in an Array, with the object IDs 
+    # A ListModelObject stores its children in an Array, with the object IDs
     # being the numeric indices into that Array.
     class ListModelObject < CompositeModelObject
       # Implement the Enumerable API on the list's children.

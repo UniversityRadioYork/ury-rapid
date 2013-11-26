@@ -5,7 +5,6 @@ require 'json'
 require_relative 'common/payload'
 
 module Bra
-  ##
   # The Sinatra application that powers the server component of bra.
   class ServerApp < Sinatra::Base
     register Sinatra::Contrib
@@ -43,8 +42,12 @@ module Bra
       end
 
       def get_credentials(auth)
-        fail(Bra::Exceptions::AuthenticationFailure) unless has_credentials?(auth)
+        fail_authentication unless has_credentials?(auth)
         auth.credentials
+      end
+
+      def fail_authentication
+        fail(Bra::Exceptions::AuthenticationFailure)
       end
 
       def has_credentials?(auth)

@@ -177,7 +177,7 @@ module Bra
       #
       # Usually this will be class name, stripped of its module prefix and
       # converted to a lowercase_underscore symbol.  This may be overridden for
-      # objects with the same class but different handlers (for example, 
+      # objects with the same class but different handlers (for example,
       # variables).
       #
       # @api semipublic

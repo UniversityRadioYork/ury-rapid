@@ -21,7 +21,7 @@ class Driver
     queue = EventMachine::Queue.new
 
     # The requester contains all the logic for instructing BAPS to make model
-    # changes happen. 
+    # changes happen.
     @requester = Bra::Baps::Requests::Requester.new(queue)
 
     # Most of the actual low-level BAPS poking is contained inside this

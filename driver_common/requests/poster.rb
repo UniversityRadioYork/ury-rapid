@@ -71,7 +71,7 @@ module Bra
 
         # Wrapper over new and run
         def self.post(*args)
-          self.new(*args).run
+          new(*args).run
         end
 
         def self.unknown_protocol(protocol)
