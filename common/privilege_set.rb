@@ -17,7 +17,7 @@ module Bra
       #   PrivilegeSet.new(:god_mode)
       def initialize(privileges)
         @privileges = privileges
-        intern_privileges
+        symbolise_privileges
       end
 
       # Requires a certain privilege on a certain target
@@ -46,18 +46,23 @@ module Bra
 
       private
 
-      def intern_privileges
-        privileges.deep_symbolize_keys.transform_values do |privlist|
-          privlist.is_a?(Array) ? privlist.map(&:to_sym) : privlist.to_sym
-        end
+      def symbolise_privileges
+        ( @privileges
+          .deep_symbolize_keys
+          .transform_values(&method(:symbolise_privilege_list))
+        )
+      end
+
+      def symbolise_privilege_list(privlist)
+        privlist.is_a?(Array) ? privlist.map(&:to_sym) : privlist.to_sym
       end
     end
 
     # A method object for checking privileges.
     class PrivilegeChecker
-      def initialize(target, privilege, privileges)
+      def initialize(target, requisite, privileges)
         @target = target.intern
-        @privilege = privilege.intern
+        @requisite = requisite.intern
         @privileges = privileges
       end
 
@@ -81,7 +86,15 @@ module Bra
       # @return [Boolean] true if this privilege set explicitly has a certain
       #   privilege for a certain target.
       def has_direct?
-        @privileges.key?(@target) && @privileges[@target].include?(@privilege)
+        target_in_privileges? && requisite_in_target_privileges?
+      end
+
+      def target_in_privileges?
+        @privileges.key?(@target)
+      end
+
+      def requisite_in_target_privileges?
+        @privileges[@target].include?(@requisite)
       end
     end
   end
