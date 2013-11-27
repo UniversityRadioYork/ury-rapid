@@ -47,7 +47,8 @@ module Bra
       private
 
       def symbolise_privileges
-        ( @privileges
+        @privileges = (
+          @privileges
           .deep_symbolize_keys
           .transform_values(&method(:symbolise_privilege_list))
         )
