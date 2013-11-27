@@ -65,7 +65,13 @@ module Bra
       # @return [void]
       def run(responder)
         responder.register(@channel)
-        EM.connect(@hostname, @port, Connection, @parser, @queue)
+	connect
+      end
+
+      private
+
+      def connect
+        EventMachine.connect(@hostname, @port, Connection, @parser, @queue)
       end
     end
   end
