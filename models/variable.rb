@@ -10,84 +10,19 @@ module Bra
     class Constant < SingleModelObject
       extend Forwardable
 
-      attr_reader :value, :get_privileges
+      attr_reader :value, :handler_target
 
       # The flat representation of a Constant is its value.
       alias_method :flat, :value
 
       # Initialises the Constant object.
       #
-      # @param value [Object] - The value of the constant.
-      # @param privileges [Array] - The array of privilege symbols that will be
-      #   required to GET this object.
+      # @param value [Object] The value of the constant.
+      # @param handler_target [Symbol] The handler target of the constant (for
+      #   privilege retrieval).
       #
-      def initialize(value, privileges)
+      def initialize(value, handler_target)
         @value = value
-        @get_privileges = privileges
-      end
-
-      # Override method_missing to redirect method requests to the value.
-      def self.method_missing(symbol, *args)
-        @value.public_send(symbol, *args)
-      end
-
-      # Override respond_to_missing? to redirect it to the value.
-      def self.respond_to_missing?(symbol, include_all)
-        @value.respond_to?(symbol, include_all)
-      end
-
-      def_delegator :@value, :to_s
-    end
-
-    # ModelObjects representing a single mutable variable.
-    #
-    # This adds to Constant the ability to write to the variable, privilege
-    # specification for performing PUT/POST/DELETE, and the ability to validate
-    # model inputs.
-    class Variable < Constant
-      # Public: Allows direct read access to the initial value.
-      attr_reader :initial_value
-
-      attr_reader :edit_privileges
-      alias_method :put_privileges, :edit_privileges
-      alias_method :post_privileges, :edit_privileges
-      alias_method :delete_privileges, :edit_privileges
-
-      def self.make_state
-        new(:stopped, method(:validate_state), [:SetPlayerState])
-      end
-
-      def self.make_load_state
-        new(:empty, method(:validate_load_state), nil)
-      end
-
-      def self.make_marker
-        new(0, method(:validate_marker), [:SetMarker])
-      end
-
-      # Internal: Initialises a PlayerVariable.
-      #
-      # name            - The name of the variable.
-      # player          - The Player the variable is attached to.
-      # initial_value   - The initial value for the PlayerVariable.
-      # validator       - A proc that, given a new value, will raise an
-      #                   exception if the value is invalid and return a
-      #                   sanitised version of the value otherwise.
-      #                   Can be nil.
-      # get_privileges
-      # edit_privileges - A list of symbols representing privileges required
-      #                   to edit this variable.
-      # @param handler_target [Symbol] The name under which this variable's
-      #   handlers are defined; if nil, use the default (see
-      #   ModelObject#handler_target).
-      def initialize(
-        initial_value, validator, get_privileges, edit_privileges,
-        handler_target = nil
-      )
-        super(initial_value, get_privileges)
-        @initial_value = initial_value
-        @validator = validator
-        @edit_privileges = edit_privileges
         @handler_target = handler_target
       end
 
@@ -96,6 +31,37 @@ module Bra
       # @return (see Bra::Models::ModelObject#handler_target)
       def handler_target
         @handler_target.nil? ? super() : @handler_target
+      end
+
+      def_delegator :@value, :public_send, :method_missing
+      def_delegator :@value, :respond_to?, :respond_to_missing?
+      def_delegator :@value, :to_s
+    end
+
+    # ModelObjects representing a single mutable variable
+    #
+    # This adds to Constant the ability to write to the variable, privilege
+    # specification for performing PUT/POST/DELETE, and the ability to validate
+    # model inputs.
+    class Variable < Constant
+      # Allows direct read access to the initial value
+      attr_reader :initial_value
+
+      # Initialises a Variable
+      #
+      # initial_value   - The initial value for the PlayerVariable.
+      # validator       - A proc that, given a new value, will raise an
+      #                   exception if the value is invalid and return a
+      #                   sanitised version of the value otherwise.
+      #                   Can be nil.
+      # @param handler_target [Symbol] The name under which this variable's
+      #   handlers are defined; if nil, use the default (see
+      #   ModelObject#handler_target).
+      def initialize(initial_value, validator, handler_target = nil)
+        super(initial_value, handler_target)
+        @initial_value = initial_value
+        @validator = validator
+        @handler_target = handler_target
       end
 
       def value=(new_value)

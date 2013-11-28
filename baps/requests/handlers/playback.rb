@@ -131,7 +131,7 @@ module Bra
         # Object that performs the POSTing and PUTting of a playback marker
         class StatePoster < Bra::DriverCommon::Requests::Poster
           def post_string(new_state)
-            code_for_state(object.value, new_state).try do |command|
+            code_for_state(@object.value, new_state).try do |command|
               request(Request.new(command, channel_id))
             end
           end

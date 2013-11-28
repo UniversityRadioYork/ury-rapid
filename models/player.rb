@@ -15,42 +15,6 @@ module Bra
       attr_writer :item
       alias_method :link_item, :item=
 
-      # Public: Retrieves the player's state value.
-      #
-      # Returns the state value, as a symbol.
-      def state_value
-        state.value
-      end
-
-      # Public: Change the player model's state.
-      #
-      # new_state - The symbol representing the new state.
-      #
-      # @return [void]
-      def set_state(new_state)
-        state.value = new_state
-      end
-
-      # Public: Gets one of the player markers.
-      #
-      # type     - The marker type (:position, :cue, :intro or :duration).
-      # position - The new position, as a non-negative integer or coercible.
-      #
-      # @return [void]
-      def marker(type)
-        child(type)
-      end
-
-      # Public: Sets the position of one of the player markers.
-      #
-      # type     - The marker type (:position, :cue, :intro or :duration).
-      # position - The new position, as a non-negative integer or coercible.
-      #
-      # @return [void]
-      def set_marker(type, position)
-        marker(type).value = position
-      end
-
       # Public: Change the player model's current item and load state.
       #
       # new_state - The symbol (must be one of :ok, :loading or :failed)
@@ -66,13 +30,6 @@ module Bra
         set_load_state(new_state)
       end
 
-      # Public: Returns a hash of marker position values.
-      #
-      # Returns a hash mapping marker names to their raw position values.
-      def marker_values
-        @markers.transform_values { |marker| marker.value }
-      end
-
       # Internal: Removes an item from the player.
       #
       # item - The item to unlink.  This must be the same as the item currently
@@ -81,26 +38,6 @@ module Bra
       # @return [void]
       def unlink_item(item)
         fail("Tried to unlink wrong item from #{name}") unless item == @item
-      end
-
-      def get_privileges
-        []
-      end
-
-      def put_privileges
-        [:EditPlayer]
-      end
-      alias_method :post_privileges, :put_privileges
-
-      private
-
-      # Internal: Change the player model's load state.
-      #
-      # new_state - The symbol representing the new state.
-      #
-      # @return [void]
-      def set_load_state(new_state)
-        child(:load_state).value = new_state
       end
     end
 
@@ -114,15 +51,15 @@ module Bra
     # discovered.
     class PlayerVariable < Variable
       def self.make_state
-        new(:stopped, method(:validate_state), [], [:SetPlayerState])
+        new(:stopped, method(:validate_state))
       end
 
       def self.make_load_state
-        new(:empty, method(:validate_load_state), [], nil)
+        new(:empty, method(:validate_load_state))
       end
 
       def self.make_marker
-        new(0, method(:validate_marker), [], [:SetMarker])
+        new(0, method(:validate_marker))
       end
 
       # Sets the handler target for this player variable

@@ -93,8 +93,11 @@ module Bra
       def register_handlers(object)
         handler = @options[object.handler_target]
         object.register_handler(handler) unless handler.nil?
-        puts("No handler for target #{object.handler_target}.") if handler.nil?
-        @options[object.handler_target].try(&object.method(:register_handler))
+        warn_no_handler_for(object) if handler.nil?
+      end
+
+      def warn_no_handler_for(object)
+        puts("No handler for target #{object.handler_target}.") 
       end
 
       MARKERS = %i(cue position intro duration)

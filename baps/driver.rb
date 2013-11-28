@@ -51,7 +51,7 @@ class Driver
   def process_model(model)
     # The BAPS driver exposes some of its configuration as part of the BRA
     # model, so we need to extend the model to accommodate these.
-    Bra::Baps::Models.add_baps_models_to(model, @config)
+    Bra::Baps::Models::Creator.create(model, @config)
   end
 
   # Begin running the driver, given the completed bra model
