@@ -49,7 +49,7 @@ module Bra
       #   Item, or an Item by itself.
       #
       # @return [void]
-      def post_do(item)
+      def driver_post(item)
         index = nil
         index = children.size if item.is_a?(Item)
         index, item = item.flatten if item.is_a?(Hash)
@@ -57,13 +57,6 @@ module Bra
 
         item.move_to(self, Integer(index))
       end
-
-      # The driver_XYZ methods allow the driver to perform modifications to the
-      # model using the same verbs as the server without triggering the usual
-      # handlers.  They are implemented using the _do methods.
-      alias_method :driver_put, :put_do
-      alias_method :driver_delete, :delete_do
-      alias_method :driver_post, :post_do
     end
   end
 end

@@ -115,23 +115,30 @@ module Bra
         @handler.delete(self)
       end
 
-      # PUTs a resource to this model object, without using the put handler.
+      # POSTs a resource to this model object from the driver side
       #
       # This is a stub; any concrete model objects must override it.
-      #
-      # Consider using driver_put for code updating the model from the driver.
-      def put_do(_)
-        fail("put_do needs overriding for object #{id}, class #{self.class}.")
+      def driver_post(_)
+        driver_method_not_implemented('put')
       end
 
-      # DELETEs this model object, without using the delete handler.
+      # PUTs a resource to this model object from the driver side
       #
       # This is a stub; any concrete model objects must override it.
+      def driver_put(_)
+        driver_method_not_implemented('put')
+      end
+
+      # DELETEs this model object from the driver side
       #
-      # Consider using driver_delete for code updating the model from the
-      # driver.
-      def delete_do
+      # This is a stub; any concrete model objects must override it.
+      def driver_delete
+        driver_method_not_implemented('delete')
         raise "delete_do must be overridden for model object #{id}."
+      end
+
+      def driver_method_not_implemented(action)
+        fail("driver_#{action} needs overriding for #{self.class} #{id}.")
       end
 
       # Moves this model object to a new parent with a new ID.
