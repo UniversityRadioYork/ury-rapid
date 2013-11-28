@@ -1,6 +1,6 @@
 require 'eventmachine'
 require_relative 'client'
-require_relative 'responder'
+require_relative 'responses/responder'
 require_relative 'requests/requester'
 require_relative 'models'
 
@@ -64,7 +64,7 @@ class Driver
     #
     # We'd make the responder earlier, but we need access to the model,
     # which we only get definitive access to here.
-    responder = Bra::Baps::Responder.new(model, @requester)
+    responder = Bra::Baps::Responses::Responder.new(model, @requester)
 
     # Now we can run the client, passing it the responder so it can send
     # BAPS responses to it.  The client will get BAPS requests sent to it
