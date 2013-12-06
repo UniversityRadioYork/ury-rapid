@@ -10,7 +10,7 @@ module Bra
     # of necessity; if the driver receives a response it doesn't know, the
     # driver cannot parse the rest of the stream and dies), as well as its
     # parameters in order of receipt and their corresponding names in the
-    # response hashes produced by the ResponseParser.
+    # response hashes produced by the response parser.
     module Responses
 
       private

@@ -1,7 +1,7 @@
 require 'eventmachine'
 require_relative 'codes'
 require_relative 'connection'
-require_relative 'response_parser'
+require_relative 'responses/parser'
 require_relative 'reader'
 require_relative 'responses'
 
@@ -43,7 +43,7 @@ module Bra
 
         @channel = EventMachine::Channel.new
         @reader = Reader.new
-        @parser = ResponseParser.new(@channel, @reader)
+        @parser = Responses::Parser.new(@channel, @reader)
         @queue = queue
       end
 
