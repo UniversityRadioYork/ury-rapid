@@ -86,70 +86,66 @@ module Bra
       set :threaded, false
     end
 
-    options('/*/?') do
-      cors
-    end
+    # Respond to HTTP OPTIONS with CORS headers, to allow out-of-request
+    # CORS checks.
+    options('/*/?') { cors }
+
+    # Special files.
     get('/') { respond_with :index }
-    get '/stylesheets/*' do
-      content_type 'text/css', charset: 'utf-8'
-      filename = params[:splat].first
-      send_file File.join(settings.root, 'assets', 'stylesheets', filename)
-    end
-    get '/scripts/*' do
-      content_type 'text/javascript', charset: 'utf-8'
-      filename = params[:splat].first
-      send_file File.join(settings.root, 'assets', 'scripts', filename)
-    end
-    get('/*/?') do
-      cors
+    get('/stylesheets/*') { serve_text('css', 'stylesheets') }
+    get('/scripts/*') { serve_text('javascript', 'scripts') }
 
-      begin
-        find(params) do |resource|
-          get_repr = resource.get(privilege_set)
+    # General model traversals.
+    get('/*/?') { model_traversal { |target| handle_get(target) } }
+    put('/*/?') { model_traversal_with_payload(:put) }
+    post('/*/?') { model_traversal_with_payload(:post) }
+    delete('/*/?') { model_traversal_without_payload(:delete) }
 
-          sym = resource.class.name.demodulize.underscore.intern
-          respond_with sym, get_repr do |f|
-            f.html do
-              haml(
-                :object,
-                locals: {
-                  resource_url: resource.url,
-                  resource_id: resource.id,
-                  resource_type: sym,
-                  resource: get_repr,
-                  inner: false
-                }
-              )
-            end
-          end
+    def serve_text(type, directory)
+      content_type "text/#{type}", charset: 'utf-8'
+      filename = params[:splat].first
+      send_file File.join(settings.root, 'assets', directory, filename)
+    end
+
+    def handle_get(target)
+      get_repr = target.get(privilege_set)
+
+      sym = target.class.name.demodulize.underscore.intern
+      respond_with sym, get_repr do |f|
+        f.html do
+          haml(
+            :object,
+            locals: {
+              resource_url: target.url,
+              resource_id: target.id,
+              resource_type: sym,
+              resource: get_repr,
+              inner: false
+            }
+          )
         end
-      rescue Bra::Exceptions::InsufficientPrivilegeError
-        forbidden
       end
     end
-    put('/*/?') { payload_action(:put) }
-    post('/*/?') { payload_action(:post) }
 
-    def payload_action(action)
-      cors
-
-      find(params) do |target|
+    def model_traversal_with_payload(action)
+      model_traversal do |target|
         payload = make_payload(action, privilege_set, request, target)
         target.send(action, payload)
       end
+    end
+
+    def model_traversal_without_payload(action)
+      model_traversal { |target| target.send(action, privilege_set) }
+    end
+
+    # Performs a model traversal
+    def model_traversal(&block)
+      cors
+      find(params, &block)
     rescue Bra::Exceptions::InsufficientPrivilegeError
       forbidden
     end
 
-    delete('/*/?') do
-      cors
-
-      begin
-        find(params) { |resource| resource.delete(privilege_set) }
-      rescue Bra::Exceptions::InsufficientPrivilegeError
-        forbidden
-      end
-    end
 
     def find(params)
       @model.find_url(params[:splat].first) { |resource| yield(resource) }
