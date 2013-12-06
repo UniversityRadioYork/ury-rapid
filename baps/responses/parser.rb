@@ -112,8 +112,8 @@ module Bra
         #
         # For our purposes, the subcode is the last four bits of the command
         # word.  This means that some subcommnds in BAPS are full commands in
-        # the bra BAPS driver, but most of the commands where this happens aren't
-        # supported by us anyway.
+        # the bra BAPS driver, but most of the commands where this happens
+        # aren't supported by us anyway.
         #
         # @api private
         #
@@ -136,7 +136,8 @@ module Bra
         #
         # @api private
         #
-        # @param code [Integer] The BAPS command code whose arguments are sought.
+        # @param code [Integer] The BAPS command code whose arguments are
+        #  sought.
         #
         # @return [Array] The expected structure of the BAPS response.
         def structure_with_code(code)
@@ -192,8 +193,8 @@ module Bra
         #
         # @api private
         #
-        # @param name [Symbol] The name of the parameter whose argument is being
-        #   read.
+        # @param name [Symbol] The name of the parameter whose argument is
+        #   being read.
         #
         # @return [Boolean] Whether or not there was enough data to process a
         #   data word.
@@ -291,7 +292,7 @@ module Bra
           !data.nil?
         end
 
-        # Finishes a response and creates a clean slate for the next one to begin
+        # Finishes a response and creates a clean slate for the next one
         #
         # @api private
         #
