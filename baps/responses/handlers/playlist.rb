@@ -7,8 +7,8 @@ module Bra
         # Handles a BAPS playlist item removal, as well as full-playlist reset
         class Delete < Bra::DriverCommon::Responses::Handler
           TARGETS = [
-            Codes::Playback::DELETE_ITEM,
-            Codes::Playback::RESET
+            Codes::Playlist::DELETE_ITEM,
+            Codes::Playlist::RESET
           ]
 
           def run(response)
@@ -17,16 +17,16 @@ module Bra
 
           def sub_url(response)
             case response[:target]
-            when Codes::Playback::DELETE_ITEM
+            when Codes::Playlist::DELETE_ITEM
               [response[:index]]
-            when Codes::Playback::RESET
+            when Codes::Playlist::RESET
               []
             end
           end
         end
 
-        class ItemCount < LoadHandler
-          TARGETS = [Codes::Playback::LOAD_COUNT]
+        class ItemCount < Bra::DriverCommon::Responses::Handler
+          TARGETS = [Codes::Playlist::ITEM_COUNT]
 
           def run(_)
             # No operation
@@ -34,10 +34,10 @@ module Bra
         end
 
         # Handles a BAPS playlist item add
-        class ItemData < LoadHandler
-          TARGETS = [Codes::Playback::ITEM_DATA]
+        class ItemData < LoaderHandler
+          TARGETS = [Codes::Playlist::ITEM_DATA]
 
-          alias_method :playlist_url, :post_url
+          alias_method :post_url, :playlist_url
 
           def id(response)
             response[:index]

@@ -8,14 +8,14 @@ module Bra
     #
     # NOTE: Subclasses must define the constant HANDLER_MODULE.
     class HandlerSet
-      
+
       protected
 
       # Populates a hash mapping handler targets to their handlers in this set
       def handler_hash
         handlers.reduce({}, &method(:add_handler_targets))
       end
-    
+
       def handler_module
         self.class::HANDLER_MODULE
       end
@@ -23,8 +23,16 @@ module Bra
       private
 
       def add_handler_targets(hash, handler_class)
-        make_and_register(hash, handler_class) if handler_class.has_targets?
+        make_and_register(hash, handler_class) if has_targets?(handler_class)
         hash
+      end
+
+      def has_targets?(handler_class)
+        valid_class?(handler_class) ? handler_class.has_targets? : false
+      end
+
+      def valid_class?(handler_class)
+        handler_class.respond_to?(:has_targets?)
       end
 
       def make_and_register(hash, handler_class)

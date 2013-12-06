@@ -12,5 +12,8 @@ module Bra
 
     # Exception generated when required privileges are missing.
     InsufficientPrivilegeError = Class.new(RuntimeError)
+
+    # Exception generated when the playout system sends an invalid message.
+    InvalidPlayoutResponseError = Class.new(RuntimeError)
   end
 end

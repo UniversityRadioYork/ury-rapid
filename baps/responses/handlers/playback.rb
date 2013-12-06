@@ -8,7 +8,7 @@ module Bra
         class State < Bra::DriverCommon::Responses::Handler
           TARGETS = [
             Codes::Playback::PLAY,
-            Codes::Playback::PAUSE, 
+            Codes::Playback::PAUSE,
             Codes::Playback::STOP
           ]
 
@@ -29,11 +29,11 @@ module Bra
           end
         end
 
-        # Handles a BAPS channel state change
+        # Handles a BAPS channel marker change
         class Marker < Bra::DriverCommon::Responses::Handler
           TARGETS = [
-            Codes::Playback::POSITION
-            Codes::Playback::CUE
+            Codes::Playback::POSITION,
+            Codes::Playback::CUE,
             Codes::Playback::INTRO
           ]
 
@@ -55,10 +55,12 @@ module Bra
         end
 
         # Handles a BAPS item load
-        class Load < Bra::DriverCommon::Responses::Handler
-          TARGETS = [Codes::Playback::LOAD]
+        class Load < LoaderHandler
+          TARGETS = [
+            Codes::Playback::LOAD
+          ]
 
-          alias_method :player_url, :post_url
+          alias_method :post_url, :playlist_url
 
           def id(response)
             response[:index]

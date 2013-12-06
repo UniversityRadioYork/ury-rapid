@@ -1,3 +1,6 @@
+require_relative '../../../driver_common/responses/handler'
+require_relative '../../exceptions'
+
 module Bra
   module Baps
     module Responses
@@ -20,6 +23,11 @@ module Bra
 
         # A method object for loading an Item object into the model
         class ItemLoader
+          # Stop handler loaders from trying to load handlers from this class.
+          def self.has_targets?
+            false
+          end
+
           def self.load(*args)
             new(*args).run
           end
@@ -58,6 +66,11 @@ module Bra
 
         # A method object for updating the bra model with BAPS track loads
         class Loader
+          # Stop handler loaders from trying to load handlers from this class.
+          def self.has_targets?
+            false
+          end
+
           def self.load(*args)
             new(*args).run
           end
@@ -153,14 +166,11 @@ module Bra
           # @return [Symbol] The bra equivalent of the BAPS track type (:library,
           #   :file or :text).
           def type_as_bra_symbol
-            fail(InvalidTrackType, @type) unless TRACK_TYPE_MAP.include? @type
+            fail(InvalidTrackType, @type) unless TRACK_TYPE_MAP.include?(@type)
             TRACK_TYPE_MAP[@type]
           end
         end
-
-        InvalidTrackType = Class.new(RuntimeError)
       end
     end
-
   end
 end

@@ -1,6 +1,6 @@
 require 'active_support/core_ext/object/try'
-require_relative 'codes'
-require_relative 'types'
+require_relative '../codes'
+require_relative '../types'
 
 module Bra
   module Baps
@@ -83,7 +83,7 @@ module Bra
           # We could use the second return from reader.command to skip an
           # unknown message, but BAPS is quite dodgy at implementing this in
           # places, so we don't do it in practice.
-          command = reader.command
+          command = @reader.command
           command.nil? ? false : parse_command(command.first)
         end
 
@@ -96,10 +96,9 @@ module Bra
         # @return [Boolean] Whether there was enough data to process a command
         #   word or not.
         def parse_command(raw_code)
-            code, subcode = split_command_word(raw_code)
-            @expected = structure_with_code(code)
-            @response = response_with_code(code, subcode)
-          end
+          code, subcode = split_command_word(raw_code)
+          @expected = structure_with_code(code)
+          @response = response_with_code(code, subcode)
 
           true
         end
