@@ -58,10 +58,17 @@ server:
     god:
       password: hunter2
       privileges:
-        - SetPlayerState
-        - SetPlayerPosition
-        - EditPlaylist
-        - XBapsReadConfig
+        channel_set: [get]
+        channel: [get]
+        player: [get, put, post]
+        playlist: [get, put, post, delete]
+        item: [get, put, post]
+        player_state: [get, put, post, delete]
+        player_load_state: [get, put, post, delete]
+        player_cue: [get, put, post, delete]
+        player_intro: [get, put, post, delete]
+        player_duration: [get, put, post, delete]
+        player_position: [get, put, post, delete]
 
 #
 # The [model] is the part of bra that tracks the playout system's state and
