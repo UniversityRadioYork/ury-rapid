@@ -11,15 +11,32 @@ module Bra
             Codes::System::LOG_MESSAGE
           ]
 
-          MESSAGES = {
+          def run(response)
+            puts("#{type_message(response)}: #{details(response)}")
+          end
+
+          def type_message(response)
+            TYPE_MESSAGE[response[:code]]
+          end
+
+          def details(response)
+            symbol = DETAILS_SYM[response[:code]]
+            response[symbol]
+          end
+
+          private
+
+          DETAILS_SYM = {
+            Codes::System::CLIENT_ADD => :client,
+            Codes::System::CLIENT_REMOVE => :client,
+            Codes::System::LOG_MESSAGE => :message
+          }
+
+          TYPE_MESSAGE = {
             Codes::System::CLIENT_ADD => 'New client',
             Codes::System::CLIENT_REMOVE => 'Client disconnected',
             Codes::System::LOG_MESSAGE => 'BAPS says'
           }
-
-          def run(response)
-            puts("#{MESSAGES[response]}: #{client}")
-          end
         end
 
         # Handler for BAPS responses carrying login seeds.
@@ -54,7 +71,7 @@ module Bra
 
           def run(response)
             code, string = response.values_at(*%i(subcode details))
-            is_ok(code) ? continue : die
+            is_ok(code) ? continue : die(code, string)
           end
 
           def is_ok(code)
@@ -65,7 +82,7 @@ module Bra
             @parent.login_synchronise
           end
 
-          def die
+          def die(code, string)
             puts("BAPS login FAILED: #{string}, code #{code}.")
             EventMachine.stop
           end
