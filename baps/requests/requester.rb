@@ -1,5 +1,6 @@
 require 'digest'
 require_relative 'request'
+require_relative '../../driver_common/handler_set'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.
@@ -19,7 +20,9 @@ module Bra
       #
       # The Requester delegates the request generation to several SubRequester
       # objects, which are defined elsewhere.
-      class Requester
+      class Requester < DriverCommon::HandlerSet
+        HANDLER_MODULE = Requests::Handlers
+
         # Initialises the Requester
         #
         # @api semipublic
@@ -53,18 +56,9 @@ module Bra
         # @return [Hash] The prepared model configuration hash, which may be
         #   the same object.
         def configure_model(model_config)
-          # Instantiate and insert all model change handlers into the model
-          # config.
-          #
           # There is no reason other than efficiency for this to be a mutating
-          # action - if needs be, .clone or reduce the model_config.
-          handlers.each do |handler|
-            puts "Registering handler #{handler.name} for #{handler::TARGETS}"
-            handler::TARGETS.each { |t| model_config[t] = handler.new(self) }
-          end
-          # We still need to return the hash, even though we've mutated the
-          # existing one.
-          model_config
+          # action - if needs be, merge instead of merge!.
+          model_config.merge!(handler_hash)
         end
 
         # Sends a request to the BAPS server
@@ -128,18 +122,6 @@ module Bra
         def login_synchronise
           # Subcode 3: Synchronise and add to chat.
           request(Request.new(Codes::System::SYNC, 3))
-        end
-
-        private
-
-        # Compiles a list of all handlers to register
-        #
-        # This is everything require'd by the Requester that is in the
-        # Bra::Baps::Requests::Handlers module.
-        #
-        # @return [Array] An array of handlers as described above.
-        def handlers
-          Handlers.constants.map(&Handlers.method(:const_get))
         end
       end
     end

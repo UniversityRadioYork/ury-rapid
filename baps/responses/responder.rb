@@ -1,4 +1,11 @@
 require_relative '../codes'
+require_relative '../../driver_common/handler_set'
+
+# IMPORTANT: All handlers to be registered with the model tree must be required
+# here.
+require_relative 'handlers/playback'
+require_relative 'handlers/playlist'
+
 
 module Bra
   module Baps
@@ -12,7 +19,11 @@ module Bra
       # The BAPS responder also has the ability to respond directly to the BAPS
       # server by sending requests to the outgoing requests queue.  This is used,
       # for example, to complete the BAPS login procedure.
-      class Responder
+      class Responder < DriverCommon::HandlerSet
+        HANDLER_MODULE = Responses::Handlers
+
+        attr_reader :model
+
         # Initialises the responder
         #
         # @api semipublic
@@ -26,6 +37,7 @@ module Bra
         def initialize(model, requester)
           @model = model
           @requester = requester
+          @handlers = handler_hash
         end
 
         # Registers the responder's callbacks with a incoming responses channel
@@ -43,17 +55,13 @@ module Bra
         #
         # @return [void]
         def register(channel)
-          functions = [
-            playback_functions,
-            playlist_functions,
-            system_functions
-          ].reduce({}) { |a, e| a.merge! e }
+          channel.subscribe(&method(handle_response))
+        end
 
-          channel.subscribe do |response|
-            f = functions[response[:code]]
-            f.call(response) if f
-            unhandled(response) unless f
-          end
+        def handle_response(response)
+          f = @handlers[response[:code]]
+          f.call(response) if f
+          unhandled(response) unless f
         end
 
         private
@@ -74,39 +82,6 @@ module Bra
           puts(message)
         end
 
-        # Constructs a response matching hash for playback functions
-        #
-        # @api private
-        #
-        # @return [Hash] The response hash, which should be merged into the main
-        #   response table.
-        def playback_functions
-          {
-            Codes::Playback::PLAY => set_state_handler(:playing),
-            Codes::Playback::PAUSE => set_state_handler(:paused),
-            Codes::Playback::STOP => set_state_handler(:stopped),
-            Codes::Playback::POSITION => set_marker_handler(:position),
-            Codes::Playback::CUE => set_marker_handler(:cue),
-            Codes::Playback::INTRO => set_marker_handler(:intro),
-            Codes::Playback::LOAD => method(:loaded)
-          }
-        end
-
-        # Constructs a response matching hash for playlist functions
-        #
-        # @api private
-        #
-        # @return [Hash] The response hash, which should be merged into the main
-        #   response table.
-        def playlist_functions
-          {
-            Codes::Playlist::DELETE_ITEM => method(:delete_item),
-            Codes::Playlist::ITEM_DATA => method(:item_data),
-            Codes::Playlist::ITEM_COUNT => method(:item_count),
-            Codes::Playlist::RESET => method(:reset)
-          }
-        end
-
         # Constructs a response matching hash for system functions
         #
         # @api private
@@ -123,49 +98,6 @@ module Bra
           }
         end
 
-        # Creates a lambda handling state changes for the given state
-        #
-        # @api private
-        #
-        # @param state [Symbol] The state that the proc will set players to.
-        #
-        # @return [Proc] A lambda that takes a BAPS response and sets the
-        #   appropriate player state to that provided to this function.
-        def set_state_handler(state)
-          ->(r) { @model.driver_put_url(player_url(r, 'state'), state) }
-        end
-
-        # Creates a lambda handling marker changes for the given marker type
-        #
-        # @api private
-        #
-        # @param type [Symbol] The marker type of which the proc will set the
-        #   position.
-        #
-        # @return [Proc] A lambda that takes a BAPS response and sets the
-        #   marker identified by the type provided to this function.
-        def set_marker_handler(type)
-          ->(r) { @model.driver_put_url(player_url(r, type), r[:position]) }
-        end
-
-        # Deletes the item identified by the response
-        #
-        # The response structure must have keys:
-        #
-        # - :subcode (channel index, starting from 0)
-        # - :index (playlist index, starting from 0)
-        #
-        # @api private
-        #
-        # @param response [Hash] A response structure.
-        #
-        # @return [void]
-        def delete_item(response)
-          id, index = response.values_at(:subcode, :index)
-
-          @model.driver_delete_url("channels/#{id}/playlist/#{index}")
-        end
-
         # Registers an item into channel playlist
         #
         # @api private
@@ -179,31 +111,6 @@ module Bra
           item = Bra::Models::Item.new(track_type_baps_to_bra(type), title)
 
           @model.driver_post_url("channels/#{id}/playlist/", { index => item })
-        end
-
-        # Resets a channel playlist
-        #
-        # @api private
-        #
-        # @param response [Hash] A response whose subcode is the channel to
-        #   reset.
-        #
-        # @return [void]
-        def reset(response)
-          @model.driver_delete_url("channels/#{response[:subcode]}/playlist")
-        end
-
-        # Loads an item into a channel player
-        #
-        # @api private
-        #
-        # @param response [Hash] A BAPS response containing the item.
-        #
-        # @return [void]
-        def loaded(response)
-          loaded_item(response).each do |key, value|
-            @model.driver_put_url(player_url(response, key), value)
-          end
         end
 
         # Intentionally ignores the response
@@ -232,62 +139,6 @@ module Bra
           # TODO: actually log this message
           puts "[LOG] #{response[:message]}"
         end
-
-        # Converts an loaded response into a pair of load-state and item
-        #
-        # @api private
-        #
-        # @param response [Hash] The loaded response to convert.
-        #
-        # @return [Array] The following items:
-        #   - The loading state (:ok, :loading, :empty or :failed);
-        #   - Either nil (no loaded item) or an Item representing the loaded
-        #     item.
-        def loaded_item(response)
-          type, title, duration = response.values_at(:type, :title, :duration)
-
-          load_state = LOAD_STATES[title]
-          item = normal_loaded_item(type, title) if load_state == :ok
-          {
-            duration: duration,
-            load_state: load_state,
-            item: item
-          }
-        end
-
-        # Processes a normal loaded item response
-        #
-        # This converts the response into an item and possibly a duration change.
-        #
-        # @api private
-        #
-        # @param type [Symbol] The item type (one of :library, :file or :text).
-        # @param title [String] The title to display for the item.
-        # @param duration [Fixnum] nil, or the duration of the loaded item.
-        #
-        # @return [Array] The following items:
-        #   - The loading state (:ok, :loading, :empty or :failed);
-        #   - Either nil (no loaded item) or an Item representing the loaded
-        #     item.
-        def normal_loaded_item(type, title)
-          Bra::Models::Item.new(track_type_baps_to_bra(type), title)
-        end
-
-        # Converts a BAPS track type to a BRA track type
-        #
-        # @api private
-        #
-        # @param type [Fixnum] The BAPS track type number.  Must NOT be
-        #   Types::Track::NULL.
-        #
-        # @return [Symbol] The bra equivalent of the BAPS track type (:library,
-        #   :file or :text).
-        def track_type_baps_to_bra(type)
-          fail(InvalidTrackType, type) unless TRACK_TYPE_MAP.include? type
-          TRACK_TYPE_MAP[type]
-        end
-
-        InvalidTrackType = Class.new(RuntimeError)
 
         # TODO(mattbw): Move these somewhere more relevant?
         module LoginErrors
@@ -329,38 +180,6 @@ module Bra
             EventMachine.stop
           end
         end
-
-        # Generates an URL to a channel player given a BAPS response
-        #
-        # The subcode of the BAPS response must be the target channel.
-        #
-        # @api private
-        #
-        # @param response [Hash] The response mentioning the channel to use.
-        # @param args [Array] A splat of additional model object IDs to form a
-        #   sub-URL of the player URL; optional.
-        #
-        # @return [String] The full model URL.
-        def player_url(response, *args)
-          ['channels', response[:subcode], 'player', *args].join('/')
-        end
-
-        # Hash mapping item names to BRA load states.
-        #
-        # This is necessary because of the rather odd way in which BAPS signifies
-        # loading states other than :ok (that is, inside the track name!).
-        LOAD_STATES = Hash.new(:ok).merge!({
-          '--LOADING--' => :loading,
-          '--LOAD FAILED--' => :failed,
-          '--NONE--' => :empty
-        })
-
-        # Hash mapping BAPS track type numbers to BRA symbols.
-        TRACK_TYPE_MAP = {
-          Types::Track::LIBRARY => :library,
-          Types::Track::FILE => :file,
-          Types::Track::TEXT => :text
-        }
       end
     end
   end

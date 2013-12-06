@@ -1,3 +1,5 @@
+require_relative '../handler'
+
 module Bra
   module DriverCommon
     module Requests
@@ -7,23 +9,8 @@ module Bra
       # attempts to modify the model object, the handler translates it into a
       # playout system command to perform the actual playout system event the
       # model change represents.
-      class Handler
+      class Handler < Bra::DriverCommon::Handler
         extend Forwardable
-
-        # Initialises the Handler
-        #
-        # @api semipublic
-        #
-        # @example Initialising a Handler with a parent Requester.
-        #   queue = EventMachine::Queue.new
-        #   requester = Bra::Baps::Requests::Requester.new(queue)
-        #   handler = Bra::Baps::Requests::Handler.new(requester)
-        #
-        # @param parent [Requester] The main Requester to which requests shall
-        #   be sent.
-        def initialize(parent)
-          @parent = parent
-        end
 
         protected
 

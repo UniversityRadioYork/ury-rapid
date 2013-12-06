@@ -65,7 +65,7 @@ module Bra
       # @return [void]
       def run(responder)
         responder.register(@channel)
-	connect
+        connect
       end
 
       private
