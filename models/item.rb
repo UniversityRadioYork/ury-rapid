@@ -12,7 +12,7 @@ module Bra
       # Access the track type.
       attr_reader :type
 
-      # Creates a new Item.
+      # Creates a new Item
       #
       # @api semipublic
       #
@@ -37,17 +37,12 @@ module Bra
         { name: @name, type: @type }
       end
 
-      def get_privileges
-        []
-      end
-
-      # PUTs a new item representation into this Item without triggering
-      # handlers.
+      # PUTs a new item representation into this Item from the driver end
       #
       # The new item may be a hash representation, an existing Item, nil, or a
       # hash mapping this item's ID to one of the above (for compatibility with
       # the external API).
-      def put_do(new_item)
+      def driver_put(new_item)
         value = new_item[id] if new_item.is_a?(Hash)
         value = new_item unless new_item.is_a?(Hash)
 
@@ -55,16 +50,20 @@ module Bra
         done = put_from_hash(value) if value.is_a?(Hash)
         done = set_from_item(value) if value.is_a?(Item)
         done = clear if value.nil?
-        fail("Unsupported argument to put_do: #{value.class}") unless done
+        fail("Unsupported argument to driver_put: #{value.class}") unless done
+
+        notify_update
       end
 
-      # Performs a DELETE on this object
+      # Performs a DELETE on this object from the driver end
       #
       # @return [void]
-      def delete_do
+      def driver_delete
         parent.remove_child(id)
         @parent = nil
         @id = nil
+
+        notify_delete
       end
 
       # Sets the item's properties from a hash
@@ -109,18 +108,12 @@ module Bra
         self
       end
 
-      # The driver_XYZ methods allow the driver to perform modifications to the
-      # model using the same verbs as the server without triggering the usual
-      # handlers.  They are implemented using the _do methods.
-      alias_method :driver_put, :put_do
-      alias_method :driver_delete, :delete_do
-
       private
 
       def validate_type(type)
         type = :null if type.nil?
         type = type.intern if type.respond_to?(:intern)
-        valid_type = %i(library file text null).include? type
+        valid_type = %i(library file text null).include?(type)
         raise "Not a valid type: #{type}" unless valid_type
         type
       end

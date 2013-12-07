@@ -1,7 +1,9 @@
 require 'sinatra/base'
 require 'sinatra/contrib'
+require 'sinatra/streaming'
 require 'eventmachine'
 require 'json'
+require 'haml'
 require_relative 'common/payload'
 
 module Bra
@@ -19,6 +21,8 @@ module Bra
       @config = config
       @authenticator = authenticator
     end
+
+    helpers Sinatra::Streaming
 
     # TODO: Make this protection more granular.
     helpers do
@@ -95,11 +99,16 @@ module Bra
     get('/stylesheets/*') { serve_text('css', 'stylesheets') }
     get('/scripts/*') { serve_text('javascript', 'scripts') }
 
-    # General model traversals.
+    get('/stream/') { model_updates_stream }
+
+    # General model traversals.  These need to be at the bottom, so that they
+    # don't override more specific URL matches.
     get('/*/?') { model_traversal { |target| handle_get(target) } }
     put('/*/?') { model_traversal_with_payload(:put) }
     post('/*/?') { model_traversal_with_payload(:post) }
     delete('/*/?') { model_traversal_without_payload(:delete) }
+
+    private
 
     def serve_text(type, directory)
       content_type "text/#{type}", charset: 'utf-8'
@@ -107,24 +116,48 @@ module Bra
       send_file File.join(settings.root, 'assets', directory, filename)
     end
 
+    # Sets up a connection to the model updates stream.
+    def model_updates_stream
+      content_type 'application/json', charset: 'utf-8'
+      privs = privilege_set
+
+      stream(:keep_open) do |out|
+        id = @model.register_for_updates do |(object, repr)|
+          stream_update(object, repr, out, privs)
+        end
+        out.callback { @model.deregister_from_updates(id) }
+        out.errback { @model.deregister_from_updates(id) }
+      end
+    end
+
+    def stream_update(object, repr, out, privs)
+      if object.can?(:get, privs)
+        json = { object.url => repr }.to_json
+        out.write("#{json}\n")
+      end
+    end
+
     def handle_get(target)
       get_repr = target.get(privilege_set)
 
       sym = target.class.name.demodulize.underscore.intern
       respond_with sym, get_repr do |f|
-        f.html do
-          haml(
-            :object,
-            locals: {
-              resource_url: target.url,
-              resource_id: target.id,
-              resource_type: sym,
-              resource: get_repr,
-              inner: false
-            }
-          )
-        end
+        f.html { handle_get_html(sym, target, get_repr) }
       end
+    end
+
+    def handle_get_html(sym, target, get_repr)
+      haml(:object, locals: handle_get_html_locals(sym, target, get_repr))
+    end
+
+    def handle_get_html_locals(sym, target, get_repr)
+      {
+        resource_url: target.url,
+        resource_id: target.id,
+        resource_type: sym,
+        resource: get_repr,
+        inner: false
+      }
     end
 
     def model_traversal_with_payload(action)
@@ -138,7 +171,7 @@ module Bra
       model_traversal { |target| target.send(action, privilege_set) }
     end
 
-    # Performs a model traversal
+    # Performs a model traversal, complete with CORS and privilege check
     def model_traversal(&block)
       cors
       find(params, &block)
@@ -146,22 +179,11 @@ module Bra
       forbidden
     end
 
-
     def find(params)
       @model.find_url(params[:splat].first) { |resource| yield(resource) }
     rescue Exceptions::MissingResourceError
       halt(404, json_error('Not found.'))
     end
-
-    delete '/channels/:id/playlist/?' do
-      content_type :json
-
-      require_permissions!('EditPlaylist')
-      @commander.run(:ClearPlaylist, params[:id])
-      ok
-    end
-
-    private
 
     def make_payload(action, privilege_set, request, target)
       raw_payload = parse_json_from(request.body.string)

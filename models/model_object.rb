@@ -16,6 +16,8 @@ module Bra
     # that can trigger driver handlers to translate model change requests into
     # playout server actions, and a 'driver' form that bypasses these handlers.
     class ModelObject
+      extend Forwardable
+
       # Public: Allows access to this model object's current ID.
       attr_reader :id
 
@@ -29,9 +31,10 @@ module Bra
         @parent = nil
         @id = nil
         @handler = nil
+        @update_channel = nil
       end
 
-      # Registers a handler to be used when this object is modified
+      # Registers a handler to be called when this object is modified
       #
       # @param handler [Object] A handler object.  This may contain the methods
       #   put and delete, which handle PUTs and DELETEs respectively.  These
@@ -43,6 +46,54 @@ module Bra
         @handler = handler
         self
       end
+
+      # Registers a channel to be sent updates on this model object
+      #
+      # @param channel [Channel] A channel to which objects interested in this
+      #   model object's updates can subscribe.  The same channel may (and
+      #   usually will) be shared between multiple model objects; the payloads
+      #   sent to the channel will uniquely identify the model object in
+      #   question.
+      #
+      # @return [ModelObject] This object, for method chaining purposes.
+      def register_update_channel(channel)
+        @update_channel = channel
+        self
+      end
+
+      # Sends a representation of this model object to the updates channel
+      #
+      # This should be sent when this model object is updated.
+      #
+      # @return [void]
+      def notify_update
+        notify_channel(flat)
+      end
+
+      # Signals to the updates channel that this object is being deleted
+      #
+      # Use notify_update instead if the delete is actually just resetting the
+      # object to a default value.  This is for when the object is actually
+      # about to disappear off the model tree.
+      #
+      # @return [void]
+      def notify_delete
+        notify_channel(:delete)
+      end
+
+      # Sends a notification to the updates channel
+      #
+      # @param repr [Object] A representation of the update.  This will usually
+      #   be either the flat object representation, or :deleted.
+      #
+      # @return [void]
+      def notify_channel(repr)
+        @update_channel.push([self, repr])
+      end
+
+      # Allow the server to register on the updates channel.
+      def_delegator :@update_channel, :subscribe, :register_for_updates
+      def_delegator :@update_channel, :unsubscribe, :deregister_from_updates
 
       # Fails if an operation cannot proceed on this model object
       def fail_if_cannot(operation, privilege_set)
@@ -134,7 +185,6 @@ module Bra
       # This is a stub; any concrete model objects must override it.
       def driver_delete
         driver_method_not_implemented('delete')
-        raise "delete_do must be overridden for model object #{id}."
       end
 
       def driver_method_not_implemented(action)
@@ -168,17 +218,8 @@ module Bra
         [parent_url, id].join('/')
       end
 
-      # The ID of this model object's parent.
-      # @return [String] The parent's ID.
-      def parent_id
-        @parent.id
-      end
-
-      # The canonical URL of this model object's parent.
-      # @return [String] The parent's URL.
-      def parent_url
-        @parent.url
-      end
+      def_delegator :@parent, :id, :parent_id
+      def_delegator :@parent, :url, :parent_url
 
       # The name under which this object's handlers are defined
       #

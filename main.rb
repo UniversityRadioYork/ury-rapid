@@ -81,6 +81,10 @@ end
 
 # Create a model from its config and the playout system driver.
 def init_model(init_config, driver)
+  # Make an updates channel here, because it's neither the driver's
+  # responsibility, nor can it easily be made in the YAML.
+  init_config[:update_channel] = EventMachine::Channel.new
+
   # The model config is created by loading up driver-neutral configuration from
   # the central YAML file, then passing it to the driver to check for
   # unsound config (like requesting 3 channels on a single-channel playout) and

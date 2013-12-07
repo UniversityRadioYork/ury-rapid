@@ -55,7 +55,9 @@ module Bra
         index, item = item.flatten if item.is_a?(Hash)
         fail('Unknown item type.') if index.nil?
 
+        item.register_update_channel(@update_channel)
         item.move_to(self, Integer(index))
+        item.notify_update
       end
     end
   end

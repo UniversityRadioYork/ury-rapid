@@ -50,7 +50,7 @@ module Bra
           private
 
           def marker(response)
-            CODES_TO_MARKER[response[:code]]
+            CODES_TO_MARKERS[response[:code]]
           end
         end
 

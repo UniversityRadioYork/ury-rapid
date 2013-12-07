@@ -4,7 +4,7 @@ require_relative 'player'
 
 module Bra
   module Models
-    # Public: Option-based creator for models.
+    # Option-based creator for models.
     #
     # This performs dependency injection and ensures any model modification
     # handlers specified in the options are set up.
@@ -18,67 +18,74 @@ module Bra
       # options - The options hash to use to create models.
       def initialize(options)
         @options = options
+        @channel = EventMachine::Channel.new
       end
 
       # Public: Create a Model.
       #
       # Returns a Model.
       def create
-        Model.new.tap(&method(:create_channel_set))
+        create_a(Model, :create_channel_set)
       end
 
       private
 
-      def create_a(cclass, child_maker)
-        cclass.new.tap(&method(child_maker)).tap(&method(:register_handlers))
+      def create_a(cclass, child_maker = nil)
+        create_from(cclass.new, child_maker)
       end
 
-      def create_channel_set(model)
-        create_a(ChannelSet, :create_channels).move_to(model, :channels)
+      def create_from(object, child_maker = nil)
+        register_handlers(object)
+        register_update_channel(object)
+
+        place_in(object, send(child_maker)) if child_maker
+
+        object
       end
 
-      def create_channels(channel_set)
+      def place_in(parent, objects)
+        objects.each { |id, object| object.move_to(parent, id) }
+      end
+
+      def create_channel_set
+        { channels: create_a(ChannelSet, :create_channels) }
+      end
+
+      def create_channels
         num_channels = @options[:num_channels]
-        (0...num_channels).each { |i| create_channel(channel_set, i) }
+        Hash[(0...num_channels).map { |i| [i, create_channel] }]
       end
 
-      def create_channel(channel_set, index)
-        create_a(Channel, :create_channel_children).move_to(channel_set, index)
+      def create_channel
+        create_a(Channel, :create_channel_children)
       end
 
-      def create_channel_children(channel)
-        create_player(channel)
-        create_playlist(channel)
+      def create_channel_children
+        { player: create_player, playlist: create_playlist }
       end
 
-      def create_player(channel)
-        create_a(Player, :create_player_children).move_to(channel, :player)
+      def create_player
+        create_a(Player, :create_player_children)
       end
 
-      def create_player_children(player)
-        state = PlayerVariable.make_state.move_to(player, :state)
-        register_handlers(state)
-
-        PlayerVariable.make_load_state.move_to(player, :load_state)
-        # No handlers for load state, as it's not directly mutable.
-
-        Item.new(:null, nil).move_to(player, :item)
-
-        create_player_markers(player)
+      def create_player_children
+        {
+          state: create_from(PlayerVariable.make_state),
+          load_state: create_from(PlayerVariable.make_load_state),
+          item: Item.new(:null, nil)
+        }.merge!(create_player_markers)
       end
 
-      def create_player_markers(player)
-        MARKERS.each { |marker| create_player_marker(player, marker) }
+      def create_player_markers
+        Hash[MARKERS.map { |id| [id, create_player_marker(id)] }]
       end
 
-      def create_player_marker(player, marker)
-        marker = PlayerVariable.make_marker.move_to(player, marker)
-        register_handlers(marker)
+      def create_player_marker(id)
+        create_from(PlayerVariable.make_marker(id))
       end
 
-      def create_playlist(channel)
-        playlist = Playlist.new.move_to(channel, :playlist)
-        register_handlers(playlist)
+      def create_playlist
+        create_a(Playlist)
       end
 
       # Attaches HTTP method handlers to a model resource
@@ -96,8 +103,22 @@ module Bra
         warn_no_handler_for(object) if handler.nil?
       end
 
+      # Attaches the updates channel to a model resource
+      #
+      # The attached channel will be @options[:updates_channel].
+      #
+      # @param object [ModelObject] The resource to which the handlers will
+      #   be attached.
+      #
+      # @return [void]
+      def register_update_channel(object)
+        channel = @options[:update_channel]
+        object.register_update_channel(channel) unless channel.nil?
+        fail('No update channel in @options[:update_channel].') if channel.nil?
+      end
+
       def warn_no_handler_for(object)
-        puts("No handler for target #{object.handler_target}.") 
+        puts("No handler for target #{object.handler_target}.")
       end
 
       MARKERS = %i(cue position intro duration)

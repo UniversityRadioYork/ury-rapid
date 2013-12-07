@@ -75,10 +75,12 @@ module Bra
       #
       # @param resource [Object] A hash (which should have one item, a mapping
       #   from this variable's ID to its new value), or the new value itself.
-      def put_do(resource)
+      def driver_put(resource)
         value = resource[id] if resource.is_a?(Hash)
         value = resource unless resource.is_a?(Hash)
         @value = value
+
+        notify_update
       end
 
       # Public: Resets the variable to its default value.
@@ -86,17 +88,13 @@ module Bra
       # @return [void]
       def reset
         @value = initial_value
+
+        notify_update
       end
 
-      alias_method :delete_do, :reset
+      alias_method :driver_delete, :reset
 
-      # The driver_XYZ methods allow the driver to perform modifications to the
-      # model using the same verbs as the server without triggering the usual
-      # handlers.  They are implemented using the _do methods.
-      alias_method :driver_put, :put_do
-      alias_method :driver_delete, :delete_do
-
-      # Internal: Validates an incoming symbol.
+      # Validates an incoming symbol
       #
       # new_symbol - The incoming symbol.
       # candidates - A list of allowed symbols.

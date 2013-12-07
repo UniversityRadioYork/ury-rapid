@@ -50,6 +50,8 @@ module Bra
     # Player variables also have validation, so that broken controllers can be
     # discovered.
     class PlayerVariable < Variable
+      extend Forwardable
+
       def self.make_state
         new(:stopped, method(:validate_state))
       end
@@ -58,34 +60,12 @@ module Bra
         new(:empty, method(:validate_load_state))
       end
 
-      def self.make_marker
-        new(0, method(:validate_marker))
+      def self.make_marker(id)
+        new(0, method(:validate_marker), "player_#{id}".intern)
       end
 
-      # Sets the handler target for this player variable
-      #
-      # This makes the target player_ID for player variables.
-      #
-      # @api semipublic
-      #
-      # @return [Symbol] The name under which any handlers for this player
-      #  variable must be registered.
-      def handler_target
-        "player_#{id}".intern
-      end
-
-      # Internal: Returns the channel this player component is inside.
-      #
-      # Returns the channel ID.
-      def player_channel
-        parent.channel
-      end
-
-      ##
-      # Returns the ID of this parent's channel.
-      def player_channel_id
-        parent.channel_id
-      end
+      def_delegator :@parent, :channel, :player_channel
+      def_delegator :@parent, :channel_id, :player_channel_id
 
       # Validates an incoming marker
       #
