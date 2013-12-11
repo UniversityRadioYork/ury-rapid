@@ -15,7 +15,7 @@ module Bra
               self,
               response,
               post_url(response),
-              id,
+              id(response),
               load_state_url(response)
             )
           end
@@ -38,8 +38,6 @@ module Bra
             @load_state = load_state
             @post_url = post_url
             @load_state_url = load_state_url
-
-            extract_fields_from_response
           end
 
           def run
@@ -81,6 +79,8 @@ module Bra
             @post_url = post_url
             @load_state_url = load_state_url
             @id = id
+
+            extract_fields_from_response
           end
 
           def run
@@ -123,8 +123,8 @@ module Bra
           # name).
           #
           # @return [Symbol] One of the valid load states.
-          def load_state_from_title(title)
-            TITLE_TO_ABNORMAL_LOAD_STATE[title] || :ok
+          def load_state_from_title
+            TITLE_TO_ABNORMAL_LOAD_STATE[@title] || :ok
           end
 
           # Hash mapping BAPS's special track titles to abnormal load states.
@@ -166,7 +166,7 @@ module Bra
           # @return [Symbol] The bra equivalent of the BAPS track type (:library,
           #   :file or :text).
           def type_as_bra_symbol
-            fail(InvalidTrackType, @type) unless TRACK_TYPE_MAP.include?(@type)
+            fail(Baps::Exceptions::InvalidTrackType, @type) unless TRACK_TYPE_MAP.include?(@type)
             TRACK_TYPE_MAP[@type]
           end
         end
