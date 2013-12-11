@@ -6,7 +6,15 @@ module Bra
     module Exceptions
       # Exception generated when the playout system sends a load request for a
       # track type bra doesn't understand.
-      InvalidTrackType = Class.new(Bra::Exceptions::InvalidPlayoutResponseError)
+      class InvalidTrackType < Bra::Exceptions::InvalidPlayoutResponseError
+        def initialize(type)
+          super(type)
+          @type = type
+        end
+        def to_s
+          "Invalid track type: #{@type}."
+        end
+      end
     end
   end
 end
