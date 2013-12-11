@@ -255,7 +255,14 @@ module Bra
           @reader.uint32.try do |track_type|
             # Note that these are in reverse order, as they're being shifted
             # onto the front.
-            @expected.unshift(DURATION) unless track_type == Types::Track::NULL
+            case track_type
+            when Types::Track::NULL
+              # No extra argument here.
+            when Types::Track::TEXT
+              @expected.unshift(TEXT_CONTENTS)
+            else
+              @expected.unshift(DURATION)
+            end
             @expected.unshift(TITLE)
 
             @response[name] = track_type
@@ -334,6 +341,7 @@ module Bra
         }
 
         DURATION = %i(duration uint32)
+        TEXT_CONTENTS = %i(contents string)
         TITLE = %i(title string)
       end
     end
