@@ -58,7 +58,7 @@ module Bra
           end
 
           def set_load_state
-            @parent.put(load_state_url, @load_state)
+            @parent.put(@load_state_url, @load_state)
           end
         end
 
