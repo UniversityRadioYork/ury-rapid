@@ -59,11 +59,13 @@ module Bra
       #
       # @return [void]
       def driver_delete
+        # Must notify before changing parent, as the notification requires
+        # a valid full URL.
+        notify_delete
+
         parent.remove_child(id)
         @parent = nil
         @id = nil
-
-        notify_delete
       end
 
       # Sets the item's properties from a hash

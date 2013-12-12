@@ -1,5 +1,9 @@
 /* JavaScript for the BRA API Inspector. */
 
+/*
+ * TOOLBAR
+ */
+
 $( 'header' ).append(
   ( '<nav id="toolbar">'
   + '  <h1>Send Requests</h1>'

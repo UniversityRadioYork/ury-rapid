@@ -1,10 +1,13 @@
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'sinatra/streaming'
+require 'sinatra-websocket'
 require 'eventmachine'
 require 'json'
 require 'haml'
 require_relative '../common/payload'
+require_relative 'updater'
+
 
 module Bra
   # The Sinatra application that powers the server component of bra.
@@ -100,7 +103,7 @@ module Bra
       get('/stylesheets/*') { serve_text('css', 'stylesheets') }
       get('/scripts/*') { serve_text('javascript', 'scripts') }
 
-      get('/stream/') { model_updates_stream }
+      get('/stream/?') { model_updates_stream }
 
       # General model traversals.  These need to be at the bottom, so that they
       # don't override more specific URL matches.
@@ -119,23 +122,18 @@ module Bra
 
       # Sets up a connection to the model updates stream.
       def model_updates_stream
-        content_type 'application/json', charset: 'utf-8'
-        privs = privilege_set
-
-        stream(:keep_open) do |out|
-          id = @model.register_for_updates do |(object, repr)|
-            stream_update(object, repr, out, privs)
-          end
-          out.callback { @model.deregister_from_updates(id) }
-          out.errback { @model.deregister_from_updates(id) }
-        end
+        cors
+        updater = Updater.new(@model, privilege_set)
+        request.websocket? ? websocket_update(updater) : stream_update(updater)
       end
 
-      def stream_update(object, repr, out, privs)
-        if object.can?(:get, privs)
-          json = { object.url => repr }.to_json
-          out.write("#{json}\n")
-        end
+      def stream_update(updater)
+        content_type 'application/json', charset: 'utf-8'
+        stream(:keep_open, &updater.method(:stream))
+      end
+
+      def websocket_update(updater)
+        request.websocket(&updater.method(:websocket))
       end
 
       def handle_get(target)

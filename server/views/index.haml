@@ -11,4 +11,14 @@
     %ul
       %li
         %a{ href: url('/channels') } Channels
+  %section.updates
+    %h1 Update Console
+    %p
+      If JavaScript and WebSockets are enabled, raw bra update notifications
+      will appear here.  This can be used to test that the WebSocket updates
+      system is working.
+    %p#status
+      No connection (yet).
+    %pre#update-console
+    %script{ src: url('/scripts/update.js') }
 

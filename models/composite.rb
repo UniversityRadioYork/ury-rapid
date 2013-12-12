@@ -167,8 +167,19 @@ module Bra
         clear
       end
 
+      # Default implementation of driver_post.
+      #
+      # If a resource with the requested ID exists, this will try to PUT the
+      # resource inside it; otherwise, the resource is moved to the ID.
+      #
+      # @param id [Object] The ID to POST the resource under.
+      # @param resource [Object] The resource to POST.
+      #
+      # @return [void]
       def driver_post(id, resource)
-        child(id).try? { |child| child.driver_put(resource) }
+        existing = child(id)
+        existing.driver_put(resource) unless existing.nil?
+        resource.move_to(self, id)    if     existing.nil?
       end
     end
 

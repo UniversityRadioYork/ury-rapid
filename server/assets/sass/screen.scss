@@ -256,11 +256,6 @@ section.player-secondary-markers {
     }
 }
 
-//p.item>span {
-//    padding-bottom: $size-padding;
-//        display: block;
-//    }
-//}
 li.item, p.item {
   position: relative;
   padding: $size-padding-thin;
@@ -355,7 +350,7 @@ nav.resources {
     }
 }
 
-pre.json_code {
+pre.json_code, pre#update-console {
     @include border;
 
     padding: $size-padding;
