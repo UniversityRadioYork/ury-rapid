@@ -63,11 +63,14 @@ module Bra
           alias_method :post_url, :playlist_url
 
           def id(response)
-            response[:index]
+            :item
           end
 
-          def load_state_url(response)
-            player_url(response, :load_state)
+          def urls(response)
+            { post:       player_url(response),
+              delete:     player_url(response, :item),
+              load_state: player_url(response, :load_state)
+            }
           end
         end
       end

@@ -169,8 +169,8 @@ module Bra
       # POSTs a resource to this model object from the driver side
       #
       # This is a stub; any concrete model objects must override it.
-      def driver_post(_)
-        driver_method_not_implemented('put')
+      def driver_post(_, _)
+        driver_method_not_implemented('post')
       end
 
       # PUTs a resource to this model object from the driver side

@@ -7,16 +7,15 @@ module Bra
       module Handlers
         # Base class for handlers that wrap a Loader.
         #
-        # Descendants should define methods post_url, id and load_state_url,
+        # Descendants should define methods id and urls,
         # which take the response and return the relevant Loader arguments.
         class LoaderHandler < Bra::DriverCommon::Responses::Handler
           def run(response)
             Loader.load(
               self,
               response,
-              post_url(response),
               id(response),
-              load_state_url(response)
+              urls(response),
             )
           end
         end
@@ -32,17 +31,17 @@ module Bra
             new(*args).run
           end
 
-          def initialize(parent, item, load_state, post_url, load_state_url)
+          def initialize(parent, id, item, load_state, urls)
             @parent = parent
+            @id = id
             @item = item
             @load_state = load_state
-            @post_url = post_url
-            @load_state_url = load_state_url
+            @urls = urls
           end
 
           def run
-            post_or_delete if @post_url
-            set_load_state if @load_state_url
+            post_or_delete if @urls[:post] || @urls[:delete]
+            set_load_state if @urls[:load_state]
           end
 
           def post_or_delete
@@ -50,15 +49,15 @@ module Bra
           end
 
           def delete
-            parent.delete(@post_url)
+            @parent.delete(@urls[:delete])
           end
 
           def post
-            @parent.post(@post_url, @item)
+            @parent.post(@urls[:post], @id, @item)
           end
 
           def set_load_state
-            @parent.put(@load_state_url, @load_state)
+            @parent.put(@urls[:load_state], @load_state)
           end
         end
 
@@ -73,12 +72,11 @@ module Bra
             new(*args).run
           end
 
-          def initialize(parent, response, post_url, id, load_state_url)
+          def initialize(parent, response, id, urls)
             @parent = parent
             @response = response
-            @post_url = post_url
-            @load_state_url = load_state_url
             @id = id
+            @urls = urls
 
             extract_fields_from_response
           end
@@ -100,7 +98,7 @@ module Bra
           #   - Either nil (no loaded item) or an Item representing the loaded
           #     item.
           def response_to_item_and_load_state
-            load_state = load_state_from_title
+            load_state = decide_load_state
             item = make_item if normal_load_state(load_state)
 
             [item, load_state]
@@ -114,6 +112,16 @@ module Bra
             @type, @title, @duration = @response.values_at(
               :type, :title, :duration
             )
+          end
+
+          def decide_load_state
+            expecting_abnormal_load_state? ? load_state_from_title : :ok
+          end
+
+          def expecting_abnormal_load_state?
+            # All of BAPS's non-OK load states occur when there is no real
+            # item forthcoming.
+            @type == Types::Track::VOID
           end
 
           # Returns the load state implied by the track name
@@ -143,9 +151,7 @@ module Bra
 
           # Loads an item using an ItemLoader
           def load_item(item, load_state)
-            ItemLoader.load(
-              @parent, item, load_state, @post_url, @load_state_url
-            )
+            ItemLoader.load(@parent, @id, item, load_state, @urls)
           end
 
           # Processes a normal loaded item response
@@ -156,7 +162,7 @@ module Bra
           #
           # @return [Hash] The item, wrapped in a POST payload.
           def make_item
-            { @id => Bra::Models::Item.new(type_as_bra_symbol, @title) }
+            Bra::Models::Item.new(type_as_bra_symbol, @title)
           end
 
           # Converts a BAPS track type to a BRA track type

@@ -133,8 +133,8 @@ module Bra
       # @param (see #post_url)
       #
       # @return [void]
-      def driver_post_url(url, payload)
-        find_url(url, payload, &:driver_post)
+      def driver_post_url(url, id, resource)
+        find_url(url, id, resource, &:driver_post)
       end
 
       # DELETEs the resource with the given partial URL in this object's
@@ -166,27 +166,25 @@ module Bra
         each.to_a.each(&:delete_do)
         clear
       end
+
+      def driver_post(id, resource)
+        child(id).try? { |child| child.driver_put(resource) }
+      end
     end
 
     # A model object whose children are arranged as a hash from their IDs to
     # themselves.
     class HashModelObject < CompositeModelObject
+      extend Forwardable
+
       # In order to retain the same API between CompositeModelObjects, we use
       # #each_value here.
       def_delegator :@children, :each_value, :each
+      def_delegator :@children, :delete, :remove_child
 
       def initialize
         super()
         @children = {}
-      end
-
-      # Removes a child from this model object by ID
-      #
-      # @param id [ModelObject] The ID of the child object to remove.
-      #
-      # @return [void]
-      def remove_child(id)
-        @children.delete(id)
       end
 
       # Converts this model object to a "flat" representation
@@ -238,6 +236,8 @@ module Bra
     # A ListModelObject stores its children in an Array, with the object IDs
     # being the numeric indices into that Array.
     class ListModelObject < CompositeModelObject
+      extend Forwardable
+
       # Implement the Enumerable API on the list's children.
       def_delegator :@children, :each
 
@@ -253,14 +253,7 @@ module Bra
         @children = []
       end
 
-      # Removes a child from this model object
-      #
-      # @param id [Fixnum] The index of the child object to remove.
-      #
-      # @return [void]
-      def remove_child(id)
-        @children.delete_at(id)
-      end
+      def_delegator :@children, :delete_at, :remove_child
 
       # Converts this model object to a "flat" representation
       #

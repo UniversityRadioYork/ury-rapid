@@ -256,7 +256,7 @@ module Bra
             # Note that these are in reverse order, as they're being shifted
             # onto the front.
             case track_type
-            when Types::Track::NULL
+            when Types::Track::VOID
               # No extra argument here.
             when Types::Track::TEXT
               @expected.unshift(TEXT_CONTENTS)

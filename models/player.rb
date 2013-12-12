@@ -30,6 +30,16 @@ module Bra
         set_load_state(new_state)
       end
 
+      def driver_post(id, resource)
+        if id == :item
+          resource.register_update_channel(@update_channel)
+          resource.move_to(self, id)
+          resource.notify_update
+        else
+          super(id, resource)
+        end
+      end
+
       # Internal: Removes an item from the player.
       #
       # item - The item to unlink.  This must be the same as the item currently
@@ -53,11 +63,11 @@ module Bra
       extend Forwardable
 
       def self.make_state
-        new(:stopped, method(:validate_state))
+        new(:stopped, method(:validate_state), :player_state)
       end
 
       def self.make_load_state
-        new(:empty, method(:validate_load_state))
+        new(:empty, method(:validate_load_state), :player_load_state)
       end
 
       def self.make_marker(id)

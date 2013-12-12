@@ -43,8 +43,8 @@ module Bra
             response[:index]
           end
 
-          def load_state_url(response)
-            nil
+          def urls(response)
+            { post: playlist_url(response) }
           end
         end
       end

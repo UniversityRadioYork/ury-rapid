@@ -49,14 +49,9 @@ module Bra
       #   Item, or an Item by itself.
       #
       # @return [void]
-      def driver_post(item)
-        index = nil
-        index = children.size if item.is_a?(Item)
-        index, item = item.flatten if item.is_a?(Hash)
-        fail('Unknown item type.') if index.nil?
-
+      def driver_post(id, item)
         item.register_update_channel(@update_channel)
-        item.move_to(self, Integer(index))
+        item.move_to(self, id)
         item.notify_update
       end
     end

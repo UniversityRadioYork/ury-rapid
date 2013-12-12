@@ -12,7 +12,7 @@ module Bra
 
       # Public: Enumeration of the codes used by BAPS to refer to track types.
       module Track
-        NULL = 0
+        VOID = 0
         FILE = 1
         LIBRARY = 2
         TEXT = 3

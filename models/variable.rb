@@ -78,9 +78,13 @@ module Bra
       def driver_put(resource)
         value = resource[id] if resource.is_a?(Hash)
         value = resource unless resource.is_a?(Hash)
-        @value = value
 
-        notify_update
+        # Only bother changing a variable's value and propagating the update
+        # if the value has actually changed.
+        if @value != value
+          @value = value
+          notify_update
+        end
       end
 
       # Public: Resets the variable to its default value.
