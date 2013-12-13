@@ -144,20 +144,12 @@ module Bra
         end
       end
 
-      # POSTs a resource inside this model object, using the post handler
-      #
-      # The resource can be a direct instance of this object, or a hash mapping
-      # this object's ID to one.
-      def post(payload)
-        payload_action(:post, payload)
-      end
-
-      # PUTs a resource into this model object, using the put handler.
-      #
-      # The resource can be a direct instance of this object, or a hash mapping
-      # this object's ID to one.
-      def put(payload)
-        payload_action(:put, payload)
+      # Define payload-based server methods.
+      %w{put post}.each do |action|
+        define_method(action) do |payload|
+          fail_if_cannot(action, payload.privilege_set)
+          @handler.send(action, self, payload)
+        end
       end
 
       # DELETEs this model object, using the delete handler.
@@ -166,29 +158,11 @@ module Bra
         @handler.delete(self)
       end
 
-      # POSTs a resource to this model object from the driver side
-      #
-      # This is a stub; any concrete model objects must override it.
-      def driver_post(_, _)
-        driver_method_not_implemented('post')
-      end
-
-      # PUTs a resource to this model object from the driver side
-      #
-      # This is a stub; any concrete model objects must override it.
-      def driver_put(_)
-        driver_method_not_implemented('put')
-      end
-
-      # DELETEs this model object from the driver side
-      #
-      # This is a stub; any concrete model objects must override it.
-      def driver_delete
-        driver_method_not_implemented('delete')
-      end
-
-      def driver_method_not_implemented(action)
-        fail("driver_#{action} needs overriding for #{self.class} #{id}.")
+      # Define error-raising stubs for the driver modifiers.
+      %w{put post delete}.each do |action|
+        define_method("driver_#{action}") do |*|
+          fail("driver_#{action} needs overriding for #{self.class} #{id}.")
+        end
       end
 
       # Moves this model object to a new parent with a new ID.
@@ -242,13 +216,6 @@ module Bra
       # Returns the default ID to give to POST payloads
       def default_id
         nil
-      end
-
-      private
-
-      def payload_action(action, payload)
-        fail_if_cannot(action, payload.privilege_set)
-        @handler.send(action, self, payload)
       end
     end
 
