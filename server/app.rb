@@ -110,7 +110,7 @@ module Bra
       get('/*/?') { model_traversal { |target| handle_get(target) } }
       put('/*/?') { model_traversal_with_payload(:put) }
       post('/*/?') { model_traversal_with_payload(:post) }
-      delete('/*/?') { model_traversal_without_payload(:delete) }
+      delete('/*/?') { model_traversal_with_payload(:delete) }
 
       private
 
@@ -166,10 +166,6 @@ module Bra
         end
       end
 
-      def model_traversal_without_payload(action)
-        model_traversal { |target| target.send(action, privilege_set) }
-      end
-
       # Performs a model traversal, complete with CORS and privilege check
       def model_traversal(&block)
         cors
@@ -178,18 +174,23 @@ module Bra
         forbidden
       end
 
-      def find(params)
-        @model.find_url(params[:splat].first) { |resource| yield(resource) }
+      def find(params, &block)
+        @model.find_url(params[:splat].first, &block)
       rescue Exceptions::MissingResourceError
         halt(404, json_error('Not found.'))
       end
 
       def make_payload(action, privilege_set, request, target)
-        raw_payload = parse_json_from(request.body.string)
+        raw_payload = get_raw_payload(request)
         Bra::Common::Payload.new(
           raw_payload, privilege_set,
           (action == :put ? target.id : target.default_id)
         )
+      end
+
+      def get_raw_payload(request)
+        payload_string = request.body.string
+        payload_string.empty? ? nil : parse_json_from(request.body.string)
       end
 
       # Parses the request body as JSON and throws a 400 status if it

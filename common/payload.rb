@@ -27,6 +27,11 @@ module Bra
         @id, @item = flatten_payload
       end
 
+      # Creates a new payload with this payload's privileges but a new body
+      def with_body(body)
+        self.class.new(body, @privilege_set, @default_id)
+      end
+
       def process(options)
         (
           (handle_hash(&options[:hash])       if options.key?(:hash))    ||
@@ -143,12 +148,12 @@ module Bra
 
       # Whether the payload is a valid URL or pseudo-URL
       def is_valid_url?
-        is_valid_string? && @item.include?(PROTOCOL_SPLITTER)
+        is_valid_string? && @item.to_s.include?(PROTOCOL_SPLITTER)
       end
 
       # Whether the payload is a valid plain string
       def is_valid_string?
-        @item.is_a?(String)
+        @item.is_a?(String) || @item.is_a?(Symbol)
       end
 
       # Whether the payload is a valid integer

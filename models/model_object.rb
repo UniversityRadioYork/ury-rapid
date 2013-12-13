@@ -144,22 +144,15 @@ module Bra
         end
       end
 
-      # Define payload-based server methods.
-      %w{put post}.each do |action|
+      %w{put post delete}.each do |action|
+        # Define payload-based server methods.
+
         define_method(action) do |payload|
           fail_if_cannot(action, payload.privilege_set)
           @handler.send(action, self, payload)
         end
-      end
 
-      # DELETEs this model object, using the delete handler.
-      def delete(privileges)
-        fail_if_cannot(:delete, privileges)
-        @handler.delete(self)
-      end
-
-      # Define error-raising stubs for the driver modifiers.
-      %w{put post delete}.each do |action|
+        # Define error-raising stubs for the driver modifiers.
         define_method("driver_#{action}") do |*|
           fail("driver_#{action} needs overriding for #{self.class} #{id}.")
         end

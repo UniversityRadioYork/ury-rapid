@@ -45,9 +45,15 @@ module Bra
         # @param variable [Variable] A model object representing a mutable
         #   variable.
         #
+        # @param payload [Payload] A payload (whose value is meaningless, as
+        #   this is a DELETE).
+        #
         # @return (see #put)
-        def delete(variable)
-          put(variable, variable.initial_value)
+        def delete(variable, payload)
+          put(
+            variable,
+            payload.with_body(variable.id => variable.initial_value)
+          )
         end
       end
     end
