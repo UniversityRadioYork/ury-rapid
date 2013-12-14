@@ -50,6 +50,8 @@ module Bra
 
         # Object that performs the POSTing of a playlist item.
         class PlaylistPoster < Bra::DriverCommon::Requests::Poster
+          extend Forwardable
+
           URL_PROTOCOLS = Hash.new_with_default_block({
             x_baps_file: :file_from_url
           }) { |h, k| unknown_protocol(k) }
@@ -75,9 +77,7 @@ module Bra
 
           private
 
-          def channel_id
-            @object.channel_id
-          end
+          def_delegator :@object, :channel_id
 
           def add_item_request(type)
             Request.new(Codes::Playlist::ADD_ITEM, channel_id).uint32(type)

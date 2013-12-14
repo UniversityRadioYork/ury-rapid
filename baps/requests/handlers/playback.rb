@@ -17,6 +17,8 @@ module Bra
 
         # A method object that handles POSTs to the Player for BAPS
         class PlayerPoster < Bra::DriverCommon::Requests::Poster
+          extend Forwardable
+
           def post_forward
             @payload.id == :item ? false : super()
           end
@@ -35,9 +37,7 @@ module Bra
 
           private
 
-          def channel_id
-            @object.channel_id
-          end
+          def_delegator :@object, :channel_id
 
           def item_from_playlist_hash(hash)
             # TODO(mattbw): Non-local loads?
@@ -82,15 +82,15 @@ module Bra
 
         # Object that performs the POSTing and PUTting of a playback marker
         class MarkerPoster < Bra::DriverCommon::Requests::Poster
+          extend Forwardable
+
           def post_integer(integer)
-            request(Request .new(target_to_code, channel_id) .uint32(integer))
+            request(Request.new(target_to_code, channel_id) .uint32(integer))
           end
 
           private
 
-          def channel_id
-            @object.player_channel_id
-          end
+          def_delegator :@object, :player_channel_id, :channel_id
 
           def target_to_code
             TARGET_CODES[@object.handler_target]
@@ -130,6 +130,8 @@ module Bra
 
         # Object that performs the POSTing and PUTting of a playback marker
         class StatePoster < Bra::DriverCommon::Requests::Poster
+          extend Forwardable
+
           def post_string(new_state)
             code_for_state(@object.value, new_state).try do |command|
               request(Request.new(command, channel_id))
@@ -138,9 +140,7 @@ module Bra
 
           private
 
-          def channel_id
-            @object.player_channel_id
-          end
+          def_delegator :@object, :player_channel_id, :channel_id
 
           # Converts a state change to a BAPS command code
           #
