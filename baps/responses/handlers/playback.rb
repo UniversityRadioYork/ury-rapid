@@ -1,3 +1,4 @@
+require_relative 'handler.rb'
 require_relative 'loader.rb'
 
 module Bra
@@ -5,7 +6,7 @@ module Bra
     module Responses
       module Handlers
         # Handles a BAPS channel state change
-        class State < Bra::DriverCommon::Responses::Handler
+        class State < Handler
           TARGETS = [
             Codes::Playback::PLAY,
             Codes::Playback::PAUSE,
@@ -30,7 +31,7 @@ module Bra
         end
 
         # Handles a BAPS channel marker change
-        class Marker < Bra::DriverCommon::Responses::Handler
+        class Marker < Handler
           TARGETS = [
             Codes::Playback::POSITION,
             Codes::Playback::CUE,
@@ -59,8 +60,6 @@ module Bra
           TARGETS = [
             Codes::Playback::LOAD
           ]
-
-          alias_method :post_url, :playlist_url
 
           def id(response)
             :item

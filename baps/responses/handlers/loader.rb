@@ -1,4 +1,4 @@
-require_relative '../../../driver_common/responses/handler'
+require_relative 'handler'
 require_relative '../../exceptions'
 
 module Bra
@@ -9,7 +9,7 @@ module Bra
         #
         # Descendants should define methods id and urls,
         # which take the response and return the relevant Loader arguments.
-        class LoaderHandler < Bra::DriverCommon::Responses::Handler
+        class LoaderHandler < Handler
           def run(response)
             Loader.load(
               self,

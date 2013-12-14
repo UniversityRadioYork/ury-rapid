@@ -64,7 +64,7 @@ module Bra
 
         resource = self
 
-        while tail
+        until tail.nil? || tail.empty?
           # We need to keep traversing down, as we've still got a tail.
           head, tail = tail.split('/', 2)
           resource = resource.child(head)

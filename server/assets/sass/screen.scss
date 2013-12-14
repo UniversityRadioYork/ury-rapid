@@ -138,8 +138,7 @@ h1, h2, h3 {
     font-size: 1.2em;
 }
 
-ol.channels-list {
-    text-align: left;
+.playlists, .players {
     border-collapse: separate;
     border-spacing: $size-padding;
 
@@ -148,31 +147,23 @@ ol.channels-list {
     align-items: stretch;
     margin: 0 auto;
 
-    >li {
+    >section {
         display: flex;
         flex-direction: column;
 
         flex: 1;
         // Remove duplicate borders.
-        &:not(:first-child)>section {
+        &:not(:first-child) {
             border-left: 0;
         }
-    }
-}
 
-section.channel {
-    @include border;
+        >section, >nav, >ol {
+            background-color: $colour-lol;
+        }
 
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    >section, >nav, >ol {
-        background-color: $colour-lol;
-    }
-
-    >section.playlist {
-        flex: 1;
+        >section.playlist {
+            flex: 1;
+        }
     }
 }
 

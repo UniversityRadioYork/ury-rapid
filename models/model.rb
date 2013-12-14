@@ -6,7 +6,7 @@ require_relative 'item'
 module Bra
   module Models
     # Public: A model of the BAPS server state.
-    class Model < HashModelObject
+    class Root < HashModelObject
       extend Forwardable
 
       def channels

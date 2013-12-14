@@ -6,11 +6,21 @@
     For machine readable API output, please set the
     %strong Accept
     header (application/json is preferred).
-  %nav.main-menu
-    %h1 Main Menu
-    %ul
-      %li
-        %a{ href: url('/channels') } Channels
+
+  %section.model
+    %h1=inner ? resource_id : resource_url
+
+    = haml(:playlist_set,
+      locals: { inner: true,
+                resource_id: :playlists,
+                resource_url: "#{resource_url}/playlists",
+                playlist_set: root[:playlists] })
+    = haml(:player_set,
+      locals: { inner: true,
+                resource_id: :players,
+                resource_url: "#{resource_url}/players",
+                player_set: root[:players] })
+
   %section.updates
     %h1 Update Console
     %p

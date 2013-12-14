@@ -1,3 +1,4 @@
+require_relative 'handler.rb'
 require_relative 'loader.rb'
 
 module Bra
@@ -5,7 +6,7 @@ module Bra
     module Responses
       module Handlers
         # Handles a BAPS playlist item removal, as well as full-playlist reset
-        class Delete < Bra::DriverCommon::Responses::Handler
+        class Delete < Handler
           TARGETS = [
             Codes::Playlist::DELETE_ITEM,
             Codes::Playlist::RESET
@@ -25,7 +26,7 @@ module Bra
           end
         end
 
-        class ItemCount < Bra::DriverCommon::Responses::Handler
+        class ItemCount < Handler
           TARGETS = [Codes::Playlist::ITEM_COUNT]
 
           def run(_)
@@ -36,8 +37,6 @@ module Bra
         # Handles a BAPS playlist item add
         class ItemData < LoaderHandler
           TARGETS = [Codes::Playlist::ITEM_DATA]
-
-          alias_method :post_url, :playlist_url
 
           def id(response)
             response[:index]

@@ -99,7 +99,6 @@ module Bra
       options('/*/?') { cors }
 
       # Special files.
-      get('/') { respond_with :index }
       get('/stylesheets/*') { serve_text('css', 'stylesheets') }
       get('/scripts/*') { serve_text('javascript', 'scripts') }
 

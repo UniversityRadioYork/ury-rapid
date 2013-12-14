@@ -2,28 +2,7 @@ require_relative 'composite'
 
 module Bra
   module Models
-    # Wrapper around a list of channels.
-    class ChannelSet < ListModelObject
-      alias_method :channels, :children
-      alias_method :channel, :child
-    end
-
-    # A channel in the BAPS server state.
-    class Channel < HashModelObject
-      def player
-        child(:player)
-      end
-
-      def playlist
-        child(:playlist)
-      end
-
-      # Clears the channel's playlist.
-      #
-      # @return [void]
-      def clear_playlist
-        playlist.clear
-      end
+    class PlaylistSet < HashModelObject
     end
 
     # A channel playlist, consisting of a list of playlist items.

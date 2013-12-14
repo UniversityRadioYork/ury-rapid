@@ -1,0 +1,14 @@
+-# playlist_set.haml - PlaylistSet objects
+
+%section.playlist-set
+  %h1=inner ? resource_id : resource_url
+
+  %div.playlists
+    - playlist_set.each do |id, playlist|
+      = haml(:playlist,
+             locals: { inner: true,
+                       resource_id: id,
+                       resource_url: "#{resource_url}/#{id}",
+                       playlist: playlist })
+
+  = haml :in_out_links, locals: { resource_url: resource_url, inner: inner }

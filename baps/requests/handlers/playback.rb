@@ -37,7 +37,7 @@ module Bra
 
           private
 
-          def_delegator :@object, :channel_id
+          def_delegator :@object, :id, :player_id
 
           def item_from_playlist_hash(hash)
             # TODO(mattbw): Non-local loads?
@@ -51,7 +51,7 @@ module Bra
 
           def item_from_local_playlist(index)
             request(
-              Request.new(Codes::Playback::LOAD, channel_id).uint32(index)
+              Request.new(Codes::Playback::LOAD, player_id).uint32(index)
             )
           end
         end
@@ -85,12 +85,12 @@ module Bra
           extend Forwardable
 
           def post_integer(integer)
-            request(Request.new(target_to_code, channel_id) .uint32(integer))
+            request(Request.new(target_to_code, player_id) .uint32(integer))
           end
 
           private
 
-          def_delegator :@object, :player_channel_id, :channel_id
+          def_delegator :@object, :player_id
 
           def target_to_code
             TARGET_CODES[@object.handler_target]
@@ -134,13 +134,13 @@ module Bra
 
           def post_string(new_state)
             code_for_state(@object.value, new_state).try do |command|
-              request(Request.new(command, channel_id))
+              request(Request.new(command, parent_id))
             end
           end
 
           private
 
-          def_delegator :@object, :player_channel_id, :channel_id
+          def_delegator :@object, :parent_id
 
           # Converts a state change to a BAPS command code
           #

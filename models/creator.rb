@@ -1,5 +1,5 @@
 require_relative 'model'
-require_relative 'channel'
+require_relative 'playlist'
 require_relative 'player'
 
 module Bra
@@ -22,13 +22,29 @@ module Bra
         @target = nil
       end
 
-      # Public: Create a Model.
+      # Create the model from the given configuration
       #
-      # Returns a Model.
+      # @return [Root]  The finished model.
       def create
-        root Model do
-          child(:channels, ChannelSet) { create_channels }
+        root Root do
+          child(:playlists, PlaylistSet) { playlists }
+          child(:players,   PlayerSet  ) { players   }
         end
+      end
+
+      def playlists
+        @options[:playlists].each { |i| child(i, Playlist) }
+      end
+
+      def players
+        @options[:players].each { |i| child(i, Player) { player } }
+      end
+
+      def player
+        child :state,      PlayerVariable.make_state
+        child :load_state, PlayerVariable.make_load_state
+        child :item,       Item.new(:null, nil)
+        MARKERS.each { |id| child(id, PlayerVariable.make_marker(id)) }
       end
 
       private
@@ -62,24 +78,6 @@ module Bra
       def place_in(parent, objects)
         objects.each { |id, object| object.move_to(parent, id) }
       end
-
-      def create_channels
-        num_channels = @options[:num_channels]
-        (0...num_channels).each { |i| child(i, Channel) { create_channel } }
-      end
-
-      def create_channel
-        child(:player, Player) {create_player}
-        child :playlist, Playlist
-      end
-
-      def create_player
-        child :state,      PlayerVariable.make_state
-        child :load_state, PlayerVariable.make_load_state
-        child :item,       Item.new(:null, nil)
-        MARKERS.each { |id| child(id, PlayerVariable.make_marker(id)) }
-      end
-
       # Attaches HTTP method handlers to a model resource
       #
       # The attached handlers will be @options[NAME][METHOD], where NAME is the

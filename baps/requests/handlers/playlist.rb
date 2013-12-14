@@ -19,10 +19,8 @@ module Bra
           def delete(object, _)
             case object.handler_target
             when :playlist
-              reset(object.channel_id)
-            when :channel
               reset(object.id)
-            when :channel_set
+            when :playlist_set
               object.children.map(&:id).each(&method(:reset))
             end
 
@@ -77,10 +75,10 @@ module Bra
 
           private
 
-          def_delegator :@object, :channel_id
+          def_delegator :@object, :id, :playlist_id
 
           def add_item_request(type)
-            Request.new(Codes::Playlist::ADD_ITEM, channel_id).uint32(type)
+            Request.new(Codes::Playlist::ADD_ITEM, playlist_id).uint32(type)
           end
 
           def direct(item)
