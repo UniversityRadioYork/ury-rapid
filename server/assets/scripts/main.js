@@ -45,7 +45,7 @@ function toolbar_do(action)
   );
   request.fail(
     function( jqXHR, msg ) {
-      alert(action + ' failed: ' + msg);
+      alert(action + ' failed: ' + jqXHR.responseText);
     }
   );
 }
