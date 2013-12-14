@@ -19,73 +19,65 @@ module Bra
       def initialize(options)
         @options = options
         @channel = EventMachine::Channel.new
+        @target = nil
       end
 
       # Public: Create a Model.
       #
       # Returns a Model.
       def create
-        create_a Model do
-          { channels: create_channel_set
-          }
+        root Model do
+          child(:channels, ChannelSet) { create_channels }
         end
       end
 
       private
 
-      def create_a(cclass, &block)
-        create_from(cclass.new, &block)
+      def root(object, &block)
+        object = object.new if object.is_a?(Class)
+        register(object)
+        build_children(object, &block) if block
+        object
       end
 
-      def create_from(object, &block)
+      def child(id, object, &block)
+        object = object.new if object.is_a?(Class)
+        object.move_to(@target, id)
+        register(object)
+        build_children(object, &block) if block
+      end
+
+      def build_children(object)
+        target = @target
+        @target = object
+        yield
+        @target = target
+      end
+
+      def register(object)
         register_handlers(object)
         register_update_channel(object)
-
-        place_in(object, block.call) if block
-
-        object
       end
 
       def place_in(parent, objects)
         objects.each { |id, object| object.move_to(parent, id) }
       end
 
-      def create_channel_set
-        create_a(ChannelSet) { create_channels }
-      end
-
       def create_channels
         num_channels = @options[:num_channels]
-        Hash[(0...num_channels).map { |i| [i, create_channel] }]
+        (0...num_channels).each { |i| child(i, Channel) { create_channel } }
       end
 
       def create_channel
-        create_a Channel do
-          { player: create_player,
-            playlist: create_playlist
-          }
-        end
+        child(:player, Player) {create_player}
+        child :playlist, Playlist
       end
 
       def create_player
-        create_a Player do
-          { state: create_from(PlayerVariable.make_state),
-            load_state: create_from(PlayerVariable.make_load_state),
-            item: Item.new(:null, nil)
-          }.merge!(create_player_markers)
-        end
-      end
-
-      def create_player_markers
-        Hash[MARKERS.map { |id| [id, create_player_marker(id)] }]
-      end
-
-      def create_player_marker(id)
-        create_from(PlayerVariable.make_marker(id))
-      end
-
-      def create_playlist
-        create_a(Playlist)
+        child :state,      PlayerVariable.make_state
+        child :load_state, PlayerVariable.make_load_state
+        child :item,       Item.new(:null, nil)
+        MARKERS.each { |id| child(id, PlayerVariable.make_marker(id)) }
       end
 
       # Attaches HTTP method handlers to a model resource
