@@ -1,4 +1,4 @@
-require_relative 'channel'
+require_relative 'composite'
 require_relative 'variable'
 require_relative '../utils/hash'
 
@@ -36,6 +36,7 @@ module Bra
       def driver_post(id, resource)
         if id == :item
           resource.register_update_channel(@update_channel)
+          resource.register_handler(@handler.item_handler(resource))
           resource.move_to(self, id)
           resource.notify_update
         else

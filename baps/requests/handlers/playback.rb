@@ -13,6 +13,20 @@ module Bra
           def post(object, payload)
             PlayerPoster.post(payload, self, object)
           end
+
+          # Creates a handler for the item loaded into this Player
+          def item_handler(object)
+            LoadedItem.new(@parent)
+          end
+        end
+
+        # Handler for loaded items
+        class LoadedItem < Bra::DriverCommon::Requests::Handler
+          # This handler has no targets - it is attached to incoming items
+          # by the Player's handler.
+          def delete(object, payload)
+            fail(Bra::Exceptions::NotSupportedByDriver)
+          end
         end
 
         # A method object that handles POSTs to the Player for BAPS
