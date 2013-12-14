@@ -1,4 +1,5 @@
 require_relative '../handler'
+require_relative '../../exceptions'
 
 module Bra
   module DriverCommon
@@ -26,6 +27,13 @@ module Bra
         #
         # @return [void]
         def_delegator(:@parent, :request)
+
+        # Default to a 'not supported' exception on all actions.
+        %w{put post delete}.each do |action|
+          define_method(action) do |*|
+            fail(Bra::Exceptions::NotSupportedByBra)
+          end
+        end
       end
 
       # Extension of Handler implementing default behaviour for Variables.
