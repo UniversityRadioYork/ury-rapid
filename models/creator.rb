@@ -25,20 +25,23 @@ module Bra
       #
       # Returns a Model.
       def create
-        create_a(Model, :create_channel_set)
+        create_a Model do
+          { channels: create_channel_set
+          }
+        end
       end
 
       private
 
-      def create_a(cclass, child_maker = nil)
-        create_from(cclass.new, child_maker)
+      def create_a(cclass, &block)
+        create_from(cclass.new, &block)
       end
 
-      def create_from(object, child_maker = nil)
+      def create_from(object, &block)
         register_handlers(object)
         register_update_channel(object)
 
-        place_in(object, send(child_maker)) if child_maker
+        place_in(object, block.call) if block
 
         object
       end
@@ -48,7 +51,7 @@ module Bra
       end
 
       def create_channel_set
-        { channels: create_a(ChannelSet, :create_channels) }
+        create_a(ChannelSet) { create_channels }
       end
 
       def create_channels
@@ -57,23 +60,20 @@ module Bra
       end
 
       def create_channel
-        create_a(Channel, :create_channel_children)
-      end
-
-      def create_channel_children
-        { player: create_player, playlist: create_playlist }
+        create_a Channel do
+          { player: create_player,
+            playlist: create_playlist
+          }
+        end
       end
 
       def create_player
-        create_a(Player, :create_player_children)
-      end
-
-      def create_player_children
-        {
-          state: create_from(PlayerVariable.make_state),
-          load_state: create_from(PlayerVariable.make_load_state),
-          item: Item.new(:null, nil)
-        }.merge!(create_player_markers)
+        create_a Player do
+          { state: create_from(PlayerVariable.make_state),
+            load_state: create_from(PlayerVariable.make_load_state),
+            item: Item.new(:null, nil)
+          }.merge!(create_player_markers)
+        end
       end
 
       def create_player_markers
