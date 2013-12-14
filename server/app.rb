@@ -171,6 +171,8 @@ module Bra
         find(params, &block)
       rescue Bra::Exceptions::InsufficientPrivilegeError
         forbidden
+      rescue Bra::Exceptions::NotSupported => e
+        not_supported(e)
       end
 
       def find(params, &block)
@@ -216,6 +218,10 @@ module Bra
       # @return [void]
       def client_error(message)
         halt(400, json_error(message))
+      end
+
+      def not_supported(exception)
+        halt(405, json_error(exception.to_s))
       end
 
       # Internal: Renders an error message in JSON.
