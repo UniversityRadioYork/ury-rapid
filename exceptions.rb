@@ -16,6 +16,9 @@ module Bra
     # Exception generated when the playout system sends an invalid message.
     InvalidPlayoutResponseError = Class.new(RuntimeError)
 
+    # Exception generated when the client gives an invalid payload
+    InvalidPayload = Class.new(RuntimeError)
+
     # Exception generated when the client requests something unsupported
     class NotSupported < RuntimeError
       def to_s

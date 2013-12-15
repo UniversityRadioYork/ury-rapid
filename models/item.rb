@@ -1,5 +1,6 @@
 require 'active_support/core_ext/hash/keys'
 require_relative 'model_object'
+require_relative '../common/types'
 
 module Bra
   module Models
@@ -111,11 +112,7 @@ module Bra
       private
 
       def validate_type(type)
-        type = :null if type.nil?
-        type = type.intern if type.respond_to?(:intern)
-        valid_type = %i(library file text null).include?(type)
-        raise "Not a valid type: #{type}" unless valid_type
-        type
+        Bra::Common::Types.validate_track_type(type)
       end
     end
 

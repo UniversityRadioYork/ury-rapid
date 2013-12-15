@@ -8,8 +8,8 @@ module Bra
     class PlayerSet < HashModelObject
     end
 
-    # Public: A player in the model, which represents a channel's currently
-    # playing song and its state.
+    # A player in the model, which represents a channel's currently playing
+    # song and its state.
     class Player < HashModelObject
       include ItemContainer
     end
