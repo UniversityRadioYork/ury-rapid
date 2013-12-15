@@ -1,0 +1,10 @@
+-# set.haml - Set objects
+
+%section.set
+  %h1=inspector.title
+
+  %div.players
+    - inspector.resource.each do |id, item|
+      = child(inspector, id)
+
+  = navigation(inspector)

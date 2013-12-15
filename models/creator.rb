@@ -1,4 +1,5 @@
 require_relative 'model'
+require_relative 'set'
 require_relative 'playlist'
 require_relative 'player'
 require_relative 'variable'
@@ -29,17 +30,9 @@ module Bra
       # @return [Root]  The finished model.
       def create
         root Root do
-          child(:playlists, PlaylistSet) { playlists }
-          child(:players,   PlayerSet)   { players   }
+          set :players, Player, @options[:players] { player }
+          set :playlists, Playlist, @options[:playlists]
         end
-      end
-
-      def playlists
-        @options[:playlists].each { |i| child(i, Playlist) }
-      end
-
-      def players
-        @options[:players].each { |i| child(i, Player) { player } }
       end
 
       def player
@@ -69,6 +62,18 @@ module Bra
         end
       end
 
+      private
+
+      def set(id, member_class, ids, &block)
+        child id, Set.new(member_class) do
+          children(ids, member_class, &block)
+        end
+      end
+
+      def children(ids, child_class, &block)
+        ids.each { |id| child(id, child_class, &block) }
+      end
+
       def root(object, &block)
         object = object.new if object.is_a?(Class)
         register(object)
@@ -77,10 +82,7 @@ module Bra
       end
 
       def child(id, object, &block)
-        object = object.new if object.is_a?(Class)
-        object.move_to(@target, id)
-        register(object)
-        build_children(object, &block) if block
+        root(object, &block).move_to(@target, id)
       end
 
       def var(target, validator, initial_value)

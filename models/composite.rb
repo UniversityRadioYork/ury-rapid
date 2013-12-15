@@ -198,6 +198,11 @@ module Bra
         @children = {}
       end
 
+      # Gets this object's children, as a hash
+      def child_hash
+        @children
+      end
+
       # Converts this model object to a "flat" representation
       #
       # Flat representations contain only primitive objects (integers, strings,
@@ -261,6 +266,11 @@ module Bra
       def initialize
         super()
         @children = []
+      end
+
+      # Gets this object's children, as a hash
+      def child_hash
+        Hash[*@children.each_with_index.to_a]
       end
 
       # Clears the ListModelObject

@@ -31,9 +31,17 @@ module Bra
         @update_channel = nil
       end
 
-      # Gets this object's current ID.
+      # Gets this object's current ID
       def id
         @id_function.call
+      end
+
+      # Gets this object's children, as a hash
+      #
+      # By default, model objects have no children, so this returns the empty
+      # hash.
+      def child_hash
+        {}
       end
 
       # Registers a handler to be called when this object is modified

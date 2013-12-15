@@ -1,7 +1,8 @@
 -# playlist.haml - Playlist object
 
 %section.playlist
-  %h1=inner ? resource_id : resource_url
+  %h1=inspector.title
+  - playlist = inspector.resource
   - unless 0 < playlist.size
     %p No items.
 
@@ -9,9 +10,6 @@
     %ol.playlist-items
       - playlist.each_with_index do |item, id|
         %li.item{ class: item[:type] }
-          = haml(:item, locals: { inner: true,
-                                  item: item,
-                                  resource_id: id,
-                                  resource_url: "#{resource_url}/#{id}" })
+          = child(inspector, id)
 
-  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })
+  = navigation(inspector)

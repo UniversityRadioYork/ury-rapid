@@ -1,8 +1,8 @@
 -# variable.haml - Variable object (generic template).
 
 -# Shorten this a bit.
-%section.player-variable{ class: variable }
-  %h1=inner ? resource_id : resource_url
-  %p=variable
+%section.player-variable{ class: inspector.resource }
+  %h1=inspector.title
+  %p=inspector.resource
 
-  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })
+  = navigation(inspector)

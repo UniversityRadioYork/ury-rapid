@@ -4,9 +4,9 @@ require 'sinatra/streaming'
 require 'sinatra-websocket'
 require 'eventmachine'
 require 'json'
-require 'haml'
 require_relative '../common/payload'
 require_relative 'updater'
+require_relative 'inspector'
 
 module Bra
   module Server
@@ -29,48 +29,63 @@ module Bra
 
       # TODO: Make this protection more granular.
       helpers do
-        # Gets the set of privileges the user has
-        #
-        # This fails with HTTP 401 if the user does not exist.
-        #
-        # @return [Array] An array of privilege symbols.
-        def privilege_set
-          credentials = get_credentials(rack_auth)
-          @authenticator.authenticate(*credentials)
-        rescue Bra::Exceptions::AuthenticationFailure
-          not_authorised
+        def child(inspector, id)
+          insp = inspector.inspect_child(id)
+          inspector_haml(insp)
         end
 
-        def rack_auth
-          Rack::Auth::Basic::Request.new(request.env)
+        def navigation(inspector)
+          haml(
+            :in_out_links,
+            locals: {
+              resource_url: inspector.resource_url,
+              inner: inspector.inner
+            }
+          )
         end
+      end
 
-        def get_credentials(auth)
-          fail_authentication unless has_credentials?(auth)
-          auth.credentials
-        end
+      # Gets the set of privileges the user has
+      #
+      # This fails with HTTP 401 if the user does not exist.
+      #
+      # @return [Array] An array of privilege symbols.
+      def privilege_set
+        credentials = get_credentials(rack_auth)
+        @authenticator.authenticate(*credentials)
+      rescue Bra::Exceptions::AuthenticationFailure
+        not_authorised
+      end
 
-        def fail_authentication
-          fail(Bra::Exceptions::AuthenticationFailure)
-        end
+      def rack_auth
+        Rack::Auth::Basic::Request.new(request.env)
+      end
 
-        def has_credentials?(auth)
-          auth.provided? && auth.basic? && auth.credentials
-        end
+      def get_credentials(auth)
+        fail_authentication unless has_credentials?(auth)
+        auth.credentials
+      end
 
-        # Fails with a HTTP 403 Forbidden status.
-        # @return [void]
-        def forbidden
-          halt(403, json_error('Forbidden.'))
-        end
+      def fail_authentication
+        fail(Bra::Exceptions::AuthenticationFailure)
+      end
 
-        # Fails with a HTTP 401 Not Authorised status.
-        #
-        # @return [void]
-        def not_authorised
-          headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-          halt(401, json_error('Not authorised.'))
-        end
+      def has_credentials?(auth)
+        auth.provided? && auth.basic? && auth.credentials
+      end
+
+      # Fails with a HTTP 403 Forbidden status.
+      # @return [void]
+      def forbidden
+        halt(403, json_error('Forbidden.'))
+      end
+
+      # Fails with a HTTP 401 Not Authorised status.
+      #
+      # @return [void]
+      def not_authorised
+        headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+        halt(401, json_error('Not authorised.'))
       end
 
       # Handle CORS headers
@@ -134,24 +149,19 @@ module Bra
       def handle_get(target)
         get_repr = target.get(privilege_set)
 
-        sym = target.class.name.demodulize.underscore.intern
-        respond_with sym, get_repr do |f|
-          f.html { handle_get_html(sym, target, get_repr) }
+        respond_with :json, get_repr do |f|
+          f.html do
+            inspector_haml(Inspector.new(request, target, privilege_set))
+          end
         end
       end
 
-      def handle_get_html(sym, target, get_repr)
-        haml(:object, locals: handle_get_html_locals(sym, target, get_repr))
-      end
-
-      def handle_get_html_locals(sym, target, get_repr)
-        {
-          resource_url: target.url,
-          resource_id: target.id,
-          resource_type: sym,
-          resource: get_repr,
-          inner: false
-        }
+      # Renders an API Inspector instance using HAML.
+      def inspector_haml(inspector)
+        haml(
+          inspector.resource_type,
+          locals: { inspector: inspector }
+        )
       end
 
       def model_traversal_with_payload(action)

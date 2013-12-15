@@ -11,7 +11,7 @@ module Bra
         # all have similar DELETE semantics.
         class Playlist < Bra::DriverCommon::Requests::Handler
           # The handler targets matched by this handler.
-          TARGETS = [:playlist, :channel, :channel_set]
+          TARGETS = [:playlist, :playlist_set]
 
           # Requests a playlist be DELETEd via the BAPS server
           #

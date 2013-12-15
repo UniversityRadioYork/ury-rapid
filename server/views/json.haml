@@ -1,12 +1,8 @@
--#
-  json.haml - JSON inspector
-
-  resource_url - The URL of the resource.
-  resource     - The object whose JSON should be displayed.
+-# json.haml - JSON inspector
 
 %section.json_inspector
-  %h1 JSON for #{resource_url}
-  %pre.json_code=JSON.pretty_generate(resource)
-  %a.out{ href: url(resource_url),
+  %h1 JSON for #{inspector.title}
+  %pre.json_code=JSON.pretty_generate(inspector.raw_resource)
+  %a.out{ href: url(inspector.resource_url),
           title: "Go back to the inspector view for this resource." } Out
 

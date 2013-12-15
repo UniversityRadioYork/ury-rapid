@@ -1,29 +1,20 @@
--#
 -# player.haml - Player object
--#
--# player - The item to display.
--# inner  - If True, display a condensed player for display inside a
--#          channel object.  (Default: false.)
+
+- player = inspector.resource
 
 - var_groups = { "states" => %i{state load_state},
                  "primary-markers" => %i{position duration},
                  "secondary-markers" => %i{cue intro} }
 
 %section.player
-  %h1=inner ? resource_id : resource_url
-  - var_groups.each do |group, syms|
+  %h1=inspector.title
+  - var_groups.each do |group, ids|
     %section{class: "player-#{group}"}
-      - syms.each do |sym|
-        = haml(:player_variable,
-               locals: { inner: true,
-                         resource_id: sym,
-                         resource_url: "#{resource_url}/#{sym}",
-                         player_variable: player[sym] })
-  %p.item{ class: player[:item][:type]}
-    = haml(:item,
-           locals: { inner: true,
-                     resource_id: :item,
-                     resource_url: "#{resource_url}/item",
-                     item: player[:item] })
+      - ids.each do |id|
+        = child(inspector, id)
 
-  = haml(:in_out_links, locals: { resource_url: resource_url, inner: inner })
+  - if player[:item]
+    %p.item{ class: player[:item][:type]}
+      = child(inspector, :item)
+
+  = navigation(inspector)

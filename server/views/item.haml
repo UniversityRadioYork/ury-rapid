@@ -1,22 +1,18 @@
--#
-  item.haml - Playlist/Player item object
+-# item.haml - Playlist/Player item object
 
-  item        - The item to display.
-  in_playlist - If True, display a condensed item summary for display inside a
-                playlist or player object.  (Default: false.)
+- item = inspector.resource
 
-
-- if inner
+- if inspector.inner
   -# If we're in the playlist we want a very short item summary...
   = item[:type] == :null ? "(No item)" : item[:name]
-  = haml(:in_links, locals: { resource_url: resource_url })
+  = haml(:in_links, locals: { resource_url: inspector.resource_url })
 - else
   -# ...otherwise, we want a full standalone section.
   %section.item{ class: item[:type] }
-    %h1= resource_url
+    %h1= inspector.resource_url
     %dl
       %dt Name
       %dd=item[:name]
       %dt Type
       %dd=item[:type]
-    = haml(:out_links, locals: { resource_url: resource_url })
+    = haml(:out_links, locals: { resource_url: inspector.resource_url })

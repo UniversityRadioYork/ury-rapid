@@ -8,18 +8,10 @@
     header (application/json is preferred).
 
   %section.model
-    %h1=inner ? resource_id : resource_url
+    %h1=inspector.title
 
-    = haml(:playlist_set,
-      locals: { inner: true,
-                resource_id: :playlists,
-                resource_url: "#{resource_url}/playlists",
-                playlist_set: root[:playlists] })
-    = haml(:player_set,
-      locals: { inner: true,
-                resource_id: :players,
-                resource_url: "#{resource_url}/players",
-                player_set: root[:players] })
+    = child(inspector, :playlists)
+    = child(inspector, :players)
 
   %section.updates
     %h1 Update Console

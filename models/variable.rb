@@ -21,7 +21,7 @@ module Bra
       # @param handler_target [Symbol] The handler target of the constant (for
       #   privilege retrieval).
       #
-      def initialize(value, handler_target)
+      def initialize(value, handler_target = nil)
         @value = value
         @handler_target = handler_target
       end
@@ -64,21 +64,13 @@ module Bra
         @handler_target = handler_target
       end
 
-      def value=(new_value)
-        validated = new_value if @validator.nil?
-        validated = @validator.call(new_value) unless @validator.nil?
-        @value = validated
-      end
-
       # Handle an attempt to put a new value into the PlayerVariable
       # from the API.
       #
       # @param resource [Object] A hash (which should have one item, a mapping
       #   from this variable's ID to its new value), or the new value itself.
       def driver_put(resource)
-        value = resource[id] if resource.is_a?(Hash)
-        value = resource unless resource.is_a?(Hash)
-
+        value = validate_if_possible(resource)
         # Only bother changing a variable's value and propagating the update
         # if the value has actually changed.
         if @value != value
@@ -90,27 +82,14 @@ module Bra
       # Public: Resets the variable to its default value.
       #
       # @return [void]
-      def reset
-        @value = initial_value
-
-        notify_update
+      def driver_delete
+        driver_put(initial_value)
       end
 
-      alias_method :driver_delete, :reset
+      private
 
-      # Validates an incoming symbol
-      #
-      # new_symbol - The incoming symbol.
-      # candidates - A list of allowed symbols.
-      #
-      # Returns the validated symbol.
-      # Raises an exception if the value is invalid.
-      def self.validate_symbol(new_symbol, candidates)
-        # TODO: convert strings to symbols
-        fail(
-          "Expected one of #{candidates}, got #{new_symbol}"
-        ) unless candidates.include?(new_symbol)
-        new_symbol
+      def validate_if_possible(new_value)
+        @validator.nil? ? new_value : @validator.call(new_value)
       end
     end
   end
