@@ -5,8 +5,6 @@ module Bra
   module Models
     # An item in the playout system.
     class Item < SingleModelObject
-      alias_method :enqueue, :move_to
-
       attr_reader :name
 
       # Access the track type.
@@ -47,7 +45,7 @@ module Bra
         value = new_item unless new_item.is_a?(Hash)
 
         done = nil
-        done = put_from_hash(value) if value.is_a?(Hash)
+        done = set_from_hash(value) if value.is_a?(Hash)
         done = set_from_item(value) if value.is_a?(Item)
         done = clear if value.nil?
         fail("Unsupported argument to driver_put: #{value.class}") unless done
@@ -118,6 +116,23 @@ module Bra
         valid_type = %i(library file text null).include?(type)
         raise "Not a valid type: #{type}" unless valid_type
         type
+      end
+    end
+
+    # Mixin for model objects that hold Items, such as players and playlists.
+    module ItemContainer
+      def driver_post(id, resource)
+        id == :item ? driver_post_item(id, resource) : super(id, resource)
+      end
+
+      # Helper for model object driver_posts instances for adding Items
+      def driver_post_item(id, resource)
+        ( resource
+          .register_update_channel(@update_channel)
+          .register_handler(@handler.item_handler(resource))
+          .move_to(self, id)
+          .notify_update
+        )
       end
     end
   end

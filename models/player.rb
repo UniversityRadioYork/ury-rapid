@@ -1,5 +1,6 @@
 require_relative 'composite'
 require_relative 'variable'
+require_relative 'item'
 require_relative '../utils/hash'
 
 module Bra
@@ -10,18 +11,7 @@ module Bra
     # Public: A player in the model, which represents a channel's currently
     # playing song and its state.
     class Player < HashModelObject
-      def driver_post(id, resource)
-        id == :item ? driver_post_item(id, resource) : super(id, resource)
-      end
-
-      def driver_post_item(id, resource)
-        ( resource
-          .register_update_channel(@update_channel)
-          .register_handler(@handler.item_handler(resource))
-          .move_to(self, id)
-          .notify_update
-        )
-      end
+      include ItemContainer
     end
 
     # A container for a player variable
