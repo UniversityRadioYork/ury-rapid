@@ -1,6 +1,7 @@
 require_relative 'model'
 require_relative 'playlist'
 require_relative 'player'
+require_relative 'variable'
 
 module Bra
   module Models
@@ -41,13 +42,59 @@ module Bra
       end
 
       def player
-        child :state,      PlayerVariable.make_state
-        child :load_state, PlayerVariable.make_load_state
+        child :state,      make_state
+        child :load_state, make_load_state
         child :item,       Item.new(:null, nil)
-        MARKERS.each { |id| child(id, PlayerVariable.make_marker(id)) }
+        MARKERS.each { |id| child(id, make_marker(id)) }
       end
 
       private
+
+      def make_state
+        Variable.new(:stopped, method(:validate_state), :player_state)
+      end
+
+      def make_load_state
+        Variable.new(:empty, method(:validate_load_state), :player_load_state)
+      end
+
+      def make_marker(id)
+        Variable.new(0, method(:validate_marker), "player_#{id}".intern)
+      end
+
+      # Validates an incoming marker
+      #
+      # @param new_marker [Integer] The incoming marker position.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def validate_marker(position)
+        position ||= 0
+        position_int = Integer(position)
+        fail('Position is negative.') if position_int < 0
+        # TODO: Check against duration?
+        position_int
+      end
+
+      # Validates an incoming player state
+      #
+      # @param new_state [Symbol] The incoming player state.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def validate_state(new_state)
+        validate_symbol(new_state, %i(playing paused stopped))
+      end
+
+      # Validates an incoming player load state
+      #
+      # @param new_state [Symbol] The incoming player load state.
+      #
+      # Returns the validated state.
+      # Raises an exception if the value is invalid.
+      def validate_load_state(new_state)
+        Variable.validate_symbol(new_state, %i(ok loading failed empty))
+      end
 
       def root(object, &block)
         object = object.new if object.is_a?(Class)
