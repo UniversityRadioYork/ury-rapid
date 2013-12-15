@@ -22,8 +22,8 @@ module Bra
         #
         # @param channel [Channel] An EventMachine channel that should receive
         #   parsed responses.
-        # @param reader [Reader] An object that can convert raw buffered data to
-        #   BAPS meta-protocol tokens.
+        # @param reader [Reader] An object that can convert raw buffered data
+        #   to BAPS meta-protocol tokens.
         def initialize(channel, reader)
           @channel = channel
           @reader = reader
@@ -250,30 +250,19 @@ module Bra
         # @return [Boolean] Whether or not there was enough data to process a
         #   data word.
         def load_body(name)
-          enough_data = false
-
           @reader.uint32.try do |track_type|
-            # Note that these are in reverse order, as they're being shifted
-            # onto the front.
-            case track_type
-            when Types::Track::VOID
-              # No extra argument here.
-            when Types::Track::TEXT
-              @expected.unshift(TEXT_CONTENTS)
-            else
-              @expected.unshift(DURATION)
-            end
-            @expected.unshift(TITLE)
-
+            add_arguments(track_type)
             @response[name] = track_type
-
-            enough_data = true
           end
 
-          enough_data
+          true
         end
 
         private
+
+        def add_arguments(track_type)
+          @expected.unshift(*LOAD_ARGUMENTS[track_type])
+        end
 
         # Parses a word with a primitive type
         #
@@ -336,13 +325,20 @@ module Bra
         # functions for reading them.
         CONFIG_TYPE_MAP = {
           Types::Config::CHOICE => :uint32,
-          Types::Config::INT => :uint32,
-          Types::Config::STR => :string
+          Types::Config::INT    => :uint32,
+          Types::Config::STR    => :string
         }
 
-        DURATION = %i(duration uint32)
+        DURATION      = %i(duration uint32)
         TEXT_CONTENTS = %i(contents string)
-        TITLE = %i(title string)
+        TITLE         = %i(title string)
+
+        LOAD_ARGUMENTS = {
+          Types::Track::VOID    => [TITLE],
+          Types::Track::FILE    => [TITLE, DURATION],
+          Types::Track::LIBRARY => [TITLE, DURATION],
+          Types::Track::TEXT    => [TITLE, TEXT_CONTENTS]
+        }
       end
     end
   end

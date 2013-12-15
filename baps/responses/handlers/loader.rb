@@ -156,7 +156,8 @@ module Bra
 
           # Processes a normal loaded item response
           #
-          # This converts the response into an item and possibly a duration change.
+          # This converts the response into an item and possibly a duration
+          # change.
           #
           # @api private
           #
@@ -169,11 +170,14 @@ module Bra
           #
           # @api private
           #
-          # @return [Symbol] The bra equivalent of the BAPS track type (:library,
-          #   :file or :text).
+          # @return [Symbol] The bra equivalent of the BAPS track type
+          #   (:library, :file or :text).
           def type_as_bra_symbol
-            fail(Baps::Exceptions::InvalidTrackType, @type) unless TRACK_TYPE_MAP.include?(@type)
-            TRACK_TYPE_MAP[@type]
+            TRACK_TYPE_MAP.include?(@type) ? TRACK_TYPE_MAP[@type] : bad_type
+          end
+
+          def bad_type
+            fail(Baps::Exceptions::InvalidTrackType, @type)
           end
         end
       end

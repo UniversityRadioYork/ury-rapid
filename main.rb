@@ -20,6 +20,7 @@ def load_config
   YAML.load_file(CONFIG_FILE).deep_symbolize_keys!
 end
 
+# The main bra application.
 class App
   def initialize(config)
     @driver = init_driver(config[:driver])

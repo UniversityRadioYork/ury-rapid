@@ -28,7 +28,7 @@ module Bra
       def create
         root Root do
           child(:playlists, PlaylistSet) { playlists }
-          child(:players,   PlayerSet  ) { players   }
+          child(:players,   PlayerSet)   { players   }
         end
       end
 

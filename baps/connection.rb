@@ -45,8 +45,8 @@ module Bra
 
       # Attempts to pop data off the requests queue
       #
-      # This will eventually call on_queue_pop with the data, once there is some
-      # in the queue.
+      # This will eventually call on_queue_pop with the data, once there is
+      # some in the queue.
       #
       # @return [void]
       def pop_queue

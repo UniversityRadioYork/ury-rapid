@@ -10,29 +10,6 @@ module Bra
     # Public: A player in the model, which represents a channel's currently
     # playing song and its state.
     class Player < HashModelObject
-      alias_method :channel, :parent
-      alias_method :channel_id, :parent_id
-
-      # Public: Access the player's current item for reading.
-      attr_reader :item
-      attr_writer :item
-      alias_method :link_item, :item=
-
-      # Public: Change the player model's current item and load state.
-      #
-      # new_state - The symbol (must be one of :ok, :loading or :failed)
-      #             representing the new state.
-      # new_item  - The Item representing the new loaded item.
-      def load(new_state, new_item)
-        valid_item = new_item.nil? || new_item.is_a?(Item)
-        raise "Not a valid item: #{new_item}" unless valid_item
-        @item = new_item
-
-        valid_state = %i(ok loading failed empty).include? new_state
-        raise 'Not a valid state' unless valid_state
-        set_load_state(new_state)
-      end
-
       def driver_post(id, resource)
         id == :item ? driver_post_item(id, resource) : super(id, resource)
       end
@@ -40,14 +17,14 @@ module Bra
       def driver_post_item(id, resource)
         ( resource
           .register_update_channel(@update_channel)
-          .register_handler       (@handler.item_handler(resource))
-          .move_to                (self, id)
+          .register_handler(@handler.item_handler(resource))
+          .move_to(self, id)
           .notify_update
         )
       end
     end
 
-    # Public: A container for a player variable.
+    # A container for a player variable
     #
     # This container exists to make the traversal of the API at the variable
     # level easier; player variables have a defined parent, so one can deduce
@@ -56,8 +33,6 @@ module Bra
     # Player variables also have validation, so that broken controllers can be
     # discovered.
     class PlayerVariable < Variable
-      extend Forwardable
-
       def self.make_state
         new(:stopped, method(:validate_state), :player_state)
       end
@@ -69,9 +44,6 @@ module Bra
       def self.make_marker(id)
         new(0, method(:validate_marker), "player_#{id}".intern)
       end
-
-      def_delegator :@parent, :channel, :player_channel
-      def_delegator :@parent, :channel_id, :player_channel_id
 
       # Validates an incoming marker
       #

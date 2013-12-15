@@ -26,6 +26,7 @@ module Bra
           end
         end
 
+        # Handles a BAPS item count
         class ItemCount < Handler
           TARGETS = [Codes::Playlist::ITEM_COUNT]
 

@@ -8,10 +8,9 @@ require 'haml'
 require_relative '../common/payload'
 require_relative 'updater'
 
-
 module Bra
-  # The Sinatra application that powers the server component of bra.
   module Server
+    # The Sinatra application that powers the server component of bra
     class App < Sinatra::Base
       register Sinatra::Contrib
       use Rack::MethodOverride
@@ -33,9 +32,6 @@ module Bra
         # Gets the set of privileges the user has
         #
         # This fails with HTTP 401 if the user does not exist.
-        #
-        # @param requisites [Array] An optional array of required privileges; a
-        #   HTTP exception shall be thrown if the user privileges don't match up.
         #
         # @return [Array] An array of privilege symbols.
         def privilege_set

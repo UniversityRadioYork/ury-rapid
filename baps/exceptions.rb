@@ -11,6 +11,7 @@ module Bra
           super(type)
           @type = type
         end
+
         def to_s
           "Invalid track type: #{@type}."
         end
