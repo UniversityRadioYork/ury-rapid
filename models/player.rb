@@ -34,24 +34,16 @@ module Bra
       end
 
       def driver_post(id, resource)
-        if id == :item
-          resource.register_update_channel(@update_channel)
-          resource.register_handler(@handler.item_handler(resource))
-          resource.move_to(self, id)
-          resource.notify_update
-        else
-          super(id, resource)
-        end
+        id == :item ? driver_post_item(id, resource) : super(id, resource)
       end
 
-      # Internal: Removes an item from the player.
-      #
-      # item - The item to unlink.  This must be the same as the item currently
-      #        loaded.
-      #
-      # @return [void]
-      def unlink_item(item)
-        fail("Tried to unlink wrong item from #{name}") unless item == @item
+      def driver_post_item(id, resource)
+        ( resource
+          .register_update_channel(@update_channel)
+          .register_handler       (@handler.item_handler(resource))
+          .move_to                (self, id)
+          .notify_update
+        )
       end
     end
 
