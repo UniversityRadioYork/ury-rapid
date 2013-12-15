@@ -18,9 +18,6 @@ module Bra
     class ModelObject
       extend Forwardable
 
-      # Public: Allows access to this model object's current ID.
-      attr_reader :id
-
       # Public: Allows read access to the object's children.
       attr_reader :children
 
@@ -32,6 +29,11 @@ module Bra
         @id = nil
         @handler = nil
         @update_channel = nil
+      end
+
+      # Gets this object's current ID.
+      def id
+        @id_function.call
       end
 
       # Registers a handler to be called when this object is modified
@@ -170,7 +172,7 @@ module Bra
         @parent.remove_child(self) unless @parent.nil?
         @parent = new_parent
         @parent.add_child(self, new_id) unless @parent.nil?
-        @id = new_id
+        @id_function = @parent.id_function(self)
 
         self
       end

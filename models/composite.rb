@@ -240,6 +240,11 @@ module Bra
       rescue ArgumentError, TypeError
         nil
       end
+
+      def id_function(object)
+        # Assuming two ModelObjects == if and only if equal?.
+        proc { children.key(object) }
+      end
     end
 
     # A model object whose children form a list
@@ -251,6 +256,7 @@ module Bra
 
       # Implement the Enumerable API on the list's children.
       def_delegator :@children, :each
+      def_delegator :@children, :size
 
       def initialize
         super()
@@ -303,6 +309,10 @@ module Bra
         children[Integer(id)]
       rescue ArgumentError, TypeError
         nil
+      end
+
+      def id_function(object)
+        proc { children.index { |member| member.equal?(object) } }
       end
     end
   end
