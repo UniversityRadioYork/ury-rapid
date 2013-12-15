@@ -76,35 +76,6 @@ module Bra
         yield resource, *args
       end
 
-      # GETs the resource with the given partial URL in this object's children
-      #
-      # @param url [String] A partial URL that follows this model object's URL
-      #   to form the URL of the resource to locate.  Can be nil, in which case
-      #   this object is returned.
-      # @param privileges [Array] A set of privileges to check to see if the
-      #   GET can be done.
-      # @param mode [Symbol] See #get.
-      #
-      # @return [Object] the GET representation of the object if found, and nil
-      #   otherwise.
-      def get_url(url, privileges, mode)
-        find_url(url, privileges, mode, &:resource)
-      end
-
-      # PUTs a resource with the given URL relative from this resource
-      #
-      # @param url [String] See #get_url.
-      # @param privileges [Array] - A set of privileges to check to see if the
-      #   GET can be done.
-      # @param payload [Object] A payload to PUT into the child resource.  This
-      #   may be a hash mapping the resource's ID to its new value, or the new
-      #   value directly.
-      #
-      # @return [void]
-      def put_url(url, privileges, payload)
-        find_url(url, privileges, payload, &:put)
-      end
-
       # As #put_url, but intended for driver usage
       #
       # @param (see #put_url)
@@ -114,20 +85,6 @@ module Bra
         find_url(url, payload, &:driver_put)
       end
 
-      # POSTs a resource with the given URL relative from this resource
-      #
-      # @param url [String] See #get_url.
-      # @param privileges [Array] - A set of privileges to check to see if the
-      #   GET can be done.
-      # @param payload [Object] A payload to POST into the child resource.
-      #   This may be a hash mapping the resource's ID to its new value, or the
-      #   new value directly.
-      #
-      # @return [void]
-      def post_url(url, privileges, payload)
-        find_url(url, privileges, payload, &:post)
-      end
-
       # As #post_url, but intended for driver usage
       #
       # @param (see #post_url)
@@ -135,16 +92,6 @@ module Bra
       # @return [void]
       def driver_post_url(url, id, resource)
         find_url(url, id, resource, &:driver_post)
-      end
-
-      # DELETEs the resource with the given partial URL in this object's
-      # children.
-      #
-      # @param (see #get_url)
-      #
-      # @return [void]
-      def delete_url(url, privileges)
-        find_url(url, privileges, &:delete)
       end
 
       # DELETEs the resource at the given URL relative from this resource,
