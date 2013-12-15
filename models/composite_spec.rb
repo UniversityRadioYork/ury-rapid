@@ -1,4 +1,5 @@
 require_relative 'composite'
+require_relative 'variable'
 
 describe Bra::Models::HashModelObject do
   let(:hmo) { Bra::Models::HashModelObject.new }
@@ -137,6 +138,24 @@ describe Bra::Models::ListModelObject do
         lmo.add_child('shazam', 0)
         lmo.remove_child(3)
         expect(lmo.children).to eq(['shazam'])
+      end
+    end
+    context 'with an ID in use, and children with greater IDs' do
+      it 'removes the item and reduces the IDs of those children by one' do
+        Bra::Models::Constant.new('good morning').move_to(lmo, 0)
+        Bra::Models::Constant.new('starshine').move_to(lmo, 1)
+        Bra::Models::Constant.new('the Earth says').move_to(lmo, 2)
+        Bra::Models::Constant.new('hello!').move_to(lmo, 3)
+        Bra::Models::Constant.new('etaoin shrdlu').move_to(lmo, 4)
+
+        lmo.remove_child(2)
+
+        expect(lmo.child(0).value).to eq('good morning')
+        expect(lmo.child(1).value).to eq('starshine')
+        expect(lmo.child(2).value).to eq('hello!')
+        expect(lmo.child(3).value).to eq('etaoin shrdlu')
+
+        (0...4).each { |i| expect(lmo.child(i).id).to eq(i) }
       end
     end
   end
