@@ -250,12 +250,14 @@ module Bra
         # @return [Boolean] Whether or not there was enough data to process a
         #   data word.
         def load_body(name)
-          @reader.uint32.try do |track_type|
+          track_type = @reader.uint32
+          if track_type.nil?
+            false
+          else
             add_arguments(track_type)
             @response[name] = track_type
+            true
           end
-
-          true
         end
 
         private
