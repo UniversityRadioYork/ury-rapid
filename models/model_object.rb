@@ -36,6 +36,8 @@ module Bra
         @id_function.call
       end
 
+      def_delegator :@children, :del_meth, :new_name
+
       # Gets this object's children, as a hash
       #
       # By default, model objects have no children, so this returns the empty
@@ -88,7 +90,7 @@ module Bra
       #
       # @return [void]
       def notify_delete
-        notify_channel(:delete)
+        notify_channel(nil)
       end
 
       # Sends a notification to the updates channel
@@ -118,7 +120,7 @@ module Bra
       # GETs this model object
       #
       # A GET is the retrieval of a flattened representation of a model object.
-      # See #get_flat (defined differently for different model objects) for
+      # See #flat (defined differently for different model objects) for
       # information on what constitutes a flattened representation.
       #
       # @param privileges [PrivilegeSet] The set of privileges the client has.
@@ -130,28 +132,7 @@ module Bra
       # @return [Object] A flat representation of this object.
       def get(privileges, mode = :wrap)
         fail_if_cannot(:get, privileges)
-        wrap(get_flat(privileges), mode)
-      end
-
-      # Wraps a GET response according to its wrap mode.
-      #
-      # @param value [Object] The value to wrap (or not).
-      # @param mode [Symbol] Either :wrap, in which case the result will be
-      #   wrapped in a hash mapping the object's ID to the flattened
-      #   representation, or :nowrap, in which case only the flattened value is
-      #   returned.  By default, :wrap is used.
-      #
-      # @return [Object] The (potentially) wrapped value.
-      def wrap(value, mode)
-        # TODO(mattbw): Flatten non-plain-old-data values?
-        case mode
-        when :wrap
-          { id => value }
-        when :nowrap
-          value
-        else
-          fail("Unknown get_flat mode: #{mode}")
-        end
+        flat
       end
 
       %w{put post delete}.each do |action|
@@ -235,22 +216,6 @@ module Bra
       # @return [NilClass] nil.
       def child(_)
         nil
-      end
-
-      # Converts this model object to a "flat" representation.
-      #
-      # Flat representations contain only primitive objects (integers, strings,
-      # etc.) and lists and hashes.
-      #
-      # For a SingleModelObject, the default implementation of this is to call
-      # a no-arguments method 'flat' which can be overridden by subclasses.
-      #
-      # @param privileges [Array] An array of GET privileges the caller has.
-      #   May be nil, in which case no privilege checking is done.
-      #
-      # @return [Object] A flat representation of this object.
-      def get_flat(privileges = [])
-        flat if can?(:get, privileges)
       end
     end
   end

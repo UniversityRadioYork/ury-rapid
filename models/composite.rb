@@ -128,7 +128,7 @@ module Bra
         @children
       end
 
-      # Converts this model object to a "flat" representation
+      # GETs this model object as a 'flat' representation
       #
       # Flat representations contain only primitive objects (integers, strings,
       # etc.) and lists and hashes.
@@ -140,10 +140,10 @@ module Bra
       #   May be nil, in which case no privilege checking is done.
       #
       # @return [Hash] A flat representation of this object.
-      def get_flat(privileges = [])
+      def get(privileges = [])
         ( @children
-          .select           { |_, child| child.can?(:get, privileges)    }
-          .transform_values { |child|    child.get_flat(privileges)      }
+          .select           { |_, child| child.can?(:get, privileges) }
+          .transform_values { |child|    child.get(privileges)        }
         ) if can?(:get, privileges)
       end
 
@@ -207,7 +207,7 @@ module Bra
 
       def_delegator :@children, :delete_at, :remove_child
 
-      # Converts this model object to a "flat" representation
+      # GETs this model object as a 'flat' representation
       #
       # Flat representations contain only primitive objects (integers, strings,
       # etc.) and lists and hashes.
@@ -219,10 +219,10 @@ module Bra
       #   May be nil, in which case no privilege checking is done.
       #
       # @return [Array] A flat representation of this object.
-      def get_flat(privileges = [])
+      def get(privileges = [])
         ( @children
-          .select { |child| child.can?(:get, privileges)    }
-          .map    { |child| child.get_flat(privileges)      }
+          .select { |child| child.can?(:get, privileges) }
+          .map    { |child| child.get(privileges)        }
         ) if can?(:get, privileges)
       end
 

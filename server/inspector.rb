@@ -26,10 +26,6 @@ module Bra
       end
 
       def resource
-        @get_repr[resource_id]
-      end
-
-      def raw_resource
         @get_repr
       end
 

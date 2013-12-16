@@ -100,16 +100,6 @@ module Bra
 
         self
       end
-
-      # Clears the item, setting it to a null item
-      #
-      # @return (see #set_from_hash)
-      def clear
-        @name = nil
-        @type = :null
-
-        self
-      end
     end
 
     # Mixin for model objects that hold Items, such as players and playlists.

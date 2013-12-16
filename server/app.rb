@@ -147,7 +147,10 @@ module Bra
       end
 
       def handle_get(target)
-        get_repr = target.get(privilege_set)
+        get_repr = {
+          status: :ok,
+          value: target.get(privilege_set)
+        }
 
         respond_with :json, get_repr do |f|
           f.html do
