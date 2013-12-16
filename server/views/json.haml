@@ -1,8 +1,10 @@
 -# json.haml - JSON inspector
 
+- payload = { status: :ok, value: inspector.resource }
+
 %section.json_inspector
   %h1 JSON for #{inspector.title}
-  %pre.json_code=JSON.pretty_generate(inspector.resource)
+  %pre.json_code=JSON.pretty_generate(payload)
   %a.out{ href: url(inspector.resource_url),
           title: "Go back to the inspector view for this resource." } Out
 

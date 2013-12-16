@@ -12,36 +12,87 @@
 @import url('//fonts.googleapis.com/css?family=Comfortaa:700');
 @import url('//fonts.googleapis.com/css?family=Share+Tech+Mono');
 
-$size-border: 0.15rem;
+$size-border: 0.12rem;
 $size-padding: 0.8rem;
 $size-padding-thin: 0.2rem;
 $size-inout: $size-padding * (2 / 3);
 
-$colour-peeling-paper:    #058789;
-$colour-escape:           #E3A72F;
-$colour-puzzle-24000:     #D54B1A;
-$colour-wooden-platforms: #503D2E;
-$colour-lol:              #F0ECC9;
+// Tango colour palette
+$colour-butter-light:      #fce94f;
+$colour-orange-light:      #fcaf3e;
+$colour-chocolate-light:   #e9b96e;
+$colour-chameleon-light:   #8ae234;
+$colour-sky-blue-light:    #729fcf;
+$colour-plum-light:        #ad7fa8;
+$colour-scarlet-red-light: #ef2929;
 
-// Item type colours
-$colour-0719mpd:          #DD8CA7;
-$colour-mu-sky:           #BDB8EE;
+$colour-butter:      #edd400;
+$colour-orange:      #f57900;
+$colour-chocolate:   #c17d11;
+$colour-chameleon:   #73d216;
+$colour-sky-blue:    #3465a4;
+$colour-plum:        #75507b;
+$colour-scarlet-red: #cc0000;
 
-$colour-kai:              #101F78;
-$colour-black-tulip:      #420943;
-$colour-not-quite-black:  #303030;
-$colour-asian-red:        #A80000;
+$colour-butter-dark:      #c4a000;
+$colour-orange-dark:      #ce5c00;
+$colour-chocolate-dark:   #8f5902;
+$colour-chameleon-dark:   #4e9a06;
+$colour-sky-blue-dark:    #204a87;
+$colour-plum-dark:        #5c3566;
+$colour-scarlet-red-dark: #a40000;
+
+$colour-aluminium-1: #eeeeec;
+$colour-aluminium-2: #d3d7cf;
+$colour-aluminium-3: #babdb6;
+$colour-aluminium-4: #888a85;
+$colour-aluminium-5: #555753;
+$colour-aluminium-6: #2e3436;
 
 // Semantic colour names
-$colour-outer-fg:           $colour-lol;
-$colour-outer-bg:           $colour-wooden-platforms;
-$colour-container-bg:       $colour-lol;
-$colour-container-fg:       black;
+$colour-outer-fg:           $colour-aluminium-1;
+$colour-outer-bg:           $colour-sky-blue-dark;
+$colour-container-bg:       $colour-aluminium-1;
+$colour-container-fg:       $colour-aluminium-6;
+$colour-set-bg:             $colour-aluminium-3;
+$colour-set-fg:             $colour-aluminium-6;
+$colour-variable-bg:        $colour-aluminium-2;
+$colour-variable-fg:        $colour-aluminium-6;
+$colour-border:             $colour-aluminium-6;
+
+$colour-playing-bg: $colour-chameleon-light;
+$colour-playing-fg: $colour-aluminium-6;
+$colour-paused-bg:  $colour-butter-light;
+$colour-paused-fg:  $colour-aluminium-6;
+$colour-stopped-bg: $colour-scarlet-red-light;
+$colour-stopped-fg: $colour-aluminium-6;
+
+$colour-ok-bg:      $colour-sky-blue-dark;
+$colour-ok-fg:      $colour-aluminium-1;
+$colour-loading-bg: $colour-plum-dark;
+$colour-loading-fg: $colour-aluminium-1;
+$colour-failed-bg:  $colour-scarlet-red-dark;
+$colour-failed-fg:  $colour-aluminium-1;
+$colour-empty-bg:   $colour-aluminium-4;
+$colour-empty-fg:   $colour-aluminium-1;
+
+$colour-file-bg:    $colour-sky-blue-light;
+$colour-file-fg:    $colour-aluminium-6;
+$colour-library-bg: $colour-plum-light;
+$colour-library-fg: $colour-aluminium-6;
+$colour-text-bg:    $colour-chocolate-light;
+$colour-text-fg:    $colour-aluminium-6;
+
+$colour-nav-json:      $colour-aluminium-5;
+$colour-nav-in-out:    $colour-aluminium-2;
+$colour-nav-highlight: $colour-orange-light;
+
+$colour-console-bg: $colour-aluminium-6;
+$colour-console-fg: $colour-chameleon;
 
 @mixin border {
-    border: $size-border solid black;
+    border: $size-border solid $colour-border;
     padding: $size-padding;
-    padding-bottom: 0;
 }
 
 @mixin font-normal {
@@ -54,16 +105,15 @@ $colour-container-fg:       black;
 
 a {
     @include link-colors(
-        $colour-peeling-paper,
-        $colour-escape,
-        $colour-escape,
-        $colour-puzzle-24000
+        $colour-sky-blue,
+        $colour-scarlet-red-light,
+        $colour-scarlet-red-light,
+        $colour-plum
     );
 }
 
-
 html {
-		@include font-normal;
+    @include font-normal;
 
     text-align: center;
     font-size: 16pt;
@@ -78,18 +128,17 @@ html {
     body {
         >section, >nav, >footer>section {
             font-size: 1rem !important;
-            margin: $size-padding !important;
+            margin: $size-padding auto !important;
 
             color: $colour-container-fg;
             background-color: $colour-container-bg;
-            display: inline-block;
 
             text-align: left;
-            max-width: 90%;
+            max-width: 80%;
+            display: table;
         }
 
         >header {
-            color: $colour-lol;
             margin: $size-padding;
 
             >hgroup {
@@ -105,7 +154,6 @@ html {
         }
 
         >footer {
-            color: $colour-lol;
             >p.legal {
                 font-size: 0.8rem;
             }
@@ -116,10 +164,8 @@ html {
 h1, h2, h3 {
     @include font-title;
     text-align: left;
-}
-
-h1, h2, h3, section, nav, p, ol {
     margin-bottom: $size-padding;
+    font-size: 1.2em;
 }
 
 section, nav {
@@ -128,122 +174,128 @@ section, nav {
     position: relative;
 
     font-size: 0.9em;
+
+    background-color: $colour-container-bg;
+    color: $colour-container-fg;
+}
+
+section {
+    margin: $size-padding-thin;
+}
+p:not(:last-child) {
+    margin-bottom: $size-padding;
 }
 
 nav h1 {
     display: none;
 }
 
-h1, h2, h3 {
-    font-size: 1.2em;
+.set {
+    background-color: $colour-set-bg !important;
+    color: $colour-set-fg !important;
 }
 
-.playlists, .players {
-    border-collapse: separate;
-    border-spacing: $size-padding;
+// Make players and playlists line up horizontally.
+.player_set, .playlist_set {
+    &>div.set_contents {
+        border-collapse: separate;
+        border-spacing: $size-padding;
 
-    display: flex;
-    flex: 1;
-    align-items: stretch;
-    margin: 0 auto;
-
-    >section {
         display: flex;
-        flex-direction: column;
-
         flex: 1;
-        // Remove duplicate borders.
-        &:not(:first-child) {
-            border-left: 0;
-        }
+        align-items: stretch;
+        margin: 0 auto;
 
-        >section, >nav, >ol {
-            background-color: $colour-lol;
-        }
+        >section {
+            display: flex;
+            flex-direction: column;
 
-        >section.playlist {
             flex: 1;
         }
     }
 }
 
-// Nested player variables have some special formatting.
-section>section.player-variable {
-		display: block !important;
-		h1 {
-				@include font-normal;
-				font-weight: bold;
-				font-size: 1em;
-				margin: 0;
-		}
-		p {
-				text-align: right;
-		}
+section.variable, section.constant {
+    background-color: $colour-variable-bg;
+    color: $colour-variable-fg;
+
+    // Remove lower margin on the value.
+    p {
+        margin: 0;
+    }
 }
 
-section.player-states,
-section.player-primary-markers,
-section.player-secondary-markers {
-    display: flex;
+// Nested variables have some special formatting.
+div>section, section>section {
+    &.variable, &.constant {
+        display: flex !important;
 
-    border: none;
-    padding: 0;
-    margin-bottom: 0;
-
-    > section {
-        text-align: center;
-
-        display: flex;
-        flex: 1;
-
-        &:not(:first-child) {
-            border-left: 0;
+        h1 {
+            display: inline;
+            @include font-normal;
+            font-weight: bold;
+            font-size: 1em;
+            margin: 0;
+            margin-right: $size-padding-thin;
         }
-
-        >p {
-            margin: 0 auto;
-            margin-bottom: $size-padding;
+        p {
+            display: inline;
+            flex: 1;
+            text-align: right;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 }
 
 .playing {
-    background-color: $colour-peeling-paper;
+    background-color: $colour-playing-bg !important;
+    color: $colour-playing-fg !important;
 }
 .paused {
-    background-color: $colour-escape;
+    background-color: $colour-paused-bg !important;
+    color: $colour-paused-fg !important;
 }
 .stopped {
-    background-color: $colour-puzzle-24000;
+    background-color: $colour-stopped-bg !important;
+    color: $colour-stopped-fg !important;
 }
 .file {
-    background-color: $colour-0719mpd;
+    background-color: $colour-file-bg !important;
+    color: $colour-file-fg !important;
+}
+.text {
+    background-color: $colour-text-bg !important;
+    color: $colour-text-fg !important;
 }
 .library {
-    background-color: $colour-mu-sky;
+    background-color: $colour-library-bg !important;
+    color: $colour-library-fg !important;
 }
 .loading {
-    background-color: $colour-black-tulip;
-    color: $colour-lol;
+    background-color: $colour-loading-bg !important;
+    color: $colour-loading-fg !important;
 }
 .ok {
-    background-color: $colour-kai;
-    color: $colour-lol;
+    background-color: $colour-ok-bg !important;
+    color: $colour-ok-fg !important;
 }
 .failed {
-    background-color: $colour-asian-red;
-    color: $colour-lol;
+    background-color: $colour-failed-bg !important;
+    color: $colour-failed-fg !important;
 }
-.empty, .null {
-    background-color: $colour-not-quite-black;
-    color: $colour-lol;
+.empty {
+    background-color: $colour-empty-bg !important;
+    color: $colour-empty-fg !important;
 }
 
 .item {
     @include border;
 
     >section, >nav, >ol {
-        background-color: $colour-lol;
+        //background-color: $colour-lol;
     }
 }
 
@@ -256,6 +308,10 @@ li.item, p.item {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+p.item {
+    margin: $size-padding-thin;
 }
 
 ol.playlist-items {
@@ -286,14 +342,14 @@ nav.resources {
 .in, .out, .json {
     position: absolute;
     font-size: 0px;
-    border: $size-border solid black;
-    background-color: $colour-lol;
+    border: $size-border solid $colour-border;
+    background-color: $colour-nav-in-out;
     width: $size-inout;
     height: $size-inout;
     display: block;
 
     &:hover {
-        background-color: $colour-escape;
+        background-color: $colour-nav-highlight;
     }
 }
 .in {
@@ -307,7 +363,7 @@ nav.resources {
     left: -($size-inout);
 }
 .json {
-    background-color: $colour-kai;
+    background-color: $colour-nav-json;
     border-top: 0;
     border-right: 0;
     top: 0;
@@ -341,14 +397,23 @@ nav.resources {
     }
 }
 
+// Console themeing.
 pre.json_code, pre#update-console {
     @include border;
 
     padding: $size-padding;
 
-    background-color: white;
+    background-color: $colour-console-bg;
+    color: $colour-console-fg;
     font-family: "Share Tech Mono";
     margin-bottom: $size-padding;
+}
+
+dt {
+    font-weight:bold;
+}
+dd {
+    margin-left: $size-padding;
 }
 
 // Toolbar

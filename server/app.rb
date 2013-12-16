@@ -255,7 +255,7 @@ module Bra
         catch(:halt) do
           respond_with(
             :error,
-            { status: :error, error: message, http_code: code}
+            { status: error, error: message, http_code: code }
           )
         end
       end

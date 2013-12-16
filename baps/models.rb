@@ -1,28 +1,14 @@
-require_relative '../models/model_object'
+require_relative '../models/set'
+require_relative '../models/variable'
 
 module Bra
   module Baps
-    # Internal: Model objects specific to BAPS.
+    # Model objects specific to BAPS.
     #
     # The BAPS module exposes its own custom model tree in the x-baps/ section
     # of BRA's URL hierarchy, containing information specific to the BAPS
     # playout system.
     module Models
-      # Internal: The parent model object for model objects in the BAPS
-      # namespace.
-      class XBaps < Bra::Models::HashModelObject
-        def handler_target
-          'x_baps'
-        end
-      end
-
-      # Internal: The model object containing server information for BAPS.
-      class Server < Bra::Models::HashModelObject
-        def handler_target
-          'x_baps_server'
-        end
-      end
-
       # Object that creates the BAPS model set, given a model root and config.
       class Creator
         def initialize(root, config)
@@ -31,7 +17,7 @@ module Bra
         end
 
         def run
-          xbaps = XBaps.new.move_to(@root, :x_baps)
+          xbaps = Bra::Models::Set.new(:x_baps).move_to(@root, :x_baps)
           server.move_to(xbaps, :server)
         end
 
@@ -53,7 +39,9 @@ module Bra
         private
 
         def server
-          Server.new.tap(&method(:add_server_constants))
+          Bra::Models::Set.new(:x_baps_server).tap(
+            &method(:add_server_constants)
+          )
         end
 
         def add_server_constants(server)
@@ -61,11 +49,9 @@ module Bra
         end
 
         def add_server_constant(server, key, value)
-          Bra::Models::Constant.new(value, to_target(key)).move_to(server, key)
-        end
-
-        def to_target(key)
-          "x_baps_#{key}".intern
+          Bra::Models::Constant.new(
+            value, :x_baps_server_constant
+          ).move_to(server, key)
         end
       end
     end

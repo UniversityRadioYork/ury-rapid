@@ -20,8 +20,8 @@ class Structure < Bra::Models::Creator
   # @return [Root]  The finished model.
   def create
     root Bra::Models::Root do
-      set(:players, Bra::Models::Player, option(:players)) { player }
-      set(:playlists, Bra::Models::Playlist, option(:playlists))
+      set_of(:players, Bra::Models::Player, option(:players)) { player }
+      set_of(:playlists, Bra::Models::Playlist, option(:playlists))
       info :info
     end
   end
@@ -34,10 +34,10 @@ class Structure < Bra::Models::Creator
   # - A variable holding the load state (ok/loading/failed/empty);
   # - A variable for each position marker.
   def player
-    child :state,      var(:player_state,      play_validator, :stopped)
-    child :load_state, var(:player_load_state, load_validator, :empty)
+    var :state, :stopped, :player_state, method(:validate_play_state)
+    var :load_state, :empty, :player_load_state, method(:validate_load_state)
     Bra::Common::Types::MARKERS.each do |id|
-      child id, var("player_#{id}".intern, marker_validator, 0)
+      var id, 0, "player_#{id}".intern, marker_validator
     end
   end
 
@@ -62,7 +62,7 @@ class Structure < Bra::Models::Creator
 
   # Builds the bra information model.
   def info(id)
-    child(id, Bra::Models::Info) do
+    set(id, :info) do
       constant :version, Bra::Common::Constants::VERSION, :version
       constant :channel_mode, channel_mode?, :channel_mode
     end

@@ -1,9 +1,9 @@
 -# set.haml - Set objects
 
-%section.set
+%section.set{class: inspector.resource_handler_target }
   %h1=inspector.title
 
-  %div.players
+  %div.set_contents
     - if inspector.resource
       - inspector.resource.each do |id, item|
         = child(inspector, id)

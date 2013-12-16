@@ -9,12 +9,11 @@
 %section.player
   %h1=inspector.title
   - var_groups.each do |group, ids|
-    %section{class: "player-#{group}"}
-      - ids.each do |id|
-        = child(inspector, id)
+    - ids.each do |id|
+      = child(inspector, id)
 
   - if player[:item]
-    %p.item{ class: player[:item][:type]}
+    %p.item{ class: player[:item][:type] }
       = child(inspector, :item)
 
   = navigation(inspector)

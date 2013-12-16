@@ -7,21 +7,23 @@
     %strong Accept
     header (application/json is preferred).
 
-  %section.model
-    %h1=inspector.title
+%section.model
+  %h1=inspector.title
 
-    = child(inspector, :playlists)
-    = child(inspector, :players)
-    = child(inspector, :info)
+  - if inspector.resource
+    - inspector.resource.keys.each do |child|
+      = child(inspector, child)
 
-  %section.updates
-    %h1 Update Console
-    %p
-      If JavaScript and WebSockets are enabled, raw bra update notifications
-      will appear here.  This can be used to test that the WebSocket updates
-      system is working.
-    %p#status
-      No connection (yet).
-    %pre#update-console
-    %script{ src: url('/scripts/update.js') }
+  = navigation(inspector)
+
+%section.updates
+  %h1 Update Console
+  %p
+    If JavaScript and WebSockets are enabled, raw bra update notifications
+    will appear here.  This can be used to test that the WebSocket updates
+    system is working.
+  %p#status
+    No connection (yet).
+  %pre#update-console
+  %script{ src: url('/scripts/update.js') }
 

@@ -1,0 +1,9 @@
+-# x_baps.haml - BAPS driver model root
+
+%section.x_baps
+  %h1=inspector.title
+  - if inspector.resource
+    - inspector.resource.each do |id, item|
+      = child(inspector, id)
+
+  = navigation(inspector)

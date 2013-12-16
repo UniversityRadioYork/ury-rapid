@@ -36,11 +36,26 @@ module Bra
         child id, Constant.new(value, handler_target)
       end
 
-      # Creates a Set of items with the given ID list
-      def set(id, member_class, ids, &block)
-        child id, Set.new(member_class) do
+      # Creates a Variable with the given parameters
+      def var(id, initial_value, handler_target, validator)
+        child id, Variable.new(initial_value, validator, handler_target)
+      end
+
+      # Creates a Set of items with the given ID list and class
+      def set_of(id, member_class, ids, &block)
+        set(id, class_to_set_target(member_class)) do
           children(ids, member_class, &block)
         end
+      end
+
+      # Creates a Set with the given handler target and ID
+      def set(id, handler_target, &block)
+        child(id, Set.new(handler_target), &block)
+      end
+
+      def class_to_set_target(member_class)
+        class_name = member_class.name.demodulize.underscore
+        "#{class_name}_set".intern
       end
 
       def children(ids, child_class, &block)
@@ -56,10 +71,6 @@ module Bra
 
       def child(id, object, &block)
         root(object, &block).move_to(@target, id)
-      end
-
-      def var(target, validator, initial_value)
-        Variable.new(initial_value, validator, target)
       end
 
       def build_children(object)

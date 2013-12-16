@@ -10,10 +10,10 @@ module Bra
       # @example Initialise a set of playlists.
       #   Set.new(Playlist)
       #
-      # @param target_class [Class] The class of items expected to form the
-      #   set's children.
-      def initialize(target_class)
-        @class = target_class
+      # @param handler_target [Symbol] The symbol identifying this set to the
+      #   handler registrar.
+      def initialize(handler_target)
+        @handler_target = handler_target
         super()
       end
 
@@ -30,8 +30,7 @@ module Bra
       #
       # @return [Symbol] The handler target.
       def handler_target
-        class_name = @class.name.demodulize.underscore
-        "#{class_name}_set".intern
+        @handler_target
       end
     end
   end

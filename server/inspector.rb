@@ -2,6 +2,7 @@ module Bra
   module Server
     # Sinatra helpers for the API Inspector
     module InspectorHelpers
+
     end
 
     # An instance of the API Inspector
@@ -48,6 +49,7 @@ module Bra
 
       def_delegator :@target, :url, :resource_url
       def_delegator :@target, :id, :resource_id
+      def_delegator :@target, :handler_target, :resource_handler_target
 
       # Creates a new Inspector inspecting one of target's children
       def inspect_child(id)
