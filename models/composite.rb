@@ -76,32 +76,10 @@ module Bra
         yield resource, *args
       end
 
-      # As #put_url, but intended for driver usage
-      #
-      # @param (see #put_url)
-      #
-      # @return [void]
-      def driver_put_url(url, payload)
-        find_url(url, payload, &:driver_put)
-      end
-
-      # As #post_url, but intended for driver usage
-      #
-      # @param (see #post_url)
-      #
-      # @return [void]
-      def driver_post_url(url, id, resource)
-        find_url(url, id, resource, &:driver_post)
-      end
-
-      # DELETEs the resource at the given URL relative from this resource,
-      # without triggering any handlers.
-      #
-      # @param (see #get_url)
-      #
-      # @return [void]
-      def driver_delete_url(url)
-        find_url(url, &:driver_delete)
+      %w{put post delete}.each do |action|
+        define_method("driver_#{action}_url") do |url, *args|
+          find_url(url) { |resource| resource.send("driver_#{action}", *args) }
+        end
       end
 
       # Default implementation of DELETE on composite model objects
