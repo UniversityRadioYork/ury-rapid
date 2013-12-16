@@ -16,11 +16,12 @@ module Bra
           end
         end
 
-        def validate_symbol(candidate, range)
-          # TODO: convert strings to symbols
-          symbol = candidate.to_sym
-          fail(InvalidPayload) unless range.include?(symbol)
-          symbol
+        def validate_symbol(input, range)
+          input.to_sym.tap { |symbol| invalid unless range.include?(symbol) }
+        end
+
+        def invalid
+          fail(InvalidPayload)
         end
       end
     end
