@@ -8,23 +8,20 @@ module Bra
       TRACK_TYPES = %i{library file text null}
       MARKERS = %i{cue position intro duration}
 
-      def self.validate_play_state(candidate)
-        validate_symbol(candidate, PLAY_STATES)
-      end
+      # Validators for the BRA type enumerators.
+      module Validators
+        %w{play_state load_state track_type}.each do |type|
+          define_method("validate_#{type}") do |candidate|
+            validate_symbol(candidate, Types.const_get("#{type.upcase}S"))
+          end
+        end
 
-      def self.validate_load_state(candidate)
-        validate_symbol(candidate, LOAD_STATES)
-      end
-
-      def self.validate_track_type(candidate)
-        validate_symbol(candidate, TRACK_TYPES)
-      end
-
-      def self.validate_symbol(candidate, range)
-        # TODO: convert strings to symbols
-        symbol = candidate.to_sym
-        fail(InvalidPayload) unless range.include?(symbol)
-        symbol
+        def validate_symbol(candidate, range)
+          # TODO: convert strings to symbols
+          symbol = candidate.to_sym
+          fail(InvalidPayload) unless range.include?(symbol)
+          symbol
+        end
       end
     end
   end

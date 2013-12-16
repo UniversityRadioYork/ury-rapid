@@ -6,6 +6,8 @@ module Bra
   module Models
     # An item in the playout system.
     class Item < SingleModelObject
+      include Bra::Common::Types::Validators
+
       attr_reader :name
 
       # Access the track type.
@@ -23,7 +25,7 @@ module Bra
       def initialize(type, name)
         super()
 
-        @type = validate_type(type)
+        @type = validate_track_type(type)
         @name = name
       end
 
@@ -81,7 +83,7 @@ module Bra
         hash = hash.symbolize_keys
 
         @name = hash[:name]
-        @type = validate_type(hash[:type])
+        @type = validate_track_type(hash[:type])
 
         self
       end
@@ -94,7 +96,7 @@ module Bra
       # @return (see #set_from_hash)
       def set_from_item(item)
         @name = item.name
-        @type = validate_type(item.type)
+        @type = validate_track_type(item.type)
 
         self
       end
@@ -107,12 +109,6 @@ module Bra
         @type = :null
 
         self
-      end
-
-      private
-
-      def validate_type(type)
-        Bra::Common::Types.validate_track_type(type)
       end
     end
 

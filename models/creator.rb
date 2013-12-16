@@ -16,6 +16,8 @@ module Bra
     # registrations; to add new model trees to the model, pass the result of
     # the model creator to other functions.
     class Creator
+      include Bra::Common::Types::Validators
+
       # Public: Initialise a Creator.
       #
       # options - The options hash to use to create models.
@@ -44,11 +46,11 @@ module Bra
       end
 
       def play_validator
-        Bra::Common::Types.method(:validate_play_state)
+        method(:validate_play_state)
       end
 
       def load_validator
-        Bra::Common::Types.method(:validate_load_state)
+        method(:validate_load_state)
       end
 
       # Validates an incoming marker

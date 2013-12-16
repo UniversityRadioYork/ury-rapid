@@ -146,6 +146,7 @@ module Bra
         # Object that performs the POSTing and PUTting of a playback marker
         class StatePoster < Bra::DriverCommon::Requests::Poster
           extend Forwardable
+          include Bra::Common::Types::Validators
 
           def post_string(new_state)
             code_for_state(@object.value, new_state).try do |command|
@@ -171,7 +172,7 @@ module Bra
             from = from.intern
             to = to.intern
 
-            [from, to].each(&Bra::Common::Types.method(:validate_play_state))
+            [from, to].each(&method(:validate_play_state))
             CODES[from][to]
           end
 
