@@ -1,9 +1,0 @@
--# x_baps_server.haml - BAPS driver server constants
-
-%section.x_baps_server
-  %h1=inspector.title
-  - if inspector.resource
-    - inspector.resource.each do |id, item|
-      = child(inspector, id)
-
-  = navigation(inspector)
