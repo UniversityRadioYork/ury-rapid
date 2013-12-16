@@ -1,5 +1,6 @@
 require_relative '../../../driver_common/requests/handler'
 require_relative '../../../driver_common/requests/poster'
+require_relative '../../../common/types'
 
 module Bra
   module Baps
@@ -170,9 +171,7 @@ module Bra
             from = from.intern
             to = to.intern
 
-            [from, to].each(
-              &Bra::Models::PlayerVariable.method(:validate_state)
-            )
+            [from, to].each(&Bra::Common::Types.method(:validate_play_state))
             CODES[from][to]
           end
 
