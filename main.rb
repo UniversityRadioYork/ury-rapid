@@ -66,8 +66,17 @@ class App
     # Now we create the driver-neutral model, but the driver might want to add
     # its own model items into the model space, so we pass the model back to
     # the driver to post-process.
-    creator = Bra::Models::Creator.new(full_config)
-    driver.process_model(creator.create)
+    model = make_model_with(full_config)
+    driver.process_model(model)
+  end
+
+  # Given a full model configuration, builds the model from a structure class
+  def make_model_with(full_config)
+    structure_module = full_config[:source]
+    require structure_module
+
+    structure = Structure.new(full_config)
+    structure.create
   end
 
   # Creates the authenticator for the server

@@ -1,5 +1,17 @@
 module Bra
   module Server
+    # Sinatra helpers for the API Inspector
+    module InspectorHelpers
+    end
+
+    # An instance of the API Inspector
+    #
+    # The API Inspector is bra's HTML output.  It allows the API space to be
+    # navigated and interacted with in a basic way.
+    #
+    # Because the API inspector needs more information about the model than
+    # its flat representation, the Inspector object is used to hold the extra
+    # state.
     class Inspector
       extend Forwardable
 

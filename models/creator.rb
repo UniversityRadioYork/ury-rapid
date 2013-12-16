@@ -1,13 +1,8 @@
-require_relative 'model'
 require_relative 'set'
-require_relative 'playlist'
-require_relative 'player'
-require_relative 'variable'
-require_relative '../common/types'
 
 module Bra
   module Models
-    # Option-based creator for models.
+    # Option-based creator for models
     #
     # This performs dependency injection and ensures any model modification
     # handlers specified in the options are set up.
@@ -15,9 +10,10 @@ module Bra
     # It does not handle driver-specific model additions beyond method hook
     # registrations; to add new model trees to the model, pass the result of
     # the model creator to other functions.
+    #
+    # Usually you will want to subclass this and override #create, to create a
+    # model structure definition.
     class Creator
-      include Bra::Common::Types::Validators
-
       # Public: Initialise a Creator.
       #
       # options - The options hash to use to create models.
@@ -27,44 +23,11 @@ module Bra
         @target = nil
       end
 
-      # Create the model from the given configuration
-      #
-      # @return [Root]  The finished model.
-      def create
-        root Root do
-          set :players, Player, @options[:players] { player }
-          set :playlists, Playlist, @options[:playlists]
-        end
-      end
+      protected
 
-      def player
-        child :state,      var(:player_state,      play_validator, :stopped)
-        child :load_state, var(:player_load_state, load_validator, :empty)
-        Bra::Common::Types::MARKERS.each do |id|
-          child id, var("player_#{id}".intern, marker_validator, 0)
-        end
+      def option(param)
+        @options[param]
       end
-
-      def play_validator
-        method(:validate_play_state)
-      end
-
-      def load_validator
-        method(:validate_load_state)
-      end
-
-      # Validates an incoming marker
-      def marker_validator
-        proc do |position|
-          position ||= 0
-          position_int = Integer(position)
-          fail('Position is negative.') if position_int < 0
-          # TODO: Check against duration?
-          position_int
-        end
-      end
-
-      private
 
       def set(id, member_class, ids, &block)
         child id, Set.new(member_class) do
@@ -103,9 +66,6 @@ module Bra
         register_update_channel(object)
       end
 
-      def place_in(parent, objects)
-        objects.each { |id, object| object.move_to(parent, id) }
-      end
       # Attaches HTTP method handlers to a model resource
       #
       # The attached handlers will be @options[NAME][METHOD], where NAME is the
