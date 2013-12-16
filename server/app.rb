@@ -77,7 +77,7 @@ module Bra
       # Fails with a HTTP 403 Forbidden status.
       # @return [void]
       def forbidden
-        halt(403, json_error('Forbidden.'))
+        error(403, 'Forbidden.')
       end
 
       # Fails with a HTTP 401 Not Authorised status.
@@ -85,7 +85,7 @@ module Bra
       # @return [void]
       def not_authorised
         headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-        halt(401, json_error('Not authorised.'))
+        error(401, 'Not authorised.')
       end
 
       # Handle CORS headers
@@ -161,10 +161,7 @@ module Bra
 
       # Renders an API Inspector instance using HAML.
       def inspector_haml(inspector)
-        haml(
-          inspector.resource_type,
-          locals: { inspector: inspector }
-        )
+        haml(inspector.resource_type, locals: { inspector: inspector })
       end
 
       def model_traversal_with_payload(action)
@@ -187,7 +184,7 @@ module Bra
       def find(params, &block)
         @model.find_url(params[:splat].first, &block)
       rescue Exceptions::MissingResourceError
-        halt(404, json_error('Not found.'))
+        error(404, 'Not found.')
       end
 
       def make_payload(action, privilege_set, request, target)
@@ -215,38 +212,63 @@ module Bra
       def parse_json_from(string)
         json = JSON.parse(string)
       rescue JSON::ParserError
-        halt(400, json_error('Badly formed JSON.'))
+        error(400, 'Badly formed JSON.')
       else
         json.deep_symbolize_keys!
       end
 
-      # Internal: Flags a client error.
+      # Flags a client error
       #
-      # message - The error message.
+      # @param message [String] The error message.
       #
       # @return [void]
       def client_error(message)
-        halt(400, json_error(message))
+        error(400, message)
       end
 
+      # Halts due to an operation not being supported
       def not_supported(exception)
-        halt(405, json_error(exception.to_s))
+        error(405, exception.to_s)
       end
 
-      # Internal: Renders an error message in JSON.
+      # Halts with an error status code and message
       #
-      # message - The error message.
+      # @param code [Integer]  The HTTP status code to return.
+      # @param message [String]  A human-readable message to show the client.
       #
-      # Returns the JSON-padded equivalent.
-      def json_error(message)
-        { status: :error, error: message }.to_json
+      # @return [void]
+      def error(code, message)
+        halt(code, render_error(code, message))
       end
 
-      # Internal: Returns a "request sent OK" message.
+      # Renders an error message
       #
-      # Returns some JSON.
+      # @param code [Integer]  The HTTP status code to return.
+      # @param message [String]  A human-readable message to show the client.
+      #
+      # @return [String]  The error message, rendered according to the client's
+      #   Accept headers.
+      def render_error(code, message)
+        # This is a very hacky way of making respond_with resolve the correct
+        # format for our error message, while stopping it from halting with
+        # a 200 status code (we need to specify our own status code).
+        catch(:halt) do
+          respond_with(
+            :error,
+            { status: :error, error: message, http_code: code}
+          )
+        end
+      end
+
+      # Renders a 'request sent OK' message
+      #
+      # This should be used for PUT, POST and DELETE responses.  There is a
+      # special handler for GET, and OPTIONS returns CORS headers.
+      #
+      # @return [String]  The OK message, rendered according to the client's
+      #   Accept headers.
       def ok
-        { status: :ok }.to_json
+        respond_with :ok, { status: :ok }
       end
     end
   end
