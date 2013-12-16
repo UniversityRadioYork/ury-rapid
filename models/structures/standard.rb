@@ -3,7 +3,9 @@ require_relative '../model'
 require_relative '../playlist'
 require_relative '../player'
 require_relative '../variable'
+require_relative '../info'
 require_relative '../../common/types'
+
 
 # A normal model structure
 #
@@ -20,6 +22,7 @@ class Structure < Bra::Models::Creator
     root Bra::Models::Root do
       set(:players, Bra::Models::Player, option(:players)) { player }
       set(:playlists, Bra::Models::Playlist, option(:playlists))
+      info :info
     end
   end
 
@@ -55,5 +58,26 @@ class Structure < Bra::Models::Creator
       # TODO: Check against duration?
       position_int
     end
+  end
+
+  # Builds the bra information model.
+  def info(id)
+    child(id, Bra::Models::Info) do
+      constant :version, Bra::Common::Constants::VERSION, :version
+      constant :channel_mode, channel_mode?, :channel_mode
+    end
+  end
+
+  # Determines whether the model is in 'channel mode'
+  #
+  # Channel mode means that the players and playlists are linked in
+  # channels; this means the set of player and playlist IDs are equal.
+  #
+  # Some user interfaces will only work when bra is in channel mode, so
+  # this is provided to allow them to check.
+  #
+  # @return [Boolean] True if the model is in channel mode; false if not.
+  def channel_mode?
+    option(:players) == option(:playlists)
   end
 end

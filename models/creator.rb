@@ -1,4 +1,5 @@
 require_relative 'set'
+require_relative '../common/constants'
 
 module Bra
   module Models
@@ -25,10 +26,17 @@ module Bra
 
       protected
 
+      # Retrieves the model option with the given key
       def option(param)
         @options[param]
       end
 
+      # Creates a Constant with the given ID, value and handler target
+      def constant(id, value, handler_target)
+        child id, Constant.new(value, handler_target)
+      end
+
+      # Creates a Set of items with the given ID list
       def set(id, member_class, ids, &block)
         child id, Set.new(member_class) do
           children(ids, member_class, &block)

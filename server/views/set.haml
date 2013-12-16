@@ -4,7 +4,8 @@
   %h1=inspector.title
 
   %div.players
-    - inspector.resource.each do |id, item|
-      = child(inspector, id)
+    - if inspector.resource
+      - inspector.resource.each do |id, item|
+        = child(inspector, id)
 
   = navigation(inspector)
