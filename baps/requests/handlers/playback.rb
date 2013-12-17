@@ -33,11 +33,9 @@ module Bra
 
         # A method object that handles POSTs to the Player for BAPS
         class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
-          extend Forwardable
-
           def item_from_local_playlist(index)
             request(
-              Request.new(Codes::Playback::LOAD, player_id).uint32(index)
+              Request.new(Codes::Playback::LOAD, object_id).uint32(index)
             )
           end
         end

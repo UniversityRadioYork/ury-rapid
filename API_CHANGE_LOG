@@ -1,0 +1,16 @@
+NOTE: When changing the API version, change Bra::Common::Constants.
+
+0.1.0
+  - Player item POSTing:
+    - "playlist://<PLAYLIST-ID>/<INDEX>" is now a valid payload.
+      - "playlist://<INDEX>" is now an alias for
+        "playlist://<PLAYER-ID>/<INDEX>", in other words, local playlist
+        loading.
+    - {"type": "playlist", "playlist": <PLAYLIST-ID>, "index": <INDEX>} is now
+      a valid payload.
+      - {"type": "playlist", "index": <INDEX>} is now an alias for
+        {"type": "playlist", "playlist": <PLAYER-ID>, "index": <INDEX>}, in
+        other words, local playlist loading.
+
+0.0.0
+  - Initial versioned release

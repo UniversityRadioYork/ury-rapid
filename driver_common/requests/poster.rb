@@ -8,6 +8,8 @@ module Bra
       # This should be subclassed to provide the actual functionality for a
       # specific POST operation.
       class Poster < Handler
+        extend Forwardable
+
         # Prevent crashing if the requester tries to register this as a
         # handler.
         TARGETS = []
@@ -49,6 +51,9 @@ module Bra
             )
           end
         end
+
+        def_delegator :@object, :id, :object_id
+        def_delegator :@payload, :id, :payload_id
 
         # Tries to forward the payload elsewhere
         #
