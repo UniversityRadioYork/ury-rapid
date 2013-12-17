@@ -9,6 +9,10 @@ module Bra
       include ItemContainer
 
       def_delegator :@children, :size
+
+      def id_is_item?(_)
+        true
+      end
     end
   end
 end

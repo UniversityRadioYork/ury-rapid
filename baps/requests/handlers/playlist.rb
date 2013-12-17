@@ -44,6 +44,11 @@ module Bra
           def reset(id)
             request(Request.new(Codes::Playlist::RESET, id))
           end
+
+          def item_handler(id)
+            # TODO(mattbw): Add something here
+            nil
+          end
         end
 
         # Object that performs the POSTing of a playlist item.

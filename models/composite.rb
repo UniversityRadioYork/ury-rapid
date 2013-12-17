@@ -87,8 +87,8 @@ module Bra
       # This instructs the composite's children to delete themselves.
       #
       # @return [void]
-      def delete_do
-        each.to_a.each(&:delete_do)
+      def driver_delete
+        each.to_a.each(&:driver_delete)
         clear
       end
 
