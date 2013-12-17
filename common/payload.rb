@@ -133,14 +133,6 @@ module Bra
         is_valid_hash?.tap { |valid| yield(*split_hash) if valid }
       end
 
-      # Whether the payload should be forwarded to the handler intact
-      #
-      # This method returns true if and only if the forward_proc given in
-      # initialisation returns true.
-      def is_valid_forward?
-        @forward_proc.nil? ? false : @forward_proc.call(@id)
-      end
-
       # Whether the payload is a valid hash format payload
       def is_valid_hash?
         @item.is_a?(Hash) && @item.key?(:type)

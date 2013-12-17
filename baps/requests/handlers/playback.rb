@@ -1,5 +1,6 @@
 require_relative '../../../driver_common/requests/handler'
 require_relative '../../../driver_common/requests/poster'
+require_relative '../../../driver_common/requests/player_poster'
 require_relative '../../../common/types'
 
 module Bra
@@ -31,38 +32,8 @@ module Bra
         end
 
         # A method object that handles POSTs to the Player for BAPS
-        class PlayerPoster < Bra::DriverCommon::Requests::Poster
+        class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
           extend Forwardable
-
-          def post_forward
-            @payload.id == :item ? false : super()
-          end
-
-          def post_url(protocol, url)
-            # TODO(mattbw): IDs other than :item.
-            item_from_playlist_url(url)     if     protocol == :playlist
-            unsupported_protocol(protocol)  unless protocol == :playlist
-          end
-
-          def post_hash(type, hash)
-            # TODO(mattbw): IDs other than :item.
-            item_from_playlist_hash(hash)   if     type == :playlist
-            unsupported_protocol(type)      unless type == :playlist
-          end
-
-          private
-
-          def_delegator :@object, :id, :player_id
-
-          def item_from_playlist_hash(hash)
-            # TODO(mattbw): Non-local loads?
-            # TODO(mattbw): Non-existent indices.
-            item_from_local_playlist(hash[:index].to_i)
-          end
-
-          def item_from_playlist_url(url)
-            item_from_local_playlist(url.to_i)
-          end
 
           def item_from_local_playlist(index)
             request(
