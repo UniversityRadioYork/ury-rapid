@@ -71,6 +71,10 @@ module Bra
               load_state: player_url(response, :load_state)
             }
           end
+
+          def origin(response)
+            "playlist://#{response[:subcode]}/#{response[:index]}"
+          end
         end
       end
     end

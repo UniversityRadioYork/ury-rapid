@@ -22,11 +22,14 @@ module Bra
       #
       # @param type [Symbol] The Item type: one of :library, :file or :text.
       # @param name [String] The display name of the Item.
-      def initialize(type, name)
+      # @param origin [String] The origin of the Item, as an URL or
+      #   pseudo-URL, if available.
+      def initialize(type, name, origin)
         super()
 
         @type = validate_track_type(type)
         @name = name
+        @origin = origin
       end
 
       # Converts the Item to a flat representation
@@ -35,7 +38,7 @@ module Bra
       #
       # @return [Hash] A flat representation of the Item.
       def flat
-        { name: @name, type: @type }
+        { name: @name, type: @type, origin: @origin }
       end
 
       # PUTs a new item representation into this Item from the driver end

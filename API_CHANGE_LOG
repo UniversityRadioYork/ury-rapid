@@ -1,5 +1,11 @@
 NOTE: When changing the API version, change Bra::Common::Constants.
 
+0.2.0
+  - Items now have another field, "origin", which tracks the origin of the
+    Item in URL format, driver support permitting.  For example, in BAPS, an
+    item loaded into a Player from index 5 of player 2 will have origin
+    "playlist://2/5".  This field will be NULL if not supplied.
+
 0.1.0
   - Player item POSTing:
     - "playlist://<PLAYLIST-ID>/<INDEX>" is now a valid payload.

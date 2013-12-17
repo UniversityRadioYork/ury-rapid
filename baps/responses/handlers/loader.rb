@@ -16,7 +16,19 @@ module Bra
               response,
               id(response),
               urls(response),
+              origin(response)
             )
+          end
+
+          # Returns the origin of an item
+          #
+          # This defaults to nil.  Subclasses may override this to provide an
+          # appropriate origin URL for the item.
+          #
+          # @param response [Response]  The response representing the load.
+          # @return [NilClass] nil.
+          def origin(response)
+            nil
           end
         end
 
@@ -49,7 +61,7 @@ module Bra
           end
 
           def delete
-            @parent.delete(@urls[:delete])
+            @parent.delete_if_exists(@urls[:delete])
           end
 
           def post
@@ -72,11 +84,12 @@ module Bra
             new(*args).run
           end
 
-          def initialize(parent, response, id, urls)
+          def initialize(parent, response, id, urls, origin)
             @parent = parent
             @response = response
             @id = id
             @urls = urls
+            @origin = origin
 
             extract_fields_from_response
           end
@@ -154,16 +167,13 @@ module Bra
             ItemLoader.load(@parent, @id, item, load_state, @urls)
           end
 
-          # Processes a normal loaded item response
-          #
-          # This converts the response into an item and possibly a duration
-          # change.
+          # Makes an item from the response
           #
           # @api private
           #
-          # @return [Hash] The item, wrapped in a POST payload.
+          # @return [Item] The item
           def make_item
-            Bra::Models::Item.new(type_as_bra_symbol, @title)
+            Bra::Models::Item.new(type_as_bra_symbol, @title, @origin)
           end
 
           # Converts a BAPS track type to a BRA track type

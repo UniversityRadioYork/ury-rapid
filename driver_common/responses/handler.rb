@@ -1,4 +1,5 @@
 require_relative '../handler'
+require_relative '../../exceptions'
 
 module Bra
   module DriverCommon
@@ -17,13 +18,18 @@ module Bra
           @model = parent.model
         end
 
-        protected
-
         # Shorthand for @model.driver_X_url.
         def_delegator(:@model, :find_url, :find)
-        def_delegator(:@model, :driver_put_url, :put)
-        def_delegator(:@model, :driver_post_url, :post)
-        def_delegator(:@model, :driver_delete_url, :delete)
+        %i{put post delete}.each do |action|
+          def_delegator(:@model, "driver_#{action}_url".intern, action)
+        end
+
+        # Like delete, but does not fail if the resource does not exist.
+        def delete_if_exists(*args)
+          delete(*args)
+        rescue Bra::Exceptions::MissingResourceError
+          nil
+        end
       end
     end
   end

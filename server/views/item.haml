@@ -11,8 +11,7 @@
   %section.item{ class: item[:type] }
     %h1= inspector.resource_url
     %dl
-      %dt Name
-      %dd=item[:name]
-      %dt Type
-      %dd=item[:type]
+      -item.each do |key, value|
+        %dt=key
+        %dd=value
     = haml(:out_links, locals: { resource_url: inspector.resource_url })
