@@ -60,14 +60,11 @@ class App
     # The model config is created by loading up driver-neutral configuration
     # from the central YAML file, then passing it to the driver to check for
     # unsound config (like requesting 3 channels on a single-channel playout)
-    # and to add in driver-specific configuration, like model handlers.
+    # and to add in driver-specific configuration, like model handlers or
+    # model extension creators.
     full_config = driver.configure_model(init_config)
 
-    # Now we create the driver-neutral model, but the driver might want to add
-    # its own model items into the model space, so we pass the model back to
-    # the driver to post-process.
     model = make_model_with(full_config)
-    driver.process_model(model)
   end
 
   # Given a full model configuration, builds the model from a structure class
@@ -76,7 +73,18 @@ class App
     require structure_module
 
     structure = Structure.new(full_config)
-    structure.create
+    model = structure.create
+    extend_model(full_config, model)
+  end
+
+  # Apply any extensions in the model config to the model.
+  def extend_model(full_config, model)
+    full_config[:extensions].try do |extensions|
+      # TODO: Handle strings and other un-instantiated models.
+      extensions.each { |extension| extension.extend(model) }
+    end
+
+    model
   end
 
   # Creates the authenticator for the server

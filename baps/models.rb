@@ -10,48 +10,20 @@ module Bra
     # playout system.
     module Models
       # Object that creates the BAPS model set, given a model root and config.
-      class Creator
-        def initialize(root, config)
-          @root = root
-          @config = config
+      class Creator < Bra::Models::Creator
+        def initialize(model_config, baps_config)
+          super(model_config)
+          @baps_config = baps_config
         end
 
-        def run
-          xbaps = Bra::Models::Set.new(:x_baps).move_to(@root, :x_baps)
-          server.move_to(xbaps, :server)
-        end
-
-        # Constructs and populates a BAPS model set under the given model root
-        #
-        # The BAPS models are initially populated with values from the config
-        # given.
-        #
-        # model  - The root of the model to which the BAPS model tree should be
-        #          added.
-        # config - The config dict from which the BAPS model will be populated.
-        #
-        # @return [Model] The initial model root, which may have been mutated.
-        def self.create(root, config)
-          new(root, config).run
-          root
-        end
-
-        private
-
-        def server
-          Bra::Models::Set.new(:x_baps_server).tap(
-            &method(:add_server_constants)
-          )
-        end
-
-        def add_server_constants(server)
-          @config.each { |key, value| add_server_constant(server, key, value) }
-        end
-
-        def add_server_constant(server, key, value)
-          Bra::Models::Constant.new(
-            value, :x_baps_server_constant
-          ).move_to(server, key)
+        def extend(model)
+          root model do
+            set :x_baps, :x_baps do
+              set :server, :x_baps_server do
+                constants @baps_config, :x_baps_server_constant
+              end
+            end
+          end
         end
       end
     end

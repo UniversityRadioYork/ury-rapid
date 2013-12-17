@@ -38,20 +38,13 @@ class Driver
   # model_config.
   #
   # @return [Hash] The prepared configuration.
-  def configure_model(model_config)
+  def configure_model(init_config)
     # Add in the BAPS-specific model handlers, so that model actions
     # trigger BAPS commands.
-    @requester.configure_model(model_config)
-  end
-
-  # Perform post-processing on the finished bra model root
-  #
-  # This returns its changes, but may or may not mutate the original model.
-  #
-  def process_model(model)
-    # The BAPS driver exposes some of its configuration as part of the BRA
-    # model, so we need to extend the model to accommodate these.
-    Bra::Baps::Models::Creator.create(model, @config)
+    config = @requester.configure_model(init_config)
+    config[:extensions] = [] unless config.key?(:extensions)
+    config[:extensions] << Bra::Baps::Models::Creator.new(config, @config)
+    config
   end
 
   # Begin running the driver, given the completed bra model

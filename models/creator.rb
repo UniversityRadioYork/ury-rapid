@@ -31,6 +31,11 @@ module Bra
         @options[param]
       end
 
+      # Creates multiple Constants with the same handler target from a hash
+      def constants(hash, handler_target)
+        hash.each { |key, value| constant(key, value, handler_target) }
+      end
+
       # Creates a Constant with the given ID, value and handler target
       def constant(id, value, handler_target)
         child id, Constant.new(value, handler_target)
