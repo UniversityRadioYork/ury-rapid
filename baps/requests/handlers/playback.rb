@@ -100,7 +100,7 @@ module Bra
           extend Forwardable
 
           def post_integer(integer)
-            request(Request.new(target_to_code, player_id) .uint32(integer))
+            request(Request.new(target_to_code, player_id).uint32(integer))
           end
 
           private
