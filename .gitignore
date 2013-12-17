@@ -1,4 +1,5 @@
 .fuse_hidden*
+*.tmp
 *.gem
 *.rbc
 .bundle
