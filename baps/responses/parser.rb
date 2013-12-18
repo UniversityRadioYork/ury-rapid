@@ -1,13 +1,12 @@
 require 'active_support/core_ext/object/try'
+require_relative 'structures'
 require_relative '../codes'
 require_relative '../types'
+require_relative '../../exceptions'
 
 module Bra
   module Baps
     module Responses
-      class UnknownResponse < StandardError
-      end
-
       # An interpreter that reads and converts raw command data from the BAPS
       # server into response messages.
       class Parser
@@ -34,6 +33,7 @@ module Bra
             code: Codes::System::WELCOME_MESSAGE,
             subcode: 0
           }
+          @structures = Bra::Baps::Responses::Structures.new
         end
 
         # Read and interpret a response from the BAPS server
@@ -140,12 +140,12 @@ module Bra
         #
         # @return [Array] The expected structure of the BAPS response.
         def structure_with_code(code)
-          structure = Responses::STRUCTURES[code]
+          structure = @structures.structure(code)
           structure.nil? ? unknown_response(code) : structure.clone
         end
 
         def unknown_response(code)
-          fail(UnknownResponse, code.to_s(16))
+          fail(Bra::Exceptions::InvalidPlayoutResponse, code.to_s(16))
         end
 
         # Constructs an initial response from the given code and subcode
