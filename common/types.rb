@@ -6,7 +6,7 @@ module Bra
       PLAY_STATES = %i{playing paused stopped}
       LOAD_STATES = %i{ok empty loading failed}
       TRACK_TYPES = %i{library file text null}
-      MARKERS = %i{cue position intro duration}
+      MARKERS = %i{cue position intro}
 
       # Validators for the BRA type enumerators.
       module Validators

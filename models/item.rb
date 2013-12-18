@@ -24,12 +24,14 @@ module Bra
       # @param name [String] The display name of the Item.
       # @param origin [String] The origin of the Item, as an URL or
       #   pseudo-URL, if available.
-      def initialize(type, name, origin)
+      # @param duration [Integer] The duration of the Item, in milliseconds.
+      def initialize(type, name, origin, duration)
         super()
 
         @type = validate_track_type(type)
         @name = name
         @origin = origin
+        @duration = duration
       end
 
       # Converts the Item to a flat representation
@@ -38,25 +40,17 @@ module Bra
       #
       # @return [Hash] A flat representation of the Item.
       def flat
-        { name: @name, type: @type, origin: @origin }
+        { name: @name, type: @type, origin: @origin, duration: @duration }
       end
 
       # PUTs a new item representation into this Item from the driver end
       #
-      # The new item may be a hash representation, an existing Item, nil, or a
-      # hash mapping this item's ID to one of the above (for compatibility with
-      # the external API).
+      # This just asks the parent to POST the new item over this one, for the
+      # sake of convenience.
+      #
+      # @param new_item [Item] The new Item.
       def driver_put(new_item)
-        value = new_item[id] if new_item.is_a?(Hash)
-        value = new_item unless new_item.is_a?(Hash)
-
-        done = nil
-        done = set_from_hash(value) if value.is_a?(Hash)
-        done = set_from_item(value) if value.is_a?(Item)
-        done = clear if value.nil?
-        fail("Unsupported argument to driver_put: #{value.class}") unless done
-
-        notify_update
+        parent.driver_post(id, new_item)
       end
 
       # Performs a DELETE on this object from the driver end
@@ -70,38 +64,6 @@ module Bra
         parent.remove_child(id)
         @parent = nil
         @id = nil
-      end
-
-      # Sets the item's properties from a hash
-      #
-      # The hash should have keys 'value' and 'type', which may be symbols or
-      # strings.
-      #
-      # @param hash [Hash] The hash containing the values to place in this
-      #   Item.
-      #
-      # @return [Item] This object, for method chaining.
-      def set_from_hash(hash)
-        # This is to allow the keys to be strings as well as symbols.
-        hash = hash.symbolize_keys
-
-        @name = hash[:name]
-        @type = validate_track_type(hash[:type])
-
-        self
-      end
-
-      # Sets the item's properties from an existing item
-      #
-      # @param item [Item] The Item whose values are to be copied into this
-      #   Item.
-      #
-      # @return (see #set_from_hash)
-      def set_from_item(item)
-        @name = item.name
-        @type = validate_track_type(item.type)
-
-        self
       end
     end
 

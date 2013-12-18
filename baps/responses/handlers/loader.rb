@@ -173,7 +173,9 @@ module Bra
           #
           # @return [Item] The item
           def make_item
-            Bra::Models::Item.new(type_as_bra_symbol, @title, @origin)
+            Bra::Models::Item.new(
+              type_as_bra_symbol, @title, @origin, @duration
+            )
           end
 
           # Converts a BAPS track type to a BRA track type

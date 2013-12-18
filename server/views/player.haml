@@ -8,9 +8,8 @@
 
 %section.player
   %h1=inspector.title
-  - var_groups.each do |group, ids|
-    - ids.each do |id|
-      = child(inspector, id)
+  - player.keys.each do |id|
+    = child(inspector, id) unless id == :item
 
   - if player[:item]
     %p.item{ class: player[:item][:type] }
