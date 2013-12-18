@@ -49,12 +49,13 @@ module Bra
       #
       # This fails with HTTP 401 if the user does not exist.
       #
-      # @return [Array] An array of privilege symbols.
-      def privilege_set
+      # @return [Array] An array of privilege symbols.  If suppress_error is
+      #   true and an authentication failure occurs, this may be nil.
+      def privilege_set(suppress_error = false)
         credentials = get_credentials(rack_auth)
         @authenticator.authenticate(*credentials)
       rescue Bra::Exceptions::AuthenticationFailure
-        not_authorised
+        not_authorised unless suppress_error
       end
 
       def rack_auth
@@ -133,17 +134,23 @@ module Bra
       # Sets up a connection to the model updates stream.
       def model_updates_stream
         cors
-        updater = Updater.new(@model, privilege_set)
-        request.websocket? ? websocket_update(updater) : stream_update(updater)
+        send(request.websocket? ? :websocket_update : :stream_update)
       end
 
-      def stream_update(updater)
+      def stream_update
         content_type 'application/json', charset: 'utf-8'
-        stream(:keep_open, &updater.method(:stream))
+        stream(:keep_open) do |stream|
+          StreamUpdater.launch(@model, stream, privilege_set)
+        end
       end
 
-      def websocket_update(updater)
-        request.websocket(&updater.method(:websocket))
+      def websocket_update
+        request.websocket do |websocket|
+          WebSocketUpdater.launch(
+            @model, websocket, @authenticator.method(:authenticate),
+            privilege_set(true)
+          )
+        end
       end
 
       def handle_get(target)
