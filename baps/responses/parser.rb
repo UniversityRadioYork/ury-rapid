@@ -141,11 +141,11 @@ module Bra
         # @return [Array] The expected structure of the BAPS response.
         def structure_with_code(code)
           structure = Responses::STRUCTURES[code]
-          structure.nil? ? unknown_response : structure.clone
+          structure.nil? ? unknown_response(code) : structure.clone
         end
 
         def unknown_response(code)
-          fail(UnknownResponse, code.to_s(16)) if structure.nil?
+          fail(UnknownResponse, code.to_s(16))
         end
 
         # Constructs an initial response from the given code and subcode
