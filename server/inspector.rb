@@ -2,7 +2,20 @@ module Bra
   module Server
     # Sinatra helpers for the API Inspector
     module InspectorHelpers
+      def child(inspector, id)
+        insp = inspector.inspect_child(id)
+        inspector_haml(insp)
+      end
 
+      def navigation(inspector)
+        haml(
+          :in_out_links,
+          locals: {
+            resource_url: inspector.resource_url,
+            inner: inspector.inner
+          }
+        )
+      end
     end
 
     # An instance of the API Inspector

@@ -25,25 +25,8 @@ module Bra
         @authenticator = authenticator
       end
 
+      helpers InspectorHelpers
       helpers Sinatra::Streaming
-
-      # TODO: Make this protection more granular.
-      helpers do
-        def child(inspector, id)
-          insp = inspector.inspect_child(id)
-          inspector_haml(insp)
-        end
-
-        def navigation(inspector)
-          haml(
-            :in_out_links,
-            locals: {
-              resource_url: inspector.resource_url,
-              inner: inspector.inner
-            }
-          )
-        end
-      end
 
       # Gets the set of privileges the user has
       #
