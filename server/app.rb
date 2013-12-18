@@ -122,16 +122,17 @@ module Bra
 
       def stream_update
         content_type 'application/json', charset: 'utf-8'
+        privs = privilege_set
         stream(:keep_open) do |stream|
-          StreamUpdater.launch(@model, stream, privilege_set)
+          StreamUpdater.launch(@model, stream, privs)
         end
       end
 
       def websocket_update
+        privs = privilege_set(true)
         request.websocket do |websocket|
           WebSocketUpdater.launch(
-            @model, websocket, @authenticator.method(:authenticate),
-            privilege_set(true)
+            @model, websocket, @authenticator.method(:authenticate), privs
           )
         end
       end

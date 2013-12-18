@@ -83,7 +83,7 @@ module Bra
       private
 
       def request(message)
-        json = JSON.parse(string)
+        json = JSON.parse(message)
       rescue JSON::ParserError
         send_json(type: :fail, message: 'Invalid JSON')
       else
@@ -93,7 +93,7 @@ module Bra
 
       def request_json(parsed)
         case parsed[:type]
-        when :auth
+        when 'auth'
           try_auth(parsed[:username], parsed[:password])
         else
           error("Unknown request: #{parsed[:type]}")
@@ -101,8 +101,9 @@ module Bra
       end
 
       def try_auth(username, password)
-        new_privileges = @authenticator.authenticate(*credentials)
+        new_privileges = @authenticator.call(username, password)
         @privileges = new_privileges
+        send_json(type: :auth, username: username)
       rescue Bra::Exceptions::AuthenticationFailure
         error('Authentication failed.')
       end
