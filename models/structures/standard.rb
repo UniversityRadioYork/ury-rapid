@@ -41,14 +41,6 @@ class Structure < Bra::Models::Creator
     end
   end
 
-  def play_validator
-    method(:validate_play_state)
-  end
-
-  def load_validator
-    method(:validate_load_state)
-  end
-
   # Validates an incoming marker
   def marker_validator
     proc do |position|
