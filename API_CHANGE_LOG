@@ -1,5 +1,12 @@
 NOTE: When changing the API version, change Bra::Common::Constants.
 
+0.4.0
+  - Stream and WebSocket payloads are now of the form
+    {"type": "update", "<url>": <payload>}.
+  - In WebSockets, to authenticate without HTTP Basic, send
+    {"type": "auth", "username": "<username>", "password": "<password>"}.
+  - WebSockets now sends errors of the form
+    {"type": "error", "message": "<message>"}.
 0.3.0
   - Items now have another field, 'duration', which tracks the item duration
     as long as the driver exposes it.
