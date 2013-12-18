@@ -15,10 +15,16 @@ module Bra
       # its parameters in order of receipt and their corresponding names in the
       # response hashes produced by the response parser.
       class Structures < Bra::DriverCommon::StructureBuilder
+        # These are the types used in BAPS, and correspond to the types used
+        # in the response parser.
         def_types :float32, :uint32, :string, :load_body, :config_setting
+
+        # Some common arguments
         def_argument_shortcuts :uint32, %i{position count index}
+        def_argument_shortcuts :uint32, %i{old_index new_index}
         def_argument_shortcuts :uint32, %i{id choice_id option_id}
         def_argument_shortcuts :string, %i{title description message client}
+
         def_struct :unary
         def_struct :marker, position
         def_struct :config, option_id, config_setting(:setting)
@@ -27,18 +33,24 @@ module Bra
         def initialize
           structures do
             group Codes::Playback do
+              unary  :PLAY
+              unary  :STOP
+              unary  :PAUSE
+              marker :POSITION
               struct :VOLUME, float32(:volume)
               struct :LOAD,   index, load_body(:type)
-
-              unary  :STOP, :PAUSE, :PLAY
-              marker :POSITION, :CUE, :INTRO
+              marker :CUE
+              marker :INTRO
             end
             group Codes::Playlist do
-              struct :DELETE_ITEM, index
-              struct :ITEM_COUNT,  count
-              struct :ITEM_DATA,   index, uint32(:type), title
-
+              # ADD_ITEM is request only
+              struct :DELETE_ITEM,           index
+              struct :MOVE_ITEM_IN_PLAYLIST, old_index, new_index
+              struct :ITEM_COUNT,            count
+              struct :ITEM_DATA,             index, uint32(:type), title
+              # GET is unused
               unary  :RESET
+              # COPY_ITEM_TO_PLAYLIST is request only
             end
             group Codes::Config do
               struct :OPTION_COUNT,         count
