@@ -37,6 +37,10 @@ server:
   # is useful if you're proxying through to the server in Apache or suchlike.
   root: /
 
+  # This should be changed to point to the directory containing the
+  # /assets/ and /views/ subdirectories.
+  root_directory: /home/mattbw/bra-ruby/lib/bra/server/
+
   # Cross-origin resource sharing config goes in here.
   # This is in the form of a dictionary mapping X, where "Access-Control-X" is
   # a CORS header, to a list of values to set for that header.
@@ -58,24 +62,39 @@ server:
     god:
       password: hunter2
       privileges:
-        channel_set: [get]
-        channel: [get]
+        root: [get]
+        player_set: [get, put, post, delete]
         player: [get, put, post]
+        playlist_set: [get, put, post, delete]
         playlist: [get, put, post, delete]
-        item: [get, put, post]
+        item: [get, put, post, delete]
         player_state: [get, put, post, delete]
         player_load_state: [get, put, post, delete]
         player_cue: [get, put, post, delete]
         player_intro: [get, put, post, delete]
         player_duration: [get, put, post, delete]
         player_position: [get, put, post, delete]
+        # BAPS2
+        x_baps: [get]
+        x_baps_server: [get]
+        x_baps_server_constant: [get]
+        # Info
+        info: [get]
+        version: [get]
+        channel_mode: [get]
 
 #
 # The [model] is the part of bra that tracks the playout system's state and
 # allows it to be viewed and manipulated as a collection of objects.
 #
 model:
-  # Set the *desired* number of playout channels here.  If the driver cannot
-  # support this number, it may set a different channel count than that
-  # specified here.
-  num_channels: 3
+  # Specify the module from which the model structure is being loaded here.
+  # This can be a relative path or a gem name.
+  source: bra/models/structures/standard
+
+  # Set the identifiers for the players here.  Certain drivers may restrict
+  # what can go here.
+  players: [0, 1, 2]
+  # Set the identifiers for the playlists here.  Certain drivers may restrict
+  # what can go here.
+  playlists: [0, 1, 2]
