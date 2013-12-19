@@ -6,8 +6,7 @@ module Bra
         # but otherwise ignores.
         class Log < Bra::DriverCommon::Responses::Handler
           TARGETS = [
-            Codes::System::CLIENT_ADD,
-            Codes::System::CLIENT_REMOVE,
+            Codes::System::CLIENT_CHANGE,
             Codes::System::LOG_MESSAGE
           ]
 
@@ -16,7 +15,7 @@ module Bra
           end
 
           def type_message(response)
-            TYPE_MESSAGE[response[:code]]
+            TYPE_MESSAGE[response[:code] + response[:subcode]]
           end
 
           def details(response)
@@ -27,14 +26,13 @@ module Bra
           private
 
           DETAILS_SYM = {
-            Codes::System::CLIENT_ADD => :client,
-            Codes::System::CLIENT_REMOVE => :client,
+            Codes::System::CLIENT_CHANGE => :client,
             Codes::System::LOG_MESSAGE => :message
           }
 
           TYPE_MESSAGE = {
-            Codes::System::CLIENT_ADD => 'New client',
-            Codes::System::CLIENT_REMOVE => 'Client disconnected',
+            Codes::System::CLIENT_CHANGE => 'Client disconnected',
+            Codes::System::CLIENT_CHANGE + 1 => 'Client connected',
             Codes::System::LOG_MESSAGE => 'BAPS says'
           }
         end

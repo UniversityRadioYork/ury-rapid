@@ -64,8 +64,7 @@ module Bra
             group Codes::System do
               struct :SEED,          string(:seed)
               struct :LOGIN_RESULT,  string(:details)
-              struct :CLIENT_ADD,    client
-              struct :CLIENT_REMOVE, client
+              struct :CLIENT_CHANGE, client
               struct :LOG_MESSAGE,   string(:message)
             end
           end
