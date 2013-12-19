@@ -160,7 +160,7 @@ module Bra
       def move_to(new_parent, new_id)
         @parent.remove_child(self) unless @parent.nil?
         @parent = new_parent
-        @parent.add_child(self, new_id) unless @parent.nil?
+        @parent.add_child(new_id, self) unless @parent.nil?
         @id_function = @parent.id_function(self)
 
         self

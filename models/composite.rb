@@ -19,26 +19,12 @@ module Bra
 
       attr_reader :children
 
-      # Removes a child from this model object
-      #
-      # @param id [ModelObject] The ID of the child to remove.
-      #
-      # @return [void]
-      def remove_child(id)
-        fail('Implementations of CompositeModelObject need to implement this.')
-      end
-
-      # Adds a child to this model object
-      #
-      # @param object [ModelObject] The object to add to this object's
-      #   children.  The object's resource name must be unique in this object's
-      #   children.
-      # @param id [Object] The ID to register the child under.  Acceptable IDs
-      #   depend on the underlying type of the model object.
-      #
-      # @return [void]
-      def add_child(object, id)
-        @children[id] = object
+      # Methods that form the interface to a CompositeModelObject, but cannot
+      # be implemented generically.
+      %i{add_child remove_child}.each do |method|
+        define_method(method) do |*|
+          fail("CompositeModelObject subclasses need to implement #{method}.")
+        end
       end
 
       # Attempts to find a child resource with the given partial URL
@@ -116,6 +102,7 @@ module Bra
       # In order to retain the same API between CompositeModelObjects, we use
       # #each_value here.
       def_delegator :@children, :each_value, :each
+      def_delegator :@children, :[]=, :add_child
       def_delegator :@children, :delete, :remove_child
 
       def initialize
@@ -205,6 +192,7 @@ module Bra
         @children = []
       end
 
+      def_delegator :@children, :insert, :add_child
       def_delegator :@children, :delete_at, :remove_child
 
       # GETs this model object as a 'flat' representation
