@@ -1,3 +1,5 @@
+require 'haml'
+
 module Bra
   module Server
     # Sinatra helpers for the API Inspector
