@@ -28,6 +28,8 @@ module Bra
         @model = model
         @config = config
         @authenticator = authenticator
+
+        config[:root_directory].try { |root| settings.set :root, root }
       end
 
       helpers InspectorHelpers
