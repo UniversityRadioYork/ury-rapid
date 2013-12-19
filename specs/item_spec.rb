@@ -2,7 +2,14 @@ require_relative '../models/item'
 require_relative '../models/composite'
 
 describe Bra::Models::Item do
-  let(:item) { Bra::Models::Item.new(:library, 'Brown Girl In The Ring') }
+  let(:item) do
+    Bra::Models::Item.new(
+      :library,
+      'Brown Girl In The Ring',
+      'playlist://0/0',
+      31415
+    )
+  end
   # Brown girl in the ring, tra la la la la
   # There's a brown girl in the ring, tra la la la la la
   # Brown girl in the ring, tra la la la la
@@ -10,7 +17,11 @@ describe Bra::Models::Item do
   describe '#flat' do
     it 'flattens the Item into a hash representation' do
       expect(item.flat).to eq(
-        { name: 'Brown Girl In The Ring', type: :library }
+        { name: 'Brown Girl In The Ring',
+          type: :library,
+          origin: 'playlist://0/0',
+          duration: 31415
+        }
       )
     end
   end
@@ -24,32 +35,18 @@ describe Bra::Models::Item do
       expect(item.type).to eq(:library)
     end
   end
-  describe '#set_from_hash' do
-    context 'given a valid Hash' do
-      it 'sets the contents of the Item to those in the Hash' do
-        item.set_from_hash({ name: 'URY Whisper (Dry)', type: :file })
-        expect(item.name).to eq('URY Whisper (Dry)')
-        expect(item.type).to eq(:file)
-      end
-    end
-  end
-  describe '#set_from_item' do
-    context 'given a valid Item' do
-      it 'sets the contents of the Item to those in the other Item' do
-        new_item = Bra::Models::Item.new(:file, 'URY 1')
-        item.set_from_item(new_item)
-        expect(item.name).to eq('URY 1')
-        expect(item.type).to eq(:file)
-      end
-    end
-  end
-  describe '#delete_do' do
+  describe '#driver_delete' do
     context 'when the Item is in a parent object' do
-      it 'removes the Item from that object' do
+      it 'removes the Item from that object, and notifies the channel' do
+        # Ensure the update channel is notified of the deletion
+        channel = double(:channel)
+        channel.should_receive(:push).with([item, nil])
+        item.register_update_channel(channel)
+
         lmo = Bra::Models::ListModelObject.new
         item.move_to(lmo, 0)
         expect(lmo.children).to eq([item])
-        item.delete_do
+        item.driver_delete
         expect(lmo.children).to eq([])
       end
     end
