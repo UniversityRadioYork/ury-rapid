@@ -72,12 +72,12 @@ module Bra
         @websocket = websocket
       end
 
-      def_delegator :@websocket, :send
+      def_delegator :@websocket, :send_message, :send
 
       def run
         register
-        @websocket.onmessage(&method(:request))
-        @websocket.onclose(&method(:clean_up))
+        @websocket.on_message(&method(:request))
+        @websocket.on_close(&method(:clean_up))
       end
 
       private
