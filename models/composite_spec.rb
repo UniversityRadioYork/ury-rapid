@@ -79,9 +79,9 @@ describe Bra::Models::HashModelObject do
     context 'with a block' do
       it 'runs it on each child' do
         count = 0
-        hmo.add_child(:karl, :marx )
-        hmo.add_child(:friedrich, :engels )
-        hmo.add_child(:vladimir, :lenin )
+        hmo.add_child(:karl, :marx)
+        hmo.add_child(:friedrich, :engels)
+        hmo.add_child(:vladimir, :lenin)
         hmo.each do |child|
           expect(hmo.children.values).to include(child)
           count += 1
@@ -188,9 +188,9 @@ describe Bra::Models::ListModelObject do
     context 'with a block' do
       it 'runs it on each child' do
         count = 0
-        lmo.add_child(0, :marx )
-        lmo.add_child(1, :engels )
-        lmo.add_child(2, :lenin )
+        lmo.add_child(0, :marx)
+        lmo.add_child(1, :engels)
+        lmo.add_child(2, :lenin)
         lmo.each do |child|
           expect(lmo.children).to include(child)
           count += 1
