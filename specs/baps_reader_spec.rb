@@ -1,4 +1,4 @@
-require_relative 'reader'
+require_relative '../baps/reader'
 
 # Representative values
 UINT16_MIN = 0

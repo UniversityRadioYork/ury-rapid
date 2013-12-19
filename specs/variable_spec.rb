@@ -1,4 +1,4 @@
-require_relative 'variable'
+require_relative '../models/variable'
 
 class TestVariable < Bra::Models::Variable
 end

@@ -1,4 +1,4 @@
-require_relative 'config_authenticator'
+require_relative '../common/config_authenticator'
 
 describe Bra::Common::ConfigAuthenticator do
   let(:config) do

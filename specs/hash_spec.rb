@@ -1,4 +1,4 @@
-require_relative 'hash'
+require_relative '../utils/hash'
 
 describe Hash do
   describe '.new_with_default_block' do

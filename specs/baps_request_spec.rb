@@ -1,5 +1,5 @@
-require_relative 'request'
-require_relative '../format_strings'
+require_relative '../baps/requests/request'
+require_relative '../baps/format_strings'
 
 # Simple queue for testing requests.
 class MockQueue

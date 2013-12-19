@@ -1,5 +1,5 @@
-require_relative 'item'
-require_relative 'composite'
+require_relative '../models/item'
+require_relative '../models/composite'
 
 describe Bra::Models::Item do
   let(:item) { Bra::Models::Item.new(:library, 'Brown Girl In The Ring') }
