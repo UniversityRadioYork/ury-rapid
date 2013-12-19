@@ -12,17 +12,17 @@ describe Bra::Models::HashModelObject do
   describe '#add_child' do
     context 'with an ID not yet used' do
       it 'adds the child into the object\'s children' do
-        hmo.add_child('shazam', :marvel)
+        hmo.add_child(:marvel, 'shazam')
         expect(hmo.children).to eq({ marvel: 'shazam' })
-        hmo.add_child('scoosh', 3)
+        hmo.add_child(3, 'scoosh')
         expect(hmo.children).to eq({ marvel: 'shazam', 3 => 'scoosh' })
       end
     end
     context 'with an ID already in use' do
       it 'replaces the existing child' do
-        hmo.add_child('scoosh', :cillit)
+        hmo.add_child(:cillit, 'scoosh')
         expect(hmo.children).to eq({ cillit: 'scoosh' })
-        hmo.add_child('bang', :cillit)
+        hmo.add_child(:cillit, 'bang')
         expect(hmo.children).to eq({ cillit: 'bang' })
       end
     end
@@ -30,14 +30,14 @@ describe Bra::Models::HashModelObject do
   describe '#remove_child' do
     context 'with an ID in use' do
       it 'removes the item' do
-        hmo.add_child('shazam', :spoo)
+        hmo.add_child(:spoo, 'shazam')
         hmo.remove_child(:spoo)
         expect(hmo.children).to eq({})
       end
     end
     context 'with an ID not in use' do
       it 'does nothing' do
-        hmo.add_child('shazam', :spoo)
+        hmo.add_child(:spoo, 'shazam')
         hmo.remove_child(:flub)
         expect(hmo.children).to eq({ spoo: 'shazam' })
       end
@@ -46,26 +46,26 @@ describe Bra::Models::HashModelObject do
   describe '#child' do
     context 'with a valid integer ID' do
       it 'returns the child at that ID' do
-        hmo.add_child('shazam', 42)
+        hmo.add_child(42, 'shazam')
         expect(hmo.child(42)).to eq('shazam')
       end
     end
     context 'with a valid string ID' do
       it 'returns the child at that ID' do
-        hmo.add_child('fawkes', 42)
-        hmo.add_child('shazam', '42')
+        hmo.add_child(42, 'fawkes')
+        hmo.add_child('42', 'shazam')
         expect(hmo.child('42')).to eq('shazam')
       end
     end
     context 'with a valid string ID matching an integer ID' do
       it 'returns the child at that integer ID' do
-        hmo.add_child('fawkes', 42)
+        hmo.add_child(42, 'fawkes')
         expect(hmo.child('42')).to eq('fawkes')
       end
     end
     context 'with a valid string ID matching a symbol ID' do
       it 'returns the child at that symbol ID' do
-        hmo.add_child('granma', :foop)
+        hmo.add_child(:foop, 'granma')
         expect(hmo.child('foop')).to eq('granma')
       end
     end
@@ -79,9 +79,9 @@ describe Bra::Models::HashModelObject do
     context 'with a block' do
       it 'runs it on each child' do
         count = 0
-        hmo.add_child(:marx, :karl)
-        hmo.add_child(:engels, :friedrich)
-        hmo.add_child(:lenin, :vladimir)
+        hmo.add_child(:karl, :marx )
+        hmo.add_child(:friedrich, :engels )
+        hmo.add_child(:vladimir, :lenin )
         hmo.each do |child|
           expect(hmo.children.values).to include(child)
           count += 1
@@ -110,32 +110,32 @@ describe Bra::Models::ListModelObject do
   describe '#add_child' do
     context 'with an ID not yet used' do
       it 'adds the child into the object\'s children' do
-        lmo.add_child('shazam', 0)
+        lmo.add_child(0, 'shazam')
         expect(lmo.children).to eq(['shazam'])
-        lmo.add_child('scoosh', 3)
+        lmo.add_child(3, 'scoosh')
         expect(lmo.children).to eq(['shazam', nil, nil, 'scoosh'])
       end
     end
     context 'with an ID already in use' do
-      it 'replaces the existing child' do
-        lmo.add_child('scoosh', 3)
+      it 'inserts before the existing child' do
+        lmo.add_child(3, 'scoosh')
         expect(lmo.children).to eq([nil, nil, nil, 'scoosh'])
-        lmo.add_child('bang', 3)
-        expect(lmo.children).to eq([nil, nil, nil, 'bang'])
+        lmo.add_child(3, 'bang')
+        expect(lmo.children).to eq([nil, nil, nil, 'bang', 'scoosh'])
       end
     end
   end
   describe '#remove_child' do
     context 'with an ID in use' do
       it 'removes the item' do
-        lmo.add_child('shazam', 0)
+        lmo.add_child(0, 'shazam')
         lmo.remove_child(0)
         expect(lmo.children).to eq([])
       end
     end
     context 'with an ID not in use' do
       it 'does nothing' do
-        lmo.add_child('shazam', 0)
+        lmo.add_child(0, 'shazam')
         lmo.remove_child(3)
         expect(lmo.children).to eq(['shazam'])
       end
@@ -162,13 +162,13 @@ describe Bra::Models::ListModelObject do
   describe '#child' do
     context 'with a valid integer ID' do
       it 'returns the child at that ID' do
-        lmo.add_child('shazam', 42)
+        lmo.add_child(42, 'shazam')
         expect(lmo.child(42)).to eq('shazam')
       end
     end
     context 'with a valid string ID' do
       it 'returns the child at the integer equivalent of that ID' do
-        lmo.add_child('shazam', 42)
+        lmo.add_child(42, 'shazam')
         expect(lmo.child('42')).to eq('shazam')
       end
     end
@@ -179,7 +179,7 @@ describe Bra::Models::ListModelObject do
     end
     context 'with an invalid ID' do
       it 'returns nil' do
-        lmo.add_child('shazam', 42)
+        lmo.add_child(42, 'shazam')
         expect(lmo.child(:yabba_dabba_doo)).to be_nil
       end
     end
@@ -188,9 +188,9 @@ describe Bra::Models::ListModelObject do
     context 'with a block' do
       it 'runs it on each child' do
         count = 0
-        lmo.add_child(:marx, 0)
-        lmo.add_child(:engels, 1)
-        lmo.add_child(:lenin, 2)
+        lmo.add_child(0, :marx )
+        lmo.add_child(1, :engels )
+        lmo.add_child(2, :lenin )
         lmo.each do |child|
           expect(lmo.children).to include(child)
           count += 1
