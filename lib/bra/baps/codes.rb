@@ -1,4 +1,4 @@
-require_relative '../driver_common/code_table'
+require 'bra/driver_common/code_table'
 
 module Bra
   module Baps

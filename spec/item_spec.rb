@@ -1,5 +1,5 @@
-require_relative '../models/item'
-require_relative '../models/composite'
+require 'bra/models/item'
+require 'bra/models/composite'
 
 describe Bra::Models::Item do
   let(:item) do

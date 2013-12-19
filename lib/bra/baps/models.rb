@@ -1,5 +1,5 @@
-require_relative '../models/set'
-require_relative '../models/variable'
+require 'bra/models/set'
+require 'bra/models/variable'
 
 module Bra
   module Baps

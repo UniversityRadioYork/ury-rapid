@@ -1,8 +1,9 @@
 require 'active_support/core_ext/object/try'
-require_relative 'structures'
-require_relative '../codes'
-require_relative '../types'
-require_relative '../../exceptions'
+
+require 'bra/baps/codes'
+require 'bra/baps/responses/structures'
+require 'bra/baps/types'
+require 'bra/common/exceptions'
 
 module Bra
   module Baps
@@ -145,7 +146,7 @@ module Bra
         end
 
         def unknown_response(code)
-          fail(Bra::Exceptions::InvalidPlayoutResponse, code.to_s(16))
+          fail(Bra::Common::Exceptions::InvalidPlayoutResponse, code.to_s(16))
         end
 
         # Constructs an initial response from the given code and subcode
@@ -324,7 +325,6 @@ module Bra
         end
 
         # A map of configuration types to their meta-protocol types.
-        # functions for reading them.
         CONFIG_TYPE_MAP = {
           Types::Config::CHOICE => :uint32,
           Types::Config::INT    => :uint32,

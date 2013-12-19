@@ -1,10 +1,11 @@
+require 'active_support/core_ext/hash/keys'
 require 'eventmachine'
 require 'thin'
 require 'yaml'
-require 'active_support/core_ext/hash/keys'
-require_relative 'server/launcher'
-require_relative 'models/creator'
-require_relative 'common/config_authenticator'
+
+require 'bra/common/config_authenticator'
+require 'bra/models/creator'
+require 'bra/server/launcher'
 
 CONFIG_FILE = 'config.yml'
 

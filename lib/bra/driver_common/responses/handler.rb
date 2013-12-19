@@ -1,5 +1,5 @@
-require_relative '../handler'
-require_relative '../../exceptions'
+require 'bra/common/exceptions'
+require 'bra/driver_common/handler'
 
 module Bra
   module DriverCommon
@@ -27,7 +27,7 @@ module Bra
         # Like delete, but does not fail if the resource does not exist.
         def delete_if_exists(*args)
           delete(*args)
-        rescue Bra::Exceptions::MissingResourceError
+        rescue Bra::Common::Exceptions::MissingResource
           nil
         end
       end

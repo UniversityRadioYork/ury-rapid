@@ -1,4 +1,4 @@
-require_relative 'composite'
+require 'bra/models/composite'
 
 module Bra
   module Models

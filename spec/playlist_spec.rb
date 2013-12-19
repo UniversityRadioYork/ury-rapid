@@ -1,5 +1,5 @@
-require_relative '../models/playlist'
-require_relative '../models/item'
+require 'bra/models/playlist'
+require 'bra/models/item'
 
 describe Bra::Models::Playlist do
   let(:playlist) { Bra::Models::Playlist.new }

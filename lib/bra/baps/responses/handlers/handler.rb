@@ -1,4 +1,4 @@
-require_relative '../../../driver_common/responses/handler'
+require 'bra/driver_common/responses/handler'
 
 module Bra
   module Baps

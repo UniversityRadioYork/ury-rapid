@@ -1,7 +1,7 @@
-require_relative 'composite'
-require_relative 'variable'
-require_relative 'item'
-require_relative '../utils/hash'
+require 'bra/common/hash'
+require 'bra/models/composite'
+require 'bra/models/item'
+require 'bra/models/variable'
 
 module Bra
   module Models

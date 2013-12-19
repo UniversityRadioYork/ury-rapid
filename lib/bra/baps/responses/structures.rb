@@ -1,4 +1,4 @@
-require_relative '../../driver_common/responses/structure_builder'
+require 'bra/driver_common/responses/structure_builder'
 
 module Bra
   module Baps

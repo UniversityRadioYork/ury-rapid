@@ -1,5 +1,5 @@
-require_relative 'composite'
-require_relative 'item'
+require 'bra/models/composite'
+require 'bra/models/item'
 
 module Bra
   module Models

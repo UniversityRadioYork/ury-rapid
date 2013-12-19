@@ -1,5 +1,5 @@
-require_relative 'set'
-require_relative '../common/constants'
+require 'bra/models/variable'
+require 'bra/models/set'
 
 module Bra
   module Models

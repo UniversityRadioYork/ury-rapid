@@ -1,8 +1,9 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
-require_relative '../exceptions'
-require_relative '../utils/hash'
-require_relative 'model_object'
+
+require 'bra/common/exceptions'
+require 'bra/common/hash'
+require 'bra/models/model_object'
 
 module Bra
   module Models
@@ -54,7 +55,7 @@ module Bra
           # We need to keep traversing down, as we've still got a tail.
           head, tail = tail.split('/', 2)
           resource = resource.child(head)
-          fail(Bra::Exceptions::MissingResourceError, url) if resource.nil?
+          fail(Bra::Common:Exceptions::MissingResource, url) if resource.nil?
         end
 
         # Once we've exhausted the tail, the resource left should be the one

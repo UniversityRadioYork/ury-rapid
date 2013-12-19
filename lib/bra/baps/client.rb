@@ -1,8 +1,9 @@
 require 'eventmachine'
-require_relative 'codes'
-require_relative 'connection'
-require_relative 'responses/parser'
-require_relative 'reader'
+
+require 'bra/baps/codes'
+require 'bra/baps/connection'
+require 'bra/baps/reader'
+require 'bra/baps/responses/parser'
 
 module Bra
   module Baps

@@ -1,12 +1,13 @@
+require 'eventmachine'
+require 'json'
+require 'sinatra-websocket'
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'sinatra/streaming'
-require 'sinatra-websocket'
-require 'eventmachine'
-require 'json'
-require_relative '../common/payload'
-require_relative 'updater'
-require_relative 'inspector'
+
+require 'bra/common/payload'
+require 'bra/server/inspector'
+require 'bra/server/updater'
 
 module Bra
   module Server
@@ -174,7 +175,7 @@ module Bra
 
       def find(params, &block)
         @model.find_url(params[:splat].first, &block)
-      rescue Exceptions::MissingResourceError
+      rescue Exceptions::MissingResource
         error(404, 'Not found.')
       end
 

@@ -1,11 +1,12 @@
 require 'digest'
-require_relative 'request'
-require_relative '../../driver_common/handler_set'
+require 'request'
+
+require 'bra/driver_common/handler_set'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.
-require_relative 'handlers/playback'
-require_relative 'handlers/playlist'
+require 'bra/baps/requests/handlers/playback'
+require 'bra/baps/requests/handlers/playlist'
 
 module Bra
   module Baps

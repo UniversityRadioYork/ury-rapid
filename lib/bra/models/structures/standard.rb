@@ -1,10 +1,9 @@
-require_relative '../creator'
-require_relative '../model'
-require_relative '../playlist'
-require_relative '../player'
-require_relative '../variable'
-require_relative '../info'
-require_relative '../../common/types'
+require 'bra/common/types'
+require 'bra/models/creator'
+require 'bra/models/model'
+require 'bra/models/player'
+require 'bra/models/playlist'
+require 'bra/models/variable'
 
 
 # A normal model structure

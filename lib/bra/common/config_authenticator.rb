@@ -1,7 +1,8 @@
 require 'active_support/core_ext/object/try'
-require_relative '../utils/hash'
-require_relative '../exceptions'
-require_relative 'privilege_set'
+
+require 'bra/common/exceptions'
+require 'bra/common/hash'
+require 'bra/common/privilege_set'
 
 module Bra
   module Common
@@ -44,7 +45,7 @@ module Bra
       end
 
       def auth_fail
-        fail(Bra::Exceptions::AuthenticationFailure)
+        fail(Bra::Common::Exceptions::AuthenticationFailure)
       end
 
       def auth_ok?(username, password)

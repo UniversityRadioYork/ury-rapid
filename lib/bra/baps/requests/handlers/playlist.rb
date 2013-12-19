@@ -1,5 +1,5 @@
-require_relative '../../../driver_common/requests/handler'
-require_relative '../../../driver_common/requests/poster'
+require 'bra/driver_common/requests/handler'
+require 'bra/driver_common/requests/poster'
 
 module Bra
   module Baps

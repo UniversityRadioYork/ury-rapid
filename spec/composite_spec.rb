@@ -1,5 +1,5 @@
-require_relative '../models/composite'
-require_relative '../models/variable'
+require 'bra/models/composite'
+require 'bra/models/variable'
 
 describe Bra::Models::HashModelObject do
   let(:hmo) { Bra::Models::HashModelObject.new }

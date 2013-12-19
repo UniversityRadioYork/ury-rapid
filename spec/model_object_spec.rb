@@ -1,4 +1,4 @@
-require_relative '../models/model_object'
+require 'bra/models/model_object'
 
 describe Bra::Models::ModelObject do
   let(:object) { Bra::Models::ModelObject.new }

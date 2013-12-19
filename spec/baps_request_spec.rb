@@ -1,6 +1,6 @@
 require 'forwardable'
-require_relative '../baps/requests/request'
-require_relative '../baps/format_strings'
+require 'bra/baps/requests/request'
+require 'bra/baps/format_strings'
 
 # Simple queue for testing requests.
 class MockQueue

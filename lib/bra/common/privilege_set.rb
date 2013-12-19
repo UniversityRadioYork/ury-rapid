@@ -1,6 +1,7 @@
 require 'active_support/core_ext/hash/keys'
-require_relative '../utils/hash'
-require_relative '../exceptions'
+
+require 'bra/common/exceptions'
+require 'bra/common/hash'
 
 module Bra
   module Common
@@ -23,7 +24,7 @@ module Bra
       # Requires a certain privilege on a certain target
       def require(target, privilege)
         fail(
-          Bra::Exceptions::InsufficientPrivilegeError
+          Bra::Common::Exceptions::InsufficientPrivilegeError
         ) unless has?(target, privilege)
       end
 

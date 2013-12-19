@@ -1,5 +1,5 @@
-require_relative 'handler'
-require_relative '../../exceptions'
+require 'bra/baps/responses/handlers/handler'
+require 'bra/baps/exceptions'
 
 module Bra
   module Baps

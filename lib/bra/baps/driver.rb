@@ -1,8 +1,9 @@
 require 'eventmachine'
-require_relative 'client'
-require_relative 'responses/responder'
-require_relative 'requests/requester'
-require_relative 'models'
+
+require 'bra/baps/client'
+require 'bra/baps/models'
+require 'bra/baps/requests/requester'
+require 'bra/baps/responses/responder'
 
 # The top-level driver interface for the BAPS BRA driver
 class Driver

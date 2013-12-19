@@ -1,4 +1,4 @@
-require_relative 'handler.rb'
+require 'bra/driver_common/requests/handler'
 
 module Bra
   module DriverCommon

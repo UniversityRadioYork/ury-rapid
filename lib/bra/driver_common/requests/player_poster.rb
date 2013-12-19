@@ -1,4 +1,4 @@
-require_relative 'poster'
+require 'bra/driver_common/requests/poster'
 
 module Bra
   module DriverCommon

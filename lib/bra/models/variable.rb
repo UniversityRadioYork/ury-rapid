@@ -1,4 +1,4 @@
-require_relative 'model_object'
+require 'bra/models/model_object'
 
 module Bra
   module Models

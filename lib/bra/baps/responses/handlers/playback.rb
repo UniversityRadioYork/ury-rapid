@@ -1,5 +1,5 @@
-require_relative 'handler.rb'
-require_relative 'loader.rb'
+require 'bra/baps/responses/handlers/handler'
+require 'bra/baps/responses/handlers/loader'
 
 module Bra
   module Baps

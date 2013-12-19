@@ -1,6 +1,7 @@
 require 'active_support/core_ext/hash/keys'
-require_relative 'model_object'
-require_relative '../common/types'
+
+require 'bra/common/types'
+require 'bra/models/model_object'
 
 module Bra
   module Models

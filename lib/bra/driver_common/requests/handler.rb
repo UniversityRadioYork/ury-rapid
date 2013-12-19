@@ -1,5 +1,5 @@
-require_relative '../handler'
-require_relative '../../exceptions'
+require 'bra/common/exceptions'
+require 'bra/driver_common/handler'
 
 module Bra
   module DriverCommon
@@ -31,7 +31,7 @@ module Bra
         # Default to a 'not supported' exception on all actions.
         %w{put post delete}.each do |action|
           define_method(action) do |*|
-            fail(Bra::Exceptions::NotSupportedByBra)
+            fail(Bra::Common::Exceptions::NotSupportedByBra)
           end
         end
       end

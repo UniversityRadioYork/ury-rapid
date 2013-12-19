@@ -1,11 +1,11 @@
-require_relative '../codes'
-require_relative '../../driver_common/handler_set'
+require 'bra/baps/codes'
+require 'bra/driver_common/handler_set'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.
-require_relative 'handlers/playback'
-require_relative 'handlers/playlist'
-require_relative 'handlers/system'
+require 'bra/baps/responses/handlers/playback'
+require 'bra/baps/responses/handlers/playlist'
+require 'bra/baps/responses/handlers/system'
 
 module Bra
   module Baps

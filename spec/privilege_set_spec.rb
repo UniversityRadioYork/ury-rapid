@@ -1,4 +1,4 @@
-require_relative '../common/privilege_set'
+require 'bra/common/privilege_set'
 
 describe Bra::Common::PrivilegeSet do
   let(:ps) do

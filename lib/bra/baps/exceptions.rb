@@ -1,4 +1,4 @@
-require_relative '../exceptions'
+require_relative 'bra/common/exceptions'
 
 module Bra
   module Baps

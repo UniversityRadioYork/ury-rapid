@@ -1,5 +1,6 @@
 require 'active_support/core_ext/object/try'
-require_relative 'format_strings'
+
+require 'bra/baps/format_strings'
 
 module Bra
   module Baps

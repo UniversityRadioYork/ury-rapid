@@ -1,5 +1,6 @@
 require 'rack'
-require_relative 'app'
+
+require 'bra/server/app'
 
 module Bra
   module Server
