@@ -1,3 +1,4 @@
+require 'forwardable'
 require_relative '../baps/requests/request'
 require_relative '../baps/format_strings'
 
