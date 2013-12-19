@@ -1,7 +1,7 @@
 require 'digest'
-require 'request'
 
 require 'bra/driver_common/handler_set'
+require 'bra/baps/requests/request'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.

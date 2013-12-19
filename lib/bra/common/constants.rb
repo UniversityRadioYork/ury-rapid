@@ -8,6 +8,9 @@ module Bra
       MINOR_VERSION = 4
       PATCH_VERSION = 0
       VERSION = [MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION].join('.')
+
+      # The default configuration file (can be overridden at run-time)
+      CONFIG_FILE = 'config.yml'
     end
   end
 end

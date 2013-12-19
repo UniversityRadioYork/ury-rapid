@@ -55,7 +55,7 @@ module Bra
         # Set up stubs for each method we expect the driver to override.
         TO_OVERRIDE.each do |method_symbol|
           define_method(method_symbol) do |*args|
-            fail(Bra::Exceptions::NotSupportedByDriver)
+            fail(Bra::Common::Exceptions::NotSupportedByDriver)
           end
         end
 

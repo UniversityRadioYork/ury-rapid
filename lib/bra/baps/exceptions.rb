@@ -1,4 +1,4 @@
-require_relative 'bra/common/exceptions'
+require 'bra/common/exceptions'
 
 module Bra
   module Baps
@@ -6,7 +6,7 @@ module Bra
     module Exceptions
       # Exception generated when the playout system sends a load request for a
       # track type bra doesn't understand.
-      class InvalidTrackType < Bra::Exceptions::InvalidPlayoutResponse
+      class InvalidTrackType < Bra::Common::Exceptions::InvalidPlayoutResponse
         def initialize(type)
           super(type)
           @type = type

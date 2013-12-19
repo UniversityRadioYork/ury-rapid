@@ -1,9 +1,10 @@
 require 'eventmachine'
 require 'json'
-require 'sinatra-websocket'
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'sinatra/streaming'
+
+require 'sinatra-websocket'
 
 require 'bra/common/payload'
 require 'bra/server/inspector'
@@ -38,7 +39,7 @@ module Bra
       def privilege_set(suppress_error = false)
         credentials = get_credentials(rack_auth)
         @authenticator.authenticate(*credentials)
-      rescue Bra::Exceptions::AuthenticationFailure
+      rescue Common::Exceptions::AuthenticationFailure
         not_authorised unless suppress_error
       end
 
@@ -52,7 +53,7 @@ module Bra
       end
 
       def fail_authentication
-        fail(Bra::Exceptions::AuthenticationFailure)
+        fail(Common::Exceptions::AuthenticationFailure)
       end
 
       def has_credentials?(auth)
@@ -167,21 +168,21 @@ module Bra
       def model_traversal(&block)
         cors
         find(params, &block)
-      rescue Bra::Exceptions::InsufficientPrivilegeError
+      rescue Common::Exceptions::InsufficientPrivilegeError
         forbidden
-      rescue Bra::Exceptions::NotSupported => e
+      rescue Common::Exceptions::NotSupported => e
         not_supported(e)
       end
 
       def find(params, &block)
         @model.find_url(params[:splat].first, &block)
-      rescue Exceptions::MissingResource
+      rescue Common::Exceptions::MissingResource
         error(404, 'Not found.')
       end
 
       def make_payload(action, privilege_set, request, target)
         raw_payload = get_raw_payload(request)
-        Bra::Common::Payload.new(
+        Common::Payload.new(
           raw_payload, privilege_set,
           (action == :put ? target.id : target.default_id)
         )

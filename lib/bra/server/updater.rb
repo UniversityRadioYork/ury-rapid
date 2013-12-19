@@ -104,7 +104,7 @@ module Bra
         new_privileges = @authenticator.call(username, password)
         @privileges = new_privileges
         send_json(type: :auth, username: username)
-      rescue Bra::Exceptions::AuthenticationFailure
+      rescue Common::Exceptions::AuthenticationFailure
         error('Authentication failed.')
       end
     end

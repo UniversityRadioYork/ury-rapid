@@ -27,7 +27,7 @@ module Bra
           # This handler has no targets - it is attached to incoming items
           # by the Player's handler.
           def delete(object, payload)
-            fail(Bra::Exceptions::NotSupportedByDriver)
+            fail(Bra::Common::Exceptions::NotSupportedByDriver)
           end
         end
 

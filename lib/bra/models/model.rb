@@ -1,6 +1,6 @@
-require '/bra/models/item'
-require '/bra/models/model_object'
-require '/bra/models/player'
+require 'bra/models/item'
+require 'bra/models/model_object'
+require 'bra/models/player'
 
 module Bra
   module Models
