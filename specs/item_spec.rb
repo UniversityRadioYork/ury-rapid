@@ -40,7 +40,7 @@ describe Bra::Models::Item do
       it 'removes the Item from that object, and notifies the channel' do
         # Ensure the update channel is notified of the deletion
         channel = double(:channel)
-        channel.should_receive(:push).with([item, nil])
+        channel.should_receive(:push).with([item, nil]).once
         item.register_update_channel(channel)
 
         lmo = Bra::Models::ListModelObject.new
