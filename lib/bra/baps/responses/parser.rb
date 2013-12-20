@@ -51,8 +51,10 @@ module Bra
         def receive_data(data)
           @reader.add(data)
 
-          sufficient_data = true
-          sufficient_data = process_next_token while sufficient_data
+          EventMachine.next_tick do
+            sufficient_data = true
+            sufficient_data = process_next_token while sufficient_data
+          end
         end
 
         private
