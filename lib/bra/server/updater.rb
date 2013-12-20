@@ -13,6 +13,7 @@ module Bra
       def initialize(model)
         @model = model
         @id = nil
+        @running = false
       end
 
       def self.launch(*args)
@@ -23,6 +24,7 @@ module Bra
 
       def register(&block)
         @id = @model.register_for_updates(&method(:pack_and_send))
+        @running = true
       end
 
       def pack_and_send(update)
@@ -38,13 +40,13 @@ module Bra
 
       def send_json(raw)
         json = raw.to_json
-        send("#{json}\n")
+        send("#{json}\n") if @running
       end
 
       def clean_up
-        @model.deregister_from_updates(@id)
+        @model.deregister_from_updates(@id) unless id.nil?
         @id = nil
-        @send = nil
+        @running = false
       end
     end
 
