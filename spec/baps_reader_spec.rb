@@ -33,6 +33,20 @@ describe Bra::Baps::Reader do
       number_request(:float32, FLOAT32S, Bra::Baps::FormatStrings::FLOAT32)
     end
   end
+  describe '#string' do
+    let(:string1) { 'Fantasia in C Minor' }
+
+    context 'when called before data is available' do
+      it 'requests a Pascal-format string and yields it when it appears' do
+        callback = double(:callback)
+
+        subject.string { |string| callback.string1(string) }
+        callback.should_receive(:string1).with(string1).once
+        subject.add([string1.bytesize].pack('N') + string1)
+      end
+    end
+  end
+
   # Tests method, with the given values, using the given format string
   def number_request(method, values, pack_format)
     min, mid, max = values

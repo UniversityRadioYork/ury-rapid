@@ -4,11 +4,14 @@ module Bra
     #
     # The ResponseBuffer takes in requests for binary data, and fulfils them
     # as soon as it has enough data in its buffer.
+    #
+    # The ResponseBuffer is *not* thread-safe.
     class ResponseBuffer
       # Creates a Reader
       def initialize
         @buffer = ''
         @requests = []
+        @satisfying_requests = false
       end
 
       # Adds a request for packed data to the request queue
@@ -27,8 +30,8 @@ module Bra
       # @yieldparam unpacked [Array]  The unpacked data.
       #
       # @return [void]
-      def packed_request(num_bytes, format, &block)
-        request(num_bytes) { |bytes| block.call(bytes.unpack(format)) }
+      def packed_request(num_bytes, format, front = false, &block)
+        request(num_bytes, front) { |bytes| block.call(bytes.unpack(format)) }
       end
 
       # Adds a request for a given number of bytes to the request queue
@@ -42,13 +45,17 @@ module Bra
       #   #=> 'abcde'
       #
       # @param num_bytes [Integer]  The number of bytes to ask for.
+      # @param front [Boolean]  If true, the request is added onto the front
+      #   of the queue, rather than the back.  This should be used for
+      #   nested requests.
       #
       # @yieldparam bytes [String]  The bytes received.
       #
       # @return [void]
-      def request(num_bytes, &block)
-        @requests << [num_bytes, block]
-        try_satisfy_requests
+      def request(num_bytes, front = false, &block)
+        @requests << [num_bytes, block] unless front
+        @requests.unshift([num_bytes, block]) if front
+        try_satisfy_requests unless @satisfying_requests
       end
 
       # Adds more data to the internal buffer
@@ -58,8 +65,10 @@ module Bra
       # @return [void]
       def add(data)
         @buffer << data
-        try_satisfy_requests
+        try_satisfy_requests unless @satisfying_requests
       end
+
+      alias_method :receive_data, :add
 
       private
 
@@ -67,7 +76,14 @@ module Bra
       #
       # @return [void]
       def try_satisfy_requests
-        @requests = @requests.drop_while(&method(:try_satisfy_request))
+        @satisfying_requests = true
+        can_satisfy = true
+        while can_satisfy && !@requests.empty?
+          request = @requests.first
+          can_satisfy = try_satisfy_request(request)
+          @requests.delete(request) if can_satisfy
+        end
+        @satisfying_requests = false
       end
 
       # Tries to satisfy a request for data

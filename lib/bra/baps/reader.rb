@@ -22,6 +22,14 @@ module Bra
         end
       end
 
+      def string
+        uint32 do |length|
+          request(length, true) do |bytes|
+            yield bytes
+          end
+        end
+      end
+
       def command(&block)
         uint16(&block)
         uint32 { |_| nil }  # Ignore the incoming data count.

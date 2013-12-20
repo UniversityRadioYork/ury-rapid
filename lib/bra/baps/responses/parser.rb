@@ -37,24 +37,8 @@ module Bra
           @structures = Bra::Baps::Responses::Structures.new
         end
 
-        # Read and interpret a response from the BAPS server
-        #
-        # @api semipublic
-        #
-        # @example Sending data to a Parser
-        #   rp = Parser.new(channel, reader)
-        #   rp.receive_data("data")
-        #
-        # @param data [String] Raw data from the server, as a byte-string.
-        #
-        # @return [void]
-        def receive_data(data)
-          @reader.add(data)
-
-          EventMachine.next_tick do
-            sufficient_data = true
-            sufficient_data = process_next_token while sufficient_data
-          end
+        def start
+          word
         end
 
         private
@@ -63,16 +47,6 @@ module Bra
         MAIN_CODE_MASK = 0xFFF0
         SUBCODE_MASK   = 0x000F
 
-        # Attempt to process the top of the buffer as part of a response
-        #
-        # @api private
-        #
-        # @return [Boolean] Whether there was enough data to process a command
-        #   word or not.
-        def process_next_token
-          @response.nil? ? command : word
-        end
-
         # Attempt to scrape a command word off the top of the buffer
         #
         # If successful, the parser then interprets the word and sets up to
@@ -80,14 +54,15 @@ module Bra
         #
         # @api private
         #
-        # @return [Boolean] Whether there was enough data to process a command
-        #   word or not.
+        # @return [void] Whether there was enough data to process a command
         def command
           # We could use the second return from reader.command to skip an
           # unknown message, but BAPS is quite dodgy at implementing this in
           # places, so we don't do it in practice.
-          command = @reader.command
-          command.nil? ? false : parse_command(command.first)
+          @reader.command do |code|
+            parse_command(code)
+            word
+          end
         end
 
         # Parses a command word and sets up to parse the following arguments
@@ -96,14 +71,11 @@ module Bra
         #
         # @param raw_code [Integer] The raw code word from the BAPS server.
         #
-        # @return [Boolean] Whether there was enough data to process a command
-        #   word or not.
+        # @return [void]
         def parse_command(raw_code)
           code, subcode = split_command_word(raw_code)
           @expected = structure_with_code(code)
           @response = response_with_code(code, subcode)
-
-          true
         end
 
         # Splits a command word into its code and subcode.
@@ -187,26 +159,6 @@ module Bra
           @expected.empty? ? finish_response : continue_response
         end
 
-        # Reads a string argument
-        #
-        # This does not process the entire string in one go; this method reads
-        # only the string length, and then pushes in a new argument for the
-        # data itself.
-        #
-        # @api private
-        #
-        # @param name [Symbol] The name of the parameter whose argument is
-        #   being read.
-        #
-        # @return [Boolean] Whether or not there was enough data to process a
-        #   data word.
-        def string(name)
-          length = @reader.uint32
-          @expected.unshift([name, :raw_bytes, length]) unless length.nil?
-
-          !length.nil?
-        end
-
         # Reads a config setting
         #
         # Config settings are one of the uglier areas of BAPS's meta-protocol,
@@ -222,18 +174,15 @@ module Bra
         # @param name [Symbol] The name of the argument to which the config
         #   type is bound.
         #
-        # @return [Boolean] Whether or not there was enough data to process a
-        #   data word.
+        # @return [void]
         def config_setting(name)
-          enough_data = false
-
-          @reader.uint32.try do |config_type|
-            @expected.unshift([:value, CONFIG_TYPE_MAP[config_type]])
+          @reader.uint32 do |config_type|
             @response[name] = config_type
-            enough_data = true
+            @reader.send(CONFIG_TYPE_MAP[config_type]) do |value|
+              @response[:value] = value
+              word
+            end
           end
-
-          enough_data
         end
 
         # Reads the body of a LOAD command
@@ -250,16 +199,13 @@ module Bra
         # @param name [Symbol] The name of the argument to which the track
         #   type is bound.
         #
-        # @return [Boolean] Whether or not there was enough data to process a
+        # @return [void] Whether or not there was enough data to process a
         #   data word.
         def load_body(name)
-          track_type = @reader.uint32
-          if track_type.nil?
-            false
-          else
+          @reader.uint32 do |track_type|
             add_arguments(track_type)
             @response[name] = track_type
-            true
+            word
           end
         end
 
@@ -286,10 +232,10 @@ module Bra
         def primitive(parameter)
           name, arg_type, *args = parameter
 
-          data = @reader.public_send(arg_type, *args)
-          @response[name] = data unless data.nil?
-
-          !data.nil?
+          @reader.public_send(arg_type, *args) do |value|
+            @response[name] = value
+            word
+          end
         end
 
         # Finishes a response and creates a clean slate for the next one
@@ -301,7 +247,7 @@ module Bra
         def finish_response
           @channel.push(@response)
           @response = nil
-          true
+          command
         end
 
         # Attempt to grab an argument word from the reader
@@ -311,8 +257,7 @@ module Bra
         #
         # @api private
         #
-        # @return [Boolean] Whether or not there was enough data to process a
-        #   data word.
+        # @return [void]
         def continue_response
           parameter = @expected.shift
           name, type, *args = parameter
@@ -320,10 +265,7 @@ module Bra
           # Some command words can be read from the buffer directly, whereas
           # the parser has its own logic for the more complex ones.
           own_type = respond_to?(type, true)
-          success = own_type ? send(type, name, *args) : primitive(parameter)
-
-          @expected.unshift(parameter) unless success
-          success
+          own_type ? send(type, name, *args) : primitive(parameter)
         end
 
         # A map of configuration types to their meta-protocol types.
