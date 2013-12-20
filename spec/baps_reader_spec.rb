@@ -11,87 +11,47 @@ UINT32_MID = 2_147_483_647
 UINT32_MAX = 4_294_967_295
 UINT32S = [UINT32_MIN, UINT32_MID, UINT32_MAX]
 
+# These are specifically numbers divisible by two, to avoid imprecision
+FLOAT32_MIN = 0
+FLOAT32_MID = 0.125
+FLOAT32_MAX = 128.0
+FLOAT32S = [FLOAT32_MIN, FLOAT32_MID, FLOAT32_MAX]
+
 describe Bra::Baps::Reader do
-  before :each do
-    @reader = Bra::Baps::Reader.new
-  end
-
   describe '#uint16' do
-    context 'with no data' do
-      it 'returns nil' do
-        @reader.uint16.should be_nil
-      end
-    end
-    context 'with one datum' do
-      it 'reads an unsigned 16-bit integer' do
-        UINT16S.each do |n|
-          @reader.add([n].pack('n'))
-          @reader.uint16.should eq(n)
-        end
-      end
-    end
-    context 'with multiple data' do
-      it 'reads unsigned 16-bit integers in order' do
-        UINT16S.each { |n| @reader.add([n].pack('n')) }
-        UINT16S.each { |n| @reader.uint16.should eq(n) }
-      end
+    it 'requests a 16-bit integer' do
+      number_request(:uint16, UINT16S, Bra::Baps::FormatStrings::UINT16)
     end
   end
-
   describe '#uint32' do
-    context 'with no data' do
-      it 'returns nil' do
-        @reader.uint16.should be_nil
-      end
-    end
-    context 'with one datum' do
-      it 'reads an unsigned 32-bit integer' do
-        UINT32S.each do |n|
-          @reader.add([n].pack('N'))
-          @reader.uint32.should eq(n)
-        end
-      end
-    end
-    context 'with multiple data' do
-      it 'reads unsigned 32-bit integers in order' do
-        UINT32S.each { |n| @reader.add([n].pack('N')) }
-        UINT32S.each { |n| @reader.uint32.should eq(n) }
-      end
+    it 'requests a 32-bit integer' do
+      number_request(:uint32, UINT32S, Bra::Baps::FormatStrings::UINT32)
     end
   end
+  describe '#float32' do
+    it 'requests a 32-bit floating point number' do
+      number_request(:float32, FLOAT32S, Bra::Baps::FormatStrings::FLOAT32)
+    end
+  end
+  # Tests method, with the given values, using the given format string
+  def number_request(method, values, pack_format)
+    min, mid, max = values
 
-  describe '#raw_bytes' do
-    context 'with no data' do
-      it 'returns nil' do
-        @reader.raw_bytes(10).should be_nil
-      end
-    end
-    context 'with insufficient data' do
-      it 'returns nil' do
-        @reader.add('The quick brown fox jumps over the lazy dog.')
-        @reader.raw_bytes(200).should be_nil
-      end
-    end
-    context 'with sufficient data' do
-      it 'reads the number of bytes requested' do
-        str = 'The quick brown fox jumps over the lazy dog.'
-        @reader.add(str)
-        @reader.raw_bytes(str.bytesize).should eq(str)
-        @reader.raw_bytes(1).should be_nil
-      end
-    end
-    context 'with more than enough data' do
-      it 'reads the number of bytes requested' do
-        @reader.add('The quick brown fox jumps over the lazy dog.')
-        @reader.raw_bytes(10).should eq('The quick ')
-        @reader.raw_bytes(10).should eq('brown fox ')
-        @reader.raw_bytes(10).should eq('jumps over')
-        @reader.raw_bytes(10).should eq(' the lazy ')
-        @reader.raw_bytes(2).should eq('do')
-        @reader.raw_bytes(1).should eq('g')
-        @reader.raw_bytes(1).should eq('.')
-        @reader.raw_bytes(1).should be_nil
-      end
-    end
+    callback = double(:callback)
+    callback.should_receive(:a).with(min).ordered
+    callback.should_receive(:b).with(mid).ordered
+    callback.should_receive(:c).with(max).ordered
+
+    # Request before full data
+    subject.send(method, &callback.method(:a))
+    subject.add([min].pack(pack_format))
+
+    # Request before data in two instalments
+    subject.send(method, &callback.method(:b))
+    ([mid].pack(pack_format)).each_char(&subject.method(:add))
+
+    # Request after data
+    subject.add([max].pack(pack_format))
+    subject.send(method, &callback.method(:c))
   end
 end
