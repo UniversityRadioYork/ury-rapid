@@ -44,7 +44,7 @@ module Bra
       end
 
       def clean_up
-        @model.deregister_from_updates(@id) unless id.nil?
+        @model.deregister_from_updates(@id) unless @id.nil?
         @id = nil
         @running = false
       end
@@ -74,12 +74,12 @@ module Bra
         @websocket = websocket
       end
 
-      def_delegator :@websocket, :send_message, :send
+      def_delegator :@websocket, :send
 
       def run
         register
-        @websocket.on_message(&method(:request))
-        @websocket.on_close(&method(:clean_up))
+        @websocket.onmessage(&method(:request))
+        @websocket.onclose(&method(:clean_up))
       end
 
       private

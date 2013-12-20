@@ -3,14 +3,14 @@ require 'json'
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'sinatra/streaming'
-require 'skinny'
+require 'sinatra-websocket'
 
 require 'bra/common/payload'
 require 'bra/server/inspector'
 require 'bra/server/updater'
 
 class Sinatra::Request
-  include Skinny::Helpers
+  include SinatraWebsocket::Ext::Sinatra::Request
 end
 
 module Bra
@@ -137,13 +137,11 @@ module Bra
 
       def websocket_update
         privs = privilege_set(true)
-        request.websocket!(
-          on_start: proc do |websocket|
-            WebSocketUpdater.launch(
-              @model, websocket, @authenticator.method(:authenticate), privs
-            )
-          end
-        )
+        request.websocket do |websocket|
+          WebSocketUpdater.launch(
+            @model, websocket, @authenticator.method(:authenticate), privs
+          )
+        end
       end
 
       def handle_get(target)

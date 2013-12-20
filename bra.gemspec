@@ -37,5 +37,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'haml'
   spec.add_runtime_dependency 'sass'
   spec.add_runtime_dependency 'compass'
-  spec.add_runtime_dependency 'skinny'
+  spec.add_runtime_dependency 'sinatra-websocket'
 end
