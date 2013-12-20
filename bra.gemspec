@@ -7,11 +7,18 @@ Gem::Specification.new do |spec|
   spec.name          = 'bra'
   spec.version       = Bra::Common::Constants::VERSION
   spec.authors       = ['Matt Windsor']
-  spec.email         = ['matt.windsor@ury.org.uk']
-  spec.description   = ''
+  spec.email         = ['computing@ury.org.uk']
+  spec.description   = <<-EOF
+    bra is an API server and abstraction layer for radio station playout
+    systems.  It provides a HTTP and WebSocket based interface for both
+    querying and modifying a playout system's state.
+
+    bra was originally developed for University Radio York's BAPS system, but
+    is intended to be extensible to cover other systems.
+  EOF
   spec.summary       = 'Lifts and separates playout systems from their clients'
   spec.homepage      = 'http://github.com/UniversityRadioYork/bra'
-  spec.license       = 'BSD'
+  spec.license       = 'BSD-2-Clause'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -21,4 +28,14 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.3'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
+
+  spec.add_runtime_dependency 'activesupport'
+  spec.add_runtime_dependency 'sinatra'
+  spec.add_runtime_dependency 'sinatra-contrib'
+  spec.add_runtime_dependency 'eventmachine'
+  spec.add_runtime_dependency 'thin'
+  spec.add_runtime_dependency 'haml'
+  spec.add_runtime_dependency 'sass'
+  spec.add_runtime_dependency 'compass'
+  spec.add_runtime_dependency 'skinny'
 end

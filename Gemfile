@@ -1,12 +1,1 @@
-source 'https://rubygems.org'
-
-gem 'activesupport'
-gem 'sinatra'
-gem 'sinatra-contrib'
-gem 'eventmachine'
-gem 'thin'
-gem 'haml'
-gem 'sass'
-gem 'compass'
-gem 'rspec'
-gem 'skinny'
+gemspec
