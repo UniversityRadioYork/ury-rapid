@@ -134,19 +134,27 @@ describe Bra::Models::ListModelObject do
       end
     end
     context 'with an ID in use, and children with greater IDs' do
-      it 'removes the item and reduces the IDs of those children by one' do
+      def populate
         Bra::Models::Constant.new('good morning').move_to(subject, 0)
         Bra::Models::Constant.new('starshine').move_to(subject, 1)
         Bra::Models::Constant.new('the Earth says').move_to(subject, 2)
         Bra::Models::Constant.new('hello!').move_to(subject, 3)
         Bra::Models::Constant.new('etaoin shrdlu').move_to(subject, 4)
+      end
 
+      it 'removes the item' do
+        populate
         subject.remove_child(2)
 
         expect(subject.child(0).value).to eq('good morning')
         expect(subject.child(1).value).to eq('starshine')
         expect(subject.child(2).value).to eq('hello!')
         expect(subject.child(3).value).to eq('etaoin shrdlu')
+      end
+      it 'reduces the IDs of those children by one' do
+        populate
+
+        subject.remove_child(2)
 
         (0...4).each { |i| expect(subject.child(i).id).to eq(i) }
       end
