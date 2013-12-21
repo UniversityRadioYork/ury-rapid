@@ -8,8 +8,6 @@ module Bra
       # This deals with the various protocols POSTing objects handles, so that
       # drivers can override the protocol methods they implement
       class PlayerPoster < Poster
-        extend Forwardable
-
         # Supported URL protocols in this version of the bra API.
         URL_TYPES = {
           playlist: :item_from_playlist_url
@@ -28,8 +26,6 @@ module Bra
           :item_from_other_playlist   # playlist_id, index
         ]
 
-        def_delegator :@object, :id, :player_id
-
         # Determines whether a payload should be forwarded somewhere else
         #
         # This makes payloads this Poster isn't responsible for be sent to the
@@ -47,7 +43,7 @@ module Bra
           jump_table.default = :unsupported_protocol
 
           # Assume nothing other than :item reaches here.
-          define_method("post_#{style}") do |type, rest|
+          define_method(style) do |type, rest|
             send(jump_table[type], rest)
           end
         end
@@ -64,7 +60,7 @@ module Bra
         # Handles a server POST of an item from a playlist, expressed as a Hash
         def item_from_playlist_hash(hash)
           playlist   = hash[:playlist]
-          playlist ||= object_id
+          playlist ||= caller_id
           index      = hash[:index]
           index    ||= 0
 
@@ -74,7 +70,7 @@ module Bra
         # Handles a server POST of an item from a playlist, expressed as a URL
         def item_from_playlist_url(url)
           split = url.split('/', 2)
-          playlist, index = object_id, split.first if split.size == 1
+          playlist, index = caller_id, split.first if split.size == 1
           playlist, index = split                  if split.size == 2
           fail('Bad playlist URL.')                if split.size > 2
 
@@ -90,7 +86,7 @@ module Bra
         # @return [Boolean] True if the playlist ID is the same as the player
         #   ID.
         def is_local_playlist?(playlist)
-          object_id == playlist || object_id.to_s == playlist
+          caller_id == playlist || caller_id.to_s == playlist
         end
       end
     end

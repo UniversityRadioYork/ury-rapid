@@ -68,7 +68,7 @@ module Bra
         class MarkerPoster < Bra::DriverCommon::Requests::Poster
           extend Forwardable
 
-          def post_integer(integer)
+          def integer(integer)
             request(Request.new(target_to_code, player_id).uint32(integer))
           end
 
@@ -117,7 +117,7 @@ module Bra
           extend Forwardable
           include Bra::Common::Types::Validators
 
-          def post_string(new_state)
+          def string(new_state)
             code_for_state(@object.value, new_state).try do |command|
               request(Request.new(command, parent_id))
             end

@@ -42,17 +42,10 @@ module Bra
         #
         # @return [void]
         def run
-          unless post_forward
-            @payload.process(
-              hash:    ->(*args) { post_hash(*args)    },
-              url:     ->(*args) { post_url(*args)     },
-              string:  ->(*args) { post_string(*args)  },
-              integer: ->(*args) { post_integer(*args) }
-            )
-          end
+          @payload.process(self) unless post_forward
         end
 
-        def_delegator :@object, :id, :object_id
+        def_delegator :@object, :id, :caller_id
         def_delegator :@payload, :id, :payload_id
 
         # Tries to forward the payload elsewhere

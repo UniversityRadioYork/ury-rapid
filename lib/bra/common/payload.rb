@@ -15,8 +15,6 @@ module Bra
     # then spits out a normalised form of the payload so that the handling
     # objects can interpret it.
     class Payload
-      PROTOCOL_SPLITTER = '://'
-
       attr_accessor :privilege_set
       attr_accessor :id
 
@@ -24,7 +22,7 @@ module Bra
         @default_id = default_id
         @payload = payload
         @privilege_set = privilege_set
-        @id, @item = flatten_payload
+        @id, @body = flatten_payload
       end
 
       # Creates a new payload with this payload's privileges but a new body
@@ -32,125 +30,8 @@ module Bra
         self.class.new(body, @privilege_set, @default_id)
       end
 
-      def process(options)
-        (
-          (handle_hash(&options[:hash])       if options.key?(:hash))    ||
-          (handle_url(&options[:url])         if options.key?(:url))     ||
-          (handle_string(&options[:string])   if options.key?(:string))  ||
-          (handle_integer(&options[:integer]) if options.key?(:integer)) ||
-          fail("Unknown payload type: #{@item}")
-        )
-      end
-
-      private
-
-      # Splits a URL or pseudo-URL item into its protocol and body
-      #
-      # This is useful when handling PUTs or POSTs where the body is a
-      # reference to another resource.
-      #
-      # No URL parsing is done on the body, to allow 'pseudo-URL' schemes
-      # where the body is parsed in a non-standard manner.
-      #
-      # @api private
-      #
-      # @return [Array] A tuple containing the downcased protocol and
-      #   unprocessed body.
-      def split_url
-        protocol, body = @item.split(PROTOCOL_SPLITTER, 2)
-        [protocol.downcase.intern, body]
-      end
-
-      # Splits a PUT or POST hash into its type and body
-      #
-      # This is useful when handling PUTs or POSTs where the body may be
-      # interpreted in different ways depending on its type.
-      #
-      # @api private
-      #
-      # @return [Array] A tuple containing the downcased type symbol and
-      #   unprocessed body.
-      def split_hash
-        body = @item.clone
-        type = body.delete(:type).downcase.intern
-        [type, body]
-      end
-
-      # Yields the protocol and body of an object if it is a URL
-      #
-      # This is useful when handling PUTs or POSTs where the body may be a
-      # reference to another resource.
-      #
-      # @api private
-      #
-      # @yieldparam [String] The protocol of the URL.
-      # @yieldparam [String] The body of the URL.
-      #
-      # @return [Boolean] true if the body was a URL and was handled; false
-      #   otherwise.
-      def handle_url
-        is_valid_url?.tap { |valid| yield(*split_url) if valid }
-      end
-
-      # Yields the protocol and body of an object if it is a raw string
-      #
-      # @api private
-      #
-      # @yieldparam [String] The string object.
-      #
-      # @return [Boolean] true if the body was a string and was handled; false
-      #   otherwise.
-      def handle_string
-        is_valid_string?.tap { |valid| yield @item.to_s if valid }
-      end
-
-      # Yields the protocol and body of an object if it is an integer
-      #
-      # @api private
-      #
-      # @yieldparam [String] The string object.
-      #
-      # @return [Boolean] true if the body was an integer and was handled;
-      #   false otherwise.
-      def handle_integer
-        is_valid_integer?.tap { |valid| yield @item.to_i if valid }
-      end
-
-      # Yields the type and body of an object if it is a hash
-      #
-      # This is useful when handling PUTs or POSTs where the body is a
-      # direct representation, but should be interpreted in different ways
-      # depending on its type.
-      #
-      # @api private
-      #
-      # @yieldparam [Symbol] The type of the hash, downcased and symbolised.
-      # @yieldparam [Hash] The body of the hash.
-      #
-      # @return [Boolean] true if the body was a hash and was handled; false
-      #   otherwise.
-      def handle_hash
-        is_valid_hash?.tap { |valid| yield(*split_hash) if valid }
-      end
-
-      # Whether the payload is a valid hash format payload
-      def is_valid_hash?
-        @item.is_a?(Hash) && @item.key?(:type)
-      end
-
-      # Whether the payload is a valid URL or pseudo-URL
-      def is_valid_url?
-        is_valid_string? && @item.to_s.include?(PROTOCOL_SPLITTER)
-      end
-
-      # Whether the payload is a valid plain string
-      def is_valid_string?
-        @item.is_a?(String) || @item.is_a?(Symbol)
-      end
-
-      # Whether the payload is a valid integer
-      def is_valid_integer?
-        @item.respond_to?(:to_i)
+      def process(receiver)
+        PayloadDispatch.dispatch(@body, receiver)
       end
 
       # Flattens a payload into an item and target ID
@@ -167,6 +48,156 @@ module Bra
       # @return [Boolean] True if the payload is an ID-map, false otherwise.
       def id_mapped_payload?
         @payload.is_a?(Hash) && @payload.size == 1
+      end
+    end
+
+    # Method object for processing a payload and sending the results
+    class PayloadDispatch
+      PROTOCOL_SPLITTER = '://'
+
+      def initialize(body, receiver)
+        @body = body
+        @receiver = receiver
+      end
+
+      # The order of these is important - place specific types before more
+      # general ones
+      TYPES = %i{hash url integer string}
+
+      def run
+        TYPES.any?(&method(:try_type))
+      end
+
+      def self.dispatch(*args)
+        new(*args).run
+      end
+
+      private
+
+      def try_type(type)
+        can_send_type?(type) && validate_and_send(type)
+      end
+
+      def can_send_type?(type)
+        @receiver.respond_to?(type)
+      end
+
+      def validate_and_send(type)
+        send("validate_#{type}") { |*valid| @receiver.send(type, *valid) }
+      end
+
+      # Splits a URL or pseudo-URL item into its protocol and body
+      #
+      # This is useful when handling PUTs or POSTs where the body is a
+      # reference to another resource.
+      #
+      # No URL parsing is done on the body, to allow 'pseudo-URL' schemes
+      # where the body is parsed in a non-standard manner.
+      #
+      # @api private
+      #
+      # @return [Array] A tuple containing the downcased protocol and
+      #   unprocessed body.
+      def split_url
+        protocol, body = @body.split(PROTOCOL_SPLITTER, 2)
+        [protocol.downcase.intern, body]
+      end
+
+      # Splits a PUT or POST hash into its type and body
+      #
+      # This is useful when handling PUTs or POSTs where the body may be
+      # interpreted in different ways depending on its type.
+      #
+      # @api private
+      #
+      # @return [Array] A tuple containing the downcased type symbol and
+      #   unprocessed body.
+      def split_hash
+        body = @body.clone
+        type = body.delete(:type).try(:downcase).try(:intern)
+        [type, body]
+      end
+
+      # Yields a potential URL reference to another resource.
+      #
+      # @api private
+      #
+      # @yieldparam [String] The protocol of the URL.
+      # @yieldparam [String] The body of the URL.
+      #
+      # @return [Boolean] true if the body was a URL and was handled; false
+      #   otherwise.
+      def validate_url
+        is_valid_url?.tap { |valid| yield(*split_url) if valid }
+      end
+
+      # Yields the protocol and body of an object if it is a raw string
+      #
+      # @api private
+      #
+      # @yieldparam [String] The string object.
+      #
+      # @return [Boolean] true if the body was a string and was handled; false
+      #   otherwise.
+      def validate_string
+        is_valid_string?.tap { |valid| yield @body.to_s if valid }
+      end
+
+      # Yields the protocol and body of an object if it is an integer
+      #
+      # @api private
+      #
+      # @yieldparam [String] The string object.
+      #
+      # @return [Boolean] true if the body was an integer and was handled;
+      #   false otherwise.
+      def validate_integer
+        is_valid_integer?.tap { |valid| yield Integer(@body) if valid }
+      end
+
+      # Yields the type and body of an object if it is a hash
+      #
+      # This is useful when handling PUTs or POSTs where the body is a
+      # direct representation, but should be interpreted in different ways
+      # depending on its type.
+      #
+      # @api private
+      #
+      # @yieldparam [Symbol] The type of the hash, downcased and symbolised.
+      # @yieldparam [Hash] The body of the hash.
+      #
+      # @return [Boolean] true if the body was a hash and was handled; false
+      #   otherwise.
+      def validate_hash
+        is_valid_hash?.tap { |valid| yield(*split_hash) if valid }
+      end
+
+      # Whether the payload is a valid hash format payload
+      def is_valid_hash?
+        @body.is_a?(Hash)
+      end
+
+      # Whether the payload is a valid URL or pseudo-URL
+      def is_valid_url?
+        is_valid_string? && @body.to_s.include?(PROTOCOL_SPLITTER)
+      end
+
+      # Whether the payload is a valid plain string
+      def is_valid_string?
+        @body.respond_to?(:to_s)
+      end
+
+      # Whether the payload is a valid integer
+      #
+      # This includes values that can be coerced into integers, such as
+      # integral strings.
+      def is_valid_integer?
+        # A nicer way of doing this would be appreciated.
+        # Could use respond_to?(:to_i), but this is too lenient.
+        Integer(@body)
+        true
+      rescue ArgumentError
+        false
       end
     end
   end

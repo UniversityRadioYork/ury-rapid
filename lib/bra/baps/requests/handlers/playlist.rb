@@ -63,11 +63,11 @@ module Bra
             x_baps_direct: :direct
           }) { |h, k| unknown_protocol(k) }
 
-          def post_url(protocol, url)
+          def url(protocol, url)
             method(URL_PROTOCOLS[protocol]).call(url)
           end
 
-          def post_hash(type, item)
+          def hash(type, item)
             method(HASH_PROTOCOLS[type]).call(item)
           end
 
