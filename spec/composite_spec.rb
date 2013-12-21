@@ -108,14 +108,14 @@ describe Bra::Models::HashModelObject do
     context 'when given an object not in the HashModelObject' do
       it 'returns a proc that returns nil' do
         idf = subject.id_function(object1)
-        expect(idf.call()).to eq(nil)
+        expect(idf.call).to eq(nil)
       end
     end
     context 'when given an object in the HashModelObject' do
       it 'returns a proc that returns the object key' do
         object1.move_to(subject, :wozniak)
         idf = subject.id_function(object1)
-        expect(idf.call()).to eq(:wozniak)
+        expect(idf.call).to eq(:wozniak)
       end
     end
   end

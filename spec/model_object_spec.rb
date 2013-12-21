@@ -98,7 +98,7 @@ describe Bra::Models::ModelObject do
         end
 
         it 'does not change the parent' do
-          expect{ subject.move_to(new_parent, :test_id) }.to raise_error
+          expect { subject.move_to(new_parent, :test_id) }.to raise_error
           expect(subject.parent).to be(old_parent)
         end
       end
@@ -139,7 +139,9 @@ describe Bra::Models::ModelObject do
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #add_child on the receiving parent' do
-          expect(new_parent).to receive(:add_child).with(:test_id, subject).once
+          expect(new_parent).to receive(:add_child).with(
+            :test_id, subject
+          ).once
 
           subject.move_to(new_parent, :test_id)
         end

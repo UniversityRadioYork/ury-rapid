@@ -7,7 +7,7 @@ describe Bra::Common::Payload do
   let(:body) { double(:body) }
   let(:privilege_set) { double(:privilege_set) }
   let(:default_id) { double(:default_id) }
-  let (:integer) { 2401 }
+  let(:integer) { 2401 }
 
   describe '#id' do
     context 'when the payload body is a Hash with one key' do
@@ -44,15 +44,15 @@ describe Bra::Common::Payload do
   end
 
   describe '#process' do
-    let (:receiver) { receiver = double(:receiver) }
+    let(:receiver) { double(:receiver) }
 
     context 'when the body is a hash' do
       # Note that hashes with one key are taken to be mapping an explicit ID
       # to the actual body, hence why we test with two-key hashes.
       context 'and the hash has a Symbol parameter' do
-        let (:body) { { type: :test_type, foo: :bar } }
+        let(:body) { { type: :test_type, foo: :bar } }
         it 'calls #hash on the argument, with the type and rest of the hash' do
-          expect(receiver).to receive(:hash).with(body[:type], {foo: :bar})
+          expect(receiver).to receive(:hash).with(body[:type], { foo: :bar })
 
           subject.process(receiver)
         end
@@ -65,10 +65,10 @@ describe Bra::Common::Payload do
         end
       end
       context 'and the hash has a String parameter' do
-        let (:body) { { type: 'XBaps', foo: :bar } }
+        let(:body) { { type: 'XBaps', foo: :bar } }
         it 'calls #hash on the argument, with downcase Symbol type and body' do
           expect(receiver).to receive(:hash).with(
-            body[:type].downcase.intern, {foo: :bar}
+            body[:type].downcase.intern, { foo: :bar }
           )
 
           subject.process(receiver)
@@ -82,7 +82,7 @@ describe Bra::Common::Payload do
         end
       end
       context 'and the hash has no type parameter' do
-        let (:body) { { bar: :baz, foo: :bar } }
+        let(:body) { { bar: :baz, foo: :bar } }
         it 'calls #hash on the argument, with nil and the hash' do
           expect(receiver).to receive(:hash).with(nil, body)
 
@@ -99,9 +99,9 @@ describe Bra::Common::Payload do
     end
 
     context 'when the body is a URL or pseudo-URL' do
-      let (:protocol) { 'a_protocol' }
-      let (:rest) { 'a_body' }
-      let (:body) { "#{protocol}://#{rest}" }
+      let(:protocol) { 'a_protocol' }
+      let(:rest) { 'a_body' }
+      let(:body) { "#{protocol}://#{rest}" }
       it 'calls #string on the argument with the Symbol protocol, and body' do
         expect(receiver).to receive(:url).with(protocol.to_sym, rest)
 
@@ -109,7 +109,7 @@ describe Bra::Common::Payload do
       end
     end
     context 'when the body is an Integer' do
-      let (:body) { integer }
+      let(:body) { integer }
       it 'calls #integer on the argument, with the number' do
         expect(receiver).to receive(:integer).with(integer)
 
@@ -117,7 +117,7 @@ describe Bra::Common::Payload do
       end
     end
     context 'when the body is a String representation of an integral number' do
-      let (:body) { integer.to_s }
+      let(:body) { integer.to_s }
       it 'calls #integer on the argument, with the number as an Integer' do
         expect(receiver).to receive(:integer).with(integer)
 
@@ -125,7 +125,7 @@ describe Bra::Common::Payload do
       end
     end
     context 'when the body is a normal String' do
-      let (:body) { 'Normal String' }
+      let(:body) { 'Normal String' }
       it 'calls #string on the argument with the string' do
         expect(receiver).to receive(:string).with(body)
 

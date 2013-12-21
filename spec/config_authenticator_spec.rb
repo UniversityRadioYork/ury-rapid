@@ -15,6 +15,7 @@ describe Bra::Common::ConfigAuthenticator do
       }
     }
   end
+
   subject { Bra::Common::ConfigAuthenticator.new(config) }
 
   describe '#authenticate' do
@@ -53,7 +54,8 @@ describe Bra::Common::ConfigAuthenticator do
           Bra::Common::Exceptions::AuthenticationFailure
         )
       end
-    end  end
+    end
+  end
 end
 
 describe Bra::Common::PasswordCheck do
