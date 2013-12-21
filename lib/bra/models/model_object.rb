@@ -33,7 +33,7 @@ module Bra
 
       # Gets this object's current ID
       def id
-        @id_function.call
+        @id_function.try(:call)
       end
 
       def_delegator :@children, :del_meth, :new_name
@@ -160,8 +160,9 @@ module Bra
       def move_to(new_parent, new_id)
         @parent.remove_child(self.id) unless @parent.nil?
         @parent = new_parent
+
         @parent.add_child(new_id, self) unless @parent.nil?
-        @id_function = @parent.id_function(self)
+        @id_function = @parent.try { |parent| parent.id_function(self) }
 
         self
       end
