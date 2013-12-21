@@ -38,26 +38,31 @@ describe Bra::Models::Item do
   describe '#driver_delete' do
     context 'when the Item is in a parent object' do
       let(:parent) { Bra::Models::ListModelObject.new }
+      let(:channel) { double(:channel) }
 
-      it 'removes the Item from that object' do
-        channel = double(:channel)
+      before(:each) do
         allow(channel).to receive(:push)
         subject.register_update_channel(channel)
 
         subject.move_to(parent, 0)
+      end
+
+      it 'removes the Item from that object' do
         expect(parent.children).to eq([subject])
         subject.driver_delete
         expect(parent.children).to eq([])
       end
 
       it 'notifies the channel' do
-        # Ensure the update channel is notified of the deletion
-        channel = double(:channel)
         channel.should_receive(:push).with([subject, nil]).once
-        subject.register_update_channel(channel)
 
-        subject.move_to(parent, 0)
         subject.driver_delete
+      end
+
+      it 'sets the ID of the Item to nil' do
+        expect(subject.id).to eq(0)
+        subject.driver_delete
+        expect(subject.id).to be_nil
       end
     end
   end
