@@ -6,6 +6,8 @@ describe Bra::Models::ModelObject do
   let(:old_parent) { double(:old_parent) }
   let(:new_parent) { double(:new_parent) }
   let(:child) { double(:child) }
+  let(:privilege_set) { double(:privilege_set) }
+  let(:operation) { double(:operation) }
 
   before(:each) do
     allow(old_parent).to receive(:add_child)
@@ -187,6 +189,32 @@ describe Bra::Models::ModelObject do
         channel.should_receive(:push).with([subject, :repr])
 
         subject.notify_channel(:repr)
+      end
+    end
+  end
+
+  describe '#fail_if_cannot' do
+    context 'when given a valid privilege set and operation' do
+      it 'calls #require on the privileges set with the handler target' do
+        ( privilege_set
+          .should_receive(:require).once
+          .with(operation, subject.handler_target)
+        )
+
+        subject.fail_if_cannot(operation, privilege_set)
+      end
+    end
+  end
+
+  describe '#can?' do
+    context 'when given a valid privilege set and operation' do
+      it 'calls #has? on the privileges set with the handler target' do
+        ( privilege_set
+          .should_receive(:has?).once
+          .with(operation, subject.handler_target)
+        )
+
+        subject.can?(operation, privilege_set)
       end
     end
   end

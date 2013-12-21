@@ -22,7 +22,7 @@ module Bra
       end
 
       # Requires a certain privilege on a certain target
-      def require(target, privilege)
+      def require(privilege, target)
         fail(
           Bra::Common::Exceptions::InsufficientPrivilegeError
         ) unless has?(target, privilege)
@@ -41,7 +41,7 @@ module Bra
       #
       # @return [Boolean] true if the privileges are sufficient; false
       #   otherwise.
-      def has?(target, privilege)
+      def has?(privilege, target)
         PrivilegeChecker.new(target, privilege, @privileges).check?
       end
 

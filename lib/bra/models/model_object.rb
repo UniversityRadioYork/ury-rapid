@@ -124,12 +124,12 @@ module Bra
 
       # Fails if an operation cannot proceed on this model object
       def fail_if_cannot(operation, privilege_set)
-        privilege_set.require(handler_target, operation)
+        privilege_set.require(operation, handler_target)
       end
 
       # Checks whether an operation can proceed on this model object
       def can?(operation, privilege_set)
-        privilege_set.has?(handler_target, operation)
+        privilege_set.has?(operation, handler_target)
       end
 
       # GETs this model object

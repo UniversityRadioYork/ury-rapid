@@ -12,29 +12,29 @@ describe Bra::Common::ConfigAuthenticator do
       }
     }
   end
-  let(:ca) { Bra::Common::ConfigAuthenticator.new(config) }
+  subject { Bra::Common::ConfigAuthenticator.new(config) }
 
   describe '#authenticate' do
     context 'with a valid string user and password' do
       it 'returns a privilege set matching the config' do
-        privs = ca.authenticate('test', 'hunter2')
-        expect(privs.has?(:channel_set, :get)).to be_true
-        expect(privs.has?(:channel_set, :put)).to be_false
-        expect(privs.has?(:channel, :get)).to be_true
-        expect(privs.has?(:channel, :put)).to be_true
-        expect(privs.has?(:player, :get)).to be_false
-        expect(privs.has?(:player, :put)).to be_false
+        privs = subject.authenticate('test', 'hunter2')
+        expect(privs.has?(:get, :channel_set)).to be_true
+        expect(privs.has?(:put, :channel_set)).to be_false
+        expect(privs.has?(:get, :channel)).to be_true
+        expect(privs.has?(:put, :channel)).to be_true
+        expect(privs.has?(:get, :player)).to be_false
+        expect(privs.has?(:put, :player)).to be_false
       end
     end
     context 'with a valid symbol user and password' do
       it 'returns a privilege set matching the config' do
-        privs = ca.authenticate(:test, :hunter2)
-        expect(privs.has?(:channel_set, :get)).to be_true
-        expect(privs.has?(:channel_set, :put)).to be_false
-        expect(privs.has?(:channel, :get)).to be_true
-        expect(privs.has?(:channel, :put)).to be_true
-        expect(privs.has?(:player, :get)).to be_false
-        expect(privs.has?(:player, :put)).to be_false
+        privs = subject.authenticate(:test, :hunter2)
+        expect(privs.has?(:get, :channel_set)).to be_true
+        expect(privs.has?(:put, :channel_set)).to be_false
+        expect(privs.has?(:get, :channel)).to be_true
+        expect(privs.has?(:put, :channel)).to be_true
+        expect(privs.has?(:get, :player)).to be_false
+        expect(privs.has?(:put, :player)).to be_false
       end
     end
   end
