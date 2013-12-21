@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'bra/models/item'
 require 'bra/models/composite'
 

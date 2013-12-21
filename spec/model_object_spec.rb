@@ -1,8 +1,23 @@
+require 'spec_helper'
+
 require 'bra/models/model_object'
 
 describe Bra::Models::ModelObject do
   let(:parent1) { double(:parent1) }
   let(:parent2) { double(:parent2) }
+  let(:child) { double(:child) }
+
+  describe '#add_child' do
+    it 'fails' do
+      expect { subject.add_child(child) }.to raise_error
+    end
+  end
+
+  describe '#remove_child' do
+    it 'fails' do
+      expect { subject.remove_child(child) }.to raise_error
+    end
+  end
 
   describe '#move_to' do
     context 'when the receiving parent is nil' do

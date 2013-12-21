@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'bra/baps/reader'
 
 describe Bra::Baps::Reader do
