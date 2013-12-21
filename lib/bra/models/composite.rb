@@ -20,14 +20,6 @@ module Bra
 
       attr_reader :children
 
-      # Methods that form the interface to a CompositeModelObject, but cannot
-      # be implemented generically.
-      %i{add_child remove_child}.each do |method|
-        define_method(method) do |*|
-          fail("CompositeModelObject subclasses need to implement #{method}.")
-        end
-      end
-
       # Attempts to find a child resource with the given partial URL
       #
       # If the resource is found, it will be yielded to the attached block;

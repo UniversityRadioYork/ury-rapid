@@ -36,14 +36,20 @@ module Bra
         @id_function.try(:call)
       end
 
-      def_delegator :@children, :del_meth, :new_name
-
       # Gets this object's children, as a hash
       #
       # By default, model objects have no children, so this returns the empty
       # hash.
       def child_hash
         {}
+      end
+
+      # Methods that form the interface to a composite model object, but do
+      # not work in the general case.
+      %i{add_child remove_child}.each do |method|
+        define_method(method) do |*|
+          fail('This model object does not support children.')
+        end
       end
 
       # Registers a handler to be called when this object is modified
