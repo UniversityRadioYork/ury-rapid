@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'bra/driver_common/response_buffer'
 
 describe Bra::DriverCommon::ResponseBuffer do

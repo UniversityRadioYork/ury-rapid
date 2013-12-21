@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'forwardable'
 require 'bra/baps/requests/request'
 require 'bra/baps/format_strings'

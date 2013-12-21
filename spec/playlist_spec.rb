@@ -1,3 +1,5 @@
+require 'spec_helper.rb'
+
 require 'bra/models/playlist'
 require 'bra/models/item'
 

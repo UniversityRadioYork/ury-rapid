@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'bra/common/privilege_set'
 
 describe Bra::Common::PrivilegeSet do

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'bra/common/hash'
 
 describe Hash do
