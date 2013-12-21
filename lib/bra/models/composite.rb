@@ -20,6 +20,15 @@ module Bra
 
       attr_reader :children
 
+      # Returns whether this object can have children.
+      #
+      # CompositeModelObjects can have children.
+      #
+      # @return [Boolean] true.
+      def can_have_children?
+        true
+      end
+
       # Attempts to find a child resource with the given partial URL
       #
       # If the resource is found, it will be yielded to the attached block;

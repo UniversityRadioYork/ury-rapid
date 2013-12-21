@@ -18,9 +18,6 @@ module Bra
     class ModelObject
       extend Forwardable
 
-      # Public: Allows read access to the object's children.
-      attr_reader :children
-
       # Public: Allows read access to the object's parent.
       attr_reader :parent
 
@@ -36,12 +33,24 @@ module Bra
         @id_function.try(:call)
       end
 
+      # Returns whether this object supports adding new children
+      #
+      # By default, this returns false.  Objects that support add_child and
+      # remove_child should override this to return true.
+      def can_have_children?
+        false
+      end
+
       # Gets this object's children, as a hash
       #
       # By default, model objects have no children, so this returns the empty
       # hash.
       def child_hash
         {}
+      end
+
+      def children
+        nil
       end
 
       # Methods that form the interface to a composite model object, but do
@@ -164,13 +173,30 @@ module Bra
       #
       # @return [ModelObject] This object, for method chaining.
       def move_to(new_parent, new_id)
-        @parent.remove_child(id) unless @parent.nil?
-        @parent = new_parent
+        check_can_have_children(new_parent)
 
-        @parent.add_child(new_id, self) unless @parent.nil?
-        @id_function = @parent.try { |parent| parent.id_function(self) }
+        move_from_old_parent
+        @parent = new_parent
+        move_to_new_parent(new_id)
 
         self
+      end
+
+      # Checks to make sure a new parent can have children
+      def check_can_have_children(parent)
+        can = parent.nil? ? true : parent.can_have_children?
+        fail('Parent cannot have children.') unless can
+      end
+
+      # Performs the move from an old parent, if necessary
+      def move_from_old_parent
+        @parent.remove_child(id) unless @parent.nil?
+      end
+
+      # Performs the move to a new parent, if necessary
+      def move_to_new_parent(new_id)
+        @parent.add_child(new_id, self) unless @parent.nil?
+        @id_function = @parent.try { |parent| parent.id_function(self) }
       end
 
       # The canonical URL of this model object.

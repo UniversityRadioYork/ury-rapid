@@ -3,20 +3,44 @@ require 'spec_helper'
 require 'bra/models/model_object'
 
 describe Bra::Models::ModelObject do
-  let(:parent1) { double(:parent1) }
-  let(:parent2) { double(:parent2) }
+  let(:old_parent) { double(:old_parent) }
+  let(:new_parent) { double(:new_parent) }
   let(:child) { double(:child) }
 
+  before(:each) do
+    allow(old_parent).to receive(:add_child)
+    allow(old_parent).to receive(:remove_child)
+    allow(old_parent).to receive(:id_function) { proc { :test_id } }
+    allow(old_parent).to receive(:can_have_children?).and_return(:true)
+
+    allow(new_parent).to receive(:add_child)
+    allow(new_parent).to receive(:remove_child)
+    allow(new_parent).to receive(:id_function) { proc { :test_id } }
+    allow(new_parent).to receive(:can_have_children?).and_return(:true)
+  end
+
+  # ModelObjects should implement the composite interface as far as reading
+  # goes; if anything attempts to add or remove a child on a plain
+  # ModelObject, it should fail.
+
   describe '#add_child' do
-    it 'fails' do
-      expect { subject.add_child(child) }.to raise_error
-    end
+    it('fails') { expect { subject.add_child(child) }.to raise_error }
   end
 
   describe '#remove_child' do
-    it 'fails' do
-      expect { subject.remove_child(child) }.to raise_error
-    end
+    it('fails') { expect { subject.remove_child(child) }.to raise_error }
+  end
+
+  describe '#children' do
+    it('returns nil') { expect(subject.children).to be_nil }
+  end
+
+  describe '#child_hash' do
+    it('returns the empty hash') { expect(subject.child_hash).to eq({}) }
+  end
+
+  describe '#can_have_children?' do
+    it('returns false') { expect(subject.can_have_children?).to be_false }
   end
 
   describe '#move_to' do
@@ -34,22 +58,16 @@ describe Bra::Models::ModelObject do
       end
 
       context 'when the object has a parent' do
-        before(:each) do
-          allow(parent1).to receive(:add_child)
-          allow(parent1).to receive(:remove_child)
-          allow(parent1).to receive(:id_function) { proc { :test_id } }
-
-          subject.move_to(parent1, :test)
-        end
+        before(:each) { subject.move_to(old_parent, :test) }
 
         it 'calls #remove_child on the previous parent' do
-          parent1.should_receive(:remove_child).once.with(:test_id)
+          old_parent.should_receive(:remove_child).once.with(:test_id)
 
           subject.move_to(nil, :test)
         end
 
         it 'sets the parent to nil' do
-          expect(subject.parent).to eq(parent1)
+          expect(subject.parent).to eq(old_parent)
           subject.move_to(nil, :test)
           expect(subject.parent).to be_nil
         end
@@ -60,62 +78,83 @@ describe Bra::Models::ModelObject do
         end
       end
     end
+    context 'when the receiving parent cannot have children' do
+      before(:each) do
+        allow(new_parent).to receive(:can_have_children?).and_return(false)
+      end
 
-    context 'when the receiving parent is not nil' do
-      context 'when the object has no parent' do
-        before(:each) do
-          allow(parent1).to receive(:add_child)
-          allow(parent1).to receive(:id_function)
-        end
-
-        it 'calls #add_child on the receiving parent' do
-          parent1.should_receive(:add_child).with(:test_id, subject)
-
-          subject.move_to(parent1, :test_id)
-        end
-        it 'calls #id_function on the receiving parent' do
-          parent1.should_receive(:id_function).with(subject)
-
-          subject.move_to(parent1, :test_id)
-        end
-        it 'sets the parent of the object to the receiving parent' do
-          subject.move_to(parent1, :test_id)
-          expect(subject.parent).to be(parent1)
+      context 'and the object has no parent' do
+        it 'fails' do
+          expect { subject.move_to(new_parent, :test_id) }.to raise_error
         end
       end
-      context 'when the object already has a parent' do
-        before(:each) do
-          allow(parent1).to receive(:add_child)
-          allow(parent1).to receive(:id_function)
-          allow(parent1).to receive(:remove_child)
-          allow(parent2).to receive(:add_child)
-          allow(parent2).to receive(:id_function)
+      context 'and the object has a parent' do
+        before(:each) { subject.move_to(old_parent, :old) }
 
-          parent1.should_receive(:id_function).once.and_return(
-            proc { :test_id }
-          )
-          subject.move_to(parent1, :test_id)
+        it 'fails' do
+          expect { subject.move_to(new_parent, :test_id) }.to raise_error
         end
 
-        it 'calls #add_child on the receiving parent' do
-          parent2.should_receive(:add_child).with(:test_id, subject).once
+        it 'does not change the parent' do
+          expect{ subject.move_to(new_parent, :test_id) }.to raise_error
+          expect(subject.parent).to be(old_parent)
+        end
+      end
+    end
+    context 'when the receiving parent can have children' do
+      context 'and the object has no parent' do
+        it 'calls #can_have_children? on the receiving parent' do
+          new_parent.should_receive(:can_have_children?).once
 
-          subject.move_to(parent2, :test_id)
+          subject.move_to(new_parent, :test_id)
+        end
+        it 'calls #add_child on the receiving parent' do
+          new_parent.should_receive(:add_child).with(:test_id, subject)
+
+          subject.move_to(new_parent, :test_id)
         end
         it 'calls #id_function on the receiving parent' do
-          parent2.should_receive(:id_function).with(subject).once
+          new_parent.should_receive(:id_function).with(subject)
 
-          subject.move_to(parent2, :test_id)
-        end
-        it 'calls #remove_child on the previous parent' do
-          parent1.should_receive(:remove_child).with(:test_id).once
-
-          subject.move_to(parent2, :test_id)
+          subject.move_to(new_parent, :test_id)
         end
         it 'sets the parent of the object to the receiving parent' do
-          expect(subject.parent).to be(parent1)
-          subject.move_to(parent2, :test_id)
-          expect(subject.parent).to be(parent2)
+          subject.move_to(new_parent, :test_id)
+          expect(subject.parent).to be(new_parent)
+        end
+      end
+      context 'and the object already has a parent' do
+        before(:each) do
+          old_parent.should_receive(:id_function).once.and_return(
+            proc { :test_id }
+          )
+          subject.move_to(old_parent, :test_id)
+        end
+
+        it 'calls #can_have_children? on the receiving parent' do
+          new_parent.should_receive(:can_have_children?).once
+
+          subject.move_to(new_parent, :test_id)
+        end
+        it 'calls #add_child on the receiving parent' do
+          new_parent.should_receive(:add_child).with(:test_id, subject).once
+
+          subject.move_to(new_parent, :test_id)
+        end
+        it 'calls #id_function on the receiving parent' do
+          new_parent.should_receive(:id_function).with(subject).once
+
+          subject.move_to(new_parent, :test_id)
+        end
+        it 'calls #remove_child on the previous parent' do
+          old_parent.should_receive(:remove_child).with(:test_id).once
+
+          subject.move_to(new_parent, :test_id)
+        end
+        it 'sets the parent of the object to the receiving parent' do
+          expect(subject.parent).to be(old_parent)
+          subject.move_to(new_parent, :test_id)
+          expect(subject.parent).to be(new_parent)
         end
       end
     end
@@ -123,19 +162,15 @@ describe Bra::Models::ModelObject do
 
   describe '#id' do
     context 'when the object has not been moved to a parent' do
-      it 'returns nil' do
-        expect(subject.id).to be_nil
-      end
+      it('returns nil') { expect(subject.id).to be_nil }
     end
     context 'when the object has been moved to a parent' do
       it 'returns the result of calling the ID function given by the parent' do
         procedure = double(:proc)
-
-        allow(parent1).to receive(:add_child)
-        allow(parent1).to receive(:id_function) { procedure }
         procedure.should_receive(:call).once.and_return(:test_id)
+        allow(new_parent).to receive(:id_function).and_return(procedure)
 
-        subject.move_to(parent1, :test123)
+        subject.move_to(new_parent, :test123)
         expect(subject.id).to eq(:test_id)
       end
     end
@@ -143,9 +178,7 @@ describe Bra::Models::ModelObject do
 
   describe '#notify_channel' do
     context 'when there is no update channel' do
-      it 'fails' do
-        expect { subject.notify_channel(:repr) }.to raise_error
-      end
+      it('fails') { expect { subject.notify_channel(:repr) }.to raise_error }
     end
     context 'when there is an update channel' do
       it 'calls channel#push with a tuple of itself and the given item' do
