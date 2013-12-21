@@ -139,13 +139,9 @@ module Bra
       # information on what constitutes a flattened representation.
       #
       # @param privileges [PrivilegeSet] The set of privileges the client has.
-      # @param mode [Symbol] Either :wrap, in which case the result will be
-      #   wrapped in a hash mapping the object's ID to the flattened
-      #   representation, or :nowrap, in which case only the flattened value is
-      #   returned.  By default, :wrap is used.
       #
       # @return [Object] A flat representation of this object.
-      def get(privileges, mode = :wrap)
+      def get(privileges)
         fail_if_cannot(:get, privileges)
         flat
       end
@@ -160,7 +156,7 @@ module Bra
 
         # Define error-raising stubs for the driver modifiers.
         define_method("driver_#{action}") do |*|
-          fail("driver_#{action} needs overriding for #{self.class} #{id}.")
+          fail(Bra::Common::Exceptions::NotSupportedByBra)
         end
       end
 

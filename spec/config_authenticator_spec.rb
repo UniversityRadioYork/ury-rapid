@@ -1,4 +1,7 @@
+require 'spec_helper'
+
 require 'bra/common/config_authenticator'
+require 'bra/common/exceptions'
 
 describe Bra::Common::ConfigAuthenticator do
   let(:config) do
@@ -15,7 +18,7 @@ describe Bra::Common::ConfigAuthenticator do
   subject { Bra::Common::ConfigAuthenticator.new(config) }
 
   describe '#authenticate' do
-    context 'with a valid string user and password' do
+    context 'when the user and password are valid strings' do
       it 'returns a privilege set matching the config' do
         privs = subject.authenticate('test', 'hunter2')
         expect(privs.has?(:get, :channel_set)).to be_true
@@ -26,7 +29,7 @@ describe Bra::Common::ConfigAuthenticator do
         expect(privs.has?(:put, :player)).to be_false
       end
     end
-    context 'with a valid symbol user and password' do
+    context 'when the user and password are valid symbols' do
       it 'returns a privilege set matching the config' do
         privs = subject.authenticate(:test, :hunter2)
         expect(privs.has?(:get, :channel_set)).to be_true
@@ -37,7 +40,20 @@ describe Bra::Common::ConfigAuthenticator do
         expect(privs.has?(:put, :player)).to be_false
       end
     end
-  end
+    context 'when the user is not authorised' do
+      it 'fails with an AuthenticationFailure' do
+        expect { subject.authenticate(:wrong, :hunter2) }.to raise_error(
+          Bra::Common::Exceptions::AuthenticationFailure
+        )
+      end
+    end
+    context 'when the password is incorrect' do
+      it 'fails with an AuthenticationFailure' do
+        expect { subject.authenticate(:test, :wrong) }.to raise_error(
+          Bra::Common::Exceptions::AuthenticationFailure
+        )
+      end
+    end  end
 end
 
 describe Bra::Common::PasswordCheck do

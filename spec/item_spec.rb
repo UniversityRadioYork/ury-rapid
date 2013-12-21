@@ -69,5 +69,19 @@ describe Bra::Models::Item do
     end
   end
 
+  describe '#driver_put' do
+    let(:parent) { Bra::Models::Playlist.new }
+
+    it 'calls #driver_post on the parent with its current ID' do
+      payload = double(:payload)
+      subject.move_to(parent, 10)
+
+      allow(parent).to receive(:driver_post)
+      expect(parent).to receive(:driver_post).with(10, payload)
+
+      subject.driver_put(payload)
+    end
+  end
+
   # TODO(mattbw): Add artists etc. if drivers ever support them?
 end

@@ -1,3 +1,5 @@
+require 'bra/common/exceptions'
+
 module Bra
   module Common
     # Common type enumerations used in bra, as well as validators for those
@@ -19,10 +21,12 @@ module Bra
         def validate_symbol(input, range)
           input.to_sym.tap { |symbol| invalid unless range.include?(symbol) }
         end
+        module_function :validate_symbol
 
         def invalid
-          fail(InvalidPayload)
+          fail(Bra::Common::Exceptions::InvalidPayload)
         end
+        module_function :invalid
       end
     end
   end

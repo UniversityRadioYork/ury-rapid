@@ -8,6 +8,21 @@ describe Bra::Common::PrivilegeSet do
     )
   end
 
+  describe '#require' do
+    context 'when #has? returns true' do
+      it 'does nothing' do
+        allow(subject).to receive(:has?).and_return(true)
+        subject.require(:get, :foo)
+      end
+    end
+    context 'when #has? returns false' do
+      it 'fails' do
+        allow(subject).to receive(:has?).and_return(false)
+        expect { subject.require(:get, :foo) }.to raise_error
+      end
+    end
+  end
+
   describe '#has?' do
     context 'when given a valid target' do
       context 'and the privilege is directly in the PrivilegeSet' do

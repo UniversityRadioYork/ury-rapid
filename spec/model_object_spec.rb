@@ -218,4 +218,26 @@ describe Bra::Models::ModelObject do
       end
     end
   end
+
+  describe '#driver_put' do
+    it('fails with NotSupportedByBra') do
+      expect { subject.driver_put(:foo) }.to raise_error(
+        Bra::Common::Exceptions::NotSupportedByBra
+      )
+    end
+  end
+  describe '#driver_post' do
+    it('fails with NotSupportedByBra') do
+      expect { subject.driver_post(:foo, :bar) }.to raise_error(
+        Bra::Common::Exceptions::NotSupportedByBra
+      )
+    end
+  end
+  describe '#driver_delete' do
+    it('fails with NotSupportedByBra') do
+      expect { subject.driver_delete }.to raise_error(
+        Bra::Common::Exceptions::NotSupportedByBra
+      )
+    end
+  end
 end
