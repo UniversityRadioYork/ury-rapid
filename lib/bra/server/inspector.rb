@@ -44,7 +44,7 @@ module Bra
       def initialize(request, target, privilege_set, inner = false)
         @request = request
         @target = target
-        @get_repr = target.get(privilege_set)
+        @resource = target.get(privilege_set)
         @inner = inner
         @privilege_set = privilege_set
       end
@@ -53,9 +53,7 @@ module Bra
         @inner ? resource_id : resource_url
       end
 
-      def resource
-        @get_repr
-      end
+      attr_reader :resource
 
       # Retrieves the type of the target
       def resource_type
@@ -86,7 +84,7 @@ module Bra
       # @return [Boolean]  True if the request was for the JSON format of a
       #   model object.
       def json?
-        @request.params.key? "json"
+        @request.params.key? 'json'
       end
     end
   end

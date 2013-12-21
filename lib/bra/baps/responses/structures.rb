@@ -14,7 +14,9 @@ module Bra
       # the driver cannot parse the rest of the stream and dies), as well as
       # its parameters in order of receipt and their corresponding names in the
       # response hashes produced by the response parser.
-      class Structures < Bra::DriverCommon::StructureBuilder
+      module Structures
+        extend Bra::DriverCommon::Responses::StructureBuilder
+
         # These are the types used in BAPS, and correspond to the types used
         # in the response parser.
         def_types :float32, :uint32, :string, :load_body, :config_setting
@@ -30,43 +32,41 @@ module Bra
         def_struct :config, option_id, config_setting(:setting)
         def_struct :option, id, description, uint32(:type)
 
-        def initialize
-          structures do
-            group Codes::Playback do
-              unary  :PLAY
-              unary  :STOP
-              unary  :PAUSE
-              marker :POSITION
-              struct :VOLUME, float32(:volume)
-              struct :LOAD,   index, load_body(:type)
-              marker :CUE
-              marker :INTRO
-            end
-            group Codes::Playlist do
-              # ADD_ITEM is request only
-              struct :DELETE_ITEM,           index
-              struct :MOVE_ITEM_IN_PLAYLIST, old_index, new_index
-              struct :ITEM_COUNT,            count
-              struct :ITEM_DATA,             index, uint32(:type), title
-              # GET is unused
-              unary  :RESET
-              # COPY_ITEM_TO_PLAYLIST is request only
-            end
-            group Codes::Config do
-              struct :OPTION_COUNT,         count
-              struct :OPTION_CHOICE_COUNT,  option_id, count
-              struct :OPTION_CHOICE,        option_id, choice_id, description
-              struct :CONFIG_SETTING_COUNT, count
+        structures do
+          group Codes::Playback do
+            unary  PLAY
+            unary  STOP
+            unary  PAUSE
+            marker POSITION
+            struct VOLUME, float32(:volume)
+            struct LOAD,   index, load_body(:type)
+            marker CUE
+            marker INTRO
+          end
+          group Codes::Playlist do
+            # ADD_ITEM is request only
+            struct DELETE_ITEM,           index
+            struct MOVE_ITEM_IN_PLAYLIST, old_index, new_index
+            struct ITEM_COUNT,            count
+            struct ITEM_DATA,             index, uint32(:type), title
+            # GET is unused
+            unary  RESET
+            # COPY_ITEM_TO_PLAYLIST is request only
+          end
+          group Codes::Config do
+            struct OPTION_COUNT,         count
+            struct OPTION_CHOICE_COUNT,  option_id, count
+            struct OPTION_CHOICE,        option_id, choice_id, description
+            struct CONFIG_SETTING_COUNT, count
 
-              option :OPTION, :OPTION_INDEXED
-              config :CONFIG_SETTING, :CONFIG_SETTING_INDEXED
-            end
-            group Codes::System do
-              struct :SEED,          string(:seed)
-              struct :LOGIN_RESULT,  string(:details)
-              struct :CLIENT_CHANGE, client
-              struct :LOG_MESSAGE,   string(:message)
-            end
+            option OPTION, OPTION_INDEXED
+            config CONFIG_SETTING, CONFIG_SETTING_INDEXED
+          end
+          group Codes::System do
+            struct SEED,          string(:seed)
+            struct LOGIN_RESULT,  string(:details)
+            struct CLIENT_CHANGE, client
+            struct LOG_MESSAGE,   string(:message)
           end
         end
       end

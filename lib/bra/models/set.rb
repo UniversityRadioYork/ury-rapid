@@ -17,21 +17,7 @@ module Bra
         super()
       end
 
-      # Returns the handler target of this object
-      #
-      # For Sets, the target is 'CLASS_set', where the class name is converted
-      # to underscore_lowercase.
-      #
-      # @api semipublic
-      # @example Get the handler target of a set of playlists.
-      #   a = Set.new(Playlist)
-      #   a.handler_target
-      #   #=> :playlist_set
-      #
-      # @return [Symbol] The handler target.
-      def handler_target
-        @handler_target
-      end
+      attr_reader :handler_target
     end
   end
 end

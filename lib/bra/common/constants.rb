@@ -1,5 +1,6 @@
 module Bra
   module Common
+    # Constants used throughout BRA
     module Constants
       # The API version
       # This follows Semantic Versioning (http://semver.org).

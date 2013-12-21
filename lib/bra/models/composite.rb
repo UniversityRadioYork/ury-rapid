@@ -111,10 +111,7 @@ module Bra
         @children = {}
       end
 
-      # Gets this object's children, as a hash
-      def child_hash
-        @children
-      end
+      alias_method :child_hash, :children
 
       # GETs this model object as a 'flat' representation
       #

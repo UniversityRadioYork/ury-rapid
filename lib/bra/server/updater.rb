@@ -50,6 +50,7 @@ module Bra
       end
     end
 
+    # An Updater that sends updates to a HTTP stream
     class StreamUpdater < Updater
       def initialize(model, stream, privileges)
         super(model)
@@ -66,6 +67,7 @@ module Bra
       end
     end
 
+    # An Updater that sends updates to a sinatra-websocket WebSocket
     class WebSocketUpdater < Updater
       def initialize(model, websocket, authenticator, init_privileges)
         super(model)

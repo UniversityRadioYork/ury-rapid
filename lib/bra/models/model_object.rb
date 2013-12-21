@@ -158,7 +158,7 @@ module Bra
       #
       # @return [ModelObject] This object, for method chaining.
       def move_to(new_parent, new_id)
-        @parent.remove_child(self.id) unless @parent.nil?
+        @parent.remove_child(id) unless @parent.nil?
         @parent = new_parent
 
         @parent.add_child(new_id, self) unless @parent.nil?

@@ -76,7 +76,6 @@ describe Bra::Models::HashModelObject do
   describe '#each' do
     context 'with a block' do
       it 'runs it on each child' do
-        count = 0
         subject.add_child(:karl, :marx)
         subject.add_child(:friedrich, :engels)
         subject.add_child(:vladimir, :lenin)
@@ -188,7 +187,6 @@ describe Bra::Models::ListModelObject do
   describe '#each' do
     context 'with a block' do
       it 'runs it on each child' do
-        count = 0
         subject.add_child(0, :marx)
         subject.add_child(1, :engels)
         subject.add_child(2, :lenin)

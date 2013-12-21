@@ -64,7 +64,7 @@ module Bra
       # model extension creators.
       full_config = driver.configure_model(init_config)
 
-      model = make_model_with(full_config)
+      make_model_with(full_config)
     end
 
     # Given a full model configuration, builds the model from a structure class

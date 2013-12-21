@@ -34,7 +34,6 @@ module Bra
             code: Codes::System::WELCOME_MESSAGE,
             subcode: 0
           }
-          @structures = Bra::Baps::Responses::Structures.new
         end
 
         def start
@@ -115,7 +114,7 @@ module Bra
         #
         # @return [Array] The expected structure of the BAPS response.
         def structure_with_code(code)
-          structure = @structures.structure(code)
+          structure = Baps::Responses::Structures.structure(code)
           structure.nil? ? unknown_response(code) : structure.clone
         end
 

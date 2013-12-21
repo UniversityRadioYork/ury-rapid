@@ -9,6 +9,9 @@ require 'bra/common/payload'
 require 'bra/server/inspector'
 require 'bra/server/updater'
 
+# Extends Sinatra's requests to include WebSocket extensions
+#
+# This doesn't seem to happen by default in some cases.
 class Sinatra::Request
   include SinatraWebsocket::Ext::Sinatra::Request
 end

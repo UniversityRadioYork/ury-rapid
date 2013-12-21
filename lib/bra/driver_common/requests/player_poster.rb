@@ -42,12 +42,12 @@ module Bra
         end
 
         # Set up the main Poster methods to reference the jump tables above
-        %w{url hash}.each do |type|
-          jump_table = const_get("#{type.upcase}_TYPES")
+        %w{url hash}.each do |style|
+          jump_table = const_get("#{style.upcase}_TYPES")
           jump_table.default = :unsupported_protocol
 
           # Assume nothing other than :item reaches here.
-          define_method("post_#{type}") do |type, rest|
+          define_method("post_#{style}") do |type, rest|
             send(jump_table[type], rest)
           end
         end
@@ -82,10 +82,9 @@ module Bra
         end
 
         def item_from_playlist(playlist, index)
-          ( is_local_playlist?(playlist) ?
-            item_from_local_playlist(index) :
-            item_from_other_playlist(playlist, index)
-          )
+          local = is_local_playlist?(playlist)
+          item_from_local_playlist(index)           if local
+          item_from_other_playlist(playlist, index) unless local
         end
 
         # @return [Boolean] True if the playlist ID is the same as the player

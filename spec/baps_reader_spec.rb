@@ -1,71 +1,100 @@
 require 'bra/baps/reader'
 
-# Representative values
-UINT16_MIN = 0
-UINT16_MID = 32_767
-UINT16_MAX = 65_535
-UINT16S = [UINT16_MIN, UINT16_MID, UINT16_MAX]
-
-UINT32_MIN = 0
-UINT32_MID = 2_147_483_647
-UINT32_MAX = 4_294_967_295
-UINT32S = [UINT32_MIN, UINT32_MID, UINT32_MAX]
-
-# These are specifically numbers divisible by two, to avoid imprecision
-FLOAT32_MIN = 0
-FLOAT32_MID = 0.125
-FLOAT32_MAX = 128.0
-FLOAT32S = [FLOAT32_MIN, FLOAT32_MID, FLOAT32_MAX]
-
 describe Bra::Baps::Reader do
+  let(:callback) { double(:callback) }
+
+  before(:each) do
+    callback.should_receive(:test).with(value).once
+  end
+
   describe '#uint16' do
-    it 'requests a 16-bit integer' do
-      number_request(:uint16, UINT16S, Bra::Baps::FormatStrings::UINT16)
+    context 'when called before a full data send' do
+      let(:value) { 0 }
+      it 'requests a 16-bit integer' do
+        test_number_full_data(:uint16, Bra::Baps::FormatStrings::UINT16)
+      end
     end
-  end
-  describe '#uint32' do
-    it 'requests a 32-bit integer' do
-      number_request(:uint32, UINT32S, Bra::Baps::FormatStrings::UINT32)
+    context 'when called before an incremental data send' do
+      let(:value) { 32767 }
+      it 'requests a 16-bit integer' do
+        test_number_split_data(:uint16, Bra::Baps::FormatStrings::UINT16)
+      end
     end
-  end
-  describe '#float32' do
-    it 'requests a 32-bit floating point number' do
-      number_request(:float32, FLOAT32S, Bra::Baps::FormatStrings::FLOAT32)
-    end
-  end
-  describe '#string' do
-    let(:string1) { 'Fantasia in C Minor' }
-
-    context 'when called before data is available' do
-      it 'requests a Pascal-format string and yields it when it appears' do
-        callback = double(:callback)
-
-        subject.string { |string| callback.string1(string) }
-        callback.should_receive(:string1).with(string1).once
-        subject.add([string1.bytesize].pack('N') + string1)
+    context 'when called after a full data send' do
+      let(:value) { 65535 }
+      it 'requests a 16-bit integer' do
+        test_number_post_data(:uint16, Bra::Baps::FormatStrings::UINT16)
       end
     end
   end
 
-  # Tests method, with the given values, using the given format string
-  def number_request(method, values, pack_format)
-    min, mid, max = values
+  describe '#uint32' do
+    context 'when called before a full data send' do
+      let(:value) { 0 }
+      it 'requests a 32-bit integer' do
+        test_number_full_data(:uint32, Bra::Baps::FormatStrings::UINT32)
+      end
+    end
+    context 'when called before an incremental data send' do
+      let(:value) { 2_147_483_647 }
+      it 'requests a 32-bit integer' do
+        test_number_split_data(:uint32, Bra::Baps::FormatStrings::UINT32)
+      end
+    end
+    context 'when called after a full data send' do
+      let(:value) { 4_294_967_295 }
+      it 'requests a 32-bit integer' do
+        test_number_post_data(:uint32, Bra::Baps::FormatStrings::UINT32)
+      end
+    end
+  end
 
-    callback = double(:callback)
-    callback.should_receive(:a).with(min).ordered
-    callback.should_receive(:b).with(mid).ordered
-    callback.should_receive(:c).with(max).ordered
+  describe '#float32' do
+    context 'when called before a full data send' do
+      let(:value) { 0 }
+      it 'requests a 32-bit floating-point number' do
+        test_number_full_data(:float32, Bra::Baps::FormatStrings::FLOAT32)
+      end
+    end
+    context 'when called before an incremental data send' do
+      let(:value) { 0.125 }
+      it 'requests a 32-bit floating-point number' do
+        test_number_split_data(:float32, Bra::Baps::FormatStrings::FLOAT32)
+      end
+    end
+    context 'when called after a full data send' do
+      let(:value) { 512.0 }
+      it 'requests a 32-bit floating-point number' do
+        test_number_post_data(:float32, Bra::Baps::FormatStrings::FLOAT32)
+      end
+    end
+  end
 
-    # Request before full data
-    subject.send(method, &callback.method(:a))
-    subject.add([min].pack(pack_format))
+  describe '#string' do
+    let(:value) { 'Fantasia in C Minor' }
 
-    # Request before data in two instalments
-    subject.send(method, &callback.method(:b))
-    ([mid].pack(pack_format)).each_char(&subject.method(:add))
+    context 'when called before data is available' do
+      it 'requests a Pascal-format string and yields it when it appears' do
 
-    # Request after data
-    subject.add([max].pack(pack_format))
-    subject.send(method, &callback.method(:c))
+        subject.string { |string| callback.test(string) }
+        subject.add([value.bytesize].pack('N') + value)
+      end
+    end
+  end
+
+  def test_number_full_data(method, pack_format)
+    subject.send(method, &callback.method(:test))
+    subject.add([value].pack(pack_format))
+  end
+
+  def test_number_split_data(method, pack_format)
+
+    subject.send(method, &callback.method(:test))
+    ([value].pack(pack_format)).each_char(&subject.method(:add))
+  end
+
+  def test_number_post_data(method, pack_format)
+    subject.add([value].pack(pack_format))
+    subject.send(method, &callback.method(:test))
   end
 end

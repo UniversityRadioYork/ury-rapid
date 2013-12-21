@@ -5,7 +5,6 @@ require 'bra/models/player'
 require 'bra/models/playlist'
 require 'bra/models/variable'
 
-
 # A normal model structure
 #
 # This contains:
