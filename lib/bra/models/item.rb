@@ -61,10 +61,7 @@ module Bra
         # Must notify before changing parent, as the notification requires
         # a valid full URL.
         notify_delete
-
-        parent.remove_child(id)
-        @parent = nil
-        @id = nil
+        move_to(nil, nil)
       end
     end
 
