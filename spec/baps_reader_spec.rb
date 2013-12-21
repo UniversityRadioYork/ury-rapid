@@ -72,6 +72,17 @@ describe Bra::Baps::Reader do
     end
   end
 
+  describe '#command' do
+    let(:value) { 0xE300 }
+
+    context 'when called before a single, full data send' do
+      it 'requests a command word and payload length, and yields the former' do
+        subject.command { |word| callback.test(word) }
+        subject.add([value, 10].pack('nN'))
+      end
+    end
+  end
+
   describe '#string' do
     let(:value) { 'Fantasia in C Minor' }
 
