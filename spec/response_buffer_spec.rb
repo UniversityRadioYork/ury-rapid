@@ -5,8 +5,8 @@ describe Bra::DriverCommon::ResponseBuffer do
     context 'when a request callback asks for a new immediate request' do
       it 'processes the two requests in order' do
         callback = double(:callback)
-        callback.should_receive(:a).with('MoreBytes').ordered
-        callback.should_receive(:b).with('Please').ordered
+        expect(callback).to receive(:a).with('MoreBytes').ordered
+        expect(callback).to receive(:b).with('Please').ordered
 
         subject.request(4) do |bytes|
           expect(bytes).to eq('Test')
@@ -18,9 +18,9 @@ describe Bra::DriverCommon::ResponseBuffer do
     end
     it 'yields the request block with raw data, as soon as it appears' do
       callback = double(:callback)
-      callback.should_receive(:a).with('TestBytes').ordered
-      callback.should_receive(:b).with('MoreTestBytes').ordered
-      callback.should_receive(:c).with('EvenMore').ordered
+      expect(callback).to receive(:a).with('TestBytes').ordered
+      expect(callback).to receive(:b).with('MoreTestBytes').ordered
+      expect(callback).to receive(:c).with('EvenMore').ordered
 
       # Add request first, provide enough bytes
       subject.request(9, &callback.method(:a))
@@ -40,9 +40,9 @@ describe Bra::DriverCommon::ResponseBuffer do
   describe '#packed_request' do
     it 'yields the request block with unpacked data, as soon as it appears' do
       callback = double(:callback)
-      callback.should_receive(:a).with([2001]).ordered
-      callback.should_receive(:b).with(['MoreTestBytes']).ordered
-      callback.should_receive(:c).with([12, 34, 56]).ordered
+      expect(callback).to receive(:a).with([2001]).ordered
+      expect(callback).to receive(:b).with(['MoreTestBytes']).ordered
+      expect(callback).to receive(:c).with([12, 34, 56]).ordered
 
       # Add request first, provide enough bytes
       subject.packed_request(4, 'N', &callback.method(:a))

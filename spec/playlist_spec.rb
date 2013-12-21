@@ -28,9 +28,9 @@ describe Bra::Models::Playlist do
         it 'registers the playlist updates channel with the Item' do
           ignore_handler
 
-          channel.should_receive(:push).with([test1, test1.flat]).ordered
-          channel.should_receive(:push).with([test2, test2.flat]).ordered
-          channel.should_receive(:push).with([test3, test3.flat]).ordered
+          expect(channel).to receive(:push).with([test1, test1.flat]).ordered
+          expect(channel).to receive(:push).with([test2, test2.flat]).ordered
+          expect(channel).to receive(:push).with([test3, test3.flat]).ordered
 
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)
@@ -39,9 +39,9 @@ describe Bra::Models::Playlist do
         it 'registers the playlist item handler with the Item' do
           ignore_channel
 
-          handler.should_receive(:item_handler).with(test1).ordered
-          handler.should_receive(:item_handler).with(test2).ordered
-          handler.should_receive(:item_handler).with(test3).ordered
+          expect(handler).to receive(:item_handler).with(test1).ordered
+          expect(handler).to receive(:item_handler).with(test2).ordered
+          expect(handler).to receive(:item_handler).with(test3).ordered
 
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)
@@ -139,9 +139,9 @@ describe Bra::Models::Playlist do
       end
 
       it 'announces each item deletion' do
-        channel.should_receive(:push).with([test1, nil]).ordered
-        channel.should_receive(:push).with([test2, nil]).ordered
-        channel.should_receive(:push).with([test3, nil]).ordered
+        expect(channel).to receive(:push).with([test1, nil]).ordered
+        expect(channel).to receive(:push).with([test2, nil]).ordered
+        expect(channel).to receive(:push).with([test3, nil]).ordered
 
         subject.driver_delete
       end

@@ -63,7 +63,7 @@ describe Bra::Models::ModelObject do
         before(:each) { subject.move_to(old_parent, :test) }
 
         it 'calls #remove_child on the previous parent' do
-          old_parent.should_receive(:remove_child).once.with(:test_id)
+          expect(old_parent).to receive(:remove_child).once.with(:test_id)
 
           subject.move_to(nil, :test)
         end
@@ -106,17 +106,17 @@ describe Bra::Models::ModelObject do
     context 'when the receiving parent can have children' do
       context 'and the object has no parent' do
         it 'calls #can_have_children? on the receiving parent' do
-          new_parent.should_receive(:can_have_children?).once
+          expect(new_parent).to receive(:can_have_children?).once
 
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #add_child on the receiving parent' do
-          new_parent.should_receive(:add_child).with(:test_id, subject)
+          expect(new_parent).to receive(:add_child).with(:test_id, subject)
 
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #id_function on the receiving parent' do
-          new_parent.should_receive(:id_function).with(subject)
+          expect(new_parent).to receive(:id_function).with(subject)
 
           subject.move_to(new_parent, :test_id)
         end
@@ -127,29 +127,29 @@ describe Bra::Models::ModelObject do
       end
       context 'and the object already has a parent' do
         before(:each) do
-          old_parent.should_receive(:id_function).once.and_return(
+          expect(old_parent).to receive(:id_function).once.and_return(
             proc { :test_id }
           )
           subject.move_to(old_parent, :test_id)
         end
 
         it 'calls #can_have_children? on the receiving parent' do
-          new_parent.should_receive(:can_have_children?).once
+          expect(new_parent).to receive(:can_have_children?).once
 
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #add_child on the receiving parent' do
-          new_parent.should_receive(:add_child).with(:test_id, subject).once
+          expect(new_parent).to receive(:add_child).with(:test_id, subject).once
 
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #id_function on the receiving parent' do
-          new_parent.should_receive(:id_function).with(subject).once
+          expect(new_parent).to receive(:id_function).with(subject).once
 
           subject.move_to(new_parent, :test_id)
         end
         it 'calls #remove_child on the previous parent' do
-          old_parent.should_receive(:remove_child).with(:test_id).once
+          expect(old_parent).to receive(:remove_child).with(:test_id).once
 
           subject.move_to(new_parent, :test_id)
         end
@@ -169,7 +169,7 @@ describe Bra::Models::ModelObject do
     context 'when the object has been moved to a parent' do
       it 'returns the result of calling the ID function given by the parent' do
         procedure = double(:proc)
-        procedure.should_receive(:call).once.and_return(:test_id)
+        expect(procedure).to receive(:call).once.and_return(:test_id)
         allow(new_parent).to receive(:id_function).and_return(procedure)
 
         subject.move_to(new_parent, :test123)
@@ -186,7 +186,7 @@ describe Bra::Models::ModelObject do
       it 'calls channel#push with a tuple of itself and the given item' do
         channel = double('channel')
         subject.register_update_channel(channel)
-        channel.should_receive(:push).with([subject, :repr])
+        expect(channel).to receive(:push).with([subject, :repr])
 
         subject.notify_channel(:repr)
       end
@@ -196,8 +196,8 @@ describe Bra::Models::ModelObject do
   describe '#fail_if_cannot' do
     context 'when given a valid privilege set and operation' do
       it 'calls #require on the privileges set with the handler target' do
-        ( privilege_set
-          .should_receive(:require).once
+        ( expect(privilege_set)
+          .to receive(:require).once
           .with(operation, subject.handler_target)
         )
 
@@ -209,8 +209,8 @@ describe Bra::Models::ModelObject do
   describe '#can?' do
     context 'when given a valid privilege set and operation' do
       it 'calls #has? on the privileges set with the handler target' do
-        ( privilege_set
-          .should_receive(:has?).once
+        ( expect(privilege_set)
+          .to receive(:has?).once
           .with(operation, subject.handler_target)
         )
 

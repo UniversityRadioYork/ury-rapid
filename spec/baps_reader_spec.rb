@@ -6,7 +6,7 @@ describe Bra::Baps::Reader do
   let(:callback) { double(:callback) }
 
   before(:each) do
-    callback.should_receive(:test).with(value).once
+    expect(callback).to receive(:test).with(value).once
   end
 
   describe '#uint16' do

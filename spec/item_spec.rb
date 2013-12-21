@@ -56,7 +56,7 @@ describe Bra::Models::Item do
       end
 
       it 'notifies the channel' do
-        channel.should_receive(:push).with([subject, nil]).once
+        expect(channel).to receive(:push).with([subject, nil]).once
 
         subject.driver_delete
       end
