@@ -159,7 +159,14 @@ module Bra
       #
       # @return [Array] A tuple of the target ID and direct object.
       def flatten_payload
-        @payload.is_a?(Hash) ? @payload.flatten : [@default_id, @payload]
+        id_mapped_payload? ? @payload.flatten : [@default_id, @payload]
+      end
+
+      # Determines whether a payload is a map from an ID to a payload body
+      #
+      # @return [Boolean] True if the payload is an ID-map, false otherwise.
+      def id_mapped_payload?
+        @payload.is_a?(Hash) && @payload.size == 1
       end
     end
   end
