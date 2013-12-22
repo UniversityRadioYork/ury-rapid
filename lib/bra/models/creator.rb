@@ -1,5 +1,5 @@
 require 'bra/models/variable'
-require 'bra/models/set'
+require 'bra/models/composite'
 
 module Bra
   module Models
@@ -55,7 +55,7 @@ module Bra
 
       # Creates a Set with the given handler target and ID
       def set(id, handler_target, &block)
-        child(id, Set.new(handler_target), &block)
+        child(id, HashModelObject.new(handler_target), &block)
       end
 
       def class_to_set_target(member_class)

@@ -1,5 +1,4 @@
-require 'bra/models/set'
-require 'bra/models/variable'
+require 'bra/models/creator'
 
 module Bra
   module Baps

@@ -107,8 +107,8 @@ module Bra
       def_delegator :@children, :[]=, :add_child
       def_delegator :@children, :delete, :remove_child
 
-      def initialize
-        super()
+      def initialize(*args)
+        super(*args)
         @children = {}
       end
 
@@ -174,8 +174,8 @@ module Bra
       def_delegator :@children, :each
       def_delegator :@children, :size
 
-      def initialize
-        super()
+      def initialize(*args)
+        super(*args)
         @children = []
       end
 
