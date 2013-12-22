@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'bra/model/model_object'
+require 'bra/model'
 
 describe Bra::Model::ModelObject do
   subject { Bra::Model::ModelObject.new(target) }
