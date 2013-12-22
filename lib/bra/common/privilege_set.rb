@@ -22,7 +22,7 @@ module Bra
       end
 
       # Requires a certain privilege on a certain target
-      def require(privilege, target)
+      def require(target, privilege)
         fail(
           Bra::Common::Exceptions::InsufficientPrivilegeError
         ) unless has?(target, privilege)
