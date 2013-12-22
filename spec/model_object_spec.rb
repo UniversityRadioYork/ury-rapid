@@ -28,23 +28,23 @@ describe Bra::Model::ModelObject do
   # ModelObject, it should fail.
 
   describe '#add_child' do
-    it('fails') { expect { subject.add_child(child) }.to raise_error }
+    specify { expect { subject.add_child(child) }.to raise_error }
   end
 
   describe '#remove_child' do
-    it('fails') { expect { subject.remove_child(child) }.to raise_error }
+    specify { expect { subject.remove_child(child) }.to raise_error }
   end
 
   describe '#children' do
-    it('returns nil') { expect(subject.children).to be_nil }
+    specify { expect(subject.children).to be_nil }
   end
 
   describe '#child_hash' do
-    it('returns the empty hash') { expect(subject.child_hash).to eq({}) }
+    specify { expect(subject.child_hash).to eq({}) }
   end
 
   describe '#can_have_children?' do
-    it('returns false') { expect(subject.can_have_children?).to be_false }
+    specify { expect(subject.can_have_children?).to be_false }
   end
 
   describe '#move_to' do
@@ -88,14 +88,14 @@ describe Bra::Model::ModelObject do
       end
 
       context 'and the object has no parent' do
-        it 'fails' do
+        specify do
           expect { subject.move_to(new_parent, :test_id) }.to raise_error
         end
       end
       context 'and the object has a parent' do
         before(:each) { subject.move_to(old_parent, :old) }
 
-        it 'fails' do
+        specify do
           expect { subject.move_to(new_parent, :test_id) }.to raise_error
         end
 
@@ -168,7 +168,7 @@ describe Bra::Model::ModelObject do
 
   describe '#id' do
     context 'when the object has not been moved to a parent' do
-      it('returns nil') { expect(subject.id).to be_nil }
+      specify { expect(subject.id).to be_nil }
     end
     context 'when the object has been moved to a parent' do
       it 'returns the result of calling the ID function given by the parent' do
@@ -184,7 +184,7 @@ describe Bra::Model::ModelObject do
 
   describe '#notify_channel' do
     context 'when there is no update channel' do
-      it('fails') { expect { subject.notify_channel(:repr) }.to raise_error }
+      specify { expect { subject.notify_channel(:repr) }.to raise_error }
     end
     context 'when there is an update channel' do
       it 'calls channel#push with a tuple of itself and the given item' do
@@ -224,21 +224,21 @@ describe Bra::Model::ModelObject do
   end
 
   describe '#driver_put' do
-    it('fails with NotSupportedByBra') do
+    specify do
       expect { subject.driver_put(:foo) }.to raise_error(
         Bra::Common::Exceptions::NotSupportedByBra
       )
     end
   end
   describe '#driver_post' do
-    it('fails with NotSupportedByBra') do
+    specify do
       expect { subject.driver_post(:foo, :bar) }.to raise_error(
         Bra::Common::Exceptions::NotSupportedByBra
       )
     end
   end
   describe '#driver_delete' do
-    it('fails with NotSupportedByBra') do
+    specify do
       expect { subject.driver_delete }.to raise_error(
         Bra::Common::Exceptions::NotSupportedByBra
       )

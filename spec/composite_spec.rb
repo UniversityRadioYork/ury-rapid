@@ -1,7 +1,6 @@
 require 'spec_helper'
 
-require 'bra/model/composite'
-require 'bra/model/variable'
+require 'bra/model'
 
 describe Bra::Model::HashModelObject do
   subject { Bra::Model::HashModelObject.new(target) }
@@ -81,9 +80,7 @@ describe Bra::Model::HashModelObject do
       end
     end
     context 'with an unused ID' do
-      it 'returns nil' do
-        expect(subject.child(42)).to be_nil
-      end
+      specify { expect(subject.child(42)).to be_nil }
     end
   end
 
@@ -100,9 +97,7 @@ describe Bra::Model::HashModelObject do
       end
     end
     context 'without a block' do
-      it 'returns an enumerator' do
-        expect(subject.each).to be_an(Enumerator)
-      end
+      specify { expect(subject.each).to be_an(Enumerator) }
     end
   end
 
@@ -221,9 +216,7 @@ describe Bra::Model::ListModelObject do
       end
     end
     context 'with an unused ID' do
-      it 'returns nil' do
-        expect(subject.child(42)).to be_nil
-      end
+      specify { expect(subject.child(42)).to be_nil }
     end
     context 'with an invalid ID' do
       it 'returns nil' do
@@ -246,9 +239,7 @@ describe Bra::Model::ListModelObject do
       end
     end
     context 'without a block' do
-      it 'returns an enumerator' do
-        expect(subject.each).to be_an(Enumerator)
-      end
+      specify { expect(subject.each).to be_an(Enumerator) }
     end
   end
 end
