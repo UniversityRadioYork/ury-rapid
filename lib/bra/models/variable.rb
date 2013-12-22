@@ -2,7 +2,7 @@ require 'bra/models/model_object'
 
 module Bra
   module Models
-    # A model object containing a constant value.
+    # A model object containing a constant value
     #
     # This is effectively a thin wrapper over a value, granting the ability to
     # treat it as a ModelObject while allowing any methods Constant doesn't
@@ -10,12 +10,13 @@ module Bra
     class Constant < ModelObject
       extend Forwardable
 
-      attr_reader :value
-
-      # The flat representation of a Constant is its value.
-      alias_method :flat, :value
-
-      # Initialises the Constant object.
+      # Initialises the Constant
+      #
+      # @api public
+      # @example  Initialising a Constant with the default handler target
+      #   Constant.new(:value)
+      # @example  Initialising a Constant with a specific handler target
+      #   Constant.new(:value, :target)
       #
       # @param value [Object] The value of the constant.
       # @param handler_target [Symbol] The handler target of the constant (for
@@ -25,6 +26,18 @@ module Bra
         @value = value
         @handler_target = handler_target
       end
+
+      # Returns the current value of this Constant
+      #
+      # @api public
+      # @example  Retrieving a Constant's value.
+      #   const = Constant.new(:spoon)
+      #   const.value
+      #   #=> :spoon
+      #
+      # @return [Object]  The Constant's internal value.
+      attr_reader :value
+      alias_method :flat, :value
 
       def_delegator :@value, :public_send, :method_missing
       def_delegator :@value, :respond_to?, :respond_to_missing?
@@ -38,9 +51,6 @@ module Bra
     # track of its initial value, to which it will be set if DELETEd by the
     # driver.
     class Variable < Constant
-      # Allows direct read access to the initial value
-      attr_reader :initial_value
-
       # Initialises a Variable
       #
       # @api public
@@ -100,6 +110,19 @@ module Bra
       def driver_delete
         driver_put(initial_value)
       end
+
+      # Returns the initial value of this Variable
+      #
+      # This is the value the Variable will assume after a #driver_delete.
+      #
+      # @api public
+      # @example  Retrieving a Variable's initial value.
+      #   var = Variable.new(:fork, nil)
+      #   var.initial_value
+      #   #=> :fork
+      #
+      # @return [Object]  The Constant's internal value.
+      attr_reader :initial_value
 
       private
 
