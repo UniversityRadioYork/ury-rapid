@@ -4,6 +4,8 @@ require 'bra/models/composite'
 require 'bra/models/variable'
 
 describe Bra::Models::HashModelObject do
+  subject { Bra::Models::HashModelObject.new(target) }
+  let(:target) { nil }
   let(:object1) { Bra::Models::Constant.new(:test1) }
   let(:object2) { Bra::Models::Constant.new(:test2) }
   let(:object3) { Bra::Models::Constant.new(:test3) }
@@ -116,6 +118,20 @@ describe Bra::Models::HashModelObject do
         object1.move_to(subject, :wozniak)
         idf = subject.id_function(object1)
         expect(idf.call).to eq(:wozniak)
+      end
+    end
+  end
+
+  describe '#handler_target' do
+    context 'when the handler_target is nil' do
+      it 'returns the relative, underscored class name as a symbol' do
+        expect(subject.handler_target).to eq(:hash_model_object)
+      end
+    end
+    context 'when the handler_target is defined' do
+      let(:target) { :angry_anderson }
+      it 'returns that handler_target' do
+        expect(subject.handler_target).to eq(:angry_anderson)
       end
     end
   end
