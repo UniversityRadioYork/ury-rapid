@@ -55,6 +55,15 @@ module Bra
       #
       # @api public
       # @example  Initialising a Variable with no validator.
+      #   var = Variable.new(:initial_value, nil)
+      # @example  Initialising a Variable with a validator.
+      #   var = Variable.new(:initial_value, validator)
+      # @example  Initialising a Variable with no validator and a specific
+      # handler target.
+      #   var = Variable.new(:initial_value, nil, :target)
+      # @example  Initialising a Variable with a validator and specific
+      # handler target.
+      #   var = Variable.new(:initial_value, validator, :target)
       #
       # @param initial_value [Object]  The initial value for the Variable.
       # @param validator [Object] - A callable that, given a new value, will
