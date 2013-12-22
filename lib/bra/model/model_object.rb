@@ -231,14 +231,22 @@ module Bra
         @id_function = @parent.try { |parent| parent.id_function(self) }
       end
 
-      # The canonical URL of this model object.
+      # The current URL of this model object with respect to its root
       #
-      # This is effectively the result of postfixing this object's ID to the
-      # canonical URL of its parent.
+      # The URL is recursively defined: the base case is '' for objects with
+      # no parent, and objects with parents take the URL "#{parent_url}/#{id}".
+      #
+      # @api public
+      # @example  Get the URL of an object with no parent
+      #   orphan.url
+      #   #=> ''
+      # @example  Get the URL of an object with a parent
+      #   parented.url
+      #   #=> ''
       #
       # @return [String] The URL.
       def url
-        [parent_url, id].join('/')
+        parent.nil? ? '' : [parent_url, id].join('/')
       end
 
       def_delegator :@parent, :id, :parent_id

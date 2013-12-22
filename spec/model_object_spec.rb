@@ -23,6 +23,10 @@ describe Bra::Model::ModelObject do
     allow(new_parent).to receive(:can_have_children?).and_return(:true)
   end
 
+  #
+  # Composite interface
+  #
+
   # ModelObjects should implement the composite interface as far as reading
   # goes; if anything attempts to add or remove a child on a plain
   # ModelObject, it should fail.
@@ -46,6 +50,61 @@ describe Bra::Model::ModelObject do
   describe '#can_have_children?' do
     specify { expect(subject.can_have_children?).to be_false }
   end
+
+  #
+  # URLs and IDs
+  #
+
+  describe '#url' do
+    context 'when the object has not been moved to a parent' do
+      specify { expect(subject.url).to eq '' }
+    end
+    context 'when the object has been moved to a parent' do
+      before(:each) do
+        subject.move_to(new_parent, nil)
+        allow(new_parent).to receive(:url)
+      end
+
+      it 'calls #id' do
+        allow(subject).to receive(:id)
+        expect(subject).to receive(:id).once
+
+        subject.url
+      end
+      it 'calls #url recursively on its parent' do
+        expect(new_parent).to receive(:url).once
+
+        subject.url
+      end
+      it 'is equal to the joining of the parent URL and ID with a slash' do
+        allow(subject).to receive(:id).and_return(:woof)
+        allow(new_parent).to receive(:url).and_return('dog/goes')
+
+        expect(subject.url).to eq('dog/goes/woof')
+      end
+    end
+  end
+
+  describe '#id' do
+    context 'when the object has not been moved to a parent' do
+      specify { expect(subject.id).to be_nil }
+    end
+    context 'when the object has been moved to a parent' do
+      it 'returns the result of calling the ID function given by the parent' do
+        procedure = double(:proc)
+        expect(procedure).to receive(:call).once.and_return(:test_id)
+        allow(new_parent).to receive(:id_function).and_return(procedure)
+
+        subject.move_to(new_parent, :test123)
+        expect(subject.id).to eq(:test_id)
+      end
+    end
+  end
+
+
+  #
+  # Moving children
+  #
 
   describe '#move_to' do
     context 'when the receiving parent is nil' do
@@ -162,22 +221,6 @@ describe Bra::Model::ModelObject do
           subject.move_to(new_parent, :test_id)
           expect(subject.parent).to be(new_parent)
         end
-      end
-    end
-  end
-
-  describe '#id' do
-    context 'when the object has not been moved to a parent' do
-      specify { expect(subject.id).to be_nil }
-    end
-    context 'when the object has been moved to a parent' do
-      it 'returns the result of calling the ID function given by the parent' do
-        procedure = double(:proc)
-        expect(procedure).to receive(:call).once.and_return(:test_id)
-        allow(new_parent).to receive(:id_function).and_return(procedure)
-
-        subject.move_to(new_parent, :test123)
-        expect(subject.id).to eq(:test_id)
       end
     end
   end

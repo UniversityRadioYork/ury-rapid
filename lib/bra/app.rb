@@ -5,7 +5,7 @@ require 'yaml'
 
 require 'bra/common/config_authenticator'
 require 'bra/common/constants'
-require 'bra/model/creator'
+require 'bra/model'
 require 'bra/server/launcher'
 
 module Bra

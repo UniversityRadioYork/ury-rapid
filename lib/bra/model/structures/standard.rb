@@ -1,9 +1,5 @@
 require 'bra/common/types'
-require 'bra/model/creator'
-require 'bra/model/model'
-require 'bra/model/player'
-require 'bra/model/playlist'
-require 'bra/model/variable'
+require 'bra/model'
 
 # A normal model structure
 #
@@ -17,7 +13,7 @@ class Structure < Bra::Model::Creator
   #
   # @return [Root]  The finished model.
   def create
-    root Bra::Model::Root do
+    root(Bra::Model::HashModelObject.new(:root)) do
       set_of(:players, Bra::Model::Player, option(:players)) { player }
       set_of(:playlists, Bra::Model::Playlist, option(:playlists))
       info :info

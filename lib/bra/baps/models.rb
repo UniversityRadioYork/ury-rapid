@@ -2,12 +2,12 @@ require 'bra/model/creator'
 
 module Bra
   module Baps
-    # Model objects specific to BAPS.
+    # Model objects specific to BAPS
     #
     # The BAPS module exposes its own custom model tree in the x-baps/ section
     # of BRA's URL hierarchy, containing information specific to the BAPS
     # playout system.
-    module Models
+    module Model
       # Object that creates the BAPS model set, given a model root and config.
       class Creator < Bra::Model::Creator
         def initialize(model_config, baps_config)
