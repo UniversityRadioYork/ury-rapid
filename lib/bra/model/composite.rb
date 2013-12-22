@@ -3,10 +3,10 @@ require 'active_support/core_ext/object/try'
 
 require 'bra/common/exceptions'
 require 'bra/common/hash'
-require 'bra/models/model_object'
+require 'bra/model/model_object'
 
 module Bra
-  module Models
+  module Model
     # A model object which contains children
     #
     # This should be subclassed to provide the actual child structure (hash,

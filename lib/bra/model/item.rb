@@ -1,10 +1,10 @@
 require 'active_support/core_ext/hash/keys'
 
 require 'bra/common/types'
-require 'bra/models/model_object'
+require 'bra/model/model_object'
 
 module Bra
-  module Models
+  module Model
     # An item in the playout system.
     class Item < ModelObject
       include Bra::Common::Types::Validators

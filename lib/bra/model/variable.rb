@@ -1,7 +1,7 @@
-require 'bra/models/model_object'
+require 'bra/model/model_object'
 
 module Bra
-  module Models
+  module Model
     # A model object containing a constant value
     #
     # This is effectively a thin wrapper over a value, granting the ability to

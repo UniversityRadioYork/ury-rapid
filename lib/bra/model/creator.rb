@@ -1,8 +1,8 @@
-require 'bra/models/variable'
-require 'bra/models/composite'
+require 'bra/model/variable'
+require 'bra/model/composite'
 
 module Bra
-  module Models
+  module Model
     # Option-based creator for models
     #
     # This performs dependency injection and ensures any model modification

@@ -1,4 +1,4 @@
-require 'bra/models/creator'
+require 'bra/model/creator'
 
 module Bra
   module Baps
@@ -9,7 +9,7 @@ module Bra
     # playout system.
     module Models
       # Object that creates the BAPS model set, given a model root and config.
-      class Creator < Bra::Models::Creator
+      class Creator < Bra::Model::Creator
         def initialize(model_config, baps_config)
           super(model_config)
           @baps_config = baps_config

@@ -1,10 +1,10 @@
 require 'bra/common/hash'
-require 'bra/models/composite'
-require 'bra/models/item'
-require 'bra/models/variable'
+require 'bra/model/composite'
+require 'bra/model/item'
+require 'bra/model/variable'
 
 module Bra
-  module Models
+  module Model
     # A player in the model, which represents a channel's currently playing
     # song and its state.
     class Player < HashModelObject

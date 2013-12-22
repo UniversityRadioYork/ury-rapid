@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require 'bra/models/model_object'
+require 'bra/model/model_object'
 
-describe Bra::Models::ModelObject do
-  subject { Bra::Models::ModelObject.new(target) }
+describe Bra::Model::ModelObject do
+  subject { Bra::Model::ModelObject.new(target) }
   let(:target) { nil }
   let(:old_parent) { double(:old_parent) }
   let(:new_parent) { double(:new_parent) }

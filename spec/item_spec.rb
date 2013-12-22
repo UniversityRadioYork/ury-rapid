@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-require 'bra/models/item'
-require 'bra/models/composite'
+require 'bra/model/item'
+require 'bra/model/composite'
 
-describe Bra::Models::Item do
+describe Bra::Model::Item do
   subject do
-    Bra::Models::Item.new(type, name, origin, duration)
+    Bra::Model::Item.new(type, name, origin, duration)
   end
   let(:type) { :library }
   let(:name) { 'Brown Girl In The Ring' }
@@ -39,7 +39,7 @@ describe Bra::Models::Item do
   end
   describe '#driver_delete' do
     context 'when the Item is in a parent object' do
-      let(:parent) { Bra::Models::Playlist.new }
+      let(:parent) { Bra::Model::Playlist.new }
       let(:channel) { double(:channel) }
 
       before(:each) do
@@ -70,7 +70,7 @@ describe Bra::Models::Item do
   end
 
   describe '#driver_put' do
-    let(:parent) { Bra::Models::Playlist.new }
+    let(:parent) { Bra::Model::Playlist.new }
 
     it 'calls #driver_post on the parent with its current ID' do
       payload = double(:payload)

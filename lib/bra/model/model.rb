@@ -1,9 +1,9 @@
-require 'bra/models/item'
-require 'bra/models/model_object'
-require 'bra/models/player'
+require 'bra/model/item'
+require 'bra/model/model_object'
+require 'bra/model/player'
 
 module Bra
-  module Models
+  module Model
     # Public: A model of the BAPS server state.
     class Root < HashModelObject
       # Returns the canonical URL of the model channel list

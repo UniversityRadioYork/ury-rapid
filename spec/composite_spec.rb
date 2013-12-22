@@ -1,16 +1,16 @@
 require 'spec_helper'
 
-require 'bra/models/composite'
-require 'bra/models/variable'
+require 'bra/model/composite'
+require 'bra/model/variable'
 
-describe Bra::Models::HashModelObject do
-  subject { Bra::Models::HashModelObject.new(target) }
+describe Bra::Model::HashModelObject do
+  subject { Bra::Model::HashModelObject.new(target) }
   let(:target) { nil }
-  let(:object1) { Bra::Models::Constant.new(:test1) }
-  let(:object2) { Bra::Models::Constant.new(:test2) }
-  let(:object3) { Bra::Models::Constant.new(:test3) }
-  let(:object4) { Bra::Models::Constant.new(:test4) }
-  let(:object5) { Bra::Models::Constant.new(:test5) }
+  let(:object1) { Bra::Model::Constant.new(:test1) }
+  let(:object2) { Bra::Model::Constant.new(:test2) }
+  let(:object3) { Bra::Model::Constant.new(:test3) }
+  let(:object4) { Bra::Model::Constant.new(:test4) }
+  let(:object5) { Bra::Model::Constant.new(:test5) }
 
   describe '#initialize' do
     it 'initialises with no children' do
@@ -137,12 +137,12 @@ describe Bra::Models::HashModelObject do
   end
 end
 
-describe Bra::Models::ListModelObject do
-  let(:object1) { Bra::Models::Constant.new(:test1) }
-  let(:object2) { Bra::Models::Constant.new(:test2) }
-  let(:object3) { Bra::Models::Constant.new(:test3) }
-  let(:object4) { Bra::Models::Constant.new(:test4) }
-  let(:object5) { Bra::Models::Constant.new(:test5) }
+describe Bra::Model::ListModelObject do
+  let(:object1) { Bra::Model::Constant.new(:test1) }
+  let(:object2) { Bra::Model::Constant.new(:test2) }
+  let(:object3) { Bra::Model::Constant.new(:test3) }
+  let(:object4) { Bra::Model::Constant.new(:test4) }
+  let(:object5) { Bra::Model::Constant.new(:test5) }
 
   describe '#initialize' do
     it 'initialises with no children' do

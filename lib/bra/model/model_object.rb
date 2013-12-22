@@ -2,7 +2,7 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
 
 module Bra
-  module Models
+  module Model
     # An object in the bra playout system model.
     #
     # ModelObjects are composable entities, each assigned an ID by its parent,

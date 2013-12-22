@@ -1,25 +1,25 @@
 require 'bra/common/types'
-require 'bra/models/creator'
-require 'bra/models/model'
-require 'bra/models/player'
-require 'bra/models/playlist'
-require 'bra/models/variable'
+require 'bra/model/creator'
+require 'bra/model/model'
+require 'bra/model/player'
+require 'bra/model/playlist'
+require 'bra/model/variable'
 
 # A normal model structure
 #
 # This contains:
 #   - A player set, with IDs set in the model config under 'players'
 #   - A playlist set, with IDs set in the model config under 'playlists'
-class Structure < Bra::Models::Creator
+class Structure < Bra::Model::Creator
   include Bra::Common::Types::Validators
 
   # Create the model from the given configuration
   #
   # @return [Root]  The finished model.
   def create
-    root Bra::Models::Root do
-      set_of(:players, Bra::Models::Player, option(:players)) { player }
-      set_of(:playlists, Bra::Models::Playlist, option(:playlists))
+    root Bra::Model::Root do
+      set_of(:players, Bra::Model::Player, option(:players)) { player }
+      set_of(:playlists, Bra::Model::Playlist, option(:playlists))
       info :info
     end
   end

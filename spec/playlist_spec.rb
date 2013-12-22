@@ -1,12 +1,12 @@
 require 'spec_helper.rb'
 
-require 'bra/models/playlist'
-require 'bra/models/item'
+require 'bra/model/playlist'
+require 'bra/model/item'
 
-describe Bra::Models::Playlist do
-  let(:test1)    { Bra::Models::Item.new(:library, '1', nil, nil) }
-  let(:test2)    { Bra::Models::Item.new(:library, '2', nil, nil) }
-  let(:test3)    { Bra::Models::Item.new(:library, '3', nil, nil) }
+describe Bra::Model::Playlist do
+  let(:test1)    { Bra::Model::Item.new(:library, '1', nil, nil) }
+  let(:test2)    { Bra::Model::Item.new(:library, '2', nil, nil) }
+  let(:test3)    { Bra::Model::Item.new(:library, '3', nil, nil) }
 
   let(:channel) { double(:channel) }
   let(:handler) { double(:handler) }

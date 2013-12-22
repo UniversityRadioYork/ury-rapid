@@ -44,7 +44,7 @@ class Driver
     # trigger BAPS commands.
     config = @requester.configure_model(init_config)
     config[:extensions] = [] unless config.key?(:extensions)
-    config[:extensions] << Bra::Baps::Models::Creator.new(config, @config)
+    config[:extensions] << Bra::Baps::Model::Creator.new(config, @config)
     config
   end
 

@@ -173,7 +173,7 @@ module Bra
           #
           # @return [Item] The item
           def make_item
-            Bra::Models::Item.new(
+            Bra::Model::Item.new(
               type_as_bra_symbol, @title, @origin, @duration
             )
           end

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require 'bra/models/variable'
+require 'bra/model/variable'
 
-describe Bra::Models::Variable do
-  subject { Bra::Models::Variable.new(initial_value, validator, target) }
+describe Bra::Model::Variable do
+  subject { Bra::Model::Variable.new(initial_value, validator, target) }
   let(:initial_value) { 'sample' }
   let(:validator) { double(:validator) }
   let(:target) { nil }
