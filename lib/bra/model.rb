@@ -1,10 +1,10 @@
 require 'bra/model/composite'
 require 'bra/model/creator'
 require 'bra/model/item'
-require 'bra/model/model'
 require 'bra/model/model_object'
 require 'bra/model/player'
 require 'bra/model/playlist'
+require 'bra/model/root'
 require 'bra/model/variable'
 
 module Bra

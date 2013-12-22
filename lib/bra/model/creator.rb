@@ -1,5 +1,4 @@
-require 'bra/model/variable'
-require 'bra/model/composite'
+require 'bra/model'
 
 module Bra
   module Model
