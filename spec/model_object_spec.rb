@@ -3,6 +3,8 @@ require 'spec_helper'
 require 'bra/models/model_object'
 
 describe Bra::Models::ModelObject do
+  subject { Bra::Models::ModelObject.new(target) }
+  let(:target) { nil }
   let(:old_parent) { double(:old_parent) }
   let(:new_parent) { double(:new_parent) }
   let(:child) { double(:child) }
@@ -240,6 +242,22 @@ describe Bra::Models::ModelObject do
       expect { subject.driver_delete }.to raise_error(
         Bra::Common::Exceptions::NotSupportedByBra
       )
+    end
+  end
+
+  describe '#handler_target' do
+    context 'when the subject is not a subclass' do
+      context 'and and handler_target is nil' do
+        it 'returns the relative, underscored class name as a symbol' do
+          expect(subject.handler_target).to eq(:model_object)
+        end
+      end
+      context 'and the handler_target is defined' do
+        let(:target) { :arsenic_catnip }
+        it 'returns that handler_target' do
+          expect(subject.handler_target).to eq(:arsenic_catnip)
+        end
+      end
     end
   end
 end

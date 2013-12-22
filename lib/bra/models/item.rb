@@ -6,7 +6,7 @@ require 'bra/models/model_object'
 module Bra
   module Models
     # An item in the playout system.
-    class Item < SingleModelObject
+    class Item < ModelObject
       include Bra::Common::Types::Validators
 
       attr_reader :name

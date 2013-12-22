@@ -18,17 +18,46 @@ module Bra
     class ModelObject
       extend Forwardable
 
-      # Public: Allows read access to the object's parent.
       attr_reader :parent
 
-      def initialize
+      # Initialises the ModelObject
+      #
+      # @api public
+      # @example  Initialises a ModelObject with the default handler target.
+      #   ModelObject.new
+      # @example  Initialises a ModelObject with a specific handler target.
+      #   ModelObject.new(:specific_target)
+      #
+      # @param handler_target [Symbol]  The symbol that identifies this
+      #   ModelObject to driver handlers, the permissions system and other
+      #   such parts of bra.  May be nil: see #handler_target for the
+      #   behaviour in this case.
+      def initialize(handler_target = nil)
         @parent = nil
         @id = nil
         @handler = nil
         @update_channel = nil
+        @handler_target = handler_target
       end
 
       # Gets this object's current ID
+      #
+      # The ID of a model object identifies it within its parent; the
+      # hierarchy of IDs for objects and their successive parents forms the
+      # URL of the model in the API space.
+      #
+      # The ID may be changed by the parent at any point in time.  For example,
+      # for playlist items, the ID is their current index in the playlist; when
+      # a playlist item is deleted, the IDs of the items after it will be
+      # reduced by one.
+      #
+      # @api public
+      # @example  Get the ID of a playlist object.
+      #   item.id
+      #   #=>5
+      #
+      # @return [Object]  The current ID of the object.  Typically, this is a
+      #   Symbol or Integer.
       def id
         @id_function.try(:call)
       end
@@ -37,6 +66,13 @@ module Bra
       #
       # By default, this returns false.  Objects that support add_child and
       # remove_child should override this to return true.
+      #
+      # @api semipublic
+      # @example  Checks whether a normal ModelObject can have children.
+      #   object.can_have_children?
+      #   #=> false
+      #
+      # @return [Boolean]  false.
       def can_have_children?
         false
       end
@@ -208,42 +244,28 @@ module Bra
       def_delegator :@parent, :id, :parent_id
       def_delegator :@parent, :url, :parent_url
 
-      # The name under which this object's handlers are defined
+      # The identifier used to find handlers and privileges for this object
       #
-      # Usually this will be class name, stripped of its module prefix and
-      # converted to a lowercase_underscore symbol.  This may be overridden for
-      # objects with the same class but different handlers (for example,
-      # variables).
+      # When @handler_target is nil (the default), this is the class name,
+      # stripped of its module and converted  to a lowercase_underscored
+      # Symbol.  If @handler_target is specified, however, that will be
+      # returned instead.
       #
-      # @api semipublic
-      #
-      # @example Get the handler target.
+      # @api public
+      # @example  Get the default handler target.
       #   ModelObject.new.handler_target
-      #   #=> model_object
+      #   #=> :model_object
+      # @example  Get a specified handler target.
+      #   ModelObject.new(:widget).handler_target
+      #   #=> :widget
       #
-      # @return [Symbol] The handler target.
+      # @return [Symbol]  The handler target for this object.
       def handler_target
-        self.class.name.demodulize.underscore.intern
+        @handler_target || self.class.name.demodulize.underscore.intern
       end
 
       # Returns the default ID to give to POST payloads
       def default_id
-        nil
-      end
-    end
-
-    # A model object that does not have children.
-    class SingleModelObject < ModelObject
-      def children
-        nil
-      end
-
-      # Responds to any request for a child with nil.
-      #
-      # This is because SingleModelObject has no children.
-      #
-      # @return [NilClass] nil.
-      def child(_)
         nil
       end
     end
