@@ -160,11 +160,6 @@ module Bra
         end
       end
 
-      # Renders an API Inspector instance using HAML.
-      def inspector_haml(inspector)
-        haml(inspector.resource_type, locals: { inspector: inspector })
-      end
-
       def model_traversal_with_payload(action)
         model_traversal do |target|
           payload = make_payload(action, privilege_set, request, target)

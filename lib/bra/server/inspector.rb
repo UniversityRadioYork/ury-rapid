@@ -18,6 +18,13 @@ module Bra
           }
         )
       end
+
+      # Renders an API Inspector instance using HAML.
+      def inspector_haml(inspector)
+        haml(inspector.resource_type, locals: { inspector: inspector })
+      rescue Errno::ENOENT
+        haml(inspector.resource_general_type, locals: { inspector: inspector })
+      end
     end
 
     # An instance of the API Inspector
@@ -57,7 +64,11 @@ module Bra
 
       # Retrieves the type of the target
       def resource_type
-        type_symbol(@target)
+        json? ? :json : @target.handler_target
+      end
+
+      def resource_general_type
+        @target.class.name.demodulize.underscore.intern
       end
 
       def_delegator :@target, :url, :resource_url
@@ -74,11 +85,6 @@ module Bra
       # Retrieves a map of child IDs to their resource type
       def resource_child_types
         @resource_child_types = target.child_hash.map(&method(:type_symbol))
-      end
-
-      # Returns the type symbol of a model object
-      def type_symbol(target)
-        json? ? :json : target.class.name.demodulize.underscore.intern
       end
 
       # @return [Boolean]  True if the request was for the JSON format of a
