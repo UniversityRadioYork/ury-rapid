@@ -182,7 +182,7 @@ module Bra
         flat
       end
 
-      %w{put post delete}.each do |action|
+      %i{put post delete}.each do |action|
         # Define payload-based server methods.
 
         define_method(action) do |payload|

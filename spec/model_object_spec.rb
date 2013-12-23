@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+require 'bra/common/payload'
 require 'bra/model'
 
 describe Bra::Model::ModelObject do
@@ -10,6 +11,7 @@ describe Bra::Model::ModelObject do
   let(:child) { double(:child) }
   let(:privilege_set) { double(:privilege_set) }
   let(:operation) { double(:operation) }
+  let(:handler) { double(:handler) }
 
   before(:each) do
     allow(old_parent).to receive(:add_child)
@@ -225,6 +227,10 @@ describe Bra::Model::ModelObject do
     end
   end
 
+  #
+  # Updates channel
+  #
+
   describe '#notify_channel' do
     context 'when there is no update channel' do
       specify { expect { subject.notify_channel(:repr) }.to raise_error }
@@ -265,6 +271,59 @@ describe Bra::Model::ModelObject do
       end
     end
   end
+
+  #
+  # Server actions
+  #
+
+  describe '#get' do
+    before(:each) { allow(subject).to receive(:flat) }
+
+    it 'calls #require on the privilege set' do
+      expect(privilege_set).to receive(:require).once.with(:get, :model_object)
+      subject.get(privilege_set)
+    end
+
+    context 'the PrivilegeSet does not raise an error in #require' do
+      it 'returns the flat representation' do
+        flat = double
+
+        allow(privilege_set).to receive(:require)
+        expect(subject).to receive(:flat).once.with(no_args).and_return(flat)
+        expect(subject.get(privilege_set)).to be(flat)
+      end
+    end
+  end
+
+  %i{put post delete}.each do |action|
+    describe "##{action}" do
+      let(:payload) { Bra::Common::Payload.new(:body, privilege_set) }
+      before(:each) do
+        subject.register_handler(handler)
+        allow(handler).to receive(action)
+      end
+
+      it 'calls #require on the privilege set' do
+        expect(privilege_set).to receive(:require).once.with(
+          action, :model_object
+        )
+        subject.send(action, payload)
+      end
+
+      context 'the PrivilegeSet does not raise an error in #require' do
+        it "calls ##{action} on the handler with the object and payload" do
+          allow(privilege_set).to receive(:require)
+
+          expect(handler).to receive(action).once.with(subject, payload)
+          subject.send(action, payload)
+        end
+      end
+    end
+  end
+
+  #
+  # Driver actions (these, by default, do nothing)
+  #
 
   describe '#driver_put' do
     specify do
