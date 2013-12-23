@@ -1,7 +1,7 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
 
-require 'bra/common/privilege_set'
+require 'kankri'
 
 module Bra
   module Model
@@ -19,7 +19,7 @@ module Bra
     # playout server actions, and a 'driver' form that bypasses these handlers.
     class ModelObject
       extend Forwardable
-      include Bra::Common::PrivilegeSubject
+      include Kankri::PrivilegeSubject
 
       attr_reader :parent
 

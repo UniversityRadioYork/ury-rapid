@@ -3,10 +3,10 @@ require 'eventmachine'
 require 'thin'
 require 'yaml'
 
-require 'bra/common/config_authenticator'
 require 'bra/common/constants'
 require 'bra/model'
 require 'bra/server'
+require 'kankri'
 
 module Bra
   # The main bra application
@@ -89,7 +89,7 @@ module Bra
 
     # Creates the authenticator for the server
     def authenticator(config)
-      Bra::Common::ConfigAuthenticator.new(config[:users])
+      Kankri::authenticator_from_hash(config[:users])
     end
   end
 end
