@@ -6,8 +6,7 @@ require 'sinatra/streaming'
 require 'sinatra-websocket'
 
 require 'bra/common/payload'
-require 'bra/server/inspector'
-require 'bra/server/updater'
+require 'bra/server'
 
 # Extends Sinatra's requests to include WebSocket extensions
 #
