@@ -1,3 +1,5 @@
+require 'kankri'
+
 module Bra
   module Server
     # Abstract method object that serves a client of the updates API
@@ -54,7 +56,7 @@ module Bra
     class StreamUpdater < Updater
       def initialize(model, stream, privileges)
         super(model)
-        @privileges = nil
+        @privileges = privileges
         @stream = stream
       end
 
@@ -108,7 +110,7 @@ module Bra
         new_privileges = @authenticator.call(username, password)
         @privileges = new_privileges
         send_json(type: :auth, username: username)
-      rescue Common::Exceptions::AuthenticationFailure
+      rescue Kankri::AuthenticationFailure
         error('Authentication failed.')
       end
     end

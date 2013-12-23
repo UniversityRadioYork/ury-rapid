@@ -8,6 +8,8 @@ require 'sinatra-websocket'
 require 'bra/common/payload'
 require 'bra/server'
 
+require 'kankri'
+
 # Extends Sinatra's requests to include WebSocket extensions
 #
 # This doesn't seem to happen by default in some cases.
@@ -16,7 +18,7 @@ class Sinatra::Request
 end
 
 module Bra
-  module Server
+module Server
     # The Sinatra application that powers the server component of bra
     class App < Sinatra::Base
       register Sinatra::Contrib
@@ -46,7 +48,7 @@ module Bra
       def privilege_set(suppress_error = false)
         credentials = get_credentials(rack_auth)
         @authenticator.authenticate(*credentials)
-      rescue Common::Exceptions::AuthenticationFailure
+      rescue Kankri::AuthenticationFailure
         not_authorised unless suppress_error
       end
 
@@ -60,7 +62,7 @@ module Bra
       end
 
       def fail_authentication
-        fail(Common::Exceptions::AuthenticationFailure)
+        fail(Kankri::AuthenticationFailure)
       end
 
       def has_credentials?(auth)
@@ -170,7 +172,7 @@ module Bra
       def model_traversal(&block)
         cors
         find(params, &block)
-      rescue Common::Exceptions::InsufficientPrivilegeError
+      rescue Kankri::InsufficientPrivilegeError
         forbidden
       rescue Common::Exceptions::NotSupported => e
         not_supported(e)

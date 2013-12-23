@@ -30,6 +30,8 @@ module Bra
       EventMachine.run do
         @server.run
         @driver.run(@model)
+        Signal.trap("INT") { EventMachine.stop }
+        Signal.trap("TERM") { EventMachine.stop }
       end
     end
 
