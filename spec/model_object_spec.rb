@@ -246,28 +246,19 @@ describe Bra::Model::ModelObject do
     end
   end
 
-  describe '#fail_if_cannot' do
-    context 'when given a valid privilege set and operation' do
-      it 'calls #require on the privileges set with the handler target' do
-        ( expect(privilege_set)
-          .to receive(:require).once
-          .with(operation, subject.handler_target)
-        )
+  #
+  # Privileges methods
+  #
 
-        subject.fail_if_cannot(operation, privilege_set)
-      end
-    end
-  end
-
-  describe '#can?' do
-    context 'when given a valid privilege set and operation' do
-      it 'calls #has? on the privileges set with the handler target' do
-        ( expect(privilege_set)
-          .to receive(:has?).once
-          .with(operation, subject.handler_target)
-        )
-
-        subject.can?(operation, privilege_set)
+  {fail_if_cannot: :require, can?: :has?}.each do |subject_meth, set_meth|
+    describe "##{subject_meth}" do
+      context 'when given a valid privilege set and operation' do
+        it 'calls ##{set_meth} on the privilege set with the handler target' do
+          expect(privilege_set).to receive(set_meth).once.with(
+            operation, subject.handler_target
+          )
+          subject.send(subject_meth, operation, privilege_set)
+        end
       end
     end
   end
@@ -325,27 +316,20 @@ describe Bra::Model::ModelObject do
   # Driver actions (these, by default, do nothing)
   #
 
-  describe '#driver_put' do
-    specify do
-      expect { subject.driver_put(:foo) }.to raise_error(
-        Bra::Common::Exceptions::NotSupportedByBra
-      )
+  { put: [:foo], post: [:foo, :bar], delete: [] }.each do |action, args|
+    describe "#driver_#{action}" do
+      specify do
+        method = "driver_#{action}".intern
+        expect { subject.send(method, *args) }.to raise_error(
+          Bra::Common::Exceptions::NotSupportedByBra
+        )
+      end
     end
   end
-  describe '#driver_post' do
-    specify do
-      expect { subject.driver_post(:foo, :bar) }.to raise_error(
-        Bra::Common::Exceptions::NotSupportedByBra
-      )
-    end
-  end
-  describe '#driver_delete' do
-    specify do
-      expect { subject.driver_delete }.to raise_error(
-        Bra::Common::Exceptions::NotSupportedByBra
-      )
-    end
-  end
+
+  #
+  # Handler target
+  #
 
   describe '#handler_target' do
     context 'when the subject is not a subclass' do
