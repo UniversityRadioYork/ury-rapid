@@ -1,6 +1,8 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
 
+require 'bra/common/privilege_set'
+
 module Bra
   module Model
     # An object in the bra playout system model.
@@ -17,6 +19,7 @@ module Bra
     # playout server actions, and a 'driver' form that bypasses these handlers.
     class ModelObject
       extend Forwardable
+      include Bra::Common::PrivilegeSubject
 
       attr_reader :parent
 
@@ -158,16 +161,6 @@ module Bra
       def_delegator :@update_channel, :subscribe, :register_for_updates
       def_delegator :@update_channel, :unsubscribe, :deregister_from_updates
 
-      # Fails if an operation cannot proceed on this model object
-      def fail_if_cannot(operation, privilege_set)
-        privilege_set.require(operation, handler_target)
-      end
-
-      # Checks whether an operation can proceed on this model object
-      def can?(operation, privilege_set)
-        privilege_set.has?(operation, handler_target)
-      end
-
       # GETs this model object
       #
       # A GET is the retrieval of a flattened representation of a model object.
@@ -271,6 +264,7 @@ module Bra
       def handler_target
         @handler_target || self.class.name.demodulize.underscore.intern
       end
+      alias_method :privilege_key, :handler_target
 
       # Returns the default ID to give to POST payloads
       def default_id

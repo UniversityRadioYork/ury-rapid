@@ -10,7 +10,6 @@ describe Bra::Model::ModelObject do
   let(:new_parent) { double(:new_parent) }
   let(:child) { double(:child) }
   let(:privilege_set) { double(:privilege_set) }
-  let(:operation) { double(:operation) }
   let(:handler) { double(:handler) }
 
   before(:each) do
@@ -242,23 +241,6 @@ describe Bra::Model::ModelObject do
         expect(channel).to receive(:push).with([subject, :repr])
 
         subject.notify_channel(:repr)
-      end
-    end
-  end
-
-  #
-  # Privileges methods
-  #
-
-  {fail_if_cannot: :require, can?: :has?}.each do |subject_meth, set_meth|
-    describe "##{subject_meth}" do
-      context 'when given a valid privilege set and operation' do
-        it 'calls ##{set_meth} on the privilege set with the handler target' do
-          expect(privilege_set).to receive(set_meth).once.with(
-            operation, subject.handler_target
-          )
-          subject.send(subject_meth, operation, privilege_set)
-        end
       end
     end
   end
