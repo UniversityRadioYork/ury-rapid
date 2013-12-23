@@ -1,6 +1,8 @@
-require 'bra/server/app'
 require 'bra/server/inspector'
 require 'bra/server/updater'
+
+# This must be required after the above two.
+require 'bra/server/app'
 require 'bra/server/launcher'
 
 module Bra
