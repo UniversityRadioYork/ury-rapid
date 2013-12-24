@@ -1,6 +1,4 @@
 require 'eventmachine'
-require 'thin'
-require 'yaml'
 
 require 'bra/common/constants'
 require 'bra/model'
