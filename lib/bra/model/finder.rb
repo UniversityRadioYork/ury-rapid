@@ -58,7 +58,7 @@ module Bra
       end
 
       def missing_resource
-        fail(Bra::Common:Exceptions::MissingResource, @url)
+        fail(Bra::Common::Exceptions::MissingResource, @url)
       end
 
       def hit_end_of_url?
