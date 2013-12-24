@@ -44,7 +44,7 @@ GEM
     haml (4.0.4)
       tilt
     i18n (0.6.9)
-    kankri (0.1.1)
+    kankri (0.1.2)
     minitest (4.7.5)
     multi_json (1.8.2)
     rack (1.5.2)
