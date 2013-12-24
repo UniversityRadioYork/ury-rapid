@@ -1,3 +1,5 @@
+require 'active_support/core_ext/object/try'
+
 module Bra
   module Common
     # A wrapper around a PUT/POST payload
@@ -62,7 +64,7 @@ module Bra
 
       # The order of these is important - place specific types before more
       # general ones
-      TYPES = %i{hash url integer string}
+      TYPES = %i{hash url integer float string}
 
       def run
         TYPES.any?(&method(:try_type))
@@ -147,12 +149,24 @@ module Bra
       #
       # @api private
       #
-      # @yieldparam [String] The string object.
+      # @yieldparam [Integer] The integer object.
       #
       # @return [Boolean] true if the body was an integer and was handled;
       #   false otherwise.
       def validate_integer
         is_valid_integer?.tap { |valid| yield Integer(@body) if valid }
+      end
+
+      # Yields the protocol and body of an object if it is a float
+      #
+      # @api private
+      #
+      # @yieldparam [Float] The float object.
+      #
+      # @return [Boolean] true if the body was n float and was handled;
+      #   false otherwise.
+      def validate_float
+        is_valid_float?.tap { |valid| yield Float(@body) if valid }
       end
 
       # Yields the type and body of an object if it is a hash
@@ -195,6 +209,18 @@ module Bra
         # A nicer way of doing this would be appreciated.
         # Could use respond_to?(:to_i), but this is too lenient.
         Integer(@body)
+        true
+      rescue ArgumentError
+        false
+      end
+
+      # Whether the payload is a valid float
+      #
+      # This includes values that can be coerced into floats, such as
+      # decimal strings.
+      def is_valid_float?
+        # A nicer way of doing this would be appreciated.
+        Float(@body)
         true
       rescue ArgumentError
         false

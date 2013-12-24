@@ -8,6 +8,7 @@ describe Bra::Common::Payload do
   let(:privilege_set) { double(:privilege_set) }
   let(:default_id) { double(:default_id) }
   let(:integer) { 2401 }
+  let(:float) { 240.1 }
 
   describe '#id' do
     context 'when the payload body is a Hash with one key' do
@@ -120,6 +121,22 @@ describe Bra::Common::Payload do
       let(:body) { integer.to_s }
       it 'calls #integer on the argument, with the number as an Integer' do
         expect(receiver).to receive(:integer).with(integer)
+
+        subject.process(receiver)
+      end
+    end
+    context 'when the body is a Float' do
+      let(:body) { float }
+      it 'calls #float on the argument, with the number' do
+        expect(receiver).to receive(:float).with(float)
+
+        subject.process(receiver)
+      end
+    end
+    context 'when the body is a String representation of a float' do
+      let(:body) { float.to_s }
+      it 'calls #float on the argument, with the number as a Float' do
+        expect(receiver).to receive(:float).with(float)
 
         subject.process(receiver)
       end
