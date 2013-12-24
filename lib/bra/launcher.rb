@@ -48,7 +48,7 @@ module Bra
     def app_arguments
       new_driver = driver
       new_model  = model(new_driver)
-      new_server = server(new_model)
+      new_server = server
       [new_driver, new_model, new_server]
     end
 
@@ -80,8 +80,8 @@ module Bra
     # Server
     #
 
-    def server(new_model)
-      make_server(@server_config, new_model, auth)
+    def server
+      make_server(@server_config, auth)
     end
 
     def auth

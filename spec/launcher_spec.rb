@@ -83,8 +83,8 @@ describe Bra::Launcher do
     it 'calls the model structure maker with the model config' do
       test_maker(model_structure_maker, model_config)
     end
-    it 'calls the server maker with config, model and authenticator' do
-      test_maker(server_maker, server_config, model, auth)
+    it 'calls the server maker with config and authenticator' do
+      test_maker(server_maker, server_config, auth)
     end
   end
 end
