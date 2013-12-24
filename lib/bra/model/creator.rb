@@ -81,7 +81,7 @@ module Bra
       end
 
       def register(object)
-        register_handlers(object)
+        register_handler(object)
         register_update_channel(object)
       end
 

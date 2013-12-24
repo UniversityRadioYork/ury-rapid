@@ -18,11 +18,7 @@ module Bra
           @model = parent.model
         end
 
-        # Shorthand for @model.driver_X_url.
-        def_delegator(:@model, :find_url, :find)
-        %i{put post delete}.each do |action|
-          def_delegator(:@model, "driver_#{action}_url".intern, action)
-        end
+        def_delegators :@model, :get, :put, :post, :delete
 
         # Like delete, but does not fail if the resource does not exist.
         def delete_if_exists(*args)

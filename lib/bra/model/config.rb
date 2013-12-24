@@ -1,3 +1,5 @@
+require 'bra/driver_common/requests/null_handler'
+
 module Bra
   module Model
     class Config
@@ -6,21 +8,24 @@ module Bra
       def initialize(structure, update_channel, options)
         @structure = structure
         @extensions = []
-        @handlers = []
+        @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
         @options = options
         @update_channel = update_channel
       end
 
       # Adds extensions to the model
       def_delegator :@extensions, :<<, :add_extension
+      def_delegator :@handlers, :merge!, :add_handlers
       def_delegator :@options, :[], :option
 
       def make
         apply_extensions(make_model_from_structure)
       end
 
+      # @return [self]
       def configure_with(configurator)
         configurator.configure_model(self)
+        self
       end
 
       def register_handler(object)
@@ -34,7 +39,7 @@ module Bra
       private
 
       def make_model_from_structure
-        structure.new(self).create
+        @structure.new(self).create
       end
 
       def apply_extensions(root)
@@ -45,11 +50,8 @@ module Bra
 
       def handler_for(object)
         handler = @handlers[object.handler_target]
-        warn_no_handler_for(object) if handler.nil?
-      end
-
-      def warn_no_handler_for(object)
-        puts("No handler for target #{object.handler_target}.")
+        puts("#{handler.to_s} -> #{object.handler_target}.")
+        handler
       end
     end
   end

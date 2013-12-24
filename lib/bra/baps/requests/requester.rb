@@ -48,18 +48,16 @@ module Bra
         #
         # @api semipublic
         #
-        # @example Prepare an incoming model configuration.
-        #   cfg = {}
-        #   cfg = configure_model(cfg)
+        # @example Adds this Requester's handlers into the model configuration.
+        #   cfg = add_handlers(cfg)
         #
-        # @param model_config [Hash] The incoming model configuration hash.
+        # @param model_config [Config] The incoming model configuration.
         #
-        # @return [Hash] The prepared model configuration hash, which may be
-        #   the same object.
-        def configure_model(model_config)
+        # @return [void]
+        def add_handlers(model_config)
           # There is no reason other than efficiency for this to be a mutating
           # action - if needs be, merge instead of merge!.
-          model_config.merge!(handler_hash)
+          model_config.add_handlers(handler_hash)
         end
 
         # Sends a request to the BAPS server

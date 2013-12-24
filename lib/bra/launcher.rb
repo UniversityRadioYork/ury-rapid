@@ -108,15 +108,15 @@ module Bra
     # External module includers
     #
 
-    def driver_from_config
-      driver_module = @driver_config[:source] || DEFAULT_DRIVER
+    def driver_from_config(driver_config)
+      driver_module = driver_config[:source] || DEFAULT_DRIVER
       require driver_module
 
-      Driver.new(@driver_config)
+      Driver.new(driver_config)
     end
 
-    def structure_from_config
-      structure_module = @structure_module[:source] || DEFAULT_MODEL_STRUCTURE
+    def structure_from_config(structure_config)
+      structure_module = structure_config[:source] || DEFAULT_MODEL_STRUCTURE
       require structure_module
 
       Structure

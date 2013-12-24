@@ -21,8 +21,8 @@ module Bra
       # @yieldparam (see #run)
       #
       # @return (see #run)
-      def self.find(*args)
-        new(*args).run
+      def self.find(*args, &block)
+        new(*args).run(&block)
       end
 
       # Attempts to find a child resource with the given partial URL

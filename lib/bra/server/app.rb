@@ -26,19 +26,16 @@ module Server
 
       respond_to :html, :json, :xml
 
-      def initialize(config, authenticator)
+      def initialize(config, model, authenticator)
         super()
 
-        @model = nil
+        @model = model
         @config = config
         @authenticator = authenticator
 
         config[:root_directory].try { |root| settings.set :root, root }
       end
 
-      def register_model(model)
-        @model = model
-      end
 
       helpers InspectorHelpers
       helpers Sinatra::Streaming

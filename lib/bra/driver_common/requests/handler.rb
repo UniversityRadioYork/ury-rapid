@@ -13,6 +13,10 @@ module Bra
       class Handler < Bra::DriverCommon::Handler
         extend Forwardable
 
+        def to_s
+          self.class.name
+        end
+
         protected
 
         # Sends a request to the parent requester

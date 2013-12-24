@@ -7,9 +7,9 @@ module Bra
     # Object for launching the bra server.
     class Launcher
       def initialize(config, authenticator)
-        @app = App.new(config, authenticator)
+        @config = config
+        @authenticator = authenticator
         @rack, @host, @port, @root = config.values_at(*%i{rack host port root})
-        @dispatch = make_dispatch
 
         check_server_em_compatible
       end
@@ -20,9 +20,8 @@ module Bra
       #
       # @return [void]
       def run(model_view)
-        @app.register_model(model_view)
         Rack::Server.start(
-          app: @dispatch, server: @rack, Host: @host, Port: @port
+          app: dispatch(model_view), server: @rack, Host: @host, Port: @port
         )
       end
 
@@ -30,9 +29,18 @@ module Bra
 
       # Creates the dispatch for the reactor
       #
-      # @return [Object] the dispatch.
-      def make_dispatch
-        root, app = @root, @app
+      # @api private
+      #
+      # @return [Object]  The dispatch.
+      def dispatch(model_view)
+        build_rack(@root, make_app(model_view))
+      end
+
+      def make_app(model_view)
+        App.new(@config, model_view, @authenticator)
+      end
+
+      def build_rack(root, app)
         Rack::Builder.app { map(root) { run(app) } }
       end
 

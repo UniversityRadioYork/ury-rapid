@@ -44,7 +44,8 @@ class Driver
   def configure_model(config)
     # Add in the BAPS-specific model handlers, so that model actions
     # trigger BAPS commands.
-    extend_model(add_handlers(config))
+    extend_model(config)
+    add_handlers(config)
   end
 
   # Begin running the driver, given a view of the completed model
@@ -74,16 +75,10 @@ class Driver
 
   private
 
-  def_delegator :@requester, :configure_model, :add_handlers
+  def_delegator :@requester, :add_handlers
 
   def extend_model(model_config)
-    initialise_extensions(model_config)
-    model_config[:extensions] << create_extender(model_config)
-    model_config
-  end
-
-  def initialise_extensions(model_config)
-    model_config[:extensions] = [] unless model_config.key?(:extensions)
+    model_config.add_extension(create_extender(model_config))
   end
 
   def create_extender(model_config)
