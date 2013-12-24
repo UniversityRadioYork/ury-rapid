@@ -2,10 +2,6 @@
 
 - player = inspector.resource
 
-- var_groups = { "states" => %i{state load_state},
-                 "primary-markers" => %i{position duration},
-                 "secondary-markers" => %i{cue intro} }
-
 %section.player
   %h1=inspector.title
   - player.keys.each do |id|
