@@ -54,39 +54,23 @@ module Bra
     end
 
     # Create a model from its config and the playout system driver.
-    def init_model(init_config, driver)
-      # Make an updates channel here, because it's neither the driver's
-      # responsibility, nor can it easily be made in the YAML.
-      init_config[:update_channel] = EventMachine::Channel.new
-
-      # The model config is created by loading up driver-neutral configuration
-      # from the central YAML file, then passing it to the driver to check for
-      # unsound config (like requesting 3 channels on a single-channel playout)
-      # and to add in driver-specific configuration, like model handlers or
-      # model extension creators.
-      full_config = driver.configure_model(init_config)
-
-      make_model_with(full_config)
+    # The model config is created by loading up driver-neutral configuration
+    # from the central YAML file, then passing it to the driver to check for
+    # unsound config (like requesting 3 channels on a single-channel playout)
+    # and to add in driver-specific configuration, like model handlers or
+    # model extension creators.
+    def init_model(options, driver)
+      make_initial_model(options).configure_with(driver).make
     end
 
-    # Given a full model configuration, builds the model from a structure class
-    def make_model_with(full_config)
-      structure_module = full_config[:source]
-      require structure_module
-
-      structure = Structure.new(full_config)
-      model = structure.create
-      extend_model(full_config, model)
+    def make_initial_model(options)
+      Bra::Model::Config.new(make_channel, options)
     end
 
-    # Apply any extensions in the model config to the model.
-    def extend_model(full_config, model)
-      full_config[:extensions].try do |extensions|
-        # TODO: Handle strings and other un-instantiated models.
-        extensions.each { |extension| extension.extend(model) }
-      end
-
-      model
+    # Make an updates channel here, because it's neither the driver's
+    # responsibility, nor can it easily be made in the YAML.
+    def make_channel
+      EventMachine::Channel.new
     end
 
     # Creates the authenticator for the server

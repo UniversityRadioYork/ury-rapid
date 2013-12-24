@@ -7,6 +7,8 @@ require 'bra/baps/responses/responder'
 
 # The top-level driver interface for the BAPS BRA driver
 class Driver
+  extend Forwardable
+
   # Initialise the driver given its driver configuration
   #
   # @param config [Hash] The configuration hash for the driver.
@@ -38,27 +40,26 @@ class Driver
   # This returns its changes, but may or may not mutate the original
   # model_config.
   #
-  # @return [Hash] The prepared configuration.
-  def configure_model(init_config)
+  # @return [Config] The prepared configuration.
+  def configure_model(config)
     # Add in the BAPS-specific model handlers, so that model actions
     # trigger BAPS commands.
-    config = @requester.configure_model(init_config)
-    config[:extensions] = [] unless config.key?(:extensions)
-    config[:extensions] << Bra::Baps::Model::Creator.new(config, @config)
-    config
+    extend_model(add_handlers(config))
   end
 
-  # Begin running the driver, given the completed bra model
+  # Begin running the driver, given a view of the completed model
   #
   # This function is always run within an EventMachine run block.
-  def run(model)
+  #
+  # @param model_view [DriverModelView]  The driver's view of the model.
+  def run(model_view)
     # The responder receives responses from the BAPS server via the client
     # and reacts on them, either updating the model or asking the requester to
     # intervene.
     #
     # We'd make the responder earlier, but we need access to the model,
     # which we only get definitive access to here.
-    responder = Bra::Baps::Responses::Responder.new(model, @requester)
+    responder = Bra::Baps::Responses::Responder.new(model_view, @requester)
 
     # Now we can run the client, passing it the responder so it can send
     # BAPS responses to it.  The client will get BAPS requests sent to it
@@ -69,5 +70,23 @@ class Driver
     # This sets up a chain reaction between the requester and responder that
     # brings up the server connection.
     @requester.login_initiate
+  end
+
+  private
+
+  def_delegator :@requester, :configure_model, :add_handlers
+
+  def extend_model(model_config)
+    initialise_extensions(model_config)
+    model_config[:extensions] << create_extender(model_config)
+    model_config
+  end
+
+  def initialise_extensions(model_config)
+    model_config[:extensions] = [] unless model_config.key?(:extensions)
+  end
+
+  def create_extender(model_config)
+    Bra::Baps::Model::Creator.new(model_config, @config)
   end
 end

@@ -29,47 +29,6 @@ module Bra
         true
       end
 
-      # Attempts to find a child resource with the given partial URL
-      #
-      # If the resource is found, it will be yielded to the attached block;
-      # otherwise, an exception will be raised.
-      #
-      # @param url [String] A partial URL that follows this model object's URL
-      #   to form the URL of the resource to locate.  Can be nil, in which case
-      #   this object is returned.
-      # @param args [Array] A splat of optional arguments to provide to the
-      #   block.
-      #
-      # @yieldparam resource [ModelObject] The resource found.
-      # @yieldparam args [Array] The splat from above.
-      #
-      # @return [void]
-      def find_url(url, *args)
-        # We're traversing down the URL by repeatedly splitting it into its
-        # head (part before the next /) and tail (part after).  While we still
-        # have a tail, then the URL still needs walking down.
-        head, tail = nil, url.chomp('/')
-
-        resource = self
-
-        until tail.nil? || tail.empty?
-          # We need to keep traversing down, as we've still got a tail.
-          head, tail = tail.split('/', 2)
-          resource = resource.child(head)
-          fail(Bra::Common:Exceptions::MissingResource, url) if resource.nil?
-        end
-
-        # Once we've exhausted the tail, the resource left should be the one
-        # referred to by the head.
-        yield resource, *args
-      end
-
-      %w{put post delete}.each do |action|
-        define_method("driver_#{action}_url") do |url, *args|
-          find_url(url) { |resource| resource.send("driver_#{action}", *args) }
-        end
-      end
-
       # Default implementation of DELETE on composite model objects
       #
       # This instructs the composite's children to delete themselves.

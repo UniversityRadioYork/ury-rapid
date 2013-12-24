@@ -14,21 +14,17 @@ module Bra
     # Usually you will want to subclass this and override #create, to create a
     # model structure definition.
     class Creator
-      # Public: Initialise a Creator.
+      extend Forwardable
+
+      # Initialise a Creator
       #
-      # options - The options hash to use to create models.
-      def initialize(options)
-        @options = options
-        @channel = EventMachine::Channel.new
+      # @param config [Config]  The model configuration.
+      def initialize(config)
+        @config = config
         @target = nil
       end
 
       protected
-
-      # Retrieves the model option with the given key
-      def option(param)
-        @options[param]
-      end
 
       # Creates multiple Constants with the same handler target from a hash
       def constants(hash, handler_target)
@@ -89,38 +85,9 @@ module Bra
         register_update_channel(object)
       end
 
-      # Attaches HTTP method handlers to a model resource
-      #
-      # The attached handlers will be @options[NAME][METHOD], where NAME is the
-      #   handler_target of the object.
-      #
-      # @param object [ModelObject] The resource to which the handlers will
-      #   be attached.
-      #
-      # @return [void]
-      def register_handlers(object)
-        handler = @options[object.handler_target]
-        object.register_handler(handler) unless handler.nil?
-        warn_no_handler_for(object) if handler.nil?
-      end
-
-      # Attaches the updates channel to a model resource
-      #
-      # The attached channel will be @options[:updates_channel].
-      #
-      # @param object [ModelObject] The resource to which the handlers will
-      #   be attached.
-      #
-      # @return [void]
-      def register_update_channel(object)
-        channel = @options[:update_channel]
-        object.register_update_channel(channel) unless channel.nil?
-        fail('No update channel in @options[:update_channel].') if channel.nil?
-      end
-
-      def warn_no_handler_for(object)
-        puts("No handler for target #{object.handler_target}.")
-      end
+      def_delegator :@config, :option
+      def_delegator :@config, :register_update_channel
+      def_delegator :@config, :register_handler
     end
   end
 end

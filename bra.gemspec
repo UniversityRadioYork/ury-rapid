@@ -40,5 +40,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'sass'
   spec.add_runtime_dependency 'compass'
   spec.add_runtime_dependency 'sinatra-websocket'
-  spec.add_runtime_dependency 'kankri'
+  spec.add_runtime_dependency 'kankri', '~> 0.1'
 end
