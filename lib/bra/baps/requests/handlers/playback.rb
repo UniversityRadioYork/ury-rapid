@@ -35,7 +35,7 @@ module Bra
         class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
           def item_from_local_playlist(index)
             request(
-              Request.new(Codes::Playback::LOAD, object_id).uint32(index)
+              Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
             )
           end
         end
@@ -66,18 +66,16 @@ module Bra
 
         # Object that performs the POSTing and PUTting of a playback marker
         class MarkerPoster < Bra::DriverCommon::Requests::Poster
-          extend Forwardable
-
           def integer(integer)
-            request(Request.new(target_to_code, player_id).uint32(integer))
+            request(
+              Request.new(target_to_code, caller_parent_id).uint32(integer)
+            )
           end
 
           private
 
-          def_delegator :@object, :player_id
-
           def target_to_code
-            TARGET_CODES[@object.handler_target]
+            TARGET_CODES.fetch(@object.handler_target)
           end
 
           TARGET_CODES = {
@@ -119,13 +117,11 @@ module Bra
 
           def string(new_state)
             code_for_state(@object.value, new_state).try do |command|
-              request(Request.new(command, parent_id))
+              request(Request.new(command, caller_parent_id))
             end
           end
 
           private
-
-          def_delegator :@object, :parent_id
 
           # Converts a state change to a BAPS command code
           #

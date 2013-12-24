@@ -8,13 +8,13 @@ module Bra
     # This provides the driver with a get/put/post/delete API.
     class ServerView < View
       def get(url)
-        find { |object| yield object }
+        find(url) { |object| yield object }
       end
 
       %i{put post delete}.each do |action|
-        define_method(action) do |url, privileges, raw_payload|
-          find do |object|
-            payload = make_payload(action, privilege_set, request, target)
+        define_method(action) do |url, privilege_set, raw_payload|
+          find(url) do |object|
+            payload = make_payload(action, privilege_set, raw_payload, object)
             object.send(action, payload)
           end
         end
@@ -22,11 +22,10 @@ module Bra
 
       private
 
-      def make_payload(action, privilege_set, request, target)
-        raw_payload = get_raw_payload(request)
+      def make_payload(action, privilege_set, raw_payload, object)
         Common::Payload.new(
           raw_payload, privilege_set,
-          (action == :put ? target.id : target.default_id)
+          (action == :put ? object.id : object.default_id)
         )
       end
     end

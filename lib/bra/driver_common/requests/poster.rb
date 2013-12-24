@@ -46,6 +46,7 @@ module Bra
         end
 
         def_delegator :@object, :id, :caller_id
+        def_delegator :@object, :parent_id, :caller_parent_id
         def_delegator :@payload, :id, :payload_id
 
         # Tries to forward the payload elsewhere

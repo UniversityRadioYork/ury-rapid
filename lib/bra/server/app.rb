@@ -162,13 +162,13 @@ module Server
         end
       end
 
-      def get(action)
-        wrap { @model.get(action, url, &method(:handle_get)) }
+      def get
+        wrap { @model.get(request_url, &method(:handle_get)) }
       end
 
       %i{put post delete}.each do |action|
         define_method(action) do
-          wrap { @model.send(action, url, privilege_set, get_raw_payload) }
+          wrap { @model.send(action, request_url, privilege_set, raw_payload) }
         end
       end
 
@@ -183,11 +183,11 @@ module Server
         not_supported(e)
       end
 
-      def url
+      def request_url
         params[:splat].first
       end
 
-      def get_raw_payload(request)
+      def raw_payload
         payload_string = request.body.string
         payload_string.empty? ? nil : parse_json_from(request.body.string)
       end
