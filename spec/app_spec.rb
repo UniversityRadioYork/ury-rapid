@@ -16,12 +16,18 @@ describe Bra::App do
       allow(reactor).to receive(:run).and_yield()
     end
 
+    it 'calls #run on the reactor' do
+      expect(reactor).to receive(:run).once.with(no_args)
+      subject.run
+    end
+
     it 'calls #run on the server with a ServerView' do
       expect(server).to receive(:run).once.with(
         an_instance_of(Bra::Model::ServerView)
       )
       subject.run
     end
+
     it 'calls #run on the driver with a DriverView' do
       expect(driver).to receive(:run).once.with(
         an_instance_of(Bra::Model::DriverView)
