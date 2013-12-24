@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'bra/app'
+require 'bra'
 
-Bra::App.from_config_file(ARGV[0]).run
+Bra.from_config_file(ARGV[0]).run

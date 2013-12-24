@@ -6,8 +6,8 @@ module Bra
   module Server
     # Object for launching the bra server.
     class Launcher
-      def initialize(config, model, authenticator)
-        @app = App.new(config, model, authenticator)
+      def initialize(config, authenticator)
+        @app = App.new(config, authenticator)
         @rack, @host, @port, @root = config.values_at(*%i{rack host port root})
         @dispatch = make_dispatch
 
@@ -19,7 +19,8 @@ module Bra
       # This should be called within an EventMachine instance.
       #
       # @return [void]
-      def run
+      def run(model_view)
+        @app.register_model(model_view)
         Rack::Server.start(
           app: @dispatch, server: @rack, Host: @host, Port: @port
         )

@@ -1,7 +1,10 @@
 module Bra
   module Model
     class Config
-      def initialize(update_channel, options)
+      extend Forwardable
+
+      def initialize(structure, update_channel, options)
+        @structure = structure
         @extensions = []
         @handlers = []
         @options = options
@@ -31,20 +34,7 @@ module Bra
       private
 
       def make_model_from_structure
-        make_model_from(structure)
-      end
-
-      def make_model_from(structure)
-        init_structure(structure).create(self)
-      end
-
-      def init_structure(structure)
-        require structure
-        Structure.new(full_config)
-      end
-
-      def structure
-        options[:source]
+        structure.new(self).create
       end
 
       def apply_extensions(root)

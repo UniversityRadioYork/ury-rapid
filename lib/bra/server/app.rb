@@ -26,14 +26,18 @@ module Server
 
       respond_to :html, :json, :xml
 
-      def initialize(config, model, authenticator)
+      def initialize(config, authenticator)
         super()
 
-        @model = model
+        @model = nil
         @config = config
         @authenticator = authenticator
 
         config[:root_directory].try { |root| settings.set :root, root }
+      end
+
+      def register_model(model)
+        @model = model
       end
 
       helpers InspectorHelpers
@@ -112,10 +116,10 @@ module Server
 
       # General model traversals.  These need to be at the bottom, so that they
       # don't override more specific URL matches.
-      get('/*/?') { model_traversal { |target| handle_get(target) } }
-      put('/*/?') { model_traversal_with_payload(:put) }
-      post('/*/?') { model_traversal_with_payload(:post) }
-      delete('/*/?') { model_traversal_with_payload(:delete) }
+      get('/*/?') { get }
+      put('/*/?') { put }
+      post('/*/?') { post }
+      delete('/*/?') { delete }
 
       private
 
@@ -161,35 +165,29 @@ module Server
         end
       end
 
-      def model_traversal_with_payload(action)
-        model_traversal do |target|
-          payload = make_payload(action, privilege_set, request, target)
-          target.send(action, payload)
+      def get(action)
+        wrap { @model.get(action, url, &method(:handle_get)) }
+      end
+
+      %i{put post delete}.each do |action|
+        define_method(action) do
+          wrap { @model.send(action, url, privilege_set, get_raw_payload) }
         end
       end
 
-      # Performs a model traversal, complete with CORS and privilege check
-      def model_traversal(&block)
+      def wrap
         cors
-        find(params, &block)
+        yield
       rescue Kankri::InsufficientPrivilegeError
         forbidden
+      rescue Common::Exceptions::MissingResource
+        error(404, 'Not found.')
       rescue Common::Exceptions::NotSupported => e
         not_supported(e)
       end
 
-      def find(params, &block)
-        @model.find_url(params[:splat].first, &block)
-      rescue Common::Exceptions::MissingResource
-        error(404, 'Not found.')
-      end
-
-      def make_payload(action, privilege_set, request, target)
-        raw_payload = get_raw_payload(request)
-        Common::Payload.new(
-          raw_payload, privilege_set,
-          (action == :put ? target.id : target.default_id)
-        )
+      def url
+        params[:splat].first
       end
 
       def get_raw_payload(request)
