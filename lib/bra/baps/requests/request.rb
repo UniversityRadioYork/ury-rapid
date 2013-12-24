@@ -28,6 +28,11 @@ module Bra
           fixnums(4, FormatStrings::UINT32, payloads)
         end
 
+        # Internal: Attaches a 32-bit floating point number to this request.
+        def float32(*payloads)
+          fixnums(4, FormatStrings::FLOAT32, payloads)
+        end
+
         # Adds strings to this request
         def string(*strings)
           strings.each(&method(:single_string))

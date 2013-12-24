@@ -24,6 +24,18 @@ module Bra
         self.class::TARGETS
       end
 
+      def self.def_targets(*targets)
+        const_set('TARGETS', targets)
+      end
+
+      def self.use_poster(poster_class, *actions)
+        actions.each do |action|
+          define_method(action) do |object, payload|
+            poster_class.post(payload, self, object)
+          end
+        end
+      end
+
       def self.has_targets?
         defined?(self::TARGETS) && !(self::TARGETS.empty?)
       end

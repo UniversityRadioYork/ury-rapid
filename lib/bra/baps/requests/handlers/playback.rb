@@ -7,14 +7,19 @@ module Bra
   module Baps
     module Requests
       module Handlers
+        # A method object that handles POSTs to the Player for BAPS
+        class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
+          def item_from_local_playlist(index)
+            request(
+              Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
+            )
+          end
+        end
+
         # Handler for channel players
         class Player < Bra::DriverCommon::Requests::Handler
-          # The handler targets matched by this handler.
-          TARGETS = [:player]
-
-          def post(object, payload)
-            PlayerPoster.post(payload, self, object)
-          end
+          def_targets :player
+          use_poster PlayerPoster, :post
 
           # Creates a handler for the item loaded into this Player
           def item_handler(object)
@@ -31,37 +36,19 @@ module Bra
           end
         end
 
-        # A method object that handles POSTs to the Player for BAPS
-        class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
-          def item_from_local_playlist(index)
+        class VolumePoster < Bra::DriverCommon::Requests::Poster
+          def float(float)
             request(
-              Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
+              Request.new(Codes::Playback::VOLUME, caller_parent_id)
+                     .float32(float)
             )
           end
         end
 
-        # Handler for player position changes.
-        class Marker < Bra::DriverCommon::Requests::VariableHandler
-          # The handler targets matched by this handler.
-          TARGETS = [:player_position, :player_cue, :player_intro]
-
-          # Requests a PUT on the given player position via the BAPS server
-          #
-          # This changes the player position to that specified by new_position,
-          # provided the position is valid.
-          #
-          # @api semipublic
-          #
-          # @example Set player state to playing via BAPS.
-          #   playback_requester.put_state(state, :playing)
-          #
-          # @param object [PlayerVariable] A player position model object.
-          # @param new_position [Integer] The intended new player position.
-          #
-          # @return [void]
-          def put(object, payload)
-            MarkerPoster.post(payload, self, object)
-          end
+        # Handler for player volume changes.
+        class Volume < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_volume
+          use_poster VolumePoster, :put
         end
 
         # Object that performs the POSTing and PUTting of a playback marker
@@ -85,29 +72,10 @@ module Bra
           }
         end
 
-        # Handler for state changes.
-        class StateHandler < Bra::DriverCommon::Requests::VariableHandler
-          # The handler targets matched by this handler.
-          TARGETS = [:player_state]
-
-          # Requests a PUT on the given player state via the BAPS server
-          #
-          # This changes the player state to that specified by new_state,
-          # provided the state transition is valid.
-          #
-          # @api semipublic
-          #
-          # @example Set player state to playing via BAPS.
-          #   playback_requester.put_state(state, :playing)
-          #
-          # @param object [PlayerState] A player state model object.
-          # @param new_state [Symbol] The intended new player state.  May be a
-          #   string, in which case the string is converted to a symbol.
-          #
-          # @return [void]
-          def put(object, payload)
-            StatePoster.post(payload, self, object)
-          end
+        # Handler for player marker changes.
+        class Marker < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_position, :player_cue, :player_intro
+          use_poster MarkerPoster, :post
         end
 
         # Object that performs the POSTing and PUTting of a playback marker
@@ -159,6 +127,12 @@ module Bra
               playing: Codes::Playback::PLAY,
             }
           }
+        end
+
+        # Handler for state changes.
+        class State < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_state
+          use_poster StatePoster, :put
         end
       end
     end
