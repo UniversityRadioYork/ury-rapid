@@ -23,6 +23,11 @@ module Bra
         end
         module_function :validate_symbol
 
+        def validate_volume(input)
+          [0.0, Float(input), 1.0].sort[1]
+        end
+        module_function :validate_volume
+
         def invalid
           fail(Bra::Common::Exceptions::InvalidPayload)
         end

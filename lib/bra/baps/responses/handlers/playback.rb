@@ -30,6 +30,14 @@ module Bra
           end
         end
 
+        class Volume < Handler
+          TARGETS = [Codes::Playback::VOLUME]
+
+          def run(response)
+            put(player_url(response, :volume), response[:volume])
+          end
+        end
+
         # Handles a BAPS channel marker change
         class Marker < Handler
           TARGETS = [
