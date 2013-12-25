@@ -24,6 +24,8 @@ module Bra
 
       protected
 
+      attr_reader :running
+
       def register(&block)
         @id = @model.register_for_updates(&method(:pack_and_send))
         @running = true
@@ -42,13 +44,13 @@ module Bra
 
       def send_json(raw)
         json = raw.to_json
-        send("#{json}\n") if @running
+        EM.next_tick { send("#{json}\n") if running }
       end
 
       def clean_up
+        @running = false
         @model.deregister_from_updates(@id) unless @id.nil?
         @id = nil
-        @running = false
       end
     end
 
@@ -87,6 +89,10 @@ module Bra
       end
 
       private
+
+      def running
+        super() && @websocket.state == :connected
+      end
 
       def request(message)
         json = JSON.parse(message)
