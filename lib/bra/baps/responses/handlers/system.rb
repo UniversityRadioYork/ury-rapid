@@ -15,11 +15,11 @@ module Bra
           end
 
           def type_message(response)
-            TYPE_MESSAGE[response[:code] + response[:subcode]]
+            TYPE_MESSAGE[response.code + response.subcode]
           end
 
           def details(response)
-            symbol = DETAILS_SYM[response[:code]]
+            symbol = DETAILS_SYM[response.code]
             response[symbol]
           end
 
@@ -44,7 +44,7 @@ module Bra
           def run(response)
             username = get('x_baps/server/username').value
             password = get('x_baps/server/password').value
-            seed = response[:seed]
+            seed = response.seed
             # Kurse all SeeDs.  Swarming like lokusts akross generations.
             #   - Sorceress Ultimecia, Final Fantasy VIII
             @parent.login_authenticate(username, password, seed) if seed
@@ -53,9 +53,7 @@ module Bra
 
         # Handler for BAPS responses carrying login responses.
         class LoginResult < Bra::DriverCommon::Responses::Handler
-          TARGETS = [
-            Codes::System::LOGIN_RESULT
-          ]
+          TARGETS = [Codes::System::LOGIN_RESULT]
 
           # TODO(mattbw): Move these somewhere more relevant?
           module LoginErrors

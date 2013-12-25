@@ -26,7 +26,7 @@ module Bra
           private
 
           def state(response)
-            CODES_TO_STATES[response[:code]]
+            CODES_TO_STATES[response.code]
           end
         end
 
@@ -34,7 +34,7 @@ module Bra
           TARGETS = [Codes::Playback::VOLUME]
 
           def run(response)
-            put(player_url(response, :volume), response[:volume])
+            put(player_url(response, :volume), response.volume)
           end
         end
 
@@ -53,13 +53,13 @@ module Bra
           }
 
           def run(response)
-            put(player_url(response, marker(response)), response[:position])
+            put(player_url(response, marker(response)), response.position)
           end
 
           private
 
           def marker(response)
-            CODES_TO_MARKERS[response[:code]]
+            CODES_TO_MARKERS[response.code]
           end
         end
 
@@ -81,7 +81,7 @@ module Bra
           end
 
           def origin(response)
-            "playlist://#{response[:subcode]}/#{response[:index]}"
+            "playlist://#{response.subcode}/#{response.index}"
           end
         end
       end

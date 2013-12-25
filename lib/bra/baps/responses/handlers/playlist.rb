@@ -20,7 +20,7 @@ module Bra
           TARGETS = [Codes::Playlist::DELETE_ITEM]
 
           def sub_url(response)
-            [response[:index]]
+            [response.index]
           end
         end
 
@@ -47,7 +47,7 @@ module Bra
           TARGETS = [Codes::Playlist::ITEM_DATA]
 
           def id(response)
-            response[:index]
+            response.index
           end
 
           def urls(response)
@@ -78,7 +78,7 @@ module Bra
 
           # Gets the item that wants to be moved and yields it to a block
           def get_item(response, &block)
-            find_url(playlist_url(response, response[:old_index]), &block)
+            find_url(playlist_url(response, response.old_index), &block)
           end
 
           # Calculates the URL to which the item shall be posted

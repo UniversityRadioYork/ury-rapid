@@ -64,7 +64,7 @@ module Bra
         end
 
         def handle_response(response)
-          f = @handlers[response[:code]]
+          f = @handlers[response.code]
           f ||= @unhandled
           f.run(response)
         end
@@ -80,9 +80,9 @@ module Bra
         #
         # @return [void]
         def run(response)
-          message = "Unhandled response: #{response[:name]}"
-          if response[:code].is_a?(Numeric)
-            hexcode = response[:code].to_s(16)
+          message = "Unhandled response: #{response.name}"
+          if response.code.is_a?(Numeric)
+            hexcode = response.code.to_s(16)
             message << " (0x#{hexcode})"
           end
           puts(message)

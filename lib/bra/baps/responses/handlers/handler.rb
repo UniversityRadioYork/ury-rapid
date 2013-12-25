@@ -53,7 +53,7 @@ module Bra
           #
           # @return [String] The full model URL.
           def channel_url(root, response, *args)
-            [root, response[:subcode], *args].join('/')
+            [root, response.subcode, *args].join('/')
           end
         end
       end
