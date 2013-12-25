@@ -60,7 +60,8 @@ module Bra
           TARGETS = [Codes::Playlist::MOVE_ITEM_IN_PLAYLIST]
 
           def run(response)
-            new_index, old_index = response.values_at(:new_index, :old_index)
+            new_index = response.new_index
+            old_index = response.old_index
 
             move(response, new_index) if new_index != old_index
           end

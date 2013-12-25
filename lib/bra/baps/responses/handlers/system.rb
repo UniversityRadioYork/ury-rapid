@@ -39,9 +39,7 @@ module Bra
 
         # Handler for BAPS responses carrying login seeds.
         class Seed < Bra::DriverCommon::Responses::Handler
-          TARGETS = [
-            Codes::System::SEED
-          ]
+          TARGETS = [Codes::System::SEED]
 
           def run(response)
             username = get('x_baps/server/username').value
@@ -68,8 +66,8 @@ module Bra
           end
 
           def run(response)
-            code, string = response.values_at(*%i(subcode details))
-            is_ok(code) ? continue : die(code, string)
+            code = response.subcode
+            is_ok(code) ? continue : die(code, response.details)
           end
 
           def is_ok(code)

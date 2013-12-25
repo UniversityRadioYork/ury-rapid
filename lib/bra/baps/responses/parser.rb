@@ -30,10 +30,10 @@ module Bra
 
           # Set up to expect the welcome message
           @expected = [%i(message string)]
-          @response = {
+          @response = OpenStruct.new(
             code: Codes::System::WELCOME_MESSAGE,
             subcode: 0
-          }
+          )
         end
 
         def start
@@ -131,7 +131,7 @@ module Bra
         #
         # @return [Hash] An initial response, ready for adding fields to.
         def response_with_code(code, subcode)
-          { name: code_name(code), code: code, subcode: subcode }
+          OpenStruct.new(name: code_name(code), code: code, subcode: subcode)
         end
 
         # Finds a semi-human-readable name for a BAPS response code
@@ -178,7 +178,7 @@ module Bra
           @reader.uint32 do |config_type|
             @response[name] = config_type
             @reader.send(CONFIG_TYPE_MAP[config_type]) do |value|
-              @response[:value] = value
+              @response.value = value
               word
             end
           end

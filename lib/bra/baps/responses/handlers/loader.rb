@@ -75,6 +75,8 @@ module Bra
 
         # A method object for updating the bra model with BAPS track loads
         class Loader
+          extend Forwardable
+
           # Stop handler loaders from trying to load handlers from this class.
           def self.has_targets?
             false
@@ -90,8 +92,6 @@ module Bra
             @id = id
             @urls = urls
             @origin = origin
-
-            extract_fields_from_response
           end
 
           def run
@@ -121,11 +121,7 @@ module Bra
             load_state == :ok
           end
 
-          def extract_fields_from_response
-            @type, @title, @duration = @response.values_at(
-              :type, :title, :duration
-            )
-          end
+          def_delegators :@response, :type, :title, :duration
 
           def decide_load_state
             expecting_abnormal_load_state? ? load_state_from_title : :ok
@@ -134,7 +130,7 @@ module Bra
           def expecting_abnormal_load_state?
             # All of BAPS's non-OK load states occur when there is no real
             # item forthcoming.
-            @type == Types::Track::VOID
+            type == Types::Track::VOID
           end
 
           # Returns the load state implied by the track name
@@ -145,7 +141,7 @@ module Bra
           #
           # @return [Symbol] One of the valid load states.
           def load_state_from_title
-            TITLE_TO_ABNORMAL_LOAD_STATE[@title] || :ok
+            TITLE_TO_ABNORMAL_LOAD_STATE[title] || :ok
           end
 
           # Hash mapping BAPS's special track titles to abnormal load states.
@@ -174,7 +170,7 @@ module Bra
           # @return [Item] The item
           def make_item
             Bra::Model::Item.new(
-              type_as_bra_symbol, @title, @origin, @duration
+              type_as_bra_symbol, title, @origin, duration
             )
           end
 
@@ -185,11 +181,11 @@ module Bra
           # @return [Symbol] The bra equivalent of the BAPS track type
           #   (:library, :file or :text).
           def type_as_bra_symbol
-            TRACK_TYPE_MAP.include?(@type) ? TRACK_TYPE_MAP[@type] : bad_type
+            TRACK_TYPE_MAP.include?(type) ? TRACK_TYPE_MAP[type] : bad_type
           end
 
           def bad_type
-            fail(Baps::Exceptions::InvalidTrackType, @type)
+            fail(Baps::Exceptions::InvalidTrackType, type)
           end
         end
       end
