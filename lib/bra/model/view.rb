@@ -7,12 +7,18 @@ module Bra
     # This allows parts of bra that use the model to access it without being
     # coupled to the actual definition of the model.
     class View
+      extend Forwardable
+
       # Initialises the model view
       #
       # @param root [Root]  The model root.
       def initialize(root)
         @root = root
       end
+
+      # Allow access to the model's updates channel
+      def_delegator :@root, :register_for_updates
+      def_delegator :@root, :deregister_from_updates
 
       protected
 
