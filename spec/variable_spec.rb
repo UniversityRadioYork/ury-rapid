@@ -46,11 +46,11 @@ describe Bra::Model::Variable do
         end
       end
       context 'when the current value differs from the proposed value' do
-        before(:each) { allow(channel).to receive(:push) }
+        before(:each) { allow(channel).to receive(:notify_update) }
         let(:new_value) { :ghostbusters }
 
         it 'notifies the updates channel of the new value' do
-          expect(channel).to receive(:push).once.with([subject, new_value])
+          expect(channel).to receive(:notify_update).once.with(subject)
 
           subject.driver_put(new_value)
         end
@@ -98,13 +98,10 @@ describe Bra::Model::Variable do
       context 'when the current value differs from the validator output' do
         let(:validated_value) { :ghostbusters }
 
-        before(:each) { allow(channel).to receive(:push) }
+        before(:each) { allow(channel).to receive(:notify_update) }
 
         it 'notifies the updates channel of the new value' do
-          expect(channel).to receive(:push).once.with(
-            [subject, validated_value]
-          )
-
+          expect(channel).to receive(:notify_update).once.with(subject)
           subject.driver_put(initial_value)
         end
 

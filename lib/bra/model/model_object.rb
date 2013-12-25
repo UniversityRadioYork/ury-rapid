@@ -2,6 +2,7 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
 
 require 'kankri'
+require 'bra/model/update_channel'
 
 module Bra
   module Model
@@ -20,6 +21,7 @@ module Bra
     class ModelObject
       extend Forwardable
       include Kankri::PrivilegeSubject
+      include Updatable
 
       attr_reader :parent
 
@@ -112,54 +114,6 @@ module Bra
         @handler = handler
         self
       end
-
-      # Registers a channel to be sent updates on this model object
-      #
-      # @param channel [Channel] A channel to which objects interested in this
-      #   model object's updates can subscribe.  The same channel may (and
-      #   usually will) be shared between multiple model objects; the payloads
-      #   sent to the channel will uniquely identify the model object in
-      #   question.
-      #
-      # @return [self]
-      def register_update_channel(channel)
-        @update_channel = channel
-        self
-      end
-
-      # Sends a representation of this model object to the updates channel
-      #
-      # This should be sent when this model object is updated.
-      #
-      # @return [void]
-      def notify_update
-        notify_channel(flat)
-      end
-
-      # Signals to the updates channel that this object is being deleted
-      #
-      # Use notify_update instead if the delete is actually just resetting the
-      # object to a default value.  This is for when the object is actually
-      # about to disappear off the model tree.
-      #
-      # @return [void]
-      def notify_delete
-        notify_channel(nil)
-      end
-
-      # Sends a notification to the updates channel
-      #
-      # @param repr [Object] A representation of the update.  This will usually
-      #   be either the flat object representation, or :deleted.
-      #
-      # @return [void]
-      def notify_channel(repr)
-        @update_channel.push([self, repr])
-      end
-
-      # Allow the server to register on the updates channel.
-      def_delegator :@update_channel, :subscribe, :register_for_updates
-      def_delegator :@update_channel, :unsubscribe, :deregister_from_updates
 
       # GETs this model object
       #

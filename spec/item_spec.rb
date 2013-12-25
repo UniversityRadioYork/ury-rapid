@@ -43,7 +43,7 @@ describe Bra::Model::Item do
       let(:channel) { double(:channel) }
 
       before(:each) do
-        allow(channel).to receive(:push)
+        allow(channel).to receive(:notify_delete)
         subject.register_update_channel(channel)
 
         subject.move_to(parent, 0)
@@ -56,7 +56,7 @@ describe Bra::Model::Item do
       end
 
       it 'notifies the channel' do
-        expect(channel).to receive(:push).with([subject, nil]).once
+        expect(channel).to receive(:notify_delete).with(subject).once
 
         subject.driver_delete
       end

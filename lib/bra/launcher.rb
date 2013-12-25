@@ -96,7 +96,7 @@ module Bra
       options.reverse_merge(
         app:                Bra::App.method(:new),
         auth:               Kankri.method(:authenticator_from_hash),
-        channel:            EventMachine::Channel.method(:new),
+        channel:            Bra::Model::UpdateChannel.method(:new),
         driver:             method(:driver_from_config),
         model_configurator: Bra::Model::Config.method(:new),
         model_structure:    method(:structure_from_config),

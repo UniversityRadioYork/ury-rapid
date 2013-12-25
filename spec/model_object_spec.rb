@@ -230,17 +230,32 @@ describe Bra::Model::ModelObject do
   # Updates channel
   #
 
-  describe '#notify_channel' do
+  describe '#notify_update' do
     context 'when there is no update channel' do
       specify { expect { subject.notify_channel(:repr) }.to raise_error }
     end
     context 'when there is an update channel' do
-      it 'calls channel#push with a tuple of itself and the given item' do
+      it 'calls channel#notify_update with itself' do
         channel = double('channel')
         subject.register_update_channel(channel)
-        expect(channel).to receive(:push).with([subject, :repr])
+        expect(channel).to receive(:notify_update).with(subject)
 
-        subject.notify_channel(:repr)
+        subject.notify_update
+      end
+    end
+  end
+
+  describe '#notify_delete' do
+    context 'when there is no update channel' do
+      specify { expect { subject.notify_channel(:repr) }.to raise_error }
+    end
+    context 'when there is an update channel' do
+      it 'calls channel#notify_delete with itself' do
+        channel = double('channel')
+        subject.register_update_channel(channel)
+        expect(channel).to receive(:notify_delete).with(subject)
+
+        subject.notify_delete
       end
     end
   end

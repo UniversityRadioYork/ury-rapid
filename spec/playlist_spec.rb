@@ -16,31 +16,24 @@ describe Bra::Model::Playlist do
     subject.register_handler(handler)
   end
 
-  def ignore_channel
-    allow(channel).to receive(:push)
-  end
-
-  def ignore_handler
-    allow(handler).to receive(:item_handler)
-  end
-
   describe '#driver_post' do
+    before(:each) do
+      allow(channel).to receive(:notify_update)
+      allow(handler).to receive(:item_handler)
+    end
+
     context 'when the index is valid' do
       context 'and the Item is not in the Playlist' do
-        it 'registers the playlist updates channel with the Item' do
-          ignore_handler
-
-          expect(channel).to receive(:push).with([test1, test1.flat]).ordered
-          expect(channel).to receive(:push).with([test2, test2.flat]).ordered
-          expect(channel).to receive(:push).with([test3, test3.flat]).ordered
+        it 'announces the update to the updates channel' do
+          expect(channel).to receive(:notify_update).with(test1).ordered
+          expect(channel).to receive(:notify_update).with(test2).ordered
+          expect(channel).to receive(:notify_update).with(test3).ordered
 
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)
           subject.driver_post(0, test3)
         end
         it 'registers the playlist item handler with the Item' do
-          ignore_channel
-
           expect(handler).to receive(:item_handler).with(test1).ordered
           expect(handler).to receive(:item_handler).with(test2).ordered
           expect(handler).to receive(:item_handler).with(test3).ordered
@@ -50,9 +43,6 @@ describe Bra::Model::Playlist do
           subject.driver_post(0, test3)
         end
         it 'adds the Item to the Playlist at the requested index' do
-          ignore_channel
-          ignore_handler
-
           subject.driver_post(0, test1)
           expect(subject.children).to eq([test1])
 
@@ -64,9 +54,6 @@ describe Bra::Model::Playlist do
           expect(subject.children).to eq([test3, test1, test2])
         end
         it 'sets the parent of the Item to the Playlist' do
-          ignore_channel
-          ignore_handler
-
           expect(test1.parent).to be_nil
           subject.driver_post(0, test1)
           expect(test1.parent).to eq(subject)
@@ -75,9 +62,6 @@ describe Bra::Model::Playlist do
 
       context 'and the Item is already in the Playlist' do
         it 'moves the Item to the new Index' do
-          ignore_channel
-          ignore_handler
-
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)
           subject.driver_post(2, test3)
@@ -90,9 +74,6 @@ describe Bra::Model::Playlist do
           expect(subject.children).to eq([test3, test2, test1])
         end
         it 'keeps the parent as the Playlist' do
-          ignore_channel
-          ignore_handler
-
           expect(test1.parent).to be_nil
           subject.driver_post(0, test1)
           expect(test1.parent).to eq(subject)
@@ -113,22 +94,19 @@ describe Bra::Model::Playlist do
     end
     context 'when Items are enqueued' do
       before(:each) do
+        allow(channel).to receive(:notify_delete)
         test1.move_to(subject, 0).register_update_channel(channel)
         test2.move_to(subject, 1).register_update_channel(channel)
         test3.move_to(subject, 2).register_update_channel(channel)
       end
 
       it 'clears the Playlist' do
-        ignore_channel
-
         expect(subject.children).to eq([test1, test2, test3])
         subject.driver_delete
         expect(subject.children).to be_empty
       end
 
       it 'sets each Item to have no parent' do
-        ignore_channel
-
         expect(test1.parent).to eq(subject)
         expect(test2.parent).to eq(subject)
         expect(test3.parent).to eq(subject)
@@ -141,9 +119,9 @@ describe Bra::Model::Playlist do
       end
 
       it 'announces each item deletion' do
-        expect(channel).to receive(:push).with([test1, nil]).ordered
-        expect(channel).to receive(:push).with([test2, nil]).ordered
-        expect(channel).to receive(:push).with([test3, nil]).ordered
+        expect(channel).to receive(:notify_delete).with(test1).ordered
+        expect(channel).to receive(:notify_delete).with(test2).ordered
+        expect(channel).to receive(:notify_delete).with(test3).ordered
 
         subject.driver_delete
       end
