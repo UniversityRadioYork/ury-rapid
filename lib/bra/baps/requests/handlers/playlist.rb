@@ -5,52 +5,6 @@ module Bra
   module Baps
     module Requests
       module Handlers
-        # Handler for playlists
-        #
-        # This handler also targets channels and channel sets, because these
-        # all have similar DELETE semantics.
-        class Playlist < Bra::DriverCommon::Requests::Handler
-          # The handler targets matched by this handler.
-          TARGETS = [:playlist, :playlist_set]
-
-          # Requests a playlist be DELETEd via the BAPS server
-          #
-          # This resets the playlist.
-          def delete(object, _)
-            case object.handler_target
-            when :playlist
-              reset(object.id)
-            when :playlist_set
-              object.children.map(&:id).each(&method(:reset))
-            end
-
-            false
-          end
-
-          # TODO(mattbw): PUT
-
-          def post(object, payload)
-            fail('FIXME') unless object.handler_target == :playlist
-            PlaylistPoster.post(payload, self, object)
-          end
-
-          # Resets a playlist given its channel ID.
-          #
-          # @api private
-          #
-          # @param id [Integer] The ID of the channel to reset.
-          #
-          # @return [void]
-          def reset(id)
-            request(Request.new(Codes::Playlist::RESET, id))
-          end
-
-          def item_handler(id)
-            # TODO(mattbw): Add something here
-            nil
-          end
-        end
-
         # Object that performs the POSTing of a playlist item.
         class PlaylistPoster < Bra::DriverCommon::Requests::Poster
           extend Forwardable
@@ -73,7 +27,7 @@ module Bra
 
           # Given a payload, decides whether to forward it elsewhere
           #
-          # @return [Boolean] false.
+          # @return [false]
           def post_forward
             false
           end
@@ -108,6 +62,33 @@ module Bra
               .uint32(directory.to_i)
               .string(filename)
             )
+          end
+        end
+
+        # Handler for playlists
+        class Playlist < Bra::DriverCommon::Requests::Handler
+          def_targets :playlist
+          use_poster PlaylistPoster, :post
+
+          # Requests a playlist be DELETEd via the BAPS server
+          #
+          # This resets the playlist.
+          def delete(object, _)
+            request(Request.new(Codes::Playlist::RESET, id))
+          end
+
+          def item_handler(id)
+            # TODO(mattbw): Add something here
+            nil
+          end
+        end
+
+        # Handler for playlist sets
+        class PlaylistSet < Bra::DriverCommon::Requests::Handler
+          def_targets :playlist_set
+
+          def delete(object, payload)
+            object.children.each { |child| child.delete(payload) }
           end
         end
       end
