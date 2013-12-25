@@ -107,7 +107,7 @@ module Bra
       #   methods shall return true if the model should update itself, and
       #   false if the model should wait until instructed by the driver.
       #
-      # @return [ModelObject] This object, for method chaining purposes.
+      # @return [self]
       def register_handler(handler)
         @handler = handler
         self
@@ -121,7 +121,7 @@ module Bra
       #   sent to the channel will uniquely identify the model object in
       #   question.
       #
-      # @return [ModelObject] This object, for method chaining purposes.
+      # @return [self]
       def register_update_channel(channel)
         @update_channel = channel
         self
@@ -196,7 +196,7 @@ module Bra
       # @param new_id [Object]  The new ID under which the object will exist in
       #   the parent.
       #
-      # @return [ModelObject] This object, for method chaining.
+      # @return [self]
       def move_to(new_parent, new_id)
         check_can_have_children(new_parent)
 
