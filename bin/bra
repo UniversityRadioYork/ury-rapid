@@ -2,4 +2,4 @@
 
 require 'bra'
 
-Bra.from_config_file(ARGV[0]).run
+Bra.from_config_file(ARGV[0])
