@@ -22,6 +22,12 @@ module Bra
         new(*args).run
       end
 
+      def run
+        register
+        on_message(&method(:request))
+        on_close(&method(:clean_up))
+      end
+
       protected
 
       attr_reader :running
@@ -64,10 +70,17 @@ module Bra
 
       def_delegator :@stream, :write, :send
 
-      def run
-        register
-        @stream.callback(&method(:clean_up))
-        @stream.errback(&method(:clean_up))
+      def on_message
+        # Can't receive messages from the stream
+      end
+
+      def request
+        # Can't take requests from the stream
+      end
+
+      def on_close(&block)
+        @stream.callback(&block)
+        @stream.errback(&block)
       end
     end
 
@@ -81,12 +94,8 @@ module Bra
       end
 
       def_delegator :@websocket, :send
-
-      def run
-        register
-        @websocket.onmessage(&method(:request))
-        @websocket.onclose(&method(:clean_up))
-      end
+      def_delegator :@websocket, :onmessage, :on_message
+      def_delegator :@websocket, :onclose, :on_close
 
       private
 
