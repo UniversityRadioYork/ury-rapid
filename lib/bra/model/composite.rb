@@ -1,5 +1,6 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/try'
+require 'compo'
 
 require 'bra/common/exceptions'
 require 'bra/common/hash'
@@ -14,32 +15,11 @@ module Bra
     #
     # CompositeModelObjects should export the Enumerable interface, which
     # forwards to the children container.
-    class CompositeModelObject < ModelObject
+    module CompositeModelObject
       extend Forwardable
-      include Enumerable
+      include ModelObject
 
-      attr_reader :children
-
-      # Returns whether this object can have children.
-      #
-      # CompositeModelObjects can have children.
-      #
-      # @return [Boolean] true.
-      def can_have_children?
-        true
-      end
-
-      # Default implementation of DELETE on composite model objects
-      #
-      # This instructs the composite's children to delete themselves.
-      #
-      # @return [void]
-      def driver_delete
-        each.to_a.each(&:driver_delete)
-        clear
-      end
-
-      # Default implementation of driver_post.
+      # Default implementation of driver_post
       #
       # If a resource with the requested ID exists, this will try to PUT the
       # resource inside it; otherwise, the resource is moved to the ID.
@@ -49,29 +29,10 @@ module Bra
       #
       # @return [void]
       def driver_post(id, resource)
-        existing = child(id)
+        existing = get_child(id)
         existing.driver_put(resource) unless existing.nil?
         resource.move_to(self, id)    if     existing.nil?
       end
-    end
-
-    # A model object whose children are arranged as a hash from their IDs to
-    # themselves.
-    class HashModelObject < CompositeModelObject
-      extend Forwardable
-
-      # In order to retain the same API between CompositeModelObjects, we use
-      # #each_value here.
-      def_delegator :@children, :each_value, :each
-      def_delegator :@children, :[]=, :add_child
-      def_delegator :@children, :delete, :remove_child
-
-      def initialize(*args)
-        super(*args)
-        @children = {}
-      end
-
-      alias_method :child_hash, :children
 
       # GETs this model object as a 'flat' representation
       #
@@ -84,41 +45,37 @@ module Bra
       # @param privileges [Array] An array of GET privileges the caller has.
       #   May be nil, in which case no privilege checking is done.
       #
-      # @return [Hash] A flat representation of this object.
-      def get(privileges = [])
-        ( @children
-          .select           { |_, child| child.can?(:get, privileges) }
-          .transform_values { |child|    child.get(privileges)        }
-        ) if can?(:get, privileges)
+      # @return [Object] A flat representation of this object.
+      def get(privileges)
+        children_to_get_representation(reachable(:get, privileges), privileges)
       end
 
-      # Finds the child with the given ID
-      #
-      # @api semipublic
-      #
-      # @example Find the child with ID :flub.
-      #   hmo = HashModelObject.new
-      #   hmo.add_child("Goose", :flub)
-      #   hmo.child(:flub)
-      #   #=> "Goose"
-      #
-      # @param id [Object] The ID of the child to find.  This may be the exact
-      #   ID, a String equivalent of a Symbol ID, or an object convertable to
-      #   Integer for an integral ID.
-      #
-      # @return [Object] The child, or nil if it was not found.
-      def child(id)
-        child = children[id]
-        child = children[id.intern]   if child.nil? && id.respond_to?(:intern)
-        child = children[Integer(id)] if child.nil?
-        child
-      rescue ArgumentError, TypeError
-        nil
+      protected
+
+      def reachable(action, privileges)
+        can?(action, privileges) ? reachable_children(action, privileges) : {}
       end
 
-      def id_function(object)
-        # Assuming two ModelObjects == if and only if equal?.
-        proc { children.key(object) }
+      def reachable_children(action, privileges)
+        children.select { |_, child| child.can?(action, privileges) }
+      end
+    end
+
+    # A model object whose children are arranged as a hash from their IDs to
+    # themselves.
+    class HashModelObject < Compo::HashComposite
+      include CompositeModelObject
+      include Compo::Movable
+      include Compo::ParentTracker
+
+      def initialize(handler_target = nil)
+        super()
+        @handler_target = handler_target || default_handler_target
+        remove_parent
+      end
+
+      def children_to_get_representation(children_subset, privileges)
+        children_subset.transform_values { |child| child.get(privileges) }
       end
     end
 
@@ -126,74 +83,19 @@ module Bra
     #
     # A ListModelObject stores its children in an Array, with the object IDs
     # being the numeric indices into that Array.
-    class ListModelObject < CompositeModelObject
-      extend Forwardable
+    class ListModelObject < Compo::ArrayComposite
+      include CompositeModelObject
+      include Compo::Movable
+      include Compo::ParentTracker
 
-      # Implement the Enumerable API on the list's children.
-      def_delegator :@children, :each
-      def_delegator :@children, :size
-
-      def initialize(*args)
-        super(*args)
-        @children = []
+      def initialize(handler_target = nil)
+        super()
+        @handler_target = handler_target || default_handler_target
+        remove_parent
       end
 
-      # Gets this object's children, as a hash
-      def child_hash
-        Hash[*@children.each_with_index.to_a]
-      end
-
-      # Clears the ListModelObject
-      #
-      # @return [void]
-      def clear
-        @children = []
-      end
-
-      def_delegator :@children, :insert, :add_child
-      def_delegator :@children, :delete_at, :remove_child
-
-      # GETs this model object as a 'flat' representation
-      #
-      # Flat representations contain only primitive objects (integers, strings,
-      # etc.) and lists and hashes.
-      #
-      # In a flat representation, children requiring privileges the caller does
-      # not have are hidden.
-      #
-      # @param privileges [Array] An array of GET privileges the caller has.
-      #   May be nil, in which case no privilege checking is done.
-      #
-      # @return [Array] A flat representation of this object.
-      def get(privileges = [])
-        ( @children
-          .select { |child| child.can?(:get, privileges) }
-          .map    { |child| child.get(privileges)        }
-        ) if can?(:get, privileges)
-      end
-
-      # Finds the child with the given ID
-      #
-      # @api semipublic
-      #
-      # @example Find the child with ID 3.
-      #   lmo = ListModelObject.new
-      #   lmo.add_child("Spruce", 3)
-      #   lmo.child(3)
-      #   #=> "Spruce"
-      #
-      # @param id [Object] The ID of the child to find.  This may be the exact
-      #   ID or an object convertable to Integer.
-      #
-      # @return [Object] The child, or nil if it was not found.
-      def child(id)
-        children[Integer(id)]
-      rescue ArgumentError, TypeError
-        nil
-      end
-
-      def id_function(object)
-        proc { children.index { |member| member.equal?(object) } }
+      def children_to_get_representation(children_subset, privileges)
+        children_subset.map { |child| child.get(privileges) }
       end
     end
   end

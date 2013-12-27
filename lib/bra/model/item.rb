@@ -1,4 +1,5 @@
 require 'active_support/core_ext/hash/keys'
+require 'compo'
 
 require 'bra/common/types'
 require 'bra/model/model_object'
@@ -6,8 +7,9 @@ require 'bra/model/model_object'
 module Bra
   module Model
     # An item in the playout system.
-    class Item < ModelObject
+    class Item < Compo::Leaf
       include Bra::Common::Types::Validators
+      include ModelObject
 
       attr_reader :name
 
@@ -28,6 +30,7 @@ module Bra
       # @param duration [Integer] The duration of the Item, in milliseconds.
       def initialize(type, name, origin, duration)
         super()
+        @handler_target = default_handler_target
 
         @type = validate_track_type(type)
         @name = name

@@ -1,4 +1,5 @@
 require 'bra/model/model_object'
+require 'compo'
 
 module Bra
   module Model
@@ -7,8 +8,9 @@ module Bra
     # This is effectively a thin wrapper over a value, granting the ability to
     # treat it as a ModelObject while allowing any methods Constant doesn't
     # define to be responded to by the value.
-    class Constant < ModelObject
+    class Constant < Compo::Leaf
       extend Forwardable
+      include ModelObject
 
       # Initialises the Constant
       #
@@ -23,8 +25,9 @@ module Bra
       #   privilege retrieval).
       #
       def initialize(value, handler_target = nil)
+        super()
         @value = value
-        @handler_target = handler_target
+        @handler_target = handler_target || default_handler_target
       end
 
       # Returns the current value of this Constant

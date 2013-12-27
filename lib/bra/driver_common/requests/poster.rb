@@ -58,11 +58,11 @@ module Bra
         # This should be overridden to catch any child IDs that should be
         # handled as a POST.
         def post_forward
-          @object.can_have_children? && try_forward_to_child
+          try_forward_to_child
         end
 
         def try_forward_to_child
-          child = @object.child(@payload.id)
+          child = @object.get_child(@payload.id)
           child.put(@payload) unless child.nil?
           !child.nil?
         end

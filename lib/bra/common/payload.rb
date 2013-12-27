@@ -42,7 +42,13 @@ module Bra
       #
       # @return [Array] A tuple of the target ID and direct object.
       def flatten_payload
-        id_mapped_payload? ? @payload.flatten : [@default_id, @payload]
+        id_mapped_payload? ? flatten_payload! : [@default_id, @payload]
+      end
+
+      def flatten_payload!
+        id, payload = @payload.flatten
+        id = id.to_sym if id.is_a?(String)
+        [id, payload]
       end
 
       # Determines whether a payload is a map from an ID to a payload body

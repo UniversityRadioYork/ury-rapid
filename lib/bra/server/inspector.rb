@@ -77,7 +77,7 @@ module Bra
 
       # Creates a new Inspector inspecting one of target's children
       def inspect_child(id)
-        Inspector.new(@request, @target.child(id), @privilege_set, true)
+        Inspector.new(@request, @target.get_child(id), @privilege_set, true)
       end
 
       private

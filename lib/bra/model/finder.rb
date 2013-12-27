@@ -43,6 +43,8 @@ module Bra
         yield @resource
       end
 
+      private
+
       def descend
         descend_url
         get_next_resource
@@ -50,7 +52,7 @@ module Bra
       end
 
       def get_next_resource
-        @resource = @resource.child(@head)
+        @resource = @resource.get_child(@next_id)
       end
 
       def fail_if_no_resource
@@ -67,13 +69,26 @@ module Bra
 
       def descend_url
         @head, @tail = @tail.split('/', 2)
+        @next_id = head_to_id
       end
-
-      private
 
       def reset
         @head, @tail = nil, @url.chomp('/')
         @resource = @root
+      end
+
+      def head_to_id
+        head_to_integer || head_to_symbol
+      end
+
+      def head_to_integer
+        Integer(@head)
+      rescue ArgumentError
+        nil
+      end
+
+      def head_to_symbol
+        @head.to_sym
       end
     end
   end
