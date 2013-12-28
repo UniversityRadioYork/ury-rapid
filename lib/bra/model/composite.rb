@@ -63,15 +63,12 @@ module Bra
 
     # A model object whose children are arranged as a hash from their IDs to
     # themselves.
-    class HashModelObject < Compo::HashComposite
+    class HashModelObject < Compo::HashBranch
       include CompositeModelObject
-      include Compo::Movable
-      include Compo::ParentTracker
 
       def initialize(handler_target = nil)
         super()
         @handler_target = handler_target || default_handler_target
-        remove_parent
       end
 
       def children_to_get_representation(children_subset, privileges)
@@ -83,15 +80,12 @@ module Bra
     #
     # A ListModelObject stores its children in an Array, with the object IDs
     # being the numeric indices into that Array.
-    class ListModelObject < Compo::ArrayComposite
+    class ListModelObject < Compo::ArrayBranch
       include CompositeModelObject
-      include Compo::Movable
-      include Compo::ParentTracker
 
       def initialize(handler_target = nil)
         super()
         @handler_target = handler_target || default_handler_target
-        remove_parent
       end
 
       def children_to_get_representation(children_subset, privileges)

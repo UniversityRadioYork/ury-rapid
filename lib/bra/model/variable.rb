@@ -25,9 +25,8 @@ module Bra
       #   privilege retrieval).
       #
       def initialize(value, handler_target = nil)
-        super()
+        super(handler_target)
         @value = value
-        @handler_target = handler_target || default_handler_target
       end
 
       # Returns the current value of this Constant

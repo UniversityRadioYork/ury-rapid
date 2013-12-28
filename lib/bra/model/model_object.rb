@@ -23,12 +23,8 @@ module Bra
       include Kankri::PrivilegeSubject
       include Updatable
 
-      # Methods that form the interface to a composite model object, but do
-      # not work in the general case.
-      %i{add_child remove_child}.each do |method|
-        define_method(method) do |*|
-          fail('This model object does not support children.')
-        end
+      def initialize(handler_target = nil)
+        @handler_target = handler_target || default_handler_target
       end
 
       # Registers a handler to be called when this object is modified

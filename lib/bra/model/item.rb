@@ -30,7 +30,6 @@ module Bra
       # @param duration [Integer] The duration of the Item, in milliseconds.
       def initialize(type, name, origin, duration)
         super()
-        @handler_target = default_handler_target
 
         @type = validate_track_type(type)
         @name = name
