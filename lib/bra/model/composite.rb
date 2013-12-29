@@ -19,21 +19,6 @@ module Bra
       extend Forwardable
       include ModelObject
 
-      # Default implementation of driver_post
-      #
-      # If a resource with the requested ID exists, this will try to PUT the
-      # resource inside it; otherwise, the resource is moved to the ID.
-      #
-      # @param id [Object] The ID to POST the resource under.
-      # @param resource [Object] The resource to POST.
-      #
-      # @return [void]
-      def driver_post(id, resource)
-        existing = get_child(id)
-        existing.driver_put(resource) unless existing.nil?
-        resource.move_to(self, id)    if     existing.nil?
-      end
-
       # GETs this model object as a 'flat' representation
       #
       # Flat representations contain only primitive objects (integers, strings,
@@ -67,8 +52,7 @@ module Bra
       include CompositeModelObject
 
       def initialize(handler_target = nil)
-        super()
-        @handler_target = handler_target || default_handler_target
+        super(handler_target)
       end
 
       def children_to_get_representation(children_subset, privileges)
@@ -84,8 +68,7 @@ module Bra
       include CompositeModelObject
 
       def initialize(handler_target = nil)
-        super()
-        @handler_target = handler_target || default_handler_target
+        super(handler_target)
       end
 
       def children_to_get_representation(children_subset, privileges)

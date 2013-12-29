@@ -44,14 +44,14 @@ describe Bra::Model::Playlist do
         end
         it 'adds the Item to the Playlist at the requested index' do
           subject.driver_post(0, test1)
-          expect(subject.children).to eq([test1])
+          expect(subject.children).to eq(0 => test1)
 
           subject.driver_post(1, test2)
-          expect(subject.children).to eq([test1, test2])
+          expect(subject.children).to eq(0 => test1, 1 => test2)
 
           # Should insert at 0 and move the other two
           subject.driver_post(0, test3)
-          expect(subject.children).to eq([test3, test1, test2])
+          expect(subject.children).to eq(0 => test3, 1 => test1, 2 => test2)
         end
         it 'sets the parent of the Item to the Playlist' do
           expect(test1.parent).to be_nil
@@ -65,13 +65,13 @@ describe Bra::Model::Playlist do
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)
           subject.driver_post(2, test3)
-          expect(subject.children).to eq([test1, test2, test3])
+          expect(subject.children).to eq(0 => test1, 1 => test2, 2 => test3)
 
           subject.driver_post(2, test1)
-          expect(subject.children).to eq([test2, test3, test1])
+          expect(subject.children).to eq(0 => test2, 1 => test3, 2 => test1)
 
           subject.driver_post(0, test3)
-          expect(subject.children).to eq([test3, test2, test1])
+          expect(subject.children).to eq(0 => test3, 1 => test2, 2 => test1)
         end
         it 'keeps the parent as the Playlist' do
           expect(test1.parent).to be_nil
@@ -101,7 +101,7 @@ describe Bra::Model::Playlist do
       end
 
       it 'clears the Playlist' do
-        expect(subject.children).to eq([test1, test2, test3])
+        expect(subject.children).to eq(0 => test1, 1 => test2, 2 => test3)
         subject.driver_delete
         expect(subject.children).to be_empty
       end

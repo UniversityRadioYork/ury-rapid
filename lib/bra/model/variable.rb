@@ -79,7 +79,6 @@ module Bra
         super(initial_value, handler_target)
         @initial_value = initial_value
         @validator = validator
-        @handler_target = handler_target
       end
 
       # Put a new value into this Variable

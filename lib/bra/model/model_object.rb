@@ -24,6 +24,7 @@ module Bra
       include Updatable
 
       def initialize(handler_target = nil)
+        super()
         @handler_target = handler_target || default_handler_target
       end
 
@@ -68,38 +69,42 @@ module Bra
         end
       end
 
+      # Default implementation of driver_put
+      #
+      # This will just POST into the parent.
+      #
+      # @param resource [Object] The resource to PUT.
+      #
+      # @return [void]
+      def driver_put(resource)
+        parent.driver_post(id, resource)
+      end
+
+      # Default implementation of driver_post
+      #
+      # This will, by default, move the incoming resource to this object
+      # under the given ID, replacing any existing resource.
+      #
+      # @param id [Object] The ID to POST the resource under.
+      # @param resource [Object] The resource to POST.
+      #
+      # @return [void]
+      def driver_post(id, resource)
+        resource.move_to(self, id)
+      end
+
       # Default implementation of DELETE on model objects
       #
-      # This instructs the object's children to delete themselves  Since
+      # This instructs the object's children to delete themselves.  Since
       # #each is a no-op on Compo::Leaf, this is safe to use with any model
       # object.
       #
       # @return [void]
       def driver_delete
-        each.to_a.each(&:driver_delete)
-        clear
-      end
-
-      # The current URL of this model object with respect to its root
-      #
-      # The URL is recursively defined: the base case is '' for objects with
-      # no parent, and objects with parents take the URL "#{parent_url}/#{id}".
-      #
-      # @api public
-      # @example  Get the URL of an object with no parent
-      #   orphan.url
-      #   #=> ''
-      # @example  Get the URL of an object with a parent
-      #   parented.url
-      #   #=> ''
-      #
-      # @return [String] The URL.
-      def url
-        parent.nil? ? '' : [parent_url, id].join('/')
+        each { |_, value| value.driver_delete }
       end
 
       def_delegator :@parent, :id, :parent_id
-      def_delegator :@parent, :url, :parent_url
 
       # The identifier used to find handlers and privileges for this object
       #

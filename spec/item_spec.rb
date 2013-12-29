@@ -50,9 +50,9 @@ describe Bra::Model::Item do
       end
 
       it 'removes the Item from that object' do
-        expect(parent.children).to eq([subject])
+        expect(parent.children).to eq(0 => subject)
         subject.driver_delete
-        expect(parent.children).to eq([])
+        expect(parent.children).to eq({})
       end
 
       it 'notifies the channel' do
@@ -74,10 +74,10 @@ describe Bra::Model::Item do
 
     it 'calls #driver_post on the parent with its current ID' do
       payload = double(:payload)
-      subject.move_to(parent, 10)
+      subject.move_to(parent, 0)
 
       allow(parent).to receive(:driver_post)
-      expect(parent).to receive(:driver_post).with(10, payload)
+      expect(parent).to receive(:driver_post).with(0, payload)
 
       subject.driver_put(payload)
     end
