@@ -72,7 +72,7 @@ module Bra
       end
 
       def children_to_get_representation(children_subset, privileges)
-        children_subset.map { |child| child.get(privileges) }
+        children_subset.map { |_, child| child.get(privileges) }
       end
     end
   end
