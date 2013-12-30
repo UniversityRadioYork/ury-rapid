@@ -24,6 +24,8 @@ module Bra
           find(url) { |resource| resource.send("driver_#{action}", *args) }
         end
       end
+
+      def_delegator :@config, :register
     end
   end
 end

@@ -80,14 +80,8 @@ module Bra
         @target = target
       end
 
-      def register(object)
-        register_handler(object)
-        register_update_channel(object)
-      end
-
       def_delegator :@config, :option
-      def_delegator :@config, :register_update_channel
-      def_delegator :@config, :register_handler
+      def_delegator :@config, :register
     end
   end
 end

@@ -28,6 +28,11 @@ module Bra
         self
       end
 
+      def register(object)
+        register_handler(object)
+        register_update_channel(object)
+      end
+
       def register_handler(object)
         object.register_handler(handler_for(object))
       end
