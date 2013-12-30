@@ -1,3 +1,4 @@
+require 'bra/model/variable'
 require 'bra/baps/responses/handlers/handler'
 require 'bra/baps/exceptions'
 
@@ -114,7 +115,13 @@ module Bra
             load_state = decide_load_state
             item = make_item if normal_load_state(load_state)
 
-            [item, load_state]
+            [item, load_state_to_constant(load_state)]
+          end
+
+          def load_state_to_constant(load_state)
+            Bra::Model::Constant.new(
+              load_state, :load_state
+            ).tap(&@parent.method(:register))
           end
 
           def normal_load_state(load_state)
