@@ -18,7 +18,7 @@ module Bra
           @model = parent.model
         end
 
-        def_delegators :@model, :get, :put, :post, :delete
+        def_delegators :@model, :get, :put, :post, :delete, :register
 
         # Like delete, but does not fail if the resource does not exist.
         def delete_if_exists(*args)

@@ -69,23 +69,6 @@ module Bra
 
     # Mixin for model objects that hold Items, such as players and playlists.
     module ItemContainer
-      def driver_post(id, resource)
-        id_is_item?(id) ? driver_post_item(id, resource) : super(id, resource)
-      end
-
-      # Helper for model object driver_posts instances for adding Items
-      def driver_post_item(id, resource)
-        ( resource
-          .register_update_channel(@update_channel)
-          .register_handler(@handler.item_handler(resource))
-          .move_to(self, id)
-          .notify_update
-        )
-      end
-
-      def id_is_item?(id)
-        id == :item
-      end
     end
   end
 end

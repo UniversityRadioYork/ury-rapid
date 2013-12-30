@@ -20,15 +20,12 @@ module Bra
         class Player < Bra::DriverCommon::Requests::Handler
           def_targets :player
           use_poster PlayerPoster, :post
-
-          # Creates a handler for the item loaded into this Player
-          def item_handler(object)
-            LoadedItem.new(@parent)
-          end
         end
 
-        # Handler for loaded items
-        class LoadedItem < Bra::DriverCommon::Requests::Handler
+        # Handler for items
+        class Item < Bra::DriverCommon::Requests::Handler
+          def_targets :item
+
           # This handler has no targets - it is attached to incoming items
           # by the Player's handler.
           def delete(object, payload)

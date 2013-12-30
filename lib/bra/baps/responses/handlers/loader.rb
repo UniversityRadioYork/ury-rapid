@@ -171,7 +171,7 @@ module Bra
           def make_item
             Bra::Model::Item.new(
               type_as_bra_symbol, title, @origin, duration
-            )
+            ).tap(&@parent.method(:register))
           end
 
           # Converts a BAPS track type to a BRA track type
