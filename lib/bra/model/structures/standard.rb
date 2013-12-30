@@ -13,10 +13,12 @@ class Structure < Bra::Model::Creator
   #
   # @return [Root]  The finished model.
   def create
-    root(Bra::Model::HashModelObject.new(:root)) do
-      set_of(:players, Bra::Model::Player, option(:players)) { player }
-      set_of(:playlists, Bra::Model::Playlist, option(:playlists))
-      info :info
+    root do
+      hashes :players, :player_set, option(:players), :player do
+        player
+      end
+      lists  :playlists, :playlist_set, option(:playlists), :playlist
+      info   :info
     end
   end
 
@@ -49,7 +51,7 @@ class Structure < Bra::Model::Creator
 
   # Builds the bra information model.
   def info(id)
-    set(id, :info) do
+    hash(id, :info) do
       constant :version, Bra::Common::Constants::VERSION, :version
       constant :channel_mode, channel_mode?, :channel_mode
     end

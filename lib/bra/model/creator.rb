@@ -41,16 +41,41 @@ module Bra
         child id, Variable.new(initial_value, validator, handler_target)
       end
 
-      # Creates a Set of items with the given ID list and class
-      def set_of(id, member_class, ids, &block)
-        set(id, class_to_set_target(member_class)) do
-          children(ids, member_class, &block)
+      def hashes(set_id, set_target, child_ids, child_target, &block)
+        set(
+          set_id, set_target, HashModelObject, child_ids, child_target, &block
+        )
+      end
+
+      def lists(set_id, set_target, child_ids, child_target, &block)
+        set(
+          set_id, set_target, ListModelObject, child_ids, child_target, &block
+        )
+      end
+
+      def set(set_id, set_target, child_class, child_ids, child_target, &block)
+        puts "#{set_id} #{set_target} #{child_class} #{child_ids} #{child_target}"
+        hash(set_id, set_target) do
+          children(child_ids, child_class, child_target, &block)
         end
       end
 
-      # Creates a Set with the given handler target and ID
-      def set(id, handler_target, &block)
-        child(id, HashModelObject.new(handler_target), &block)
+      # Creates a ListModelObject with the given handler target and ID
+      def list(id, handler_target, &block)
+        child(id, new_list(handler_target), &block)
+      end
+
+      def new_list(*args)
+        ListModelObject.new(*args)
+      end
+
+      # Creates a HashModelObject with the given handler target and ID
+      def hash(id, handler_target, &block)
+        child(id, new_hash(handler_target), &block)
+      end
+
+      def new_hash(*args)
+        HashModelObject.new(*args)
       end
 
       def class_to_set_target(member_class)
@@ -58,11 +83,15 @@ module Bra
         "#{class_name}_set".intern
       end
 
-      def children(ids, child_class, &block)
-        ids.each { |id| child(id, child_class, &block) }
+      def children(ids, child_class, *new_args, &block)
+        ids.each { |id| child(id, child_class.new(*new_args), &block) }
       end
 
-      def root(object, &block)
+      def root(object = nil, &block)
+        build(object || new_hash(:root), &block)
+      end
+
+      def build(object, &block)
         object = object.new if object.is_a?(Class)
         register(object)
         build_children(object, &block) if block
@@ -70,7 +99,8 @@ module Bra
       end
 
       def child(id, object, &block)
-        root(object, &block).move_to(@target, id)
+        @target.add(id, build(object, &block))
+        p @target.children.keys
       end
 
       def build_children(object)

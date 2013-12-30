@@ -17,8 +17,8 @@ module Bra
 
         def extend(model)
           root model do
-            set :x_baps, :x_baps do
-              set :server, :x_baps_server do
+            hash :x_baps, :x_baps do
+              hash :server, :x_baps_server do
                 constants @baps_config, :x_baps_server_constant
               end
             end
