@@ -30,9 +30,9 @@ class Structure < Bra::Model::Creator
   # - A variable holding the load state (ok/loading/failed/empty);
   # - A variable for each position marker.
   def player
-    var :state, :stopped, :player_state, method(:validate_play_state)
-    var :load_state, :empty, :player_load_state, method(:validate_load_state)
-    var :volume, 0.0, :player_volume, method(:validate_volume)
+    constant :state, :stopped, :player_state
+    constant :load_state, :empty, :player_load_state
+    constant :volume, 0.0, :player_volume
     Bra::Common::Types::MARKERS.each do |id|
       var id, 0, "player_#{id}".intern, marker_validator
     end
