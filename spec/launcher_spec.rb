@@ -10,18 +10,22 @@ describe Bra::Launcher do
     }
   end
   let(:overrides) do
+    MAKERS.map
     { app:                app_maker,
       auth:               auth_maker,
       channel:            channel_maker,
       driver:             driver_maker,
+      driver_view:        driver_view_maker,
       model_configurator: model_configurator_maker,
       model_structure:    model_structure_maker,
-      server:             server_maker
+      server:             server_maker,
+      server_view:        server_view_maker
     }
   end
 
   MAKERS = %i{
     app auth channel driver model_configurator model_structure server
+    driver_view server_view
   }
 
   MAKERS.each do |maker|
@@ -43,13 +47,16 @@ describe Bra::Launcher do
       allow(auth_maker).to receive(:call).and_return(auth)
       allow(channel_maker).to receive(:call).and_return(channel)
       allow(server_maker).to receive(:call).and_return(server)
+      allow(driver_maker).to receive(:call).and_return(driver)
+
+      allow(driver_view_maker).to receive(:call).and_return(driver_view)
+      allow(server_view_maker).to receive(:call).and_return(server_view)
       allow(model_structure_maker).to receive(:call).and_return(
         model_structure
       )
       allow(model_configurator_maker).to receive(:call).and_return(
         model_configurator
       )
-      allow(driver_maker).to receive(:call).and_return(driver)
 
       allow(model_configurator).to receive(:configure_with).and_return(
         model_configurator
@@ -63,8 +70,8 @@ describe Bra::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the driver, model and server' do
-      test_maker(app_maker, driver, model, server)
+    it 'calls the app maker with the driver, its view, server, and its view' do
+      test_maker(app_maker, driver, driver_view, server, server_view)
     end
     it 'calls the authenticator maker with the user configuration' do
       test_maker(auth_maker, user_config)
@@ -85,6 +92,12 @@ describe Bra::Launcher do
     end
     it 'calls the server maker with config and authenticator' do
       test_maker(server_maker, server_config, auth)
+    end
+    it 'calls the driver view maker with the model configurator and model' do
+      test_maker(driver_view_maker, model_configurator, model)
+    end
+    it 'calls the server view maker with the model' do
+      test_maker(server_view_maker, model)
     end
   end
 end

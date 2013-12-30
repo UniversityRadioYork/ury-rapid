@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'bra/model/view'
 
 module Bra
@@ -6,6 +7,13 @@ module Bra
     #
     # This provides the driver with a get/put/post/delete API.
     class DriverView < View
+      extend Forwardable
+
+      def initialize(config, model)
+        @config = config
+        super(model)
+      end
+
       # Gets a model object, given its URL relative to the model root
       def get(url)
         find(url) { |resource| resource }

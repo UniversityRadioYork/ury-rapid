@@ -36,9 +36,15 @@ module Bra
       @auth_maker               = options[:auth]
       @channel_maker            = options[:channel]
       @driver_maker             = options[:driver]
+      @server_maker             = options[:server]
+      make_model_builders(options)
+    end
+
+    def make_model_builders(options)
+      @driver_view_maker        = options[:driver_view]
       @model_configurator_maker = options[:model_configurator]
       @model_structure_maker    = options[:model_structure]
-      @server_maker             = options[:server]
+      @server_view_maker        = options[:server_view]
     end
 
     def app
@@ -47,9 +53,9 @@ module Bra
 
     def app_arguments
       new_driver = driver
-      new_model  = model(new_driver)
+      new_driver_view, new_server_view = model(new_driver)
       new_server = server
-      [new_driver, new_model, new_server]
+      [new_driver, new_driver_view, new_server, new_server_view]
     end
 
     #
@@ -65,7 +71,9 @@ module Bra
     #
 
     def model(driver)
-      model_configurator.configure_with(driver).make
+      config = model_configurator.configure_with(driver)
+      model = config.make
+      [make_driver_view(config, model), make_server_view(model)]
     end
 
     def model_configurator
@@ -94,14 +102,21 @@ module Bra
 
     def options_with_defaults(options)
       options.reverse_merge(
-        app:                Bra::App.method(:new),
-        auth:               Kankri.method(:authenticator_from_hash),
-        channel:            Bra::Model::UpdateChannel.method(:new),
-        driver:             method(:driver_from_config),
+        app:     Bra::App.method(:new),
+        auth:    Kankri.method(:authenticator_from_hash),
+        channel: Bra::Model::UpdateChannel.method(:new),
+        driver:  method(:driver_from_config),
+        server:  Bra::Server::Launcher.method(:new)
+      ).reverse_merge(model_defaults)
+    end
+
+    def model_defaults
+      {
+        driver_view:        Bra::Model::DriverView.method(:new),
         model_configurator: Bra::Model::Config.method(:new),
-        model_structure:    method(:structure_from_config),
-        server:             Bra::Server::Launcher.method(:new)
-      )
+        server_view:        Bra::Model::ServerView.method(:new),
+        model_structure:    method(:structure_from_config)
+      }
     end
 
     #
@@ -130,8 +145,10 @@ module Bra
     def_delegator :@auth_maker,               :call, :make_auth
     def_delegator :@channel_maker,            :call, :make_channel
     def_delegator :@driver_maker,             :call, :make_driver
+    def_delegator :@driver_view_maker,        :call, :make_driver_view
     def_delegator :@model_configurator_maker, :call, :make_model_configurator
     def_delegator :@model_structure_maker,    :call, :make_model_structure
     def_delegator :@server_maker,             :call, :make_server
+    def_delegator :@server_view_maker,        :call, :make_server_view
   end
 end
