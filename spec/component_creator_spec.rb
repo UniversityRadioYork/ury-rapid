@@ -1,13 +1,20 @@
 require 'spec_helper'
 require 'bra/model/component_creator'
 
+shared_examples 'a valid symbol constant' do |type, value|
+  it "returns an object whose flat representation is :#{value}" do
+    created = subject.create(type, value)
+    expect(created.flat).to eq(value.to_sym)
+  end
+end
+
 shared_examples 'a symbol constant' do |type, valid_list|
   valid_list.each do |valid|
     context "when the argument is :#{valid}" do
-      it "returns an object whose flat representation is :#{valid}" do
-        created = subject.create(type, valid)
-        expect(created.flat).to eq(valid)
-      end
+      it_behaves_like 'a valid symbol constant', type, valid
+    end
+    context "when the argument is '#{valid}'" do
+      it_behaves_like 'a valid symbol constant', type, valid.to_s
     end
   end
 
