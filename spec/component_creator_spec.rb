@@ -39,6 +39,26 @@ shared_examples 'a symbol constant' do |type, valid_list|
   end
 end
 
+shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
+  context "when :#{symbol} is set to a valid value in the options" do
+    it "returns an Item whose ##{symbol} is the validated option value" do
+      valid_value_hash.each do |input, output|
+        item = subject.item(symbol => input)
+        expect(item.send(symbol)).to eq(output)
+      end
+    end
+  end
+
+  context "when #{symbol} is set to an invalid value in the options" do
+    it 'fails' do
+      invalid_values.each do |input|
+        item = subject.item(symbol => input)
+        expect { item.send(symbol) }.to raise_error
+      end
+    end
+  end
+end
+
 describe Bra::Model::ComponentCreator do
   subject { Bra::Model::ComponentCreator.new(registrar) }
   let(:registrar) { double(:registrar) }
@@ -54,6 +74,44 @@ describe Bra::Model::ComponentCreator do
     it_behaves_like(
       'a symbol constant', :play_state, Bra::Common::Types::PLAY_STATES
     )
+  end
+
+  describe '#item' do
+    describe 'the duration of the Item' do
+      it_behaves_like(
+        'an item field',
+        :duration,
+        { 0 => 0, 500 => 500, nil => nil },
+        [-1, 0.3, 'moo', true, false]
+      )
+    end
+
+    describe 'the origin of the Item' do
+      it_behaves_like(
+        'an item field',
+        :origin,
+        { 'foo' => 'foo', :bar => 'bar', nil => nil },
+        [0, 0.3, true, false]
+      )
+    end
+
+    describe 'the type of the Item' do
+      it_behaves_like(
+        'an item field',
+        :type,
+        { 'file' => :file, :library => :library },
+        ['s', 0, 0.3, nil, true, false]
+      )
+    end
+
+    describe 'the name of the Item' do
+      it_behaves_like(
+        'an item field',
+        :name,
+        { 'name' => 'name', :namey_namey_name => 'namey_namey_name' },
+        [0, 0.3, nil, true, false]
+      )
+    end
   end
 end
 
