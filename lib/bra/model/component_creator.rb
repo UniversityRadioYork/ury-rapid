@@ -20,6 +20,15 @@ module Bra
         validate_then_constant(:validate_play_state, value, :state)
       end
 
+      def item(options)
+        Bra::Model::Item.new(
+          options[:type],
+          options[:name],
+          options[:origin],
+          options[:duration]
+        )
+      end
+
       private
 
       def validate_then_constant(validator, raw_value, handler_target)

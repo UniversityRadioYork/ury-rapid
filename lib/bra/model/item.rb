@@ -31,7 +31,7 @@ module Bra
       def initialize(type, name, origin, duration)
         super()
 
-        @type = validate_track_type(type)
+        @type = type
         @name = name
         @origin = origin
         @duration = duration
