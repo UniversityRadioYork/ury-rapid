@@ -6,6 +6,9 @@ module Bra
     class ComponentCreator
       include Bra::Common::Types::Validators
 
+      def initialize(registrar)
+      end
+
       def load_state(value)
         Bra::Model::Constant.new(validate_load_state(value), :load_state)
       end
