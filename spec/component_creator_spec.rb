@@ -28,6 +28,9 @@ shared_examples 'a symbol constant' do |type, valid_list|
 end
 
 describe Bra::Model::ComponentCreator do
+  subject { Bra::Model::ComponentCreator.new(registrar) }
+  let(:registrar) { double(:registrar) }
+
   describe '#load_state' do
     it_behaves_like(
       'a symbol constant', :load_state, Bra::Common::Types::LOAD_STATES
