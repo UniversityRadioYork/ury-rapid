@@ -56,7 +56,6 @@ shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
     it 'fails' do
       invalid_values.each do |input|
         hash = defaults.merge(symbol => input)
-        item = subject.item(hash)
         expect { subject.item(hash) }.to raise_error
       end
     end
@@ -94,8 +93,14 @@ describe Bra::Model::ComponentCreator do
       it_behaves_like(
         'an item field',
         :origin,
-        { 'foo' => 'foo', :bar => 'bar', nil => nil },
-        [0, 0.3, true, false]
+        { 0 => '0',
+          'origin' => 'origin',
+          :originy_originy_origin => 'originy_originy_origin',
+          nil => nil,
+          true => 'true',
+          false => 'false'
+        },
+        []
       )
     end
 
