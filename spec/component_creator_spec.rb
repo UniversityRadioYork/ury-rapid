@@ -30,17 +30,13 @@ end
 describe Bra::Model::ComponentCreator do
   describe '#load_state' do
     it_behaves_like(
-      'a symbol constant',
-      :load_state,
-      Bra::Common::Types::LOAD_STATES
+      'a symbol constant', :load_state, Bra::Common::Types::LOAD_STATES
     )
   end
 
   describe '#play_state' do
     it_behaves_like(
-      'a symbol constant',
-      :play_state,
-      Bra::Common::Types::PLAY_STATES
+      'a symbol constant', :play_state, Bra::Common::Types::PLAY_STATES
     )
   end
 end
