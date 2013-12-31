@@ -40,10 +40,13 @@ shared_examples 'a symbol constant' do |type, valid_list|
 end
 
 shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
+  let(:defaults) { { type: :file, name: 'Test Name' } }
+
   context "when :#{symbol} is set to a valid value in the options" do
     it "returns an Item whose #{symbol} is the validated option value" do
       valid_value_hash.each do |input, output|
-        item = subject.item(symbol => input)
+        hash = defaults.merge(symbol => input)
+        item = subject.item(hash)
         expect(item.flat[symbol]).to eq(output)
       end
     end
@@ -52,7 +55,9 @@ shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
   context "when #{symbol} is set to an invalid value in the options" do
     it 'fails' do
       invalid_values.each do |input|
-        expect { subject.item(symbol => input) }.to raise_error
+        hash = defaults.merge(symbol => input)
+        item = subject.item(hash)
+        expect { subject.item(hash) }.to raise_error
       end
     end
   end
@@ -107,8 +112,14 @@ describe Bra::Model::ComponentCreator do
       it_behaves_like(
         'an item field',
         :name,
-        { 'name' => 'name', :namey_namey_name => 'namey_namey_name' },
-        [0, 0.3, nil, true, false]
+        { 0 => '0',
+          'name' => 'name',
+          :namey_namey_name => 'namey_namey_name',
+          nil => '',
+          true => 'true',
+          false => 'false'
+        },
+        []
       )
     end
   end
