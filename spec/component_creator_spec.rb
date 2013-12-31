@@ -41,10 +41,10 @@ end
 
 shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
   context "when :#{symbol} is set to a valid value in the options" do
-    it "returns an Item whose ##{symbol} is the validated option value" do
+    it "returns an Item whose #{symbol} is the validated option value" do
       valid_value_hash.each do |input, output|
         item = subject.item(symbol => input)
-        expect(item.send(symbol)).to eq(output)
+        expect(item.flat[symbol]).to eq(output)
       end
     end
   end
@@ -52,8 +52,7 @@ shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
   context "when #{symbol} is set to an invalid value in the options" do
     it 'fails' do
       invalid_values.each do |input|
-        item = subject.item(symbol => input)
-        expect { item.send(symbol) }.to raise_error
+        expect { subject.item(symbol => input) }.to raise_error
       end
     end
   end
