@@ -11,12 +11,15 @@ module Bra
         @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
         @options = options
         @update_channel = update_channel
+        @component_creator = Bra::Model::ComponentCreator.new
       end
 
       # Adds extensions to the model
       def_delegator :@extensions, :<<, :add_extension
       def_delegator :@handlers, :merge!, :add_handlers
       def_delegator :@options, :[], :option
+
+      def_delegator :@component_creator, :public_send, :create_model_object
 
       def make
         apply_extensions(make_model_from_structure)

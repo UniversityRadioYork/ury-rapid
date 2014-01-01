@@ -28,6 +28,14 @@ module Bra
         end
         module_function :validate_volume
 
+        def validate_marker(input)
+          # Why is the input changed to a string?
+          # Because Integer("0.3") raises an error, but Integer(0.3) doesn't.
+          # FUUUUUUUUU
+          Integer(input.to_s).tap { |marker| invalid if marker < 0 }
+        end
+        module_function :validate_marker
+
         def invalid
           fail(Bra::Common::Exceptions::InvalidPayload)
         end

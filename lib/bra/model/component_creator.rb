@@ -22,14 +22,32 @@ module Bra
 
       def item(options)
         Bra::Model::Item.new(
-          options[:type],
-          options[:name],
-          options[:origin],
-          options[:duration]
+          item_type(options),
+          item_name(options),
+          item_origin(options),
+          item_duration(options)
         )
       end
 
       private
+
+      def item_type(options)
+        validate_track_type(options.fetch(:type).to_sym)
+      end
+
+      def item_name(options)
+        options.fetch(:name).to_s
+      end
+
+      def item_origin(options)
+        origin = options[:origin]
+        origin.nil? ? nil : origin.to_s
+      end
+
+      def item_duration(options)
+        duration = options[:duration]
+        duration.nil? ? nil : validate_marker(duration)
+      end
 
       def validate_then_constant(validator, raw_value, handler_target)
         constant(send(validator, raw_value), handler_target)

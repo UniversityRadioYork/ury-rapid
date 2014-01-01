@@ -119,9 +119,7 @@ module Bra
           end
 
           def load_state_to_constant(load_state)
-            Bra::Model::Constant.new(
-              load_state, :load_state
-            ).tap(&@parent.method(:register))
+            @parent.create_model_object(:load_state, load_state)
           end
 
           def normal_load_state(load_state)

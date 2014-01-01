@@ -26,6 +26,7 @@ module Bra
       end
 
       def_delegator :@config, :register
+      def_delegator :@config, :create_model_object
     end
   end
 end
