@@ -34,7 +34,13 @@ module Bra
           TARGETS = [Codes::Playback::VOLUME]
 
           def run(response)
-            put(player_url(response, :volume), response.volume)
+            post(player_url, :volume, body(response)
+          end
+
+          private
+
+          def body(response)
+            @parent.create_model_object(:volume, response.volume)
           end
         end
 
