@@ -110,8 +110,7 @@ module Bra
         @target = target
       end
 
-      def_delegator :@config, :option
-      def_delegator :@config, :register
+      def_delegators :@config, :option, :register, :create_model_object
     end
   end
 end
