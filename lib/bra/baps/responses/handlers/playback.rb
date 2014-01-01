@@ -53,13 +53,18 @@ module Bra
           }
 
           def run(response)
-            put(player_url(response, marker(response)), response.position)
+            marker_id = id(response)
+            post(player_url(response), marker_id, body(marker_id, response))
           end
 
           private
 
-          def marker(response)
+          def id(response)
             CODES_TO_MARKERS[response.code]
+          end
+
+          def body(marker_id, response)
+            @parent.create_model_object(:marker, marker_id, response.position)
           end
         end
 
