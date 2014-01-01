@@ -20,12 +20,16 @@ module Bra
           }
 
           def run(response)
-            put(player_url(response, 'state'), state(response))
+            post(player_url, :state, body(response))
           end
 
           private
 
-          def state(response)
+          def body(response)
+            @parent.create_model_object(:play_state, state(response))
+          end
+
+          def state
             CODES_TO_STATES[response.code]
           end
         end
