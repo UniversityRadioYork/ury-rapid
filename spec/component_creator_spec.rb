@@ -79,6 +79,12 @@ describe Bra::Model::ComponentCreator do
     )
   end
 
+  describe '#volume' do
+  end
+
+  describe '#marker' do
+  end
+
   describe '#item' do
     describe 'the duration of the Item' do
       it_behaves_like(
