@@ -80,6 +80,33 @@ describe Bra::Model::ComponentCreator do
   end
 
   describe '#volume' do
+    context 'when the value is a valid rational number between 0 and 1.0' do
+      it 'returns an object whose flat representation is the number' do
+      end
+    end
+
+    context 'when the value is the integer 0' do
+    end
+
+    context 'when the value is the integer 1' do
+    end
+
+    context 'when the value is a string' do
+      context 'and it represents a valid rational number between 0 and 1.0' do
+      end
+
+      context 'and it represents the integer 0' do
+      end
+
+      context 'and it represents the integer 1' do
+      end
+
+      context 'and it does not represent a number' do
+      end
+    end
+
+    context 'when the value is invalid' do
+    end
   end
 
   describe '#marker' do
