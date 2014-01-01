@@ -103,6 +103,11 @@ module Bra
         p @target.children.keys
       end
 
+      # Create a stock model component using the model configurator
+      def component(id, type, *args, &block)
+        child(id, create_model_object(type, *args), &block)
+      end
+
       def build_children(object)
         target = @target
         @target = object
