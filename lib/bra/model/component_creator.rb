@@ -20,6 +20,10 @@ module Bra
         validate_then_constant(:validate_play_state, value, :state)
       end
 
+      def volume(value)
+        validate_then_constant(:validate_volume, value, :volume)
+      end
+
       def item(options)
         Bra::Model::Item.new(
           item_type(options),
