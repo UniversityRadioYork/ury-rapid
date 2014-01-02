@@ -81,8 +81,20 @@ describe Bra::Model::ComponentCreator do
 
   shared_examples '#flat on a successful number volume call' do |examples|
     examples.each do |example|
-      it "returns a value equal to #{example}" do
-        expect(subject.volume(example).flat).to eq(example)
+      context "when the input is #{example}" do
+        it "returns a value equal to #{example}" do
+          expect(subject.volume(example).flat).to eq(example)
+        end
+      end
+    end
+  end
+
+  shared_examples '#flat on a successful string volume call' do |examples|
+    examples.each do |example|
+      context "when the input is '#{example}'" do
+        it "returns a value equal to '#{example}' cast as a rational" do
+          expect(subject.volume(example).flat).to eq(Rational(example))
+        end
       end
     end
   end
@@ -102,12 +114,14 @@ describe Bra::Model::ComponentCreator do
 
       context 'and the value is a string' do
         context 'and it represents a valid rational between 0 and 1.0' do
+          it_behaves_like(
+            '#flat on a successful string volume call',
+            %w{0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0}
+          )
         end
 
-        context 'and it represents the integer 0' do
-        end
-
-        context 'and it represents the integer 1' do
+        context 'and it represents a valid integer between 0 and 1' do
+          it_behaves_like '#flat on a successful string volume call', %w{0 1}
         end
 
         context 'and it does not represent a number' do
