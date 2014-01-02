@@ -79,67 +79,61 @@ describe Bra::Model::ComponentCreator do
     )
   end
 
-  shared_examples '#flat on a successful number volume call' do |examples|
-    examples.each do |example|
-      context "when the input is #{example}" do
-        it "returns a value equal to #{example}" do
-          expect(subject.volume(example).flat).to eq(example)
-        end
+  shared_examples 'a successful number volume call' do |examples|
+    it "returns an object whose #flat is equal to its input" do
+      examples.each do |example|
+        expect(subject.volume(example).flat).to eq(example)
       end
     end
   end
 
-  shared_examples '#flat on a successful string volume call' do |examples|
-    examples.each do |example|
-      context "when the input is '#{example}'" do
-        it "returns a value equal to '#{example}' cast as a rational" do
-          expect(subject.volume(example).flat).to eq(Rational(example))
-        end
+  shared_examples 'a successful string volume call' do |examples|
+    it "returns an object whose #flat is equal to Rational(input)" do
+      examples.each do |example|
+        expect(subject.volume(example).flat).to eq(Rational(example))
       end
     end
   end
 
   describe '#volume' do
-    context 'when #flat is called on the returned object' do
-      context 'and the value is a valid rational number between 0 and 1.0' do
+    context 'when the value is a valid rational number between 0 and 1.0' do
+      it_behaves_like(
+        'a successful number volume call',
+        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+      )
+    end
+
+    context 'when the value is a valid integer between 0 and 1' do
+      it_behaves_like('a successful number volume call', [0, 1])
+    end
+
+    context 'when the value is a string' do
+      context 'and it represents a valid rational between 0 and 1.0' do
         it_behaves_like(
-          '#flat on a successful number volume call',
-          [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+          'a successful string volume call',
+          %w{0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0}
         )
       end
 
-      context 'and the value is a valid integer between 0 and 1' do
-        it_behaves_like('#flat on a successful number volume call', [0, 1])
+      context 'and it represents a valid integer between 0 and 1' do
+        it_behaves_like 'a successful string volume call', %w{0 1}
       end
+    end
 
-      context 'and the value is a string' do
-        context 'and it represents a valid rational between 0 and 1.0' do
-          it_behaves_like(
-            '#flat on a successful string volume call',
-            %w{0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0}
-          )
-        end
-
-        context 'and it represents a valid integer between 0 and 1' do
-          it_behaves_like '#flat on a successful string volume call', %w{0 1}
-        end
+    context 'when the value is a string that does not represent a number' do
+      it 'fails' do
+        expect { subject.volume('bananas') }.to raise_error
+        expect { subject.volume('') }.to raise_error
+        expect { subject.volume('3.0nanana') }.to raise_error
+        expect { subject.volume('NaN') }.to raise_error
       end
+    end
 
-      context 'when the value is a string that does not represent a number' do
-        it 'fails' do
-          expect { subject.volume('bananas') }.to raise_error
-          expect { subject.volume('') }.to raise_error
-          expect { subject.volume('3.0nanana') }.to raise_error
-          expect { subject.volume('NaN') }.to raise_error
-        end
-      end
-
-      context 'when the value is invalid' do
-        it 'fails' do
-          expect { subject.volume(true) }.to raise_error
-          expect { subject.volume(false) }.to raise_error
-          expect { subject.volume(nil) }.to raise_error
-        end
+    context 'when the value is invalid' do
+      it 'fails' do
+        expect { subject.volume(true) }.to raise_error
+        expect { subject.volume(false) }.to raise_error
+        expect { subject.volume(nil) }.to raise_error
       end
     end
   end
