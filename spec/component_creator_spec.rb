@@ -79,33 +79,43 @@ describe Bra::Model::ComponentCreator do
     )
   end
 
+  shared_examples '#flat on a successful number volume call' do |examples|
+    examples.each do |example|
+      it "returns a value equal to #{example}" do
+        expect(subject.volume(example).flat).to eq(example)
+      end
+    end
+  end
+
   describe '#volume' do
-    context 'when the value is a valid rational number between 0 and 1.0' do
-      it 'returns an object whose flat representation is the number' do
-      end
-    end
-
-    context 'when the value is the integer 0' do
-    end
-
-    context 'when the value is the integer 1' do
-    end
-
-    context 'when the value is a string' do
-      context 'and it represents a valid rational number between 0 and 1.0' do
+    context 'when #flat is called on the returned object' do
+      context 'and the value is a valid rational number between 0 and 1.0' do
+        it_behaves_like(
+          '#flat on a successful number volume call',
+          [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        )
       end
 
-      context 'and it represents the integer 0' do
+      context 'and the value is a valid integer between 0 and 1' do
+        it_behaves_like('#flat on a successful number volume call', [0, 1])
       end
 
-      context 'and it represents the integer 1' do
+      context 'and the value is a string' do
+        context 'and it represents a valid rational between 0 and 1.0' do
+        end
+
+        context 'and it represents the integer 0' do
+        end
+
+        context 'and it represents the integer 1' do
+        end
+
+        context 'and it does not represent a number' do
+        end
       end
 
-      context 'and it does not represent a number' do
+      context 'when the value is invalid' do
       end
-    end
-
-    context 'when the value is invalid' do
     end
   end
 

@@ -32,7 +32,7 @@ class Structure < Bra::Model::Creator
   def player
     component :state,      :play_state, :stopped
     component :load_state, :load_state, :empty
-    constant :volume, 0.0, :player_volume
+    component :volume,     :volume,     0.0
     Bra::Common::Types::MARKERS.each do |id|
       var id, 0, "player_#{id}".intern, marker_validator
     end
