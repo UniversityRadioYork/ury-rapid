@@ -123,12 +123,23 @@ describe Bra::Model::ComponentCreator do
         context 'and it represents a valid integer between 0 and 1' do
           it_behaves_like '#flat on a successful string volume call', %w{0 1}
         end
+      end
 
-        context 'and it does not represent a number' do
+      context 'when the value is a string that does not represent a number' do
+        it 'fails' do
+          expect { subject.volume('bananas') }.to raise_error
+          expect { subject.volume('') }.to raise_error
+          expect { subject.volume('3.0nanana') }.to raise_error
+          expect { subject.volume('NaN') }.to raise_error
         end
       end
 
       context 'when the value is invalid' do
+        it 'fails' do
+          expect { subject.volume(true) }.to raise_error
+          expect { subject.volume(false) }.to raise_error
+          expect { subject.volume(nil) }.to raise_error
+        end
       end
     end
   end
