@@ -141,7 +141,7 @@ describe Bra::Model::ComponentCreator do
   describe '#marker' do
     context 'when the value is a valid natural' do
       it 'returns an object whose #flat is equal to its input' do
-        [0, 0.0, 1, 1.0, 10, 10.0, 100, 100.0, 1000, 1000.0].each do |example|
+        [0, 1, 10, 100, 1000].each do |example|
           expect(subject.marker(:foo, example).flat).to eq(example)
         end
       end
@@ -150,7 +150,7 @@ describe Bra::Model::ComponentCreator do
     context 'when the value is a string' do
       context 'and it represents a valid natural' do
         it 'returns an object whose #flat equals its input as an Integer' do
-          %w{0 0.0 1 1.0 10 10.0 100 100.0 1000 1000.0}.each do |example|
+          %w{0 1 10 100 1000}.each do |example|
             expect(subject.marker(:foo, example).flat).to eq(Integer(example))
           end
         end
