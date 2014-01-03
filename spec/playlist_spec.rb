@@ -15,6 +15,10 @@ describe Bra::Model::Playlist do
   before(:each) do
     subject.register_update_channel(channel)
     subject.register_handler(handler)
+
+    test1.register_update_channel(channel)
+    test2.register_update_channel(channel)
+    test3.register_update_channel(channel)
   end
 
   describe '#driver_post' do
@@ -29,15 +33,6 @@ describe Bra::Model::Playlist do
           expect(channel).to receive(:notify_update).with(test1).ordered
           expect(channel).to receive(:notify_update).with(test2).ordered
           expect(channel).to receive(:notify_update).with(test3).ordered
-
-          subject.driver_post(0, test1)
-          subject.driver_post(1, test2)
-          subject.driver_post(0, test3)
-        end
-        it 'registers the playlist item handler with the Item' do
-          expect(handler).to receive(:item_handler).with(test1).ordered
-          expect(handler).to receive(:item_handler).with(test2).ordered
-          expect(handler).to receive(:item_handler).with(test3).ordered
 
           subject.driver_post(0, test1)
           subject.driver_post(1, test2)

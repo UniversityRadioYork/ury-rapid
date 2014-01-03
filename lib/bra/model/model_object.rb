@@ -90,7 +90,10 @@ module Bra
       #
       # @return [void]
       def driver_post(id, resource)
-        resource.move_to(self, id)
+        unless resource.nil?
+          resource.move_to(self, id)
+          resource.notify_update
+        end
       end
 
       # Default implementation of DELETE on model objects
