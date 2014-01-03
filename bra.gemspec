@@ -26,20 +26,20 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.3'
+  spec.add_development_dependency 'fuubar'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'simplecov'
-  spec.add_development_dependency 'fuubar'
 
   spec.add_runtime_dependency 'activesupport'
+  spec.add_runtime_dependency 'compass'
+  spec.add_runtime_dependency 'compo', '~> 0.2'
+  spec.add_runtime_dependency 'eventmachine'
+  spec.add_runtime_dependency 'haml'
+  spec.add_runtime_dependency 'kankri', '~> 0.1'
+  spec.add_runtime_dependency 'sass'
   spec.add_runtime_dependency 'sinatra'
   spec.add_runtime_dependency 'sinatra-contrib'
-  spec.add_runtime_dependency 'eventmachine'
-  spec.add_runtime_dependency 'thin'
-  spec.add_runtime_dependency 'haml'
-  spec.add_runtime_dependency 'sass'
-  spec.add_runtime_dependency 'compass'
   spec.add_runtime_dependency 'sinatra-websocket'
-  spec.add_runtime_dependency 'kankri', '~> 0.1'
-  spec.add_runtime_dependency 'compo', '~> 0.2'
+  spec.add_runtime_dependency 'thin'
 end
