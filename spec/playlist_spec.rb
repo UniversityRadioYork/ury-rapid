@@ -38,6 +38,7 @@ describe Bra::Model::Playlist do
           subject.driver_post(1, test2)
           subject.driver_post(0, test3)
         end
+
         it 'adds the Item to the Playlist at the requested index' do
           subject.driver_post(0, test1)
           expect(subject.children).to eq(0 => test1)
@@ -49,6 +50,7 @@ describe Bra::Model::Playlist do
           subject.driver_post(0, test3)
           expect(subject.children).to eq(0 => test3, 1 => test1, 2 => test2)
         end
+
         it 'sets the parent of the Item to the Playlist' do
           expect(test1.parent).to be_a(Compo::Parentless)
           subject.driver_post(0, test1)
@@ -69,6 +71,7 @@ describe Bra::Model::Playlist do
           subject.driver_post(0, test3)
           expect(subject.children).to eq(0 => test3, 1 => test2, 2 => test1)
         end
+
         it 'keeps the parent as the Playlist' do
           expect(test1.parent).to be_a(Compo::Parentless)
           subject.driver_post(0, test1)
@@ -88,6 +91,7 @@ describe Bra::Model::Playlist do
         subject.driver_delete
       end
     end
+
     context 'when Items are enqueued' do
       before(:each) do
         allow(channel).to receive(:notify_delete)
