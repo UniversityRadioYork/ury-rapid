@@ -30,8 +30,8 @@ module Bra
 
         def validate_marker(input)
           # Why is the input changed to a string?
-          # Because Integer("0.3") raises an error, but Integer(0.3) doesn't.
-          # FUUUUUUUUU
+          # Because Integer('0.3') raises an error, but Integer(0.3) doesn't.
+          # Integer('3') and Integer(3), however, both return 3.
           Integer(input.to_s).tap { |marker| invalid if marker < 0 }
         end
         module_function :validate_marker
