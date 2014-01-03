@@ -24,6 +24,10 @@ module Bra
         validate_then_constant(:validate_volume, value, :volume)
       end
 
+      def marker(type, value)
+        validate_then_constant(:validate_marker, value, :type)
+      end
+
       def item(options)
         Bra::Model::Item.new(
           item_type(options),
