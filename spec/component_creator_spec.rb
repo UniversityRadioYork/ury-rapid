@@ -139,6 +139,47 @@ describe Bra::Model::ComponentCreator do
   end
 
   describe '#marker' do
+    context 'when the value is a valid natural' do
+      it 'returns an object whose #flat is equal to its input' do
+        [0, 0.0, 1, 1.0, 10, 10.0, 100, 100.0, 1000, 1000.0].each do |example|
+          expect(subject.marker(:foo, example).flat).to eq(example)
+        end
+      end
+    end
+
+    context 'when the value is a string' do
+      context 'and it represents a valid natural' do
+        it 'returns an object whose #flat equals its input as an Integer' do
+          %w{0 0.0 1 1.0 10 10.0 100 100.0 1000 1000.0}.each do |example|
+            expect(subject.marker(:foo, example).flat).to eq(Iexample)
+          end
+        end
+      end
+    end
+
+    context 'when the value is a string representing a non-natural number' do
+      it 'fails to construct' do
+        expect { subject.marker(:foo, '1.1') }.to raise_error
+      end
+    end
+
+    context 'when the value is a string that does not represent a number' do
+      it 'fails to construct' do
+        expect { subject.marker(:foo, 'bananas') }.to raise_error
+        expect { subject.marker(:foo, '') }.to raise_error
+        expect { subject.marker(:foo, '3dom') }.to raise_error
+        expect { subject.marker(:foo, '3.0nanana') }.to raise_error
+        expect { subject.marker(:foo, 'NaN') }.to raise_error
+      end
+    end
+
+    context 'when the value is invalid' do
+      it 'fails to construct' do
+        expect { subject.volume(true) }.to raise_error
+        expect { subject.volume(false) }.to raise_error
+        expect { subject.volume(nil) }.to raise_error
+      end
+    end
   end
 
   describe '#item' do
