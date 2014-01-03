@@ -1,5 +1,6 @@
 require 'spec_helper.rb'
 
+require 'compo'
 require 'bra/model/playlist'
 require 'bra/model/item'
 
@@ -54,7 +55,7 @@ describe Bra::Model::Playlist do
           expect(subject.children).to eq(0 => test3, 1 => test1, 2 => test2)
         end
         it 'sets the parent of the Item to the Playlist' do
-          expect(test1.parent).to be_nil
+          expect(test1.parent).to be_a(Compo::Parentless)
           subject.driver_post(0, test1)
           expect(test1.parent).to eq(subject)
         end
@@ -74,7 +75,7 @@ describe Bra::Model::Playlist do
           expect(subject.children).to eq(0 => test3, 1 => test2, 2 => test1)
         end
         it 'keeps the parent as the Playlist' do
-          expect(test1.parent).to be_nil
+          expect(test1.parent).to be_a(Compo::Parentless)
           subject.driver_post(0, test1)
           expect(test1.parent).to eq(subject)
 
@@ -113,9 +114,9 @@ describe Bra::Model::Playlist do
 
         subject.driver_delete
 
-        expect(test1.parent).to be_nil
-        expect(test2.parent).to be_nil
-        expect(test3.parent).to be_nil
+        expect(test1.parent).to be_a(Compo::Parentless)
+        expect(test2.parent).to be_a(Compo::Parentless)
+        expect(test3.parent).to be_a(Compo::Parentless)
       end
 
       it 'announces each item deletion' do
