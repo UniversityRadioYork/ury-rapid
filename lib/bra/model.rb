@@ -3,8 +3,6 @@ require 'bra/model/creator'
 require 'bra/model/driver_view'
 require 'bra/model/item'
 require 'bra/model/model_object'
-require 'bra/model/player'
-require 'bra/model/playlist'
 require 'bra/model/server_view'
 require 'bra/model/variable'
 
