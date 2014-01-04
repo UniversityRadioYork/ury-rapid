@@ -26,17 +26,6 @@ module Bra
           :item_from_other_playlist   # playlist_id, index
         ]
 
-        # Determines whether a payload should be forwarded somewhere else
-        #
-        # This makes payloads this Poster isn't responsible for be sent to the
-        # Player's children as PUT requests.
-        #
-        # @return [Boolean]  True if this Poster handles this payload; false if
-        #   the payload should be sent on as a PUT request.
-        def post_forward
-          payload_id == :item ? false : super()
-        end
-
         # Set up the main Poster methods to reference the jump tables above
         %w{url hash}.each do |style|
           jump_table = const_get("#{style.upcase}_TYPES")

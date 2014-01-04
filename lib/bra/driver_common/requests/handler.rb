@@ -28,6 +28,10 @@ module Bra
           self.send(@action)
         end
 
+        def self.use_post_payload_processor
+          define_method(:post) { @payload.process(self) }
+        end
+
         protected
 
         # Sends a request to the parent requester

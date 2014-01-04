@@ -19,7 +19,6 @@ module Bra
         # Handler for channel players
         class Player < Bra::DriverCommon::Requests::Handler
           def_targets :player
-          use_poster PlayerPoster, :post
         end
 
         # Handler for items
