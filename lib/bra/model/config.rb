@@ -1,4 +1,5 @@
 require 'bra/driver_common/requests/null_handler'
+require 'bra/model/component_creator'
 
 module Bra
   module Model
@@ -11,7 +12,7 @@ module Bra
         @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
         @options = options
         @update_channel = update_channel
-        @component_creator = Bra::Model::ComponentCreator.new
+        @component_creator = Bra::Model::ComponentCreator.new(self)
       end
 
       # Adds extensions to the model
