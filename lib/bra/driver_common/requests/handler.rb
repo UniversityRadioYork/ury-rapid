@@ -33,7 +33,7 @@ module Bra
         end
 
         def self.put_by_posting_to_parent
-          define_method(:put) { @object.parent.post(@object.id, @payload) }
+          define_method(:put) { @object.post_to_parent(@payload) }
         end
 
         protected

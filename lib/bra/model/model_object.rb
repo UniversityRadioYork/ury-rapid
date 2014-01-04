@@ -55,6 +55,11 @@ module Bra
         flat
       end
 
+      # Takes a PUT payload intended for this object and POSTs it to its parent
+      def post_to_parent(payload)
+        parent.post(payload)
+      end
+
       %i{put post delete}.each do |action|
         # Define payload-based server methods.
 
