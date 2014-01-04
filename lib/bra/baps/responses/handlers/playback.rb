@@ -20,7 +20,7 @@ module Bra
           }
 
           def run(response)
-            post(player_url, :state, body(response))
+            post(player_url(response), :state, body(response))
           end
 
           private
