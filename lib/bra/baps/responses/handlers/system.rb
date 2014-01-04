@@ -5,17 +5,17 @@ module Bra
         # Handler for dealing with BAPS system notifications that bra logs
         # but otherwise ignores.
         class Log < Bra::DriverCommon::Responses::Handler
-          TARGETS = [
+          def_targets (
             Codes::System::CLIENT_CHANGE,
             Codes::System::LOG_MESSAGE
-          ]
+          )
 
-          def run(response)
-            puts("#{type_message(response)}: #{details(response)}")
+          def run
+            puts("#{type_message(@response)}: #{details(@response)}")
           end
 
-          def type_message(response)
-            TYPE_MESSAGE[response.code + response.subcode]
+          def type_message
+            TYPE_MESSAGE[@response.code + @response.subcode]
           end
 
           def details(response)

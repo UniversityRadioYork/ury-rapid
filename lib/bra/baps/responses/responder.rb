@@ -39,9 +39,9 @@ module Bra
         # @param requester [Requester] The Requester via which this Responder
         #   can send BAPS login requests.
         def initialize(model, requester)
+          super()
           @model = model
           @requester = requester
-          @handlers = handler_hash
         end
 
         # Registers the responder's callbacks with a incoming responses channel
@@ -63,20 +63,15 @@ module Bra
         end
 
         def handle_response(response)
-          @handlers.fetch(response.code, UnhandledHandler).run(model, response)
+          handler_for_code(response.code).call(self, response)
         end
-      end
 
-      # Mock handler for when a BAPS code has no registered handler.
-      class UnhandledHandler
-        # Logs a response with no responder handling function
-        #
-        # @api private
-        #
-        # @param response [Hash] A response hash.
-        #
-        # @return [void]
-        def self.run(_, response)
+        def handler_for_code(code)
+          @handlers.fetch(code, method(:unhandled))
+        end
+
+        # Mock handler for when a BAPS code has no registered handler.
+        def unhandled(_, response)
           message = "Unhandled response: #{response.name}"
           if response.code.is_a?(Numeric)
             hexcode = response.code.to_s(16)

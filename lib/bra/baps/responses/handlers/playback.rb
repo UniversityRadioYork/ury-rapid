@@ -6,18 +6,18 @@ module Bra
     module Responses
       module Handlers
         class PlayerHandler < Handler
-          def run(response)
-            do_post(response) unless ignore_response?(response)
+          def run
+            do_post unless ignore_response?
           end
 
           protected
 
-          def ignore_response?(response)
+          def ignore_response?
             false
           end
 
-          def do_post(response)
-            post(player_url(response), id(response), body(response))
+          def do_post
+            post(player_url, id, body)
           end
         end
 
@@ -37,20 +37,20 @@ module Bra
 
           private
 
-          def id(response)
+          def id
             :state
           end
 
-          def ignore_response?(response)
-            get(player_url(response, id(response))).value == state(response)
+          def ignore_response?
+            get(player_url(id)).value == state
           end
 
-          def body(response)
-            create_model_object(:play_state, state(response))
+          def body
+            create_model_object(:play_state, state)
           end
 
-          def state(response)
-            CODES_TO_STATES[response.code]
+          def state
+            CODES_TO_STATES[@response.code]
           end
         end
 
@@ -59,16 +59,16 @@ module Bra
 
           private
 
-          def id(response)
+          def id
             :volume
           end
 
-          def ignore_response?(response)
-            get(player_url(response, id(response))).value == response.volume
+          def ignore_response?
+            get(player_url(id)).value == @response.volume
           end
 
-          def body(response)
-            create_model_object(:volume, response.volume)
+          def body
+            create_model_object(:volume, @response.volume)
           end
         end
 
@@ -88,16 +88,16 @@ module Bra
 
           private
 
-          def id(response)
-            CODES_TO_MARKERS[response.code]
+          def id
+            CODES_TO_MARKERS[@response.code]
           end
 
-          def ignore_response?(response)
-            get(player_url(response, id(response))).value == response.position
+          def ignore_response?
+            get(player_url(id)).value == @response.position
           end
 
-          def body(response)
-            create_model_object(:marker, id(response), response.position)
+          def body
+            create_model_object(:marker, id, @response.position)
           end
         end
 
@@ -105,19 +105,19 @@ module Bra
         class Load < LoaderHandler
           def_targets Codes::Playback::LOAD
 
-          def id(response)
+          def id
             :item
           end
 
-          def urls(response)
-            { post:       player_url(response),
-              delete:     player_url(response, :item),
-              load_state: player_url(response, :load_state)
+          def urls
+            { post:       player_url,
+              delete:     player_url(:item),
+              load_state: player_url(:load_state)
             }
           end
 
-          def origin(response)
-            "playlist://#{response.subcode}/#{response.index}"
+          def origin
+            "playlist://#{@response.subcode}/#{@response.index}"
           end
         end
       end

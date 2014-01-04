@@ -8,11 +8,20 @@ module Bra
     #
     # NOTE: Subclasses must define the constant HANDLER_MODULE.
     class HandlerSet
+      extend Forwardable
+
+      def initialize
+        @handlers = {}
+        populate(handler_classes)
+      end
+
+      def_delegator :@handlers, :[]=, :register_handler
+
       protected
 
       # Populates a hash mapping handler targets to their handlers in this set
-      def handler_hash
-        handlers.reduce({}, &method(:add_handler_targets))
+      def populate(classes)
+        classes.each(&method(:add_handler_targets))
       end
 
       def handler_module
@@ -21,9 +30,8 @@ module Bra
 
       private
 
-      def add_handler_targets(hash, handler_class)
-        handler_class.register_into(hash) if has_targets?(handler_class)
-        hash
+      def add_handler_targets(handler_class)
+        handler_class.register_into(self) if has_targets?(handler_class)
       end
 
       def has_targets?(handler_class)
@@ -40,7 +48,7 @@ module Bra
       # Bra::Baps::Requests::Handlers module.
       #
       # @return [Array] An array of handlers as described above.
-      def handlers
+      def handler_classes
         handler_module.constants.map(&handler_module.method(:const_get))
       end
     end

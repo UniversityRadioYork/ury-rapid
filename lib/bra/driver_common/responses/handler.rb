@@ -13,8 +13,9 @@ module Bra
       class Handler < Bra::DriverCommon::Handler
         extend Forwardable
 
-        def initialize(parent)
+        def initialize(parent, response)
           super(parent)
+          @response = response
           @model = parent.model
         end
 
