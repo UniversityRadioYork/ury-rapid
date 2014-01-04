@@ -35,6 +35,7 @@ module Bra
         # @param queue [Queue] The quests queue used for sending requests to
         #   the BAPS server.
         def initialize(queue)
+          super()
           @queue = queue
         end
 
@@ -57,7 +58,7 @@ module Bra
         def add_handlers(model_config)
           # There is no reason other than efficiency for this to be a mutating
           # action - if needs be, merge instead of merge!.
-          model_config.add_handlers(handler_hash)
+          model_config.add_handlers(@handlers)
         end
 
         # Sends a request to the BAPS server
