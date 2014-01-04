@@ -41,8 +41,6 @@ module Bra
       attr_reader :value
       alias_method :flat, :value
 
-      def_delegator :@value, :public_send, :method_missing
-      def_delegator :@value, :respond_to?, :respond_to_missing?
       def_delegator :@value, :to_s
     end
   end
