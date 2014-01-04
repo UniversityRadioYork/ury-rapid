@@ -3,11 +3,13 @@ require 'bra/driver_common/requests/poster'
 module Bra
   module DriverCommon
     module Requests
-      # Abstract object for handling POSTs in Player objects
+      # Extension of request handler to deal with the common Player APIs
       #
-      # This deals with the various protocols POSTing objects handles, so that
+      # This deals with the various protocols for POSTing player items, so that
       # drivers can override the protocol methods they implement
-      class PlayerPoster < Poster
+      class PlayerHandler < Handler
+        use_post_payload_processor
+
         # Supported URL protocols in this version of the bra API.
         URL_TYPES = {
           playlist: :item_from_playlist_url
