@@ -139,6 +139,10 @@ describe Bra::Model::ComponentCreator do
   end
 
   describe '#marker' do
+    it 'returns an object whose #handler_target is the first argument' do
+      expect(subject.marker(:foo, 1).handler_target).to eq(:foo)
+    end
+
     context 'when the value is a valid natural' do
       it 'returns an object whose #flat is equal to its input' do
         [0, 1, 10, 100, 1000].each do |example|
