@@ -32,6 +32,7 @@ module Bra
         class Volume < Bra::DriverCommon::Requests::VariableHandler
           def_targets :volume
           use_post_payload_processor
+          put_by_posting_to_parent
 
           def float(float)
             request(
@@ -45,6 +46,7 @@ module Bra
         class Marker < Bra::DriverCommon::Requests::VariableHandler
           def_targets :position, :cue, :intro
           use_post_payload_processor
+          put_by_posting_to_parent
 
           def integer(integer)
             request(
@@ -69,6 +71,7 @@ module Bra
         class State < Bra::DriverCommon::Requests::VariableHandler
           def_targets :state
           use_post_payload_processor
+          put_by_posting_to_parent
 
           include Bra::Common::Types::Validators
 

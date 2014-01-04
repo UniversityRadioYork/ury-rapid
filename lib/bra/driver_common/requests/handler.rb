@@ -32,6 +32,10 @@ module Bra
           define_method(:post) { @payload.process(self) }
         end
 
+        def self.put_by_posting_to_parent
+          define_method(:put) { @object.parent.post(@object.id, @payload) }
+        end
+
         protected
 
         # Sends a request to the parent requester
