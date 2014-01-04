@@ -13,11 +13,11 @@ module Bra
 
         # Handles a BAPS channel state change
         class State < PlayerHandler
-          TARGETS = [
+          def_targets(
             Codes::Playback::PLAY,
             Codes::Playback::PAUSE,
             Codes::Playback::STOP
-          ]
+          )
 
           CODES_TO_STATES = {
             Codes::Playback::PLAY  => :playing,
@@ -41,7 +41,7 @@ module Bra
         end
 
         class Volume < PlayerHandler
-          TARGETS = [Codes::Playback::VOLUME]
+          def_targets Codes::Playback::VOLUME
 
           private
 
@@ -56,11 +56,11 @@ module Bra
 
         # Handles a BAPS channel marker change
         class Marker < PlayerHandler
-          TARGETS = [
+          def_targets(
             Codes::Playback::POSITION,
             Codes::Playback::CUE,
             Codes::Playback::INTRO
-          ]
+          )
 
           CODES_TO_MARKERS = {
             Codes::Playback::POSITION => :position,
@@ -81,9 +81,7 @@ module Bra
 
         # Handles a BAPS item load
         class Load < LoaderHandler
-          TARGETS = [
-            Codes::Playback::LOAD
-          ]
+          def_targets Codes::Playback::LOAD
 
           def id(response)
             :item
