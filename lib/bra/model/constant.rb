@@ -4,10 +4,6 @@ require 'compo'
 module Bra
   module Model
     # A model object containing a constant value
-    #
-    # This is effectively a thin wrapper over a value, granting the ability to
-    # treat it as a ModelObject while allowing any methods Constant doesn't
-    # define to be responded to by the value.
     class Constant < Compo::Leaf
       extend Forwardable
       include ModelObject
