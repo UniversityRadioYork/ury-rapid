@@ -1,13 +1,13 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 
 require 'compo'
 require 'bra/model/playlist'
 require 'bra/model/item'
 
 describe Bra::Model::Playlist do
-  let(:test1)    { Bra::Model::Item.new(:library, '1', nil, nil) }
-  let(:test2)    { Bra::Model::Item.new(:library, '2', nil, nil) }
-  let(:test3)    { Bra::Model::Item.new(:library, '3', nil, nil) }
+  let(:test1) { build(:item, name: '1') }
+  let(:test2) { build(:item, name: '2') }
+  let(:test3) { build(:item, name: '3') }
 
   let(:channel) { double(:channel) }
   let(:handler) { double(:handler) }
