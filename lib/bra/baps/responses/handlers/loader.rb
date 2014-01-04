@@ -11,13 +11,13 @@ module Bra
         # Descendants should define methods id and urls,
         # which take the response and return the relevant Loader arguments.
         class LoaderHandler < Handler
-          def run(response)
+          def run
             Loader.load(
               self,
-              response,
-              id(response),
-              urls(response),
-              origin(response)
+              @response,
+              id,
+              urls,
+              origin
             )
           end
 
@@ -26,9 +26,8 @@ module Bra
           # This defaults to nil.  Subclasses may override this to provide an
           # appropriate origin URL for the item.
           #
-          # @param response [Response]  The response representing the load.
           # @return [NilClass] nil.
-          def origin(response)
+          def origin
             nil
           end
         end
