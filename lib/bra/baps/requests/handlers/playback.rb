@@ -7,18 +7,15 @@ module Bra
   module Baps
     module Requests
       module Handlers
-        # A method object that handles POSTs to the Player for BAPS
-        class PlayerPoster < Bra::DriverCommon::Requests::PlayerPoster
+        # Handler for channel players
+        class Player < Bra::DriverCommon::Requests::PlayerHandler
+          def_targets :player
+
           def item_from_local_playlist(index)
             request(
               Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
             )
           end
-        end
-
-        # Handler for channel players
-        class Player < Bra::DriverCommon::Requests::Handler
-          def_targets :player
         end
 
         # Handler for items
@@ -32,7 +29,11 @@ module Bra
           end
         end
 
-        class VolumePoster < Bra::DriverCommon::Requests::Poster
+        # Handler for player volume changes.
+        class Volume < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_volume
+          use_post_payload_processor
+
           def float(float)
             request(
               Request.new(Codes::Playback::VOLUME, caller_parent_id)
@@ -41,14 +42,11 @@ module Bra
           end
         end
 
-        # Handler for player volume changes.
-        class Volume < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :player_volume
-          use_poster VolumePoster, :put
-        end
+        # Handler for player marker changes.
+        class Marker < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_position, :player_cue, :player_intro
+          use_post_payload_processor
 
-        # Object that performs the POSTing and PUTting of a playback marker
-        class MarkerPoster < Bra::DriverCommon::Requests::Poster
           def integer(integer)
             request(
               Request.new(target_to_code, caller_parent_id).uint32(integer)
@@ -68,15 +66,11 @@ module Bra
           }
         end
 
-        # Handler for player marker changes.
-        class Marker < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :player_position, :player_cue, :player_intro
-          use_poster MarkerPoster, :post
-        end
+        # Handler for state changes.
+        class State < Bra::DriverCommon::Requests::VariableHandler
+          def_targets :player_state
+          use_poster StatePoster, :put
 
-        # Object that performs the POSTing and PUTting of a playback marker
-        class StatePoster < Bra::DriverCommon::Requests::Poster
-          extend Forwardable
           include Bra::Common::Types::Validators
 
           def string(new_state)
@@ -123,12 +117,6 @@ module Bra
               playing: Codes::Playback::PLAY,
             }
           }
-        end
-
-        # Handler for state changes.
-        class State < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :player_state
-          use_poster StatePoster, :put
         end
       end
     end
