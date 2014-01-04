@@ -63,7 +63,7 @@ module Bra
         end
 
         def handle_response(response)
-          handler_for_code(response.code).call(self, response)
+          handler_for_code(response.code).call(response)
         end
 
         def handler_for_code(code)
@@ -71,7 +71,7 @@ module Bra
         end
 
         # Mock handler for when a BAPS code has no registered handler.
-        def unhandled(_, response)
+        def unhandled(response)
           message = "Unhandled response: #{response.name}"
           if response.code.is_a?(Numeric)
             hexcode = response.code.to_s(16)
