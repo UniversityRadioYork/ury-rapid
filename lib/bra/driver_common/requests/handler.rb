@@ -38,18 +38,18 @@ module Bra
 
         def self.post_by_putting_to_child_for(*ids)
           add_id_hook(:post, ids) do |handler, object, payload|
-            object.child(id).put(payload)
+            object.get_child(payload.id).put(payload)
           end
         end
 
         def self.put_by_payload_processor
-          define_method(:put) do |handler, object, payload|
+          add_hook(:put) do |handler, object, payload|
             payload.process(handler)
           end
         end
 
         def self.put_by_posting_to_parent
-          define_method(:put) do |handler, object, payload|
+          add_hook(:put) do |handler, object, payload|
             object.post_to_parent(payload)
           end
         end
