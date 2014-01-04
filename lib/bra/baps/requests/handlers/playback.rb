@@ -68,7 +68,7 @@ module Bra
         # Handler for state changes.
         class State < Bra::DriverCommon::Requests::VariableHandler
           def_targets :player_state
-          use_poster StatePoster, :put
+          use_post_payload_processor
 
           include Bra::Common::Types::Validators
 
