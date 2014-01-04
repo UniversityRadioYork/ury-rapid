@@ -26,7 +26,7 @@ module Bra
           private
 
           def body(response)
-            @parent.create_model_object(:play_state, state(response))
+            create_model_object(:play_state, state(response))
           end
 
           def state
@@ -44,7 +44,7 @@ module Bra
           private
 
           def body(response)
-            @parent.create_model_object(:volume, response.volume)
+            create_model_object(:volume, response.volume)
           end
         end
 
@@ -74,7 +74,7 @@ module Bra
           end
 
           def body(marker_id, response)
-            @parent.create_model_object(:marker, marker_id, response.position)
+            create_model_object(:marker, marker_id, response.position)
           end
         end
 
