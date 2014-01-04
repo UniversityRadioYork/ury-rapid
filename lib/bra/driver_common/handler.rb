@@ -40,17 +40,9 @@ module Bra
         defined?(self::TARGETS) && !(self::TARGETS.empty?)
       end
 
-      # Creates a hash mapping this handler to all of its targets.
-      def target_hash
-        targets.reduce({}, &method(:register_target))
-      end
-
-      private
-
-      # Registers a handler for one target in a target-to-handler hash
-      def register_target(hash, target)
-        hash[target] = self
-        hash
+      # Adds this handler's targets into the given handler set.
+      def self.register_into(set)
+        hash.merge!(->(*args) { new(*args).run })
       end
     end
   end

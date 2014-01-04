@@ -42,7 +42,6 @@ module Bra
           @model = model
           @requester = requester
           @handlers = handler_hash
-          @handlers.default = UnhandledHandler.new
         end
 
         # Registers the responder's callbacks with a incoming responses channel
@@ -64,9 +63,7 @@ module Bra
         end
 
         def handle_response(response)
-          f = @handlers[response.code]
-          f ||= @unhandled
-          f.run(response)
+          @handlers.fetch(response.code, UnhandledHandler).run(model, response)
         end
       end
 
@@ -79,7 +76,7 @@ module Bra
         # @param response [Hash] A response hash.
         #
         # @return [void]
-        def run(response)
+        def self.run(_, response)
           message = "Unhandled response: #{response.name}"
           if response.code.is_a?(Numeric)
             hexcode = response.code.to_s(16)
