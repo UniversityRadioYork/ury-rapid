@@ -38,7 +38,7 @@ module Bra
           TARGETS = [Codes::Playback::VOLUME]
 
           def run(response)
-            post(player_url, :volume, body(response)
+            post(player_url, :volume, body(response))
           end
 
           private
