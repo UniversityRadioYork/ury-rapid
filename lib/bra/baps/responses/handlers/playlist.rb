@@ -10,80 +10,76 @@ module Bra
         # Subclasses should define sub_url, which defines the URL path from
         # the playlist that should be deleted.
         class Delete < Handler
-          def run(response)
-            delete(playlist_url(response, *sub_url(response)))
+          def run
+            delete(playlist_url(*sub_url))
           end
         end
 
         # Handles a BAPS playlist item removal
         class DeleteItem < Delete
-          TARGETS = [Codes::Playlist::DELETE_ITEM]
+          def_targets Codes::Playlist::DELETE_ITEM
 
-          def sub_url(response)
-            [response.index]
+          def sub_url
+            [@response.index]
           end
         end
 
         # Handles a BAPS full playlist delete
         class DeletePlaylist < Delete
-          TARGETS = [Codes::Playlist::RESET]
+          def_targets Codes::Playlist::RESET
 
-          def sub_url(response)
+          def sub_url
             []
           end
         end
 
         # Handles a BAPS item count
         class ItemCount < Handler
-          TARGETS = [Codes::Playlist::ITEM_COUNT]
+          def_targets Codes::Playlist::ITEM_COUNT
 
-          def run(_)
+          def run
             # No operation
           end
         end
 
         # Handles a BAPS playlist item add
         class ItemData < LoaderHandler
-          TARGETS = [Codes::Playlist::ITEM_DATA]
+          def_targets Codes::Playlist::ITEM_DATA
 
-          def id(response)
-            response.index
+          def id
+            @response.index
           end
 
-          def urls(response)
-            { post: playlist_url(response) }
+          def urls
+            { post: playlist_url }
           end
         end
 
         # Handles a BAPS item movement
         class MoveItemInPlaylist < Handler
-          TARGETS = [Codes::Playlist::MOVE_ITEM_IN_PLAYLIST]
+          def_targets Codes::Playlist::MOVE_ITEM_IN_PLAYLIST
 
-          def run(response)
-            new_index = response.new_index
-            old_index = response.old_index
-
-            move(response, new_index) if new_index != old_index
+          def run
+            move if @response.new_index != @response.old_index
           end
 
           # Moves the item pointed to by response to its new index
-          def move(response, new_index)
+          def move
             # Noting that post, if applied to an existing resource, moves it
             # to its new URL.
-            url = new_url(response, new_index)
-            get_item(response) { |item| post(url, item) }
+            get_item { |item| post(new_url, item) }
           end
 
           private
 
           # Gets the item that wants to be moved and yields it to a block
-          def get_item(response, &block)
-            find_url(playlist_url(response, response.old_index), &block)
+          def get_item(&block)
+            find_url(playlist_url(@response.old_index), &block)
           end
 
           # Calculates the URL to which the item shall be posted
-          def new_url(response, new_index)
-            playlist_url(response, new_index)
+          def new_url
+            playlist_url(@response.new_index)
           end
         end
       end
