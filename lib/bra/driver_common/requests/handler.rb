@@ -61,6 +61,10 @@ module Bra
 
         protected
 
+        def_delegator :@object, :id, :caller_id
+        def_delegator :@object, :parent_id, :caller_parent_id
+        def_delegator :@payload, :id, :payload_id
+
         # Sends a request to the parent requester
         #
         # @api semipublic
