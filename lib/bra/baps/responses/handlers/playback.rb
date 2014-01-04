@@ -5,8 +5,14 @@ module Bra
   module Baps
     module Responses
       module Handlers
+        class PlayerHandler < Handler
+          def run(response)
+            post(player_url(response), id(response), body(response))
+          end
+        end
+
         # Handles a BAPS channel state change
-        class State < Handler
+        class State < PlayerHandler
           TARGETS = [
             Codes::Playback::PLAY,
             Codes::Playback::PAUSE,
@@ -19,11 +25,11 @@ module Bra
             Codes::Playback::STOP  => :stopped
           }
 
-          def run(response)
-            post(player_url(response), :state, body(response))
-          end
-
           private
+
+          def id(response)
+            :play_state
+          end
 
           def body(response)
             create_model_object(:play_state, state(response))
@@ -34,14 +40,14 @@ module Bra
           end
         end
 
-        class Volume < Handler
+        class Volume < PlayerHandler
           TARGETS = [Codes::Playback::VOLUME]
 
-          def run(response)
-            post(player_url(response), :volume, body(response))
-          end
-
           private
+
+          def id(response)
+            :play_state
+          end
 
           def body(response)
             create_model_object(:volume, response.volume)
@@ -49,7 +55,7 @@ module Bra
         end
 
         # Handles a BAPS channel marker change
-        class Marker < Handler
+        class Marker < PlayerHandler
           TARGETS = [
             Codes::Playback::POSITION,
             Codes::Playback::CUE,
@@ -62,19 +68,14 @@ module Bra
             Codes::Playback::INTRO    => :intro,
           }
 
-          def run(response)
-            marker_id = id(response)
-            post(player_url(response), marker_id, body(marker_id, response))
-          end
-
           private
 
           def id(response)
             CODES_TO_MARKERS[response.code]
           end
 
-          def body(marker_id, response)
-            create_model_object(:marker, marker_id, response.position)
+          def body(response)
+            create_model_object(:marker, id(response), response.position)
           end
         end
 
