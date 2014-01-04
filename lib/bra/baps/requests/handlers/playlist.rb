@@ -5,9 +5,17 @@ module Bra
   module Baps
     module Requests
       module Handlers
-        # Object that performs the POSTing of a playlist item.
-        class PlaylistPoster < Bra::DriverCommon::Requests::Poster
-          extend Forwardable
+        # Handler for playlists
+        class Playlist < Bra::DriverCommon::Requests::Handler
+          def_targets :playlist
+          use_post_payload_processor
+
+          # Requests a playlist be DELETEd via the BAPS server
+          #
+          # This resets the playlist.
+          def delete(object, _)
+            request(Request.new(Codes::Playlist::RESET, id))
+          end
 
           URL_PROTOCOLS = Hash.new_with_default_block({
             x_baps_file: :file_from_url
@@ -25,19 +33,10 @@ module Bra
             method(HASH_PROTOCOLS[type]).call(item)
           end
 
-          # Given a payload, decides whether to forward it elsewhere
-          #
-          # @return [false]
-          def post_forward
-            false
-          end
-
           private
 
-          def_delegator :@object, :id, :playlist_id
-
           def add_item_request(type)
-            Request.new(Codes::Playlist::ADD_ITEM, playlist_id).uint32(type)
+            Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
           end
 
           def direct(item)
@@ -62,19 +61,6 @@ module Bra
               .uint32(directory.to_i)
               .string(filename)
             )
-          end
-        end
-
-        # Handler for playlists
-        class Playlist < Bra::DriverCommon::Requests::Handler
-          def_targets :playlist
-          use_poster PlaylistPoster, :post
-
-          # Requests a playlist be DELETEd via the BAPS server
-          #
-          # This resets the playlist.
-          def delete(object, _)
-            request(Request.new(Codes::Playlist::RESET, id))
           end
         end
 
