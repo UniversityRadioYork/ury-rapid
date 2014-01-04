@@ -5,7 +5,7 @@ module Bra
     module Requests
       class NullHandler < Handler
         def initialize
-          super(nil)
+          super(nil, nil, nil, nil)
         end
 
         def to_s
