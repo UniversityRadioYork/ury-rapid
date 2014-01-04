@@ -79,12 +79,16 @@ module Bra
         def_delegator(:@parent, :request)
 
         # Default to a 'not supported' exception on all actions.
-        %w{put post delete}.each do |action|
+        %i{put post delete}.each do |action|
           define_method(action) do |*|
-            HOOKS.fetch(action, []).any?(:call) || fail(
+            run_hooks(action) || fail(
               Bra::Common::Exceptions::NotSupportedByBra
             )
           end
+        end
+
+        def run_hooks(action)
+          HOOKS.fetch(action, []).any? { |block| instance_eval(&block) }
         end
       end
 
