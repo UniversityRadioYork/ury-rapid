@@ -60,7 +60,7 @@ module Bra
 
         define_method(action) do |payload|
           fail_if_cannot(action, payload.privilege_set)
-          @handler.send(action, self, payload)
+          @handler.call(action, self, payload)
         end
 
         # Define error-raising stubs for the driver modifiers.
