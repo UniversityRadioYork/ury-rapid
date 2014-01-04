@@ -76,11 +76,6 @@ module Bra
           def delete(object, _)
             request(Request.new(Codes::Playlist::RESET, id))
           end
-
-          def item_handler(id)
-            # TODO(mattbw): Add something here
-            nil
-          end
         end
 
         # Handler for playlist sets
