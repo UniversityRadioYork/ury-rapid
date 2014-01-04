@@ -4,7 +4,7 @@ require 'bra/model/driver_view'
 require 'bra/model/item'
 require 'bra/model/model_object'
 require 'bra/model/server_view'
-require 'bra/model/variable'
+require 'bra/model/constant'
 
 module Bra
   # The module containing the classes that make up bra's playout system model
