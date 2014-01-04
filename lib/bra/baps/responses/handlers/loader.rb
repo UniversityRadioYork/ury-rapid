@@ -1,4 +1,4 @@
-require 'bra/model/variable'
+require 'bra/model'
 require 'bra/baps/responses/handlers/handler'
 require 'bra/baps/exceptions'
 
