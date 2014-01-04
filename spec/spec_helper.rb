@@ -17,3 +17,5 @@ SimpleCov.start do
   add_group 'BAPS', 'lib/bra/baps'
   add_filter 'spec'
 end
+
+FactoryGirl.find_definitions

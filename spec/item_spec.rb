@@ -4,37 +4,28 @@ require 'bra/model/item'
 require 'bra/model/composite'
 
 describe Bra::Model::Item do
-  subject do
-    Bra::Model::Item.new(type, name, origin, duration)
-  end
-  let(:type) { :library }
-  let(:name) { 'Brown Girl In The Ring' }
-  let(:origin) { 'playlist://0/0' }
-  let(:duration) { 31415 }
+  subject { build(:item) }
+  let(:attrs) { attributes_for(:item) }
 
-  # Brown girl in the ring, tra la la la la
-  # There's a brown girl in the ring, tra la la la la la
-  # Brown girl in the ring, tra la la la la
-  # She looks like a sugar in a plum, plum plum!
   describe '#flat' do
     it 'flattens the Item into a hash representation' do
       expect(subject.flat).to eq(
-        { name: name,
-          type: type,
-          origin: origin,
-          duration: duration
+        { name:     attrs[:name],
+          type:     attrs[:type],
+          origin:   attrs[:origin],
+          duration: attrs[:duration]
         }
       )
     end
   end
   describe '#name' do
     it 'retrieves the name of the Item' do
-      expect(subject.name).to eq(name)
+      expect(subject.name).to eq(attrs[:name])
     end
   end
   describe '#type' do
     it 'retrieves the type of the Item' do
-      expect(subject.type).to eq(type)
+      expect(subject.type).to eq(attrs[:type])
     end
   end
   describe '#driver_delete' do
