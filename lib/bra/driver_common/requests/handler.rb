@@ -31,25 +31,33 @@ module Bra
         end
 
         def self.use_payload_processor_for(action, *ids)
-          add_id_hook(action, ids) { |id| @payload.process(self) }
+          add_id_hook(action, ids) do |handler, object, payload|
+            payload.process(handler)
+          end
         end
 
         def self.post_by_putting_to_child_for(*ids)
-          add_id_hook(:post, ids) { |id| @object.child(id).put(@payload) }
+          add_id_hook(:post, ids) do |handler, object, payload|
+            object.child(id).put(payload)
+          end
         end
 
         def self.put_by_payload_processor
-          define_method(:put) { @payload.process(self) }
+          define_method(:put) do |handler, object, payload|
+            payload.process(handler)
+          end
         end
 
         def self.put_by_posting_to_parent
-          define_method(:put) { @object.post_to_parent(@payload) }
+          define_method(:put) do |handler, object, payload|
+            object.post_to_parent(payload)
+          end
         end
 
         def self.add_id_hook(action, ids)
-          add_hook(action) do |id|
-            active = ids.empty? || ids.include?(id)
-            yield(id) if active
+          add_hook(action) do |handler, object, payload|
+            active = ids.empty? || ids.include?(payload.id)
+            yield(handler, object, payload) if active
             active
           end
         end
@@ -88,7 +96,9 @@ module Bra
         end
 
         def run_hooks(action)
-          HOOKS.fetch(action, []).any? { |block| instance_eval(&block) }
+          HOOKS.fetch(action, []).any? do |block|
+            block.call(self, @object, @payload)
+          end
         end
       end
 
