@@ -33,20 +33,7 @@ class Structure < Bra::Model::Creator
     component :state,      :play_state, :stopped
     component :load_state, :load_state, :empty
     component :volume,     :volume,     0.0
-    Bra::Common::Types::MARKERS.each do |id|
-      var id, 0, "player_#{id}".intern, marker_validator
-    end
-  end
-
-  # Validates an incoming marker
-  def marker_validator
-    proc do |position|
-      position ||= 0
-      position_int = Integer(position)
-      fail('Position is negative.') if position_int < 0
-      # TODO: Check against duration?
-      position_int
-    end
+    Bra::Common::Types::MARKERS.each { |id| component id, :marker, id, 0 }
   end
 
   # Builds the bra information model.
