@@ -17,6 +17,17 @@ module Bra
           self.class.name
         end
 
+        def initialize(parent, action, object, payload)
+          super(parent)
+          @action  = action
+          @object  = object
+          @payload = payload
+        end
+
+        def run
+          self.send(@action)
+        end
+
         protected
 
         # Sends a request to the parent requester
