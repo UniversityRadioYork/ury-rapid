@@ -25,7 +25,7 @@ module Bra
       end
 
       def marker(type, value)
-        validate_then_constant(:validate_marker, value, :type)
+        validate_then_constant(:validate_marker, value, type)
       end
 
       def item(options)
