@@ -8,10 +8,10 @@ FactoryGirl.define do
     duration 31415
 
     ignore do
-      channel { Bra::Model::UpdateChannel.new }
+      channel Bra::Model::UpdateChannel.new
     end
 
-    after(:create) do |item, evaluator|
+    after :build do |item, evaluator|
       item.register_update_channel(evaluator.channel) if evaluator.channel
     end
 

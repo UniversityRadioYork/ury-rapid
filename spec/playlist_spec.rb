@@ -5,20 +5,17 @@ require 'bra/model/playlist'
 require 'bra/model/item'
 
 describe Bra::Model::Playlist do
-  let(:test1) { build(:item, name: '1') }
-  let(:test2) { build(:item, name: '2') }
-  let(:test3) { build(:item, name: '3') }
-
   let(:channel) { double(:channel) }
+
+  let(:test1) { build(:item, name: '1', channel: channel) }
+  let(:test2) { build(:item, name: '2', channel: channel) }
+  let(:test3) { build(:item, name: '3', channel: channel) }
+
   let(:handler) { double(:handler) }
 
   before(:each) do
     subject.register_update_channel(channel)
     subject.register_handler(handler)
-
-    test1.register_update_channel(channel)
-    test2.register_update_channel(channel)
-    test3.register_update_channel(channel)
   end
 
   describe '#driver_post' do
