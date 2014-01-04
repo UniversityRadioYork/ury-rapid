@@ -58,9 +58,7 @@ module Bra
       end
 
       def handler_for(object)
-        handler = @handlers[object.handler_target]
-        puts("#{handler.to_s} -> #{object.handler_target}.")
-        handler
+        @handlers[object.handler_target]
       end
     end
   end
