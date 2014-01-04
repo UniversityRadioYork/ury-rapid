@@ -7,6 +7,16 @@ module Bra
       module Handlers
         class PlayerHandler < Handler
           def run(response)
+            do_post(response) unless ignore_response?(response)
+          end
+
+          protected
+
+          def ignore_response?(response)
+            false
+          end
+
+          def do_post(response)
             post(player_url(response), id(response), body(response))
           end
         end
@@ -28,7 +38,11 @@ module Bra
           private
 
           def id(response)
-            :play_state
+            :state
+          end
+
+          def ignore_response?(response)
+            get(player_url(response, id(response))).value == state(response)
           end
 
           def body(response)
@@ -46,7 +60,11 @@ module Bra
           private
 
           def id(response)
-            :play_state
+            :volume
+          end
+
+          def ignore_response?(response)
+            get(player_url(response, id(response))).value == response.volume
           end
 
           def body(response)
@@ -72,6 +90,10 @@ module Bra
 
           def id(response)
             CODES_TO_MARKERS[response.code]
+          end
+
+          def ignore_response?(response)
+            get(player_url(response, id(response))).value == response.position
           end
 
           def body(response)
