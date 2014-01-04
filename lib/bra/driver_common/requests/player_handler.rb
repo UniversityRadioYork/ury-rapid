@@ -8,7 +8,9 @@ module Bra
       # This deals with the various protocols for POSTing player items, so that
       # drivers can override the protocol methods they implement
       class PlayerHandler < Handler
-        use_post_payload_processor
+        use_payload_processor_for :post, :item
+        post_by_putting_to_child_for :volume, :state, :load_state
+        post_by_putting_to_child_for :position, :cue, :intro
 
         # Supported URL protocols in this version of the bra API.
         URL_TYPES = {

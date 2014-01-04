@@ -13,6 +13,8 @@ module Bra
       class Handler < Bra::DriverCommon::Handler
         extend Forwardable
 
+        HOOKS = {}
+
         def to_s
           self.class.name
         end
@@ -28,12 +30,33 @@ module Bra
           self.send(@action)
         end
 
-        def self.use_post_payload_processor
-          define_method(:post) { @payload.process(self) }
+        def self.use_payload_processor_for(action, *ids)
+          add_id_hook(action, ids) { |id| @payload.process(self) }
+        end
+
+        def self.post_by_putting_to_child_for(*ids)
+          add_id_hook(:post, ids) { |id| @object.child(id).put(@payload) }
+        end
+
+        def self.put_by_payload_processor
+          define_method(:put) { @payload.process(self) }
         end
 
         def self.put_by_posting_to_parent
           define_method(:put) { @object.post_to_parent(@payload) }
+        end
+
+        def self.add_id_hook(action, ids)
+          add_hook(action) do |id|
+            active = ids.empty? || ids.include?(id)
+            yield(id) if active
+            active
+          end
+        end
+
+        def self.add_hook(action, &block)
+          HOOKS[action] = [] unless HOOKS.key?(action)
+          HOOKS[action] << block
         end
 
         protected
@@ -54,7 +77,9 @@ module Bra
         # Default to a 'not supported' exception on all actions.
         %w{put post delete}.each do |action|
           define_method(action) do |*|
-            fail(Bra::Common::Exceptions::NotSupportedByBra)
+            HOOKS.fetch(action, []).any?(:call) || fail(
+              Bra::Common::Exceptions::NotSupportedByBra
+            )
           end
         end
       end

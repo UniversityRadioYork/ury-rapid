@@ -31,8 +31,7 @@ module Bra
         # Handler for player volume changes.
         class Volume < Bra::DriverCommon::Requests::VariableHandler
           def_targets :volume
-          use_post_payload_processor
-          put_by_posting_to_parent
+          put_by_payload_processor
 
           def float(float)
             request(
@@ -45,8 +44,7 @@ module Bra
         # Handler for player marker changes.
         class Marker < Bra::DriverCommon::Requests::VariableHandler
           def_targets :position, :cue, :intro
-          use_post_payload_processor
-          put_by_posting_to_parent
+          put_by_payload_processor
 
           def integer(integer)
             request(
@@ -70,8 +68,7 @@ module Bra
         # Handler for state changes.
         class State < Bra::DriverCommon::Requests::VariableHandler
           def_targets :state
-          use_post_payload_processor
-          put_by_posting_to_parent
+          put_by_payload_processor
 
           include Bra::Common::Types::Validators
 
