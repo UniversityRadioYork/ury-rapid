@@ -5,7 +5,7 @@ module Bra
         # Handler for dealing with BAPS system notifications that bra logs
         # but otherwise ignores.
         class Log < Bra::DriverCommon::Responses::Handler
-          def_targets (
+          def_targets(
             Codes::System::CLIENT_CHANGE,
             Codes::System::LOG_MESSAGE
           )
@@ -18,9 +18,9 @@ module Bra
             TYPE_MESSAGE[@response.code + @response.subcode]
           end
 
-          def details(response)
-            symbol = DETAILS_SYM[response.code]
-            response[symbol]
+          def details
+            symbol = DETAILS_SYM[@response.code]
+            @response[symbol]
           end
 
           private
@@ -39,12 +39,12 @@ module Bra
 
         # Handler for BAPS responses carrying login seeds.
         class Seed < Bra::DriverCommon::Responses::Handler
-          TARGETS = [Codes::System::SEED]
+          def_targets Codes::System::SEED
 
-          def run(response)
+          def run
             username = get('x_baps/server/username').value
             password = get('x_baps/server/password').value
-            seed = response.seed
+            seed = @response.seed
             # Kurse all SeeDs.  Swarming like lokusts akross generations.
             #   - Sorceress Ultimecia, Final Fantasy VIII
             @parent.login_authenticate(username, password, seed) if seed
@@ -53,7 +53,7 @@ module Bra
 
         # Handler for BAPS responses carrying login responses.
         class LoginResult < Bra::DriverCommon::Responses::Handler
-          TARGETS = [Codes::System::LOGIN_RESULT]
+          def_targets Codes::System::LOGIN_RESULT
 
           # TODO(mattbw): Move these somewhere more relevant?
           module LoginErrors
@@ -63,9 +63,9 @@ module Bra
             INCORRECT_PASSWORD = 3
           end
 
-          def run(response)
-            code = response.subcode
-            is_ok(code) ? continue : die(code, response.details)
+          def run
+            code = @response.subcode
+            is_ok(code) ? continue : die(code, @response.details)
           end
 
           def is_ok(code)
