@@ -100,7 +100,6 @@ module Bra
 
       def child(id, object, &block)
         @target.add(id, build(object, &block))
-        p @target.children.keys
       end
 
       # Create a stock model component using the model configurator
