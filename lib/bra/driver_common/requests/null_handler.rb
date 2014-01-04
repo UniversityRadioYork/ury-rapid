@@ -1,3 +1,4 @@
+require 'bra/common/exceptions'
 require 'bra/driver_common/requests/handler'
 
 module Bra
@@ -10,6 +11,13 @@ module Bra
 
         def to_s
           'NO HANDLER'
+        end
+
+        def call(action, *args)
+          fail(
+            Bra::Common::Exceptions::NotSupportedByBra,
+            "Tried to perform #{action} on an object with no handler."
+          )
         end
       end
     end
