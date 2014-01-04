@@ -29,7 +29,7 @@ module Bra
             create_model_object(:play_state, state(response))
           end
 
-          def state
+          def state(response)
             CODES_TO_STATES[response.code]
           end
         end
