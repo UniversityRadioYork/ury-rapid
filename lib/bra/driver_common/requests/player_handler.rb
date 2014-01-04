@@ -50,10 +50,8 @@ module Bra
 
         # Handles a server POST of an item from a playlist, expressed as a Hash
         def item_from_playlist_hash(hash)
-          playlist   = hash[:playlist]
-          playlist ||= caller_id
-          index      = hash[:index]
-          index    ||= 0
+          playlist = hash[:playlist] || caller_id
+          index    = hash[:index]    || 0
 
           item_from_playlist(playlist, index.to_i)
         end
