@@ -1,11 +1,11 @@
-require 'bra/driver_common/requests/handler'
+require 'bra/driver_common/requests/url_hash_handler'
 
 module Bra
   module Baps
     module Requests
       module Handlers
         # Handler for playlists
-        class Playlist < Bra::DriverCommon::Requests::Handler
+        class Playlist < Bra::DriverCommon::Requests::UrlHashHandler
           def_targets :playlist
           use_payload_processor_for :post
           put_by_posting_to_parent
@@ -17,29 +17,15 @@ module Bra
             request(Request.new(Codes::Playlist::RESET, id))
           end
 
-          URL_PROTOCOLS = Hash.new_with_default_block({
-            x_baps_file: :file_from_url
-          }) { |h, k| unknown_protocol(k) }
-          HASH_PROTOCOLS = Hash.new_with_default_block({
-            x_baps_file:   :file_from_hash,
-            x_baps_direct: :direct
-          }) { |h, k| unknown_protocol(k) }
-
-          def url(protocol, url)
-            method(URL_PROTOCOLS[protocol]).call(url)
+          url_type :x_baps_file do |url|
+            file(*(url.split('/', 2)))
           end
 
-          def hash(type, item)
-            method(HASH_PROTOCOLS[type]).call(item)
+          hash_type :x_baps_file do |hash|
+            file(*(hash.values_at(:directory, :filename)))
           end
 
-          private
-
-          def add_item_request(type)
-            Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
-          end
-
-          def direct(item)
+          hash_type :x_baps_direct do |hash|
             request(
               add_item_request(Types::Track::SPECIFIC_ITEM)
               .uint32(item[:record_id].to_i, item[:track_id].to_i)
@@ -47,12 +33,10 @@ module Bra
             )
           end
 
-          def file_from_hash(hash)
-            file(*(hash.values_at(:directory, :filename)))
-          end
+          private
 
-          def file_from_url(url)
-            file(*(url.split('/', 2)))
+          def add_item_request(type)
+            Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
           end
 
           def file(directory, filename)
