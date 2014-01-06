@@ -1,3 +1,5 @@
+require 'eventmachine'
+
 module Bra
   module Model
     # Mixin for classes that use an UpdateChannel
