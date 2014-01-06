@@ -67,14 +67,19 @@ module Bra
           def move
             # Noting that post, if applied to an existing resource, moves it
             # to its new URL.
-            get_item { |item| post(new_url, item) }
+            post_item(get_item)
           end
 
           private
 
-          # Gets the item that wants to be moved and yields it to a block
-          def get_item(&block)
-            find_url(playlist_url(@response.old_index), &block)
+          # Posts the item into its new position
+          def post_item(item)
+            post(playlist_url, @response.new_index, item)
+          end
+
+          # Gets the item that wants to be moved
+          def get_item
+            get(playlist_url(@response.old_index))
           end
 
           # Calculates the URL to which the item shall be posted
