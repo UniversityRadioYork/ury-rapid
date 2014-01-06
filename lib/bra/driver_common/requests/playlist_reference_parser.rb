@@ -84,7 +84,9 @@ module Bra
         # @return [Array]  A tuple containing the playlist ID and index
         #   referred to by this reference.
         def parse_playlist_reference_hash(hash)
-          [playlist, index]
+          playlist = hash.fetch(:playlist, local_playlist_id)
+          index    = hash.fetch(:index)
+          [playlist.to_sym, Integer(index)]
         end
 
         private
