@@ -32,12 +32,25 @@ describe MockPrp do
     end
 
     context 'when given a String with a slash followed by a natural' do
-      it 'returns an Array of the prefix as a Symbol and the natural' do
-        [0, 1, 10, 100, 23456].each do |number|
-          %w{flibble dibble purple doggie doo}.each do |playlist|
-            expect(
-              subject.parse_playlist_reference_url("#{playlist}/#{number}")
-            ).to eq([playlist.to_sym, number])
+      context 'and the prefix represents an Integer' do
+        it 'returns an Array of the prefix as an Integer and the natural' do
+          [0, 1, 10, 100, 23456].each do |number|
+            [2, 4, 6, 8, 999].each do |playlist|
+              expect(
+                subject.parse_playlist_reference_url("#{playlist}/#{number}")
+              ).to eq([playlist, number])
+            end
+          end
+        end
+      end
+      context 'and the prefix does not represent an Integer' do
+        it 'returns an Array of the prefix as a Symbol and the natural' do
+          [0, 1, 10, 100, 23456].each do |number|
+            %w{flibble dibble purple doggie doo}.each do |playlist|
+              expect(
+                subject.parse_playlist_reference_url("#{playlist}/#{number}")
+              ).to eq([playlist.to_sym, number])
+            end
           end
         end
       end
