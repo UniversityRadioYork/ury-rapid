@@ -15,20 +15,12 @@ module Bra
 
         # Supported URL protocols in this version of the bra API.
         url_type :playlist do |url|
-          split = url.split('/', 2)
-          playlist, index = caller_id, split.first if split.size == 1
-          playlist, index = split                  if split.size == 2
-          fail('Bad playlist URL.')                if split.size > 2
-
-          item_from_playlist(playlist, index.to_i)
+          item_from_playlist(*split_playlist_url(url))
         end
 
         # Supported hash types in this version of the bra API.
         hash_type :playlist do |hash|
-          playlist = hash[:playlist] || caller_id
-          index    = hash[:index]    || 0
-
-          item_from_playlist(playlist, index.to_i)
+          item_from_playlist(*get_location_from_hash(hash))
         end
 
         # These are the overridable functions a concrete PlayerPoster can fill
@@ -47,6 +39,20 @@ module Bra
         end
 
         protected
+
+        def split_playlist_url(url)
+          split = url.split('/', 2)
+          playlist, index = caller_id, split.first if split.size == 1
+          playlist, index = split                  if split.size == 2
+          fail('Bad playlist URL.')                if split.size > 2
+          [playlist, index.to_i]
+        end
+
+        def get_location_from_hash(hash)
+          playlist = hash[:playlist] || caller_id
+          index    = hash[:index]    || 0
+          [playlist, index.to_i]
+        end
 
         def item_from_playlist(playlist, index)
           local = is_local_playlist?(playlist)
