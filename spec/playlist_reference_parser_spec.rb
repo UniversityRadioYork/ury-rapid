@@ -21,7 +21,7 @@ describe MockPrp do
   end
 
   describe '#parse_playlist_reference_url' do
-    context 'when given a string representing a natural' do
+    context 'when given a String representing a natural' do
       it 'returns an Array containing #local_playlist_id and the natural' do
         [0, 1, 10, 100, 23456].each do |example|
           expect(
@@ -31,7 +31,7 @@ describe MockPrp do
       end
     end
 
-    context 'when given a string with a slash followed by a natural' do
+    context 'when given a String with a slash followed by a natural' do
       it 'returns an Array of the prefix as a Symbol and the natural' do
         [0, 1, 10, 100, 23456].each do |number|
           %w{flibble dibble purple doggie doo}.each do |playlist|
@@ -43,7 +43,7 @@ describe MockPrp do
       end
     end
 
-    context 'when given a string with a slash followed by a non-natural' do
+    context 'when given a String with a slash followed by a non-natural' do
       specify do
         expect { subject.parse_playlist_reference_url("squir/tle") }.to(
           raise_error
