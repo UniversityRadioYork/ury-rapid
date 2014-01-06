@@ -1,4 +1,4 @@
-require 'bra/driver_common/requests/url_hash_handler'
+require 'bra/driver_common/requests/playlist_handler'
 
 module Bra
   module Baps
