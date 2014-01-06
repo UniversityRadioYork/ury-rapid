@@ -1,7 +1,9 @@
 require 'bra/driver_common/requests/playlist_reference_parser'
 
 # Mock implementation of PlaylistReferenceParser.
-class MockPrp < Bra::DriverCommon::Requests::PlaylistReferenceParser 
+class MockPrp
+  include Bra::DriverCommon::Requests::PlaylistReferenceParser 
+
   def local_playlist_id
     :local_id
   end
