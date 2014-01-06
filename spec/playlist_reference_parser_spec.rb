@@ -62,22 +62,21 @@ describe MockPrp do
 
   describe '#parse_playlist_reference_hash' do
     let(:test) { -> { subject.parse_playlist_reference_hash(hash) } }
-    let(:hash) { { index: index } }
 
     shared_examples 'a normal call with an index' do
       context 'when :index is given and is an Integer' do
         let(:index) { 22 }
 
-        it 'returns an Array containing #local_playlist_id and the Integer' do
-          expect(test.call).to eq([subject.local_playlist_id, 22])
+        it 'returns an Array containing a playlist ID and the Integer' do
+          expect(test.call).to eq([playlist.to_sym, 22])
         end
       end
 
       context 'when :index is given as a String representing an Integer' do
         let(:index) { '44' }
 
-        it 'returns an Array containing #local_playlist_id and the Integer' do
-          expect(test.call).to eq([subject.local_playlist_id, 44])
+        it 'returns an Array containing a playlist ID and the Integer' do
+          expect(test.call).to eq([playlist.to_sym, 44])
         end
       end
 
@@ -95,6 +94,9 @@ describe MockPrp do
     end
 
     context 'when given a Hash with no :playlist key' do
+      let(:hash)     { { index: index } }
+      let(:playlist) { subject.local_playlist }
+
       it_behaves_like 'a normal call with an index'
 
       context 'and :index is not given' do
@@ -105,14 +107,43 @@ describe MockPrp do
     end
 
     context 'when given a Hash with a :playlist key' do
+      let(:hash) { { playlist: playlist, index: :index } }
+
+      context 'and :playlist is a string' do
+        let(:playlist) { 'a_playlist' }
+
+        it_behaves_like 'a normal call with an index'
+
+        context 'and :index is not given' do
+          let(:hash) { { playlist: playlist } }
+
+          specify { expect { test.call }.to(raise_error) }
+        end
+      end
+
+      context 'and :playlist is a symbol' do
+        let(:playlist) { :a_playlist }
+
+        it_behaves_like 'a normal call with an index'
+
+        context 'and :index is not given' do
+          let(:hash) { { playlist: playlist } }
+
+          specify { expect { test.call }.to(raise_error) }
+        end
+      end
+    end
+
+    context 'given an empty hash' do
+      let(:hash) { {} }
+
+      specify { expect { test.call }.to(raise_error) }
     end
 
     context 'when given nil' do
-      specify do
-        expect { subject.parse_playlist_reference_hash(nil) }.to(
-          raise_error
-        )
-      end
+      let(:hash) { nil }
+
+      specify { expect { test.call }.to(raise_error) }
     end
   end
 end
