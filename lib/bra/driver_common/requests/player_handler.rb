@@ -13,7 +13,7 @@ module Bra
         # The items POSTed to the player may be playlist references, so we
         # need to include the parser for them.
         include PlaylistReferenceParser
-        alias_method :caller_id, :local_playlist_id
+        alias_method :local_playlist_id, :caller_id
 
         # The only objects this handler takes responsibility for POSTing to the
         # playout server are items, which always come in on ID :item.

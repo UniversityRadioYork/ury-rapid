@@ -11,7 +11,7 @@ module Bra
         # The items POSTed to the playlist may be playlist references, so we
         # need to include the parser for them.
         include PlaylistReferenceParser
-        alias_method :caller_id, :local_playlist_id
+        alias_method :local_playlist_id, :caller_id
 
         # All objects POSTed to the playlist will be items, so we process their
         # payloads to find out what sort of item load they represent.
