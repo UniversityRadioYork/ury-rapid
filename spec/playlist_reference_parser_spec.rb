@@ -107,7 +107,7 @@ describe MockPrp do
     end
 
     context 'when given a Hash with a :playlist key' do
-      let(:hash) { { playlist: playlist, index: :index } }
+      let(:hash) { { playlist: playlist, index: index } }
 
       context 'and :playlist is a string' do
         let(:playlist) { 'a_playlist' }
