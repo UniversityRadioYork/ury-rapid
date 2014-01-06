@@ -5,7 +5,7 @@ module Bra
     module Requests
       module Handlers
         # Handler for playlists
-        class Playlist < Bra::DriverCommon::Requests::UrlHashHandler
+        class Playlist < Bra::DriverCommon::Requests::PlaylistHandler
           def_targets :playlist
           use_payload_processor_for :post
           put_by_posting_to_parent
