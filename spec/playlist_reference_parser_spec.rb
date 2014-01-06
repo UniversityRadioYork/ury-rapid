@@ -50,6 +50,14 @@ describe MockPrp do
         )
       end
     end
+
+    context 'when given something that is not a String' do
+      specify do
+        expect { subject.parse_playlist_reference_url(nil) }.to(
+          raise_error
+        )
+      end
+    end
   end
 
   describe '#parse_playlist_reference_hash' do
