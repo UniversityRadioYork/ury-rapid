@@ -12,9 +12,17 @@ describe Bra::Common::Payload do
 
   describe '#id' do
     context 'when the payload body is a Hash with one key' do
-      let(:body) { { test_id: :body } }
-      it 'returns that key' do
-        expect(subject.id).to eq(:test_id)
+      context 'and the key is a String representing an Integer' do
+        let(:body) { { "300" => :body } }
+        it 'returns that key as an Integer' do
+          expect(subject.id).to eq(300)
+        end
+      end
+      context 'and the key is not a String representing an Integer' do
+        let(:body) { { test_id: :body } }
+        it 'returns that key' do
+          expect(subject.id).to eq(:test_id)
+        end
       end
     end
     context 'when the payload body is a Hash with multiple keys' do
