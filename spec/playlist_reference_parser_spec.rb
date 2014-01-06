@@ -26,7 +26,7 @@ describe MockPrp do
         [0, 1, 10, 100, 23456].each do |example|
           expect(
             subject.parse_playlist_reference_url(example.to_s)
-          ).to eq([local_playlist_id, example])
+          ).to eq([subject.local_playlist_id, example])
         end
       end
     end
@@ -37,7 +37,7 @@ describe MockPrp do
           %w{flibble dibble purple doggie doo}.each do |playlist|
             expect(
               subject.parse_playlist_reference_url("#{playlist}/#{number}")
-            ).to eq([playlist.to_sym, example])
+            ).to eq([playlist.to_sym, number])
           end
         end
       end
