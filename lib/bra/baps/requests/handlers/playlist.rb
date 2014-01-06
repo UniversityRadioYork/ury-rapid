@@ -12,22 +12,29 @@ module Bra
           #
           # This resets the playlist.
           def delete(object, _)
-            request(Request.new(Codes::Playlist::RESET, id))
+            request(Request.new(Codes::Playlist::RESET, caller_id))
           end
 
-          url_type :x_baps_file do |url|
-            file(*(url.split('/', 2)))
-          end
+          # Methods of adding files that are specific to BAPS.
 
+          url_type  :x_baps_file { |url| file(*(url.split('/', 2))) }
           hash_type :x_baps_file do |hash|
             file(*(hash.values_at(:directory, :filename)))
           end
 
+          # Direct library loading
           hash_type :x_baps_direct do |hash|
             request(
               add_item_request(Types::Track::SPECIFIC_ITEM)
               .uint32(item[:record_id].to_i, item[:track_id].to_i)
               .string(item[:title], item[:artist])
+            )
+          end
+
+          def move_from_local_playlist(index)
+            request(
+              Request.new(Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id)
+              .uint32(index)
             )
           end
 
