@@ -24,30 +24,33 @@ module Bra
         #
         # @api  public
         # @example  Passing the local playlist ID.
-        #   parser.local_playlist
+        #   p.local_playlist_id
         #   #=> :local_id
-        #   parser.local_playlist?(:local_id)
+        #   p.local_playlist?(:local_id)
         #   #=> true
         # @example  Passing a foreign playlist ID.
-        #   parser.local_playlist
+        #   p.local_playlist_id
         #   #=> :local_id
-        #   parser.local_playlist?(:foreign_id)
+        #   p.local_playlist?(:foreign_id)
         #   #=> false
         #
         # @param id [Symbol]  The playlist ID to check.
         #
         # @return [Boolean]  True if the playlist is local; false otherwise.
+        def local_playlist?(id)
+          id == local_playlist_id
+        end
 
         # Parses a URL body as a playlist reference
         #
         # @api  public
         # @example  Parsing a local playlist reference.
-        #   parser.local_playlist
+        #   parser.local_playlist_id
         #   #=> :local_id
         #   parser.parse_playlist_reference_url('20')
         #   #=> [:local_id, 20]
         # @example  Parsing a foreign playlist reference.
-        #   p.local_playlist
+        #   p.local_playlist_id
         #   #=> :local_id
         #   p.parse_playlist_reference_url('foreign_id/20')
         #   #=> [:foreign_id, 20]
@@ -62,12 +65,12 @@ module Bra
         #
         # @api  public
         # @example  Parsing a local playlist reference.
-        #   p.local_playlist
+        #   p.local_playlist_id
         #   #=> :local_id
         #   p.parse_playlist_reference_hash({index: 20})
         #   #=> [:local_id, 20]
         # @example  Parsing a foreign playlist reference.
-        #   p.local_playlist
+        #   p.local_playlist_id
         #   #=> :local_id
         #   p.parse_playlist_reference_hash({playlist: :foreign_id, index: 20})
         #   #=> [:foreign_id, 20]

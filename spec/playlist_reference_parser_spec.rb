@@ -12,11 +12,11 @@ end
 describe MockPrp do
   describe '#local_playlist?' do
     context 'when the given playlist equals #local playlist_id' do
-      specify { expect(subject.local_playlist(:local_id)).to be_true }
+      specify { expect(subject.local_playlist?(:local_id)).to be_true }
     end
 
     context 'when the given playlist does not equal #local playlist' do
-      specify { expect(subject.local_playlist(:foreign_id)).to be_false }
+      specify { expect(subject.local_playlist?(:foreign_id)).to be_false }
     end
   end
 
