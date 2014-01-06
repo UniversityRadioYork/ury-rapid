@@ -62,7 +62,7 @@ module Bra
         #   referred to by this reference.
         def parse_playlist_reference_url(url)
           playlist, index = split_url(url)
-          [playlist.to_sym, Integer(index)]
+          [to_valid_id(playlist), Integer(index)]
         end
 
         # Parses a hash as a playlist reference
@@ -86,10 +86,19 @@ module Bra
         def parse_playlist_reference_hash(hash)
           playlist = hash.fetch(:playlist, local_playlist_id)
           index    = hash.fetch(:index)
-          [playlist.to_sym, Integer(index)]
+          [to_valid_id(playlist), Integer(index)]
         end
 
         private
+
+        # Validates an incoming playlist ID
+        #
+        # Playlist IDs can either be Integers or Symbols.
+        def to_valid_id(id)
+          Integer(id)
+        rescue TypeError, ArgumentError, RangeError
+          id.to_s.to_sym
+        end
 
         def split_url(url)
           split = url.split('/', 2)
