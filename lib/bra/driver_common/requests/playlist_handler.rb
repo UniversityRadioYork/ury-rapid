@@ -32,8 +32,8 @@ module Bra
         #
         #   Drivers may implement this by overriding #move_local and
         #   #move_foreign.
-        url_type  :move { |url|  move(*parse_playlist_reference_url(url)) }
-        hash_type :move { |hash| move(*parse_playlist_reference_hash(hash)) }
+        url_type(:move)  { |url|  move(*parse_playlist_reference_url(url)) }
+        hash_type(:move) { |hash| move(*parse_playlist_reference_hash(hash)) }
 
         # These are the overridable functions a concrete PlaylistHandler can
         # fill in.  They are defined in this class as raising a

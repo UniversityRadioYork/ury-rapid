@@ -17,7 +17,7 @@ module Bra
 
           # Methods of adding files that are specific to BAPS.
 
-          url_type  :x_baps_file { |url| file(*(url.split('/', 2))) }
+          url_type(:x_baps_file) { |url| file(*(url.split('/', 2))) }
           hash_type :x_baps_file do |hash|
             file(*(hash.values_at(:directory, :filename)))
           end
