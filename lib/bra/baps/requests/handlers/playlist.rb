@@ -31,10 +31,10 @@ module Bra
             )
           end
 
-          def move_from_local_playlist(index)
+          def move_from_local_playlist(new_index)
             request(
               Request.new(Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id)
-              .uint32(index)
+              .uint32(payload_id, new_index)
             )
           end
 
