@@ -47,8 +47,16 @@ module Bra
 
       def flatten_payload!
         id, payload = @payload.flatten
-        id = id.to_sym if id.is_a?(String)
-        [id, payload]
+        [make_valid_id(id), payload]
+      end
+
+      # Coaxes a payload ID into a valid type
+      #
+      # This can either be a Symbol or an Integer.
+      def make_valid_id(id)
+        Integer(id)
+      rescue TypeError, RangeError, AttributeError
+        id.to_sym
       end
 
       # Determines whether a payload is a map from an ID to a payload body
