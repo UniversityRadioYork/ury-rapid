@@ -61,6 +61,8 @@ module Bra
         # @return [Array]  A tuple containing the playlist ID and index
         #   referred to by this reference.
         def parse_playlist_reference_url(url)
+          playlist, index = split_url(url)
+          [playlist.to_sym, Integer(index)]
         end
 
         # Parses a hash as a playlist reference
@@ -82,6 +84,23 @@ module Bra
         # @return [Array]  A tuple containing the playlist ID and index
         #   referred to by this reference.
         def parse_playlist_reference_hash(hash)
+          [playlist, index]
+        end
+
+        private
+
+        def split_url(url)
+          split = url.split('/', 2)
+          check_valid_size(split)
+          add_local_if_missing(split)
+        end
+
+        def check_valid_size(split)
+          fail('Bad playlist reference URL.') unless (1..2).cover?(split.size)
+        end
+
+        def add_local_if_missing(split)
+          split.size == 1 ? split.unshift(local_playlist_id) : split
         end
       end
     end
