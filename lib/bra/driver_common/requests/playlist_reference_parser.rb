@@ -60,6 +60,8 @@ module Bra
         #
         # @return [Array]  A tuple containing the playlist ID and index
         #   referred to by this reference.
+        def parse_playlist_reference_url(url)
+        end
 
         # Parses a hash as a playlist reference
         #
@@ -79,7 +81,8 @@ module Bra
         #
         # @return [Array]  A tuple containing the playlist ID and index
         #   referred to by this reference.
-
+        def parse_playlist_reference_hash(hash)
+        end
       end
     end
   end
