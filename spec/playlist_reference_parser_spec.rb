@@ -61,5 +61,58 @@ describe MockPrp do
   end
 
   describe '#parse_playlist_reference_hash' do
+    let(:test) { -> { subject.parse_playlist_reference_hash(hash) } }
+    let(:hash) { { index: index } }
+
+    shared_examples 'a normal call with an index' do
+      context 'when :index is given and is an Integer' do
+        let(:index) { 22 }
+
+        it 'returns an Array containing #local_playlist_id and the Integer' do
+          expect(test.call).to eq([subject.local_playlist_id, 22])
+        end
+      end
+
+      context 'when :index is given as a String representing an Integer' do
+        let(:index) { '44' }
+
+        it 'returns an Array containing #local_playlist_id and the Integer' do
+          expect(test.call).to eq([subject.local_playlist_id, 44])
+        end
+      end
+
+      context 'when :index is given as a String not representing an Integer' do
+        let(:index) { 'zerg' }
+
+        specify { expect { test.call }.to(raise_error) }
+      end
+
+      context 'when :index is nil' do
+        let(:index) { nil }
+
+        specify { expect { test.call }.to(raise_error) }
+      end
+    end
+
+    context 'when given a Hash with no :playlist key' do
+      it_behaves_like 'a normal call with an index'
+
+      context 'and :index is not given' do
+        let(:hash) { {} }
+
+        specify { expect { test.call }.to(raise_error) }
+      end
+    end
+
+    context 'when given a Hash with a :playlist key' do
+    end
+
+    context 'when given nil' do
+      specify do
+        expect { subject.parse_playlist_reference_hash(nil) }.to(
+          raise_error
+        )
+      end
+    end
   end
 end
