@@ -10,6 +10,8 @@ module Bra
       # This provides boilerplate code for working with the standard bra player
       # API.
       class PlayerHandler < UrlHashHandler
+        # The items POSTed to the player may be playlist references, so we
+        # need to include the parser for them.
         include PlaylistReferenceParser
         alias_method :caller_id, :local_playlist_id
 

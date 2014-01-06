@@ -8,6 +8,11 @@ module Bra
       # This provides boilerplate code for working with the standard bra
       # playlist API.
       class PlaylistHandler < UrlHashHandler
+        # The items POSTed to the playlist may be playlist references, so we
+        # need to include the parser for them.
+        include PlaylistReferenceParser
+        alias_method :caller_id, :local_playlist_id
+
         # All objects POSTed to the playlist will be items, so we process their
         # payloads to find out what sort of item load they represent.
         use_payload_processor_for :post
