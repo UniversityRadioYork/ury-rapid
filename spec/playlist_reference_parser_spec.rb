@@ -95,7 +95,7 @@ describe MockPrp do
 
     context 'when given a Hash with no :playlist key' do
       let(:hash)     { { index: index } }
-      let(:playlist) { subject.local_playlist }
+      let(:playlist) { subject.local_playlist_id }
 
       it_behaves_like 'a normal call with an index'
 
