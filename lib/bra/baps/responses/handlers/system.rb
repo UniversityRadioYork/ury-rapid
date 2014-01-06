@@ -11,7 +11,7 @@ module Bra
           )
 
           def run
-            puts("#{type_message(@response)}: #{details(@response)}")
+            puts("#{type_message}: #{details}")
           end
 
           def type_message
