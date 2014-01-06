@@ -54,7 +54,9 @@ module Bra
       #
       # This can either be a Symbol or an Integer.
       def make_valid_id(id)
-        Integer(id)
+        # This to_s allows IDs that have been symbolised earlier up to be
+        # turned into Integers.
+        Integer(id.to_s)
       rescue TypeError, RangeError, AttributeError
         id.to_sym
       end
