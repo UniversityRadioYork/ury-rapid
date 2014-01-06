@@ -7,8 +7,6 @@ module Bra
         # Handler for playlists
         class Playlist < Bra::DriverCommon::Requests::PlaylistHandler
           def_targets :playlist
-          use_payload_processor_for :post
-          put_by_posting_to_parent
 
           # Requests a playlist be DELETEd via the BAPS server
           #

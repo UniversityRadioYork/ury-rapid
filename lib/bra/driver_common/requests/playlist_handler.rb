@@ -9,6 +9,8 @@ module Bra
         # This provides boilerplate code for working with the standard bra
         # playlist API.
         class PlaylistHandler < UrlHashHandler
+          use_payload_processor_for :post
+          put_by_posting_to_parent
         end
       end
     end
