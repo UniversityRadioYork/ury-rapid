@@ -57,7 +57,7 @@ module Bra
         # This to_s allows IDs that have been symbolised earlier up to be
         # turned into Integers.
         Integer(id.to_s)
-      rescue TypeError, RangeError, AttributeError
+      rescue TypeError, RangeError, ArgumentError
         id.to_sym
       end
 
