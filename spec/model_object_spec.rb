@@ -20,36 +20,30 @@ describe MockModelObject do
   # Updates channel
   #
 
-  describe '#notify_update' do
+  shared_examples 'a notification method' do |method|
     context 'when there is no update channel' do
-      specify { expect { subject.notify_update }.to raise_error }
+      specify { expect { subject.send(method) }.to raise_error }
     end
 
     context 'when there is an update channel' do
-      it 'calls channel#notify_update with itself' do
-        channel = double('channel')
+      let(:channel) { double(:channel) }
+      before(:each) do
         subject.register_update_channel(channel)
-        expect(channel).to receive(:notify_update).with(subject)
+      end
 
-        subject.notify_update
+      it "calls ##{method} on the channel with itself" do
+        expect(channel).to receive(method).with(subject)
+        subject.send(method)
       end
     end
   end
 
+  describe '#notify_update' do
+    it_behaves_like 'a notification method', :notify_update
+  end
+
   describe '#notify_delete' do
-    context 'when there is no update channel' do
-      specify { expect { subject.notify_delete }.to raise_error }
-    end
-
-    context 'when there is an update channel' do
-      it 'calls channel#notify_delete with itself' do
-        channel = double('channel')
-        subject.register_update_channel(channel)
-        expect(channel).to receive(:notify_delete).with(subject)
-
-        subject.notify_delete
-      end
-    end
+    it_behaves_like 'a notification method', :notify_delete
   end
 
   #
