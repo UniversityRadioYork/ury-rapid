@@ -19,7 +19,11 @@ describe Bra::Model::ModelObject do
   shared_examples 'a notification method' do |method|
     context 'when there is no update channel' do
       subject { build(:model_object, channel: nil) }
-      specify { expect { subject.send(method) }.to raise_error }
+      specify do
+        expect { subject.send(method) }.to raise_error(
+          Bra::Common::Exceptions::MissingUpdateChannel
+        ) { |e| expect(e.object).to eq(subject) }
+      end
     end
 
     context 'when there is an update channel' do
