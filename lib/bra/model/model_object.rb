@@ -26,7 +26,7 @@ module Bra
       def initialize(handler_target = nil)
         super()
         @handler_target = handler_target || default_handler_target
-        @update_channel = NoUpdateChannel
+        @update_channel = NoUpdateChannel.new
       end
 
       # Registers a handler to be called when this object is modified
