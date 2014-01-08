@@ -82,7 +82,7 @@ describe MockModelObject do
       let(:payload) { Bra::Common::Payload.new(:body, privilege_set) }
       before(:each) do
         subject.register_handler(handler)
-        allow(handler).to receive(action)
+        allow(handler).to receive(:call)
       end
 
       it 'calls #require on the privilege set' do
