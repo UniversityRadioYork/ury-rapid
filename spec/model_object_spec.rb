@@ -22,7 +22,7 @@ describe Bra::Model::ModelObject do
       specify do
         expect { subject.send(method) }.to raise_error(
           Bra::Common::Exceptions::MissingUpdateChannel
-        ) { |e| expect(e.object).to eq(subject) }
+        ) { |e| expect(e.model_object).to eq(subject) }
       end
     end
 
