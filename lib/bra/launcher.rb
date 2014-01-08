@@ -37,6 +37,7 @@ module Bra
       @channel_maker            = options[:channel]
       @driver_maker             = options[:driver]
       @server_maker             = options[:server]
+      @logger_maker             = options[:logger]
       make_model_builders(options)
     end
 
@@ -52,8 +53,9 @@ module Bra
     end
 
     def app_arguments
-      new_driver = driver
-      new_driver_view, new_server_view = model(new_driver)
+      logger = make_logger
+      new_driver = driver(logger)
+      new_driver_view, new_server_view = model(logger, new_driver)
       new_server = server
       [new_driver, new_driver_view, new_server, new_server_view]
     end
@@ -62,22 +64,24 @@ module Bra
     # Driver
     #
 
-    def driver
-      make_driver(@driver_config)
+    def driver(logger)
+      make_driver(@driver_config, logger)
     end
 
     #
     # Model
     #
 
-    def model(driver)
-      config = model_configurator.configure_with(driver)
+    def model(logger, driver)
+      config = model_configurator(logger).configure_with(driver)
       model = config.make
       [make_driver_view(config, model), make_server_view(model)]
     end
 
-    def model_configurator
-      make_model_configurator(model_structure, make_channel, @model_config)
+    def model_configurator(logger)
+      make_model_configurator(
+        model_structure, make_channel, logger, @model_config
+      )
     end
 
     def model_structure
@@ -106,6 +110,7 @@ module Bra
         auth:    Kankri.method(:authenticator_from_hash),
         channel: Bra::Model::UpdateChannel.method(:new),
         driver:  method(:driver_from_config),
+        logger:  Logger.new(STDERR),
         server:  Bra::Server::Launcher.method(:new)
       ).reverse_merge(model_defaults)
     end
@@ -146,6 +151,7 @@ module Bra
     def_delegator :@channel_maker,            :call, :make_channel
     def_delegator :@driver_maker,             :call, :make_driver
     def_delegator :@driver_view_maker,        :call, :make_driver_view
+    def_delegator :@logger_maker,             :call, :make_logger
     def_delegator :@model_configurator_maker, :call, :make_model_configurator
     def_delegator :@model_structure_maker,    :call, :make_model_structure
     def_delegator :@server_maker,             :call, :make_server

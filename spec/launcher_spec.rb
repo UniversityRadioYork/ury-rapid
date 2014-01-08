@@ -80,8 +80,8 @@ describe Bra::Launcher do
     it 'calls the channel maker with no arguments' do
       test_maker(channel_maker, no_args)
     end
-    it 'calls the driver maker with the driver config' do
-      test_maker(driver_maker, driver_config)
+    it 'calls the driver maker with the driver config and logger' do
+      test_maker(driver_maker, driver_config, logger)
     end
     it 'calls the logger maker' do
       test_maker(logger_maker)
