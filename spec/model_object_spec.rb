@@ -22,7 +22,7 @@ describe MockModelObject do
 
   describe '#notify_update' do
     context 'when there is no update channel' do
-      specify { expect { subject.notify_channel(:repr) }.to raise_error }
+      specify { expect { subject.notify_update }.to raise_error }
     end
 
     context 'when there is an update channel' do
@@ -38,7 +38,7 @@ describe MockModelObject do
 
   describe '#notify_delete' do
     context 'when there is no update channel' do
-      specify { expect { subject.notify_channel(:repr) }.to raise_error }
+      specify { expect { subject.notify_delete }.to raise_error }
     end
 
     context 'when there is an update channel' do
