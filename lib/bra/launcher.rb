@@ -110,7 +110,7 @@ module Bra
         auth:    Kankri.method(:authenticator_from_hash),
         channel: Bra::Model::UpdateChannel.method(:new),
         driver:  method(:driver_from_config),
-        logger:  Logger.new(STDERR),
+        logger:  -> { Logger.new(STDERR) },
         server:  Bra::Server::Launcher.method(:new)
       ).reverse_merge(model_defaults)
     end
@@ -128,11 +128,11 @@ module Bra
     # External module includers
     #
 
-    def driver_from_config(driver_config)
+    def driver_from_config(driver_config, logger)
       driver_module = driver_config[:source] || DEFAULT_DRIVER
       require driver_module
 
-      Driver.new(driver_config)
+      Driver.new(driver_config, logger)
     end
 
     def structure_from_config(structure_config)
