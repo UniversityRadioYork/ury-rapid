@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 require 'bra/model/item'
-require 'bra/model/composite'
 
 describe Bra::Model::Item do
   subject { build(:item) }
@@ -18,16 +17,19 @@ describe Bra::Model::Item do
       )
     end
   end
+
   describe '#name' do
     it 'retrieves the name of the Item' do
       expect(subject.name).to eq(attrs[:name])
     end
   end
+
   describe '#type' do
     it 'retrieves the type of the Item' do
       expect(subject.type).to eq(attrs[:type])
     end
   end
+
   describe '#driver_delete' do
     context 'when the Item is in a parent object' do
       let(:parent) { Bra::Model::Playlist.new }
