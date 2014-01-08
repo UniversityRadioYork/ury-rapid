@@ -14,11 +14,12 @@ class Structure < Bra::Model::Creator
   # @return [Root]  The finished model.
   def create
     root do
-      hashes :players, :player_set, option(:players), :player do
+      hashes    :players, :player_set, option(:players), :player do
         player
       end
-      lists  :playlists, :playlist_set, option(:playlists), :playlist
-      info   :info
+      lists     :playlists, :playlist_set, option(:playlists), :playlist
+      info      :info
+      component :log, :log, option(:log)
     end
   end
 
