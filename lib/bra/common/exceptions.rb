@@ -56,13 +56,16 @@ module Bra
       # Exception generated when an update is generated on a model object with
       # no update channel configured
       class MissingUpdateChannel < BadModel
-        def initialize(object)
-          @object = object
+        def initialize(model_object)
+          @model_object = model_object
         end
 
         def to_s
-          "Object #{object.url} tried to post an update, but has no channel."
+          "Object #{model_object.url} tried to notify an update," +
+          'but has no updates channel.'
         end
+
+        attr_reader :model_object
       end
     end
   end
