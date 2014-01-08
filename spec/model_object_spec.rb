@@ -93,10 +93,10 @@ describe MockModelObject do
       end
 
       context 'the PrivilegeSet does not raise an error in #require' do
-        it "calls ##{action} on the handler with the object and payload" do
+        it "calls the handler with :#{action}, the object and payload" do
           allow(privilege_set).to receive(:require)
 
-          expect(handler).to receive(action).once.with(subject, payload)
+          expect(handler).to receive(:call).once.with(action, subject, payload)
           subject.send(action, payload)
         end
       end
