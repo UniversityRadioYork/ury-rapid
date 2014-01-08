@@ -42,6 +42,28 @@ module Bra
           'Action not supported: Not implemented by driver.'
         end
       end
+
+
+      # Exception generated when the model is improperly configured
+      class BadModel < RuntimeError
+        def to_s
+          'Model is improperly configured.'
+        end
+      end
+
+
+
+      # Exception generated when an update is generated on a model object with
+      # no update channel configured
+      class MissingUpdateChannel < BadModel
+        def initialize(object)
+          @object = object
+        end
+
+        def to_s
+          "Object #{object.url} tried to post an update, but has no channel."
+        end
+      end
     end
   end
 end
