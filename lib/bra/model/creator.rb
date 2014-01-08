@@ -26,6 +26,11 @@ module Bra
 
       protected
 
+      # Creates a log object
+      def log(id)
+        child id, config.log
+      end
+
       # Creates multiple Constants with the same handler target from a hash
       def constants(hash, handler_target)
         hash.each { |key, value| constant(key, value, handler_target) }

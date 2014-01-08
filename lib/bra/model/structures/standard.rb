@@ -19,7 +19,7 @@ class Structure < Bra::Model::Creator
       end
       lists     :playlists, :playlist_set, option(:playlists), :playlist
       info      :info
-      component :log, :log, option(:log)
+      log       :log
     end
   end
 
