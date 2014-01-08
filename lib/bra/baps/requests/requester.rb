@@ -22,6 +22,8 @@ module Bra
       # The Requester delegates the request generation to several SubRequester
       # objects, which are defined elsewhere.
       class Requester < DriverCommon::HandlerSet
+        extend Forwardable
+
         HANDLER_MODULE = Requests::Handlers
 
         # Initialises the Requester
@@ -42,6 +44,8 @@ module Bra
           @queue = queue
           @logger = logger
         end
+
+        def_delegator :@logger, :send, :log
 
         # Prepares an incoming model configuration by adding handlers
         #
