@@ -40,6 +40,7 @@ module Bra
         def initialize(queue, logger)
           super()
           @queue = queue
+          @logger = logger
         end
 
         # Prepares an incoming model configuration by adding handlers
