@@ -23,6 +23,8 @@ module Bra
       # @param logger [Object]  An object that implements the standard library
       #   Logger's API.
       def initialize(logger)
+        super()
+
         @logger = logger
       end
 
