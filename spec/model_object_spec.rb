@@ -24,6 +24,7 @@ describe MockModelObject do
     context 'when there is no update channel' do
       specify { expect { subject.notify_channel(:repr) }.to raise_error }
     end
+
     context 'when there is an update channel' do
       it 'calls channel#notify_update with itself' do
         channel = double('channel')
@@ -39,6 +40,7 @@ describe MockModelObject do
     context 'when there is no update channel' do
       specify { expect { subject.notify_channel(:repr) }.to raise_error }
     end
+
     context 'when there is an update channel' do
       it 'calls channel#notify_delete with itself' do
         channel = double('channel')
@@ -116,8 +118,10 @@ describe MockModelObject do
           expect(subject.handler_target).to eq(:mock_model_object)
         end
       end
+
       context 'and the handler_target is defined' do
         let(:target) { :arsenic_catnip }
+
         it 'returns that handler_target' do
           expect(subject.handler_target).to eq(:arsenic_catnip)
         end
