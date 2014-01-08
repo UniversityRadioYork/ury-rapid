@@ -6,10 +6,11 @@ module Bra
     class Config
       extend Forwardable
 
-      def initialize(structure, update_channel, options)
+      def initialize(structure, update_channel, logger, options)
         @structure = structure
         @extensions = []
         @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
+        @logger = logger
         @options = options
         @update_channel = update_channel
         @component_creator = Bra::Model::ComponentCreator.new(self)
@@ -43,6 +44,11 @@ module Bra
 
       def register_update_channel(object)
         object.register_update_channel(@update_channel)
+      end
+
+      # Creates a model object that represents the bra log
+      def log
+        create_model_object(:log, @logger)
       end
 
       private
