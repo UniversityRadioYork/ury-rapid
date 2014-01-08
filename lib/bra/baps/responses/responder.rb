@@ -25,6 +25,7 @@ module Bra
         HANDLER_MODULE = Responses::Handlers
 
         def_delegators :@requester, :login_authenticate, :login_synchronise
+        def_delegator :@model, :log
 
         attr_reader :model
 
@@ -78,7 +79,7 @@ module Bra
             message << " (0x#{hexcode})"
           end
 
-          @model.log(:warn, message)
+          log(:warn, message)
         end
       end
     end
