@@ -14,6 +14,35 @@ module Bra
     class Log < Compo::Leaf
       include ModelObject
 
+      # Initialises the Log
+      # 
+      # @api  public
+      # @example  Initialising a log with an instance of a Ruby Logger
+      #   log = Log.new(Logger.new(STDOUT))
+      #
+      # @param logger [Object]  An object that implements the standard library
+      #   Logger's API.
+      def initialize(logger)
+        @logger = logger
+      end
+
+      # POSTs an entry to this Log
+      #
+      # The ID should be one of :info, :debug, :warn, :fatal or :error, and the
+      # payload should be the string to log.
+      #
+      # @api  public
+      # @example  Posting an error message to the log.
+      #   log.driver_post(:error, 'Somebody famous has died.')
+      #
+      # @param id [Symbol]  The target ID: for the Log, this is overloaded
+      #   to mean the severity of the error message, which must be one of those
+      #   listed above.
+      #
+      # @param payload [String]  The payload: for the Log, this should be the
+      #   string to log.
+      def driver_post(id, payload)
+      end
     end
   end
 end
