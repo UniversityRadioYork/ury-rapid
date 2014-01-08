@@ -63,7 +63,7 @@ describe Bra::Model::Item do
   end
 
   describe '#driver_put' do
-    let(:parent) { Bra::Model::Playlist.new }
+    let(:parent) { build(:playlist) }
 
     it 'calls #driver_post on the parent with its current ID' do
       payload = double(:payload)
