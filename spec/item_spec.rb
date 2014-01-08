@@ -32,7 +32,7 @@ describe Bra::Model::Item do
 
   describe '#driver_delete' do
     context 'when the Item is in a parent object' do
-      let(:parent) { Bra::Model::Playlist.new }
+      let(:parent) { build(:playlist) }
       let(:channel) { double(:channel) }
 
       before(:each) do
