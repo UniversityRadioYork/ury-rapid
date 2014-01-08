@@ -11,8 +11,12 @@ class Driver
 
   # Initialise the driver given its driver configuration
   #
-  # @param config [Hash] The configuration hash for the driver.
-  def initialize(config)
+  # @param config [Hash]  The configuration hash for the driver.
+  # @param logger [Object]  An object that can be used to log messages from
+  #   the driver.
+  def initialize(config, logger)
+    @logger = logger
+
     # We'll need this config later when we're post-processing the model.
     @config = config
 
@@ -25,7 +29,7 @@ class Driver
 
     # The requester contains all the logic for instructing BAPS to make model
     # changes happen.
-    @requester = Bra::Baps::Requests::Requester.new(queue)
+    @requester = Bra::Baps::Requests::Requester.new(queue, logger)
 
     # Most of the actual low-level BAPS poking is contained inside this
     # client object, which is what hooks into the BRA EventMachine

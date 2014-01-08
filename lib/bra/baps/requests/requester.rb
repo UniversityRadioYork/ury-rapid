@@ -30,11 +30,14 @@ module Bra
         #
         # @example Initialising a Requester with an EventMachine Queue.
         #   queue = EventMachine::Queue.new
-        #   requester = Bra::Baps::Requests::Requester.new(queue)
+        #   logger = Logger.new(STDOUT)
+        #   requester = Bra::Baps::Requests::Requester.new(queue, logger)
         #
-        # @param queue [Queue] The quests queue used for sending requests to
+        # @param queue [Queue]  The requests queue used for sending requests to
         #   the BAPS server.
-        def initialize(queue)
+        # @param logger [Object]  The Logger-compatible object used for logging
+        #   the handlers registered.
+        def initialize(queue, logger)
           super()
           @queue = queue
         end
