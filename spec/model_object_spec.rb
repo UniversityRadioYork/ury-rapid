@@ -3,12 +3,8 @@ require 'spec_helper'
 require 'bra/common/payload'
 require 'bra/model'
 
-class MockModelObject
-  include Bra::Model::ModelObject
-end
-
-describe MockModelObject do
-  subject { MockModelObject.new(target) }
+describe Bra::Model::ModelObject do
+  subject { build(:model_object) }
   let(:target) { nil }
   let(:old_parent) { double(:old_parent) }
   let(:new_parent) { double(:new_parent) }
@@ -22,14 +18,13 @@ describe MockModelObject do
 
   shared_examples 'a notification method' do |method|
     context 'when there is no update channel' do
+      subject { build(:model_object, channel: nil) }
       specify { expect { subject.send(method) }.to raise_error }
     end
 
     context 'when there is an update channel' do
       let(:channel) { double(:channel) }
-      before(:each) do
-        subject.register_update_channel(channel)
-      end
+      subject { build(:model_object, channel: channel) }
 
       it "calls ##{method} on the channel with itself" do
         expect(channel).to receive(method).with(subject)
@@ -114,7 +109,7 @@ describe MockModelObject do
       end
 
       context 'and the handler_target is defined' do
-        let(:target) { :arsenic_catnip }
+        subject { build(:model_object, handler_target: :arsenic_catnip) }
 
         it 'returns that handler_target' do
           expect(subject.handler_target).to eq(:arsenic_catnip)
