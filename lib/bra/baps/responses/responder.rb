@@ -77,7 +77,8 @@ module Bra
             hexcode = response.code.to_s(16)
             message << " (0x#{hexcode})"
           end
-          puts(message)
+
+          @model.log(:warn, message)
         end
       end
     end
