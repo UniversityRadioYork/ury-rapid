@@ -37,11 +37,7 @@ module Bra
         )
       end
 
-      def log(options)
-        # TODO(CaptainHayashi): Make the log configurable.
-
-        logger = Logger.new(STDERR)
-
+      def log(logger)
         Bra::Model::Log.new(logger)
       end
 
