@@ -40,9 +40,12 @@ module Bra
         # @param requester [Requester] The Requester via which this Responder
         #   can send BAPS login requests.
         def initialize(model, requester)
-          super()
           @model = model
           @requester = requester
+
+          model.log(:info, 'Initialising BAPS responder.')
+
+          super()
         end
 
         # Registers the responder's callbacks with a incoming responses channel

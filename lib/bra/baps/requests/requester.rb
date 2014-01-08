@@ -40,9 +40,12 @@ module Bra
         # @param logger [Object]  The Logger-compatible object used for logging
         #   the handlers registered.
         def initialize(queue, logger)
-          super()
           @queue = queue
           @logger = logger
+
+          logger.info('Initialising BAPS requester.')
+
+          super()
         end
 
         def_delegator :@logger, :send, :log

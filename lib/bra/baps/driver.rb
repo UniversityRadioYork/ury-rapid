@@ -16,6 +16,7 @@ class Driver
   #   the driver.
   def initialize(config, logger)
     @logger = logger
+    logger.info('Initialising BAPS driver.')
 
     # We'll need this config later when we're post-processing the model.
     @config = config
@@ -29,7 +30,7 @@ class Driver
 
     # The requester contains all the logic for instructing BAPS to make model
     # changes happen.
-    @requester = Bra::Baps::Requests::Requester.new(queue, logger)
+    @requester = Bra::Baps::Requests::Requester.new(queue, @logger)
 
     # Most of the actual low-level BAPS poking is contained inside this
     # client object, which is what hooks into the BRA EventMachine

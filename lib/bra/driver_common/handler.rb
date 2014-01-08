@@ -44,7 +44,7 @@ module Bra
       def self.register_into(set)
         self::TARGETS.each do |target|
           set.register_handler(target, ->(*args) { new(set, *args).run })
-          puts("Registered #{to_s} for #{target}.")
+          set.log(:info, "Registered #{to_s} for #{target}.")
         end
       end
     end

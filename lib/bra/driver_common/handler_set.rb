@@ -6,7 +6,8 @@ module Bra
     # requests or responses, from server and playout system actions
     # respectively.
     #
-    # NOTE: Subclasses must define the constant HANDLER_MODULE.
+    # NOTE: Subclasses must define the constant HANDLER_MODULE, as well as a
+    #   function #log which takes a severity symbol and string and logs it.
     class HandlerSet
       extend Forwardable
 
