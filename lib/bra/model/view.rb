@@ -30,6 +30,19 @@ module Bra
       def find(url, &block)
         Compo::UrlFinder.find(@root, url, &block)
       end
+
+      # Logs an error message in the bra log
+      # 
+      # @api private
+      #
+      # @param severity [Symbol]  The severity level of the log message.  This
+      #   must be one of :debug, :info, :warn, :error or :fatal.
+      # @param message [String]  The log message itself.
+      #
+      # @return [void]
+      def log(severity, message)
+        find('/log') { |log| log.driver_post(severity, message) }
+      end
     end
   end
 end
