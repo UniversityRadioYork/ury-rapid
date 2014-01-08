@@ -1,10 +1,11 @@
 require 'bra/model/composite'
+require 'bra/model/constant'
 require 'bra/model/creator'
 require 'bra/model/driver_view'
 require 'bra/model/item'
+require 'bra/model/log'
 require 'bra/model/model_object'
 require 'bra/model/server_view'
-require 'bra/model/constant'
 
 module Bra
   # The module containing the classes that make up bra's playout system model
