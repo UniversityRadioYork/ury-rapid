@@ -10,12 +10,12 @@ describe Bra::Launcher do
     }
   end
   let(:overrides) do
-    MAKERS.map
     { app:                app_maker,
       auth:               auth_maker,
       channel:            channel_maker,
       driver:             driver_maker,
       driver_view:        driver_view_maker,
+      logger:             logger_maker,
       model_configurator: model_configurator_maker,
       model_structure:    model_structure_maker,
       server:             server_maker,
@@ -24,7 +24,7 @@ describe Bra::Launcher do
   end
 
   MAKERS = %i{
-    app auth channel driver model_configurator model_structure server
+    app auth channel driver logger model_configurator model_structure server
     driver_view server_view
   }
 
@@ -48,6 +48,7 @@ describe Bra::Launcher do
       allow(channel_maker).to receive(:call).and_return(channel)
       allow(server_maker).to receive(:call).and_return(server)
       allow(driver_maker).to receive(:call).and_return(driver)
+      allow(logger_maker).to receive(:call).and_return(logger)
 
       allow(driver_view_maker).to receive(:call).and_return(driver_view)
       allow(server_view_maker).to receive(:call).and_return(server_view)
@@ -82,9 +83,17 @@ describe Bra::Launcher do
     it 'calls the driver maker with the driver config' do
       test_maker(driver_maker, driver_config)
     end
-    it 'calls the model configurator maker with struct, channel and config' do
+    it 'calls the logger maker' do
+      test_maker(logger_maker)
+    end
+
+    it 'calls the model configurator maker with its expected arguments' do
       test_maker(
-        model_configurator_maker, model_structure, channel, model_config
+        model_configurator_maker,
+        model_structure,
+        channel,
+        logger,
+        model_config
       )
     end
     it 'calls the model structure maker with the model config' do
