@@ -28,7 +28,7 @@ module Bra
 
       # Creates a log object
       def log(id)
-        child id, config.log
+        child id, @config.log
       end
 
       # Creates multiple Constants with the same handler target from a hash
