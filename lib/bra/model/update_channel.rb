@@ -15,7 +15,7 @@ module Bra
       #
       # @return [self]
       def register_update_channel(channel)
-        @update_channel = channel
+        @update_channel = channel || NoUpdateChannel
         self
       end
 
