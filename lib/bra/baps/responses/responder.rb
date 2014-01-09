@@ -43,7 +43,7 @@ module Bra
           @model = model
           @requester = requester
 
-          model.log(:info, 'Initialising BAPS responder.')
+          log(:info, 'Initialising BAPS responder.')
 
           super()
         end
