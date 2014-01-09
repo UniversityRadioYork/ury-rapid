@@ -15,11 +15,11 @@ class Driver
   # @param logger [Object]  An object that can be used to log messages from
   #   the driver.
   def initialize(config, logger)
-    @logger = logger
-    logger.info('Initialising BAPS driver.')
-
     # We'll need this config later when we're post-processing the model.
     @config = config
+
+    @logger = logger
+    log_initialisation
 
     # We need a queue for requests to the BAPS server to be funneled
     # through.  This will later need to be given to the actual BAPS client
@@ -81,6 +81,11 @@ class Driver
   private
 
   def_delegator :@requester, :add_handlers
+
+  def log_initialisation
+    @logger.info('Initialising BAPS driver...')
+    @logger.info("BAPS server: #{@config[:host]}:#{@config[:port]}")
+  end
 
   def extend_model(model_config)
     model_config.add_extension(create_extender(model_config))
