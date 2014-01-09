@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov'
 
   spec.add_runtime_dependency 'activesupport'
+  spec.add_runtime_dependency 'colored'
   spec.add_runtime_dependency 'compass'
   spec.add_runtime_dependency 'compo', '~> 0.3', '>=0.3.1'
   spec.add_runtime_dependency 'eventmachine'
