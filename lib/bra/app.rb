@@ -20,12 +20,21 @@ module Bra
 
     # Runs th bra application in a new EventMachine instance
     def run
+      @driver_view.log(:info, 'Now starting bra.')
+      @driver_view.log(:info, "Version: #{Bra::Common::Constants::VERSION}.")
+
       @reactor.run do
         @server.run(@server_view)
         @driver.run(@driver_view)
-        Signal.trap("INT") { EventMachine.stop }
-        Signal.trap("TERM") { EventMachine.stop }
+
+        Signal.trap('INT', &method(:close))
+        Signal.trap('TERM', &method(:close))
       end
+    end
+
+    def close(signal)
+      puts "Caught signal #{signal} -- exiting"
+      EventMachine.stop
     end
   end
 end
