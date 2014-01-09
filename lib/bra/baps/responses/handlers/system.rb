@@ -11,7 +11,7 @@ module Bra
           )
 
           def run
-            puts("#{type_message}: #{details}")
+            log(:info, "#{type_message}: #{details}")
           end
 
           def type_message
@@ -77,7 +77,7 @@ module Bra
           end
 
           def die(code, string)
-            puts("BAPS login FAILED: #{string}, code #{code}.")
+            log(:fatal, "BAPS login failed: #{string}, code #{code}.")
             EventMachine.stop
           end
         end
