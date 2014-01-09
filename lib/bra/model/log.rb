@@ -26,6 +26,8 @@ module Bra
         super()
 
         @logger = logger
+
+        logger.info('Log created.')
       end
 
       # POSTs an entry to this Log

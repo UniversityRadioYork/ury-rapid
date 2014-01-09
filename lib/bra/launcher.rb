@@ -1,3 +1,5 @@
+require 'colored'
+
 require 'bra/app'
 require 'bra/model/config'
 
@@ -110,7 +112,7 @@ module Bra
         auth:    Kankri.method(:authenticator_from_hash),
         channel: Bra::Model::UpdateChannel.method(:new),
         driver:  method(:driver_from_config),
-        logger:  -> { Logger.new(STDERR) },
+        logger:  method(:default_logger),
         server:  Bra::Server::Launcher.method(:new)
       ).reverse_merge(model_defaults)
     end
@@ -122,6 +124,45 @@ module Bra
         server_view:        Bra::Model::ServerView.method(:new),
         model_structure:    method(:structure_from_config)
       }
+    end
+
+    #
+    # Default logger (TODO: move this elsewhere?)
+    #
+
+    def default_logger
+      # TODO: Allow redirecting
+      output = STDERR
+      Logger.new(STDERR).tap do |logger|
+        logger.formatter = proc do |severity, datetime, progname, msg|
+          [ format_date(datetime, output),
+            format_severity(severity, output),
+            msg
+          ].join(' ') + "\n"
+        end
+      end
+    end
+
+    # Colourises the severity if the logging output is a terminal
+    def format_severity(severity, output)
+      "[#{output.is_a?(String) ? severity : coloured_severity(severity)}]"
+    end
+
+    def format_date(datetime, output)
+      dt = datetime.strftime('%d/%m/%y %H:%M:%S')
+      output.is_a?(String) ? dt : dt.green
+    end
+
+    SEVERITIES = {
+      'DEBUG' => :green,
+      'INFO' => :blue,
+      'WARN' => :yellow,
+      'ERROR' => :red,
+      'FATAL' => :magenta
+    }
+
+    def coloured_severity(severity)
+      severity.send(SEVERITIES.fetch(severity, :white))
     end
 
     #
