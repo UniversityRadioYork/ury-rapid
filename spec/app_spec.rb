@@ -15,6 +15,10 @@ describe Bra::App do
       allow(driver).to receive(:run)
       allow(server).to receive(:run)
       allow(reactor).to receive(:run).and_yield()
+
+      # Logging messages go through the driver view, which has access to the
+      # logger.  This is normal.
+      allow(driver_view).to receive(:log)
     end
 
     it 'calls #run on the reactor' do
