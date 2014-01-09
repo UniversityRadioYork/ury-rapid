@@ -5,6 +5,8 @@ module Bra
     # See Bra::DriverCommon::Requests::Handler and
     # Bra::DriverCommon::Responses::Handler for the more specific base classes.
     class Handler
+      extend Forwardable
+
       # Initialises the Handler
       #
       # @api semipublic
@@ -19,6 +21,10 @@ module Bra
       def initialize(parent)
         @parent = parent
       end
+
+      # It's the handler set's responsibility to provide a way for the handler
+      # to log things.
+      def_delegator :@parent, :log
 
       def targets
         self.class::TARGETS
