@@ -1,3 +1,4 @@
+require 'bra/common/exceptions'
 require 'bra/driver_common/requests/handler'
 
 module Bra
@@ -48,9 +49,13 @@ module Bra
         end
 
         # Shorthand for creating a type valid in both URL and hash forms
-        def self.url_and_hash_type(type, url_processor, hash_processor)
-          url_type(type) { |url| yield *url_processor.call(url) }
-          hash_type(type) { |hash| yield *hash_processor.call(hash) }
+        def self.url_and_hash_type(type, url_processor, hash_processor, &block)
+          url_type(type) do |url|
+            instance_exec(*url_processor.call(url), &block)
+          end
+          hash_type(type) do |hash|
+            instance_exec(*hash_processor.call(hash), &block)
+          end
         end
 
         def self.url_type(type, &block)
@@ -68,7 +73,7 @@ module Bra
         end
 
         def unsupported_type(*args)
-          fail(Bra::Exceptions::InvalidPayload, 'Invalid payload type.')
+          fail(Bra::Common::Exceptions::InvalidPayload, 'Invalid payload type.')
         end
       end
     end
