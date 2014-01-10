@@ -1,5 +1,8 @@
 NOTE: When changing the API version, change Bra::Common::Constants.
 
+0.4.1
+  - New type for playlist POSTing, move, which takes a playlist reference
+    and moves the referenced item to the POST location.
 0.4.0
   - Stream and WebSocket payloads are now of the form
     {"type": "update", "<url>": <payload>}.
