@@ -74,10 +74,7 @@ module Bra
         end
 
         handler 'Item', :item do
-          # Deletes the Item
-          #
-          # This only works if the Item is attached to a playlist.
-          def delete
+          on_delete do
             unsupported_by_driver unless in_playlist?
 
             request(
