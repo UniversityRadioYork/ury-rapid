@@ -24,11 +24,15 @@ module Bra
 
           # Direct library loading
           hash_type :x_baps_direct do |item|
-            request(
-              add_item_request(Types::Track::SPECIFIC_ITEM)
-              .uint32(item[:record_id].to_i, item[:track_id].to_i)
-              .string(item[:title], item[:artist])
-            )
+            direct(*item.values_at(%i{record_id track_id title artist}))
+          end
+
+          #
+          # Implementations of PlaylistHandler load types
+          #
+
+          def text(contents)
+            add_item_request(:text) { |rq| rq.string(contents) }
           end
 
           def move_from_local_playlist(old_index)
@@ -40,16 +44,23 @@ module Bra
 
           private
 
-          def add_item_request(type)
-            Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
+          def add_item_request(type_symbol)
+            type = Types::Track::const_get(type_symbol.upcase)
+            rq = Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
+            request(yield rq)
+          end
+
+          def direct(record_id, track_id, title, artist)
+            add_item_request(:specific_item) do |rq|
+              rq.uint32(Integer(record_id), Integer(track_id))
+                .string(title, artist)
+            end
           end
 
           def file(directory, filename)
-            request(
-              add_item_request(Types::Track::FILE)
-              .uint32(directory.to_i)
-              .string(filename)
-            )
+            add_item_request(:file) do |rq|
+              rq.uint32(directory.to_i).string(filename)
+            end
           end
         end
 
