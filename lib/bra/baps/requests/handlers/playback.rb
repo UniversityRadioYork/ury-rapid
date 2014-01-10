@@ -21,10 +21,28 @@ module Bra
         class Item < Bra::DriverCommon::Requests::Handler
           def_targets :item
 
-          # This handler has no targets - it is attached to incoming items
-          # by the Player's handler.
-          def delete(object, payload)
-            fail(Bra::Common::Exceptions::NotSupportedByDriver)
+          # Deletes the Item
+          #
+          # This only works if the Item is attached to a playlist.
+          def delete
+            unsupported_by_driver unless in_playlist?
+
+            request(
+              Request.new(Codes::Playlist::DELETE_ITEM, caller_parent_id)
+                     .uint32(caller_id)
+            )
+          end
+
+          private
+
+          # Checks to see if the Item is in a playlist
+          #
+          # @api  private
+          #
+          # @return [Boolean]  True if the item is in a playlist; false
+          #   otherwise.
+          def in_playlist?
+            caller_parent.handler_target == :playlist
           end
         end
 
