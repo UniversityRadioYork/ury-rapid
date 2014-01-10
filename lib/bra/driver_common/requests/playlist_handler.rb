@@ -23,7 +23,7 @@ module Bra
         # move
         #   URL: 'move://[old-playlist/]old-index
         #   Hash: {type: :move, [playlist: old-playlist,] index: old-index}
-        #   
+        #
         #   Moves the item from the given playlist reference to the playlist
         #   and index it is being POSTed to.
         #

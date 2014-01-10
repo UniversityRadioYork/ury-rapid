@@ -9,7 +9,21 @@ module Bra
       # and HASH_TYPES, mapping URL protocols and hash type identifiers to
       # methods.
       class UrlHashHandler < Handler
-        @@types = { url: {}, hash: {} }
+        # Somewhat hacky way of making URL/hash types propagate to subclasses
+        # while not polluting UrlHashHandler with their types.
+          def self.types
+            if superclass.ancestors.include?(UrlHashHandler)
+              types = superclass.types
+            end
+
+            types ||= {}
+            types.merge(@types) unless @types.nil?
+          end
+
+        def self.register_type(style, type, &block)
+          @types ||= { url: {}, hash: {} }
+          @types[style][type] = block
+        end
 
         # Set up the main Poster methods to reference the jump tables above
         %i{url hash}.each do |style|
@@ -29,11 +43,10 @@ module Bra
         private
 
         def processed_payload_handler(style, type)
-          @@types[style].fetch(type, method(:unsupported_type))
-        end
-
-        def self.register_type(style, type, &block)
-          @@types[style][type] = block
+          p style
+          p type
+          p self.singleton_class.types
+          self.class.types[style].fetch(type, method(:unsupported_type))
         end
 
         def unsupported_type(*args)
