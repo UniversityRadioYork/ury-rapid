@@ -139,25 +139,6 @@ module Bra
           )
         end
       end
-
-      module HandlerBundle
-        # Constructs a new handler
-        def handler(name, *targets, &block)
-          handler_with_class(Handler, name, *targets, &block)
-        end
-
-        private
-
-        # Constructs a new handler with the given arguments
-        def handler_with_class(base_class, name, *targets, &block)
-          cls = Class.new(base_class) do
-            def_targets *targets
-
-            class_eval(&block)
-          end
-          const_set(name, cls)
-        end
-      end
     end
   end
 end

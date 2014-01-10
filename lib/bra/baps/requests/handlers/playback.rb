@@ -1,15 +1,12 @@
 require 'bra/common/types'
-require 'bra/driver_common/requests/handler'
-require 'bra/driver_common/requests/player_handler'
+require 'bra/driver_common/requests/handler_bundle'
 
 module Bra
   module Baps
     module Requests
       module Handlers
         # Handler for channel players
-        class Player < Bra::DriverCommon::Requests::PlayerHandler
-          def_targets :player
-
+        player_handler Player, :player do
           def item_from_local_playlist(index)
             request(
               Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
