@@ -1,3 +1,5 @@
+require 'bra/common/exceptions'
+
 module Bra
   module DriverCommon
     # Base class for request and response handlers.
@@ -52,6 +54,18 @@ module Bra
           set.register_handler(target, ->(*args) { new(set, *args).run })
           set.log(:info, "Registered #{to_s} for #{target}.")
         end
+      end
+
+      protected
+
+      # Raises an error signifying an action is unimplemented by bra
+      def unimplemented_by_bra
+        fail(Bra::Common::Exceptions::NotSupportedByBra)
+      end
+
+      # Raises an error signifying an action is unimplemented by the driver
+      def unimplemented_by_driver
+        fail(Bra::Common::Exceptions::NotSupportedByDriver)
       end
     end
   end
