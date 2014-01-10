@@ -25,7 +25,7 @@ module Bra
             :x_baps_file,
             ->(url) { url.split('/', 2) },
             ->(hash) { hash.values_at(:directory, :filename) }
-          ) do |file|
+          ) do |directory, filename|
             add_item_request(:file) do |rq|
               rq.uint32(directory.to_i).string(filename)
             end
