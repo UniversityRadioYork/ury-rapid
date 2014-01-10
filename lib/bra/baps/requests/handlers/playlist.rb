@@ -31,8 +31,8 @@ module Bra
           # Implementations of PlaylistHandler load types
           #
 
-          def text(contents)
-            add_item_request(:text) { |rq| rq.string(contents) }
+          def text(summary, details)
+            add_item_request(:text) { |rq| rq.string(summary, details) }
           end
 
           def move_from_local_playlist(old_index)
