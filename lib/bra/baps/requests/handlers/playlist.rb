@@ -1,5 +1,4 @@
-require 'bra/driver_common/requests/handler'
-require 'bra/driver_common/requests/playlist_handler'
+require 'bra/driver_common/requests/handler_bundle'
 
 module Bra
   module Baps
@@ -7,31 +6,42 @@ module Bra
       module Handlers
         extend Bra::DriverCommon::Requests::HandlerBundle
 
-        # Handler for playlists
-        class Playlist < Bra::DriverCommon::Requests::PlaylistHandler
-          def_targets :playlist
-
-          # Requests a playlist be DELETEd via the BAPS server
-          #
-          # This resets the playlist.
-          def delete(object, _)
-            request(Request.new(Codes::Playlist::RESET, caller_id))
+        playlist_handler 'Playlist', :playlist do
+          on_delete do
+            request(Request.new(Codes::Playlist::RESET, playlist_id))
           end
 
-          # Methods of adding files that are specific to BAPS.
+          #
+          # BAPS extensions to the Playlist API
+          # (see Bra::DriverCommon::Requests::PlaylistHandler for the main API)
+          # 
 
+          # x_baps_file
+          #   URL: 'x_baps_file://directory/filename'
+          #   Hash: {type: :x_baps_file, directory: dir, filename: filename}
+          #
+          #   Loads a file from one of BAPS's pre-configured directories.
           url_type(:x_baps_file) { |url| file(*(url.split('/', 2))) }
           hash_type :x_baps_file do |hash|
             file(*(hash.values_at(:directory, :filename)))
           end
 
-          # Direct library loading
+          # x_baps_direct
+          #   Hash: {type:      :x_baps_direct,
+          #          record_id: id,
+          #          track_id:  id,
+          #          title:     title,
+          #          artist:    artis,
+          #         }
+          #
+          #   Loads a track from the BAPS Record Library, with the given IDs
+          #   and metadata.
           hash_type :x_baps_direct do |item|
             direct(*item.values_at(*%i{record_id track_id title artist}))
           end
 
           #
-          # Implementations of PlaylistHandler load types
+          # Implementations for the Playlist API
           #
 
           def text(summary, details)
@@ -68,7 +78,7 @@ module Bra
         end
 
         handler 'PlaylistSet', :playlist_set do
-          def delete(object, payload)
+          on_delete do
             object.children.each { |child| child.delete(payload) }
           end
         end

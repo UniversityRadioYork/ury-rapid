@@ -5,8 +5,9 @@ module Bra
   module Baps
     module Requests
       module Handlers
-        # Handler for channel players
-        player_handler Player, :player do
+        extend Bra::DriverCommon::Requests::HandlerBundle
+
+        player_handler 'Player', :player do
           def item_from_local_playlist(index)
             request(
               Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
@@ -14,9 +15,7 @@ module Bra
           end
         end
 
-        # Handler for player volume changes.
-        class Volume < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :volume
+        handler 'Volume', :volume do
           put_by_payload_processor
 
           def float(float)
@@ -27,9 +26,7 @@ module Bra
           end
         end
 
-        # Handler for player marker changes.
-        class Marker < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :position, :cue, :intro
+        handler 'Marker', :position, :cue, :intro do
           put_by_payload_processor
 
           def integer(integer)
@@ -52,8 +49,7 @@ module Bra
         end
 
         # Handler for state changes.
-        class State < Bra::DriverCommon::Requests::VariableHandler
-          def_targets :state
+        handler 'State', :state do
           put_by_payload_processor
 
           include Bra::Common::Types::Validators
