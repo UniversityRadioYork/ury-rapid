@@ -21,9 +21,14 @@ module Bra
           #   Hash: {type: :x_baps_file, directory: dir, filename: filename}
           #
           #   Loads a file from one of BAPS's pre-configured directories.
-          url_type(:x_baps_file) { |url| file(*(url.split('/', 2))) }
-          hash_type :x_baps_file do |hash|
-            file(*(hash.values_at(:directory, :filename)))
+          url_and_hash_type(
+            :x_baps_file,
+            ->(url) { url.split('/', 2) },
+            ->(hash) { hash.values_at(:directory, :filename) }
+          ) do |file|
+            add_item_request(:file) do |rq|
+              rq.uint32(directory.to_i).string(filename)
+            end
           end
 
           # x_baps_direct
@@ -67,12 +72,6 @@ module Bra
             add_item_request(:specific_item) do |rq|
               rq.uint32(Integer(record_id), Integer(track_id))
                 .string(title, artist)
-            end
-          end
-
-          def file(directory, filename)
-            add_item_request(:file) do |rq|
-              rq.uint32(directory.to_i).string(filename)
             end
           end
         end
