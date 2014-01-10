@@ -67,6 +67,14 @@ module Bra
           HOOKS[action] << block
         end
 
+        def self.on_delete
+          class_eval do
+            def delete
+              yield
+            end
+          end
+        end
+
         protected
 
         def_delegator :@object, :id, :caller_id
@@ -141,11 +149,11 @@ module Bra
         private
 
         # Constructs a new handler with the given arguments
-        def handler_with_class(base_class, name, *targets)
+        def handler_with_class(base_class, name, *targets, &block)
           cls = Class.new(base_class) do
             def_targets *targets
 
-            yield
+            class_eval(&block)
           end
           const_set(name, cls)
         end
