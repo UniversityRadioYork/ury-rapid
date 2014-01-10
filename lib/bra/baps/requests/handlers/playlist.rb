@@ -24,7 +24,7 @@ module Bra
 
           # Direct library loading
           hash_type :x_baps_direct do |item|
-            direct(*item.values_at(%i{record_id track_id title artist}))
+            direct(*item.values_at(*%i{record_id track_id title artist}))
           end
 
           #
