@@ -1,9 +1,12 @@
+require 'bra/driver_common/requests/handler'
 require 'bra/driver_common/requests/playlist_handler'
 
 module Bra
   module Baps
     module Requests
       module Handlers
+        extend Bra::DriverCommon::Requests::HandlerBundle
+
         # Handler for playlists
         class Playlist < Bra::DriverCommon::Requests::PlaylistHandler
           def_targets :playlist
@@ -64,19 +67,13 @@ module Bra
           end
         end
 
-        # Handler for playlist sets
-        class PlaylistSet < Bra::DriverCommon::Requests::Handler
-          def_targets :playlist_set
-
+        handler 'PlaylistSet', :playlist_set do
           def delete(object, payload)
             object.children.each { |child| child.delete(payload) }
           end
         end
 
-        # Handler for items
-        class Item < Bra::DriverCommon::Requests::Handler
-          def_targets :item
-
+        handler 'Item', :item do
           # Deletes the Item
           #
           # This only works if the Item is attached to a playlist.
