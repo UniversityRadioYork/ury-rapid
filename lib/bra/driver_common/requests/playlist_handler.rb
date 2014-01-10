@@ -35,6 +35,15 @@ module Bra
         url_type(:move)  { |url|  move(*parse_playlist_reference_url(url)) }
         hash_type(:move) { |hash| move(*parse_playlist_reference_hash(hash)) }
 
+        # text
+        #   Hash: {type: :text, summary: 'summary', details: 'string'}
+        #
+        #   Adds a text item into the playlist, if the playout system supports
+        #   text items.
+        #
+        #   Drivers may implement this by overriding #text.
+        hash_type(:text) { |hash| text(hash[:summary], hash[:details]) }
+
         # These are the overridable functions a concrete PlaylistHandler can
         # fill in.  They are defined in this class as raising a
         # NotSupportedByDriver exception.
