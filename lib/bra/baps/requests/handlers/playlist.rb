@@ -23,7 +23,7 @@ module Bra
           end
 
           # Direct library loading
-          hash_type :x_baps_direct do |hash|
+          hash_type :x_baps_direct do |item|
             request(
               add_item_request(Types::Track::SPECIFIC_ITEM)
               .uint32(item[:record_id].to_i, item[:track_id].to_i)
