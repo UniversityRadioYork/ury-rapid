@@ -11,17 +11,32 @@ module Bra
       class UrlHashHandler < Handler
         # Somewhat hacky way of making URL/hash types propagate to subclasses
         # while not polluting UrlHashHandler with their types.
-          def self.types
-            if superclass.ancestors.include?(UrlHashHandler)
-              types = superclass.types
-            end
+        def self.types
+          merge_types(@types || {}, superclass_types)
+        end
 
-            types ||= {}
-            types.merge(@types) unless @types.nil?
+        # Overlays this class's URL/hash types atop of those of the superclass
+        def self.merge_types(our_types, their_types)
+          types = their_types.dup
+
+          our_types.keys.each do |key|
+            types[key] = types.fetch(key, {}).merge(our_types[key] || {})
           end
 
+          types
+        end
+
+        def self.superclass_types
+          valid_superclass? ? superclass.types : {}
+        end
+
+        def self.valid_superclass?
+          superclass.ancestors.include?(UrlHashHandler)
+        end
+
         def self.register_type(style, type, &block)
-          @types ||= { url: {}, hash: {} }
+          @types ||= {}
+          @types[style] ||= {}
           @types[style][type] = block
         end
 
@@ -43,9 +58,6 @@ module Bra
         private
 
         def processed_payload_handler(style, type)
-          p style
-          p type
-          p self.singleton_class.types
           self.class.types[style].fetch(type, method(:unsupported_type))
         end
 
