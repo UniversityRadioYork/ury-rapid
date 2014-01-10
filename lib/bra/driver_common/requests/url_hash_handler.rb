@@ -47,6 +47,12 @@ module Bra
           end
         end
 
+        # Shorthand for creating a type valid in both URL and hash forms
+        def self.url_and_hash_type(type, url_processor, hash_processor)
+          url_type(type) { |url| yield *url_processor.call(url) }
+          hash_type(type) { |hash| yield *hash_processor.call(hash) }
+        end
+
         def self.url_type(type, &block)
           register_type(:url, type, &block)
         end
