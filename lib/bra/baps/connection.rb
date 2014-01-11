@@ -14,22 +14,37 @@ module Bra
       # @example Initialises the Connection.
       #   conn = Connection.new(parser, request_queue)
       #
-      # @param response_parser [Parser] An object that interprets and acts upon
+      # @param reader [Reader] An object that interprets and acts upon
       #   raw responses from the BAPS server.
       # @param request_queue [EventMachine::Queue] A queue that holds raw
       #   requests to the BAPS server.
       # @param logger [Object]  The logger, for logging errors.
-      def initialize(response_parser, request_queue, logger)
-        @response_parser = response_parser
-        @request_queue   = request_queue
-        @logger          = logger
+      def initialize(reader, request_queue, logger)
+        @reader         = reader
+        @request_queue  = request_queue
+        @logger         = logger
+        @closing        = false
+      end
 
+      def post_init
         # Initiate the request queue pumping loop.
         pop_queue
       end
 
       # Send all data to the parser.
-      def_delegator :@response_parser, :receive_data
+      def_delegator :@reader, :receive_data
+
+      # Handles a successful connection completion
+      #
+      # @api semipublic
+      # @example  Tell the Connection it's finished.
+      #   conn.connection_completed
+      #
+      # @return [void]
+      #
+      def connection_completed
+        @closing = true
+      end
 
       # Handles a connection loss
       #
@@ -40,8 +55,10 @@ module Bra
       # @return [void]
       #
       def unbind
-        @logger.fatal('Lost connection to BAPS, terminating bra')
-        EventMachine.stop
+        unless @closing
+          @logger.fatal('Lost connection to BAPS, trying to reconnect...')
+          EventMachine.stop
+        end
       end
 
       private
