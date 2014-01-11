@@ -11,8 +11,9 @@ module Bra
         # The items POSTed to the playlist may be playlist references, so we
         # need to include the parser for them.
         include PlaylistReferenceParser
-
         alias_method :local_playlist_id, :caller_id
+
+        # The caller of a playlist handler is the playlist
         alias_method :playlist_id, :caller_id
 
         # All objects POSTed to the playlist will be items, so we process their
@@ -39,6 +40,8 @@ module Bra
           move_from_local_playlist(index)                 if local
           move_from_foreign_playlist(playlist, index) unless local
         end
+        driver_should_override :move_from_local_playlist
+        driver_should_override :move_from_foreign_playlist
 
         # text
         #   Hash: {type: :text, summary: 'summary', details: 'string'}
@@ -48,19 +51,7 @@ module Bra
         #
         #   Drivers may implement this by overriding #text.
         hash_type(:text) { |hash| text(hash[:summary], hash[:details]) }
-
-        # These are the overridable functions a concrete PlaylistHandler can
-        # fill in.  They are defined in this class as raising a
-        # NotSupportedByDriver exception.
-        TO_OVERRIDE = [
-          :move_from_local_playlist,  # index
-          :move_from_foreign_playlist # playlist_id, index
-        ]
-        TO_OVERRIDE.each do |method_symbol|
-          define_method(method_symbol) do |*args|
-            fail(Bra::Common::Exceptions::NotSupportedByDriver)
-          end
-        end
+        driver_should_override :text
       end
     end
   end

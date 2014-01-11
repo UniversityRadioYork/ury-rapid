@@ -15,6 +15,9 @@ module Bra
         include PlaylistReferenceParser
         alias_method :local_playlist_id, :caller_id
 
+        # The caller of a player handler is the player
+        alias_method :player_id, :caller_id
+
         # The only objects this handler takes responsibility for POSTing to the
         # playout server are items, which always come in on ID :item.
         # Every other POST goes to the ID'd child as a PUT.
@@ -44,19 +47,8 @@ module Bra
           item_from_local_playlist(index)                 if local
           item_from_foreign_playlist(playlist, index) unless local
         end
-
-        # These are the overridable functions a concrete PlayerHandler can fill
-        # in.  They are defined in this class as raising a NotSupportedByDriver
-        # exception.
-        TO_OVERRIDE = [
-          :item_from_local_playlist,  # index
-          :item_from_foreign_playlist # playlist_id, index
-        ]
-        TO_OVERRIDE.each do |method_symbol|
-          define_method(method_symbol) do |*args|
-            fail(Bra::Common::Exceptions::NotSupportedByDriver)
-          end
-        end
+        driver_should_override :item_from_local_playlist
+        driver_should_override :item_from_foreign_playlist
       end
     end
   end

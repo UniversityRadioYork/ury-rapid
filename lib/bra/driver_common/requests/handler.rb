@@ -75,6 +75,15 @@ module Bra
           end
         end
 
+        # Generates NotSupportedByDriver stubs for the given methods
+        def self.driver_should_override(*methods)
+          methods.each do |method|
+            define_method(method) do |*args|
+              fail(Bra::Common::Exceptions::NotSupportedByDriver)
+            end
+          end
+        end
+
         protected
 
         def_delegator :@object, :id, :caller_id
