@@ -32,9 +32,13 @@ module Bra
         #   Drivers MAY choose not to implement non-local playlist moves, but
         #   SHOULD implement some form of move.
         #
-        #   Drivers may implement this by overriding #move_local and
-        #   #move_foreign.
-        playlist_reference_type(:move) { |*args| move(*args) }
+        #   Drivers may implement this by overriding #move_from_local_playlist
+        #   and #move_from_foreign_playlist.
+        playlist_reference_type(:move) do |playlist, index|
+          local = local_playlist?(playlist)
+          move_from_local_playlist(index)                 if local
+          move_from_foreign_playlist(playlist, index) unless local
+        end
 
         # text
         #   Hash: {type: :text, summary: 'summary', details: 'string'}
@@ -56,14 +60,6 @@ module Bra
           define_method(method_symbol) do |*args|
             fail(Bra::Common::Exceptions::NotSupportedByDriver)
           end
-        end
-
-        protected
-
-        def move(playlist, index)
-          local = local_playlist?(playlist)
-          move_from_local_playlist(index)                 if local
-          move_from_foreign_playlist(playlist, index) unless local
         end
       end
     end

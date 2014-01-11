@@ -39,12 +39,10 @@ module Bra
         #
         #   Drivers may implement this by overriding #item_from_local_playlist
         #   and #item_from_foreign_playlist.
-        # Supported URL protocols in this version of the bra API.
-        url_type :playlist do |url|
-          item_from_playlist(*parse_playlist_reference_url(url))
-        end
-        hash_type :playlist do |hash|
-          item_from_playlist(*parse_playlist_reference_hash(hash))
+        playlist_reference_type :playlist do |playlist, index|
+          local = local_playlist?(playlist)
+          item_from_local_playlist(index)                 if local
+          item_from_foreign_playlist(playlist, index) unless local
         end
 
         # These are the overridable functions a concrete PlayerHandler can fill
@@ -58,14 +56,6 @@ module Bra
           define_method(method_symbol) do |*args|
             fail(Bra::Common::Exceptions::NotSupportedByDriver)
           end
-        end
-
-        protected
-
-        def item_from_playlist(playlist, index)
-          local = local_playlist?(playlist)
-          item_from_local_playlist(index)                 if local
-          item_from_foreign_playlist(playlist, index) unless local
         end
       end
     end
