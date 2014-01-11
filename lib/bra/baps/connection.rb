@@ -18,9 +18,11 @@ module Bra
       #   raw responses from the BAPS server.
       # @param request_queue [EventMachine::Queue] A queue that holds raw
       #   requests to the BAPS server.
-      def initialize(response_parser, request_queue)
+      # @param logger [Object]  The logger, for logging errors.
+      def initialize(response_parser, request_queue, logger)
         @response_parser = response_parser
-        @request_queue = request_queue
+        @request_queue   = request_queue
+        @logger          = logger
 
         # Initiate the request queue pumping loop.
         pop_queue
@@ -28,6 +30,19 @@ module Bra
 
       # Send all data to the parser.
       def_delegator :@response_parser, :receive_data
+
+      # Handles a connection loss
+      #
+      # @api semipublic
+      # @example  Tell the Connection it's died.
+      #   conn.unbind
+      #
+      # @return [void]
+      #
+      def unbind
+        @logger.fatal('Lost connection to BAPS, terminating bra')
+        EventMachine.stop
+      end
 
       private
 

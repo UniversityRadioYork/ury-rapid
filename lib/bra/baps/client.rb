@@ -29,13 +29,14 @@ module Bra
       #
       # @param queue [Queue] The requests queue that will connect to this
       #   client.
+      # @param logger [Logger] The logger, for logging error messages.
       # @param hostname [String] The host of the BAPS server to which this will
       #   connect.
       # @param port [Fixnum] The port of the BAPS server to which this will
       #   connect.
       # @param username [String] The username with which the login will occur.
       # @param password [String] The password with which the login will occur.
-      def initialize(queue, hostname, port, username, password)
+      def initialize(queue, logger, hostname, port, username, password)
         @hostname = hostname
         @port = port
         @username = username
@@ -45,6 +46,8 @@ module Bra
         @reader = Reader.new
         @parser = Responses::Parser.new(@channel, @reader)
         @queue = queue
+
+        @connection_args = [@reader, @queue, logger]
       end
 
       # Runs the client
@@ -72,7 +75,7 @@ module Bra
       private
 
       def connect
-        EventMachine.connect(@hostname, @port, Connection, @reader, @queue)
+        EventMachine.connect(@hostname, @port, Connection, *@connection_args)
       end
     end
   end

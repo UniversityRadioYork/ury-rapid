@@ -37,7 +37,7 @@ class Driver
     # instance.  We need to give it access to parts of the driver config so
     # it knows where and how to connect to BAPS.
     client_config = config.values_at(*%i(host port username password))
-    @client = Bra::Baps::Client.new(queue, *client_config)
+    @client = Bra::Baps::Client.new(queue, logger, *client_config)
   end
 
   # Prepare model configuration with driver specifics ready for initialisation
