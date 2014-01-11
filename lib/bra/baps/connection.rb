@@ -56,7 +56,7 @@ module Bra
       #
       def unbind
         unless @closing
-          @logger.fatal('Lost connection to BAPS, trying to reconnect...')
+          @logger.fatal('Lost connection to BAPS, dying.')
           EventMachine.stop
         end
       end
