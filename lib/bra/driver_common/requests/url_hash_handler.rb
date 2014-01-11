@@ -48,13 +48,25 @@ module Bra
           end
         end
 
+        # Shorthand for creating a type that takes playlist references
+        def self.playlist_reference_type(type, &block)
+          self.url_and_hash_type(
+            type,
+            ->(url) { parse_playlist_reference_url(url) },
+            ->(hash) { parse_playlist_reference_hash(hash) },
+            &block
+          )
+        end
+
         # Shorthand for creating a type valid in both URL and hash forms
         def self.url_and_hash_type(type, url_processor, hash_processor, &block)
           url_type(type) do |url|
-            instance_exec(*url_processor.call(url), &block)
+            url = instance_exec(url, &url_processor)
+            instance_exec(*url, &block)
           end
           hash_type(type) do |hash|
-            instance_exec(*hash_processor.call(hash), &block)
+            hash = instance_exec(hash, &hash_processor)
+            instance_exec(*hash, &block)
           end
         end
 

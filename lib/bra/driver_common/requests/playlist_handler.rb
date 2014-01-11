@@ -34,8 +34,7 @@ module Bra
         #
         #   Drivers may implement this by overriding #move_local and
         #   #move_foreign.
-        url_type(:move)  { |url|  move(*parse_playlist_reference_url(url)) }
-        hash_type(:move) { |hash| move(*parse_playlist_reference_hash(hash)) }
+        playlist_reference_type(:move) { |*args| move(*args) }
 
         # text
         #   Hash: {type: :text, summary: 'summary', details: 'string'}
