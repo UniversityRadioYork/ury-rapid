@@ -9,9 +9,9 @@ module Bra
 
         player_handler 'Player', :player do
           def item_from_local_playlist(index)
-            request(
-              Request.new(Codes::Playback::LOAD, caller_id).uint32(index)
-            )
+            request(Codes::Playback::LOAD, caller_id) do |r|
+              r.uint32(index)
+            end
           end
         end
 
@@ -19,10 +19,9 @@ module Bra
           put_by_payload_processor
 
           def float(float)
-            request(
-              Request.new(Codes::Playback::VOLUME, caller_parent_id)
-                     .float32(float)
-            )
+            request(Codes::Playback::VOLUME, caller_parent_id) do |r|
+              r.float32(float)
+            end
           end
         end
 
@@ -30,9 +29,9 @@ module Bra
           put_by_payload_processor
 
           def integer(integer)
-            request(
-              Request.new(target_to_code, caller_parent_id).uint32(integer)
-            )
+            request(target_to_code, caller_parent_id) do |r|
+              r.uint32(integer)
+            end
           end
 
           private
@@ -56,7 +55,7 @@ module Bra
 
           def string(new_state)
             code_for_state(@object.value, new_state).try do |command|
-              request(Request.new(command, caller_parent_id))
+              request(command, caller_parent_id)
             end
           end
 

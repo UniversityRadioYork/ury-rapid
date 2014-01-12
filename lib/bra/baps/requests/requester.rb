@@ -74,16 +74,24 @@ module Bra
 
         # Sends a request to the BAPS server
         #
-        # @api semipublic
+        # @api public
+        # @example  Send a request.
+        #   requester.request(Bra::Baps::Codes::Playlist::LOAD, channel) do |r|
+        #     r.uint32(index)
+        #   end
         #
-        # @example Send a request.
-        #   requester.request(Bra::Baps::Requests::Request.new(0)
+        # @param code [Integer]  The BAPS protocol code for the request: this
+        #   will usually be a value from Bra::Baps::Codes.
+        # @param subcode [Integer]  The sub-code for the request (usually a
+        #   channel ID or similar): this will default to 0 if not given.
         #
-        # @param request_obj [Request] The request to send.
+        # @yieldparam request [Request]  The request that is about to be sent,
+        #   so that it can have arguments added to it using the #uint32,
+        #   #string and similar methods.
         #
         # @return [void]
-        def request(request_obj)
-          request_obj.to(@queue)
+        def request(code, subcode = 0, &block)
+          Request.new(code, subcode).tap(&block).to(@queue)
         end
 
         # TODO(mattbw): Perhaps move these login commands elsewhere.
@@ -94,7 +102,7 @@ module Bra
         #
         # @return [void]
         def login_initiate
-          request(Request.new(Codes::System::SET_BINARY_MODE))
+          request(Codes::System::SET_BINARY_MODE)
         end
 
         # Sends credentials to the BAPS server to further log-in
@@ -117,11 +125,8 @@ module Bra
           password_hash = Digest::MD5.hexdigest(password.to_s)
           full_hash = Digest::MD5.hexdigest(seed + password_hash)
 
-          request(
-            Request
-            .new(Codes::System::LOGIN)
-            .string(username.to_s)
-            .string(full_hash)
+          request(Codes::System::LOGIN) do |r|
+            r.string(username.to_s).string(full_hash)
           )
         end
 
@@ -132,7 +137,7 @@ module Bra
         # @return [void]
         def login_synchronise
           # Subcode 3: Synchronise and add to chat.
-          request(Request.new(Codes::System::SYNC, 3))
+          request(Codes::System::SYNC, 3)
         end
       end
     end

@@ -54,18 +54,19 @@ module Bra
           end
 
           def move_from_local_playlist(old_index)
-            request(
-              Request.new(Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id)
-              .uint32(old_index, payload_id)
-            )
+            request(Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id) do |r|
+              r.uint32(old_index, payload_id)
+            end
           end
 
           private
 
           def add_item_request(type_symbol)
             type = Types::Track::const_get(type_symbol.upcase)
-            rq = Request.new(Codes::Playlist::ADD_ITEM, caller_id).uint32(type)
-            request(yield rq)
+            request(Codes::Playlist::ADD_ITEM, caller_id) do |r|
+              r.uint32(type)
+              yield r
+            end
           end
 
           def direct(record_id, track_id, title, artist)
@@ -86,10 +87,9 @@ module Bra
           on_delete do
             unsupported_by_driver unless in_playlist?
 
-            request(
-              Request.new(Codes::Playlist::DELETE_ITEM, caller_parent_id)
-                     .uint32(caller_id)
-            )
+            request(Codes::Playlist::DELETE_ITEM, caller_parent_id).do |r|
+              r.uint32(caller_id)
+            end
           end
 
           private

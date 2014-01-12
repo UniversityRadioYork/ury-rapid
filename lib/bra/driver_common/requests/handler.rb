@@ -90,19 +90,7 @@ module Bra
         def_delegator :@object, :parent_id, :caller_parent_id
         def_delegator :@object, :parent, :caller_parent
         def_delegator :@payload, :id, :payload_id
-
-        # Sends a request to the parent requester
-        #
-        # @api semipublic
-        #
-        # @example Sending a request.
-        #   request = Bra::Baps::Requests::Request.new(0)
-        #   handler.send(request)
-        #
-        # @param request [Request] A BAPS request in need of sending.
-        #
-        # @return [void]
-        def_delegator(:@parent, :request)
+        def_delegator :@parent, :request
 
         # Default to a 'not supported' exception on all actions.
         %i{put post delete}.each do |action|
