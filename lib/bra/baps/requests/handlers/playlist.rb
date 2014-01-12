@@ -7,9 +7,7 @@ module Bra
         extend Bra::DriverCommon::Requests::HandlerBundle
 
         playlist_handler 'Playlist', :playlist do
-          on_delete do
-            request(Request.new(Codes::Playlist::RESET, playlist_id))
-          end
+          on_delete { request Codes::Playlist::RESET, playlist_id }
 
           #
           # BAPS extensions to the Playlist API
@@ -54,25 +52,25 @@ module Bra
           end
 
           def move_from_local_playlist(old_index)
-            request(Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id) do |r|
-              r.uint32(old_index, payload_id)
+            request Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id do
+              uint32 old_index, payload_id
             end
           end
 
           private
 
-          def add_item_request(type_symbol)
+          def add_item_request(type_symbol, &block)
             type = Types::Track::const_get(type_symbol.upcase)
-            request(Codes::Playlist::ADD_ITEM, caller_id) do |r|
-              r.uint32(type)
-              yield r
+            request Codes::Playlist::ADD_ITEM, caller_id  do
+              uint32 type
+              instance_exec(&block)
             end
           end
 
           def direct(record_id, track_id, title, artist)
-            add_item_request(:specific_item) do |rq|
-              rq.uint32(Integer(record_id), Integer(track_id))
-                .string(title, artist)
+            add_item_request(:specific_item) do
+              uint32 Integer(record_id), Integer(track_id)
+              string title, artist
             end
           end
         end
@@ -87,8 +85,8 @@ module Bra
           on_delete do
             unsupported_by_driver unless in_playlist?
 
-            request(Codes::Playlist::DELETE_ITEM, caller_parent_id).do |r|
-              r.uint32(caller_id)
+            request Codes::Playlist::DELETE_ITEM, caller_parent_id do
+              uint32 caller_id
             end
           end
 

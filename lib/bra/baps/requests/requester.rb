@@ -91,7 +91,9 @@ module Bra
         #
         # @return [void]
         def request(code, subcode = 0, &block)
-          Request.new(code, subcode).tap(&block).to(@queue)
+          request = Request.new(code, subcode)
+          request.instance_exec(&block) if block
+          request.to(@queue)
         end
 
         # TODO(mattbw): Perhaps move these login commands elsewhere.
@@ -125,9 +127,7 @@ module Bra
           password_hash = Digest::MD5.hexdigest(password.to_s)
           full_hash = Digest::MD5.hexdigest(seed + password_hash)
 
-          request(Codes::System::LOGIN) do |r|
-            r.string(username.to_s).string(full_hash)
-          )
+          request(Codes::System::LOGIN) { string username.to_s, full_hash }
         end
 
         # Instructs BAPS to synchronise its state with bra and start chatting
