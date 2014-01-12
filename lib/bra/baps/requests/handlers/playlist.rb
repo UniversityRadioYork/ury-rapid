@@ -61,7 +61,7 @@ module Bra
 
           def add_item_request(type_symbol, &block)
             type = Types::Track::const_get(type_symbol.upcase)
-            request Codes::Playlist::ADD_ITEM, caller_id  do
+            request Codes::Playlist::ADD_ITEM, caller_id do
               uint32 type
               instance_exec(&block)
             end
