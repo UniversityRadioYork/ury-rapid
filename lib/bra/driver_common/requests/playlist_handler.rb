@@ -23,6 +23,26 @@ module Bra
         # In the current version of the bra API, the standard methods for
         # POSTing an item into a playlist are:
 
+        # copy
+        #   URL: 'copy://[old-playlist/]old-index
+        #   Hash: {type: :copy, [playlist: old-playlist,] index: old-index}
+        #
+        #   Copies the item from the given playlist reference to the playlist
+        #   and index it is being POSTed to.
+        #
+        #   Drivers MAY choose not to implement non-local playlist copies, but
+        #   SHOULD implement some form of copy.
+        #
+        #   Drivers may implement this by overriding #copy_from_local_playlist
+        #   and #copy_from_foreign_playlist.
+        playlist_reference_type(:copy) do |playlist, index|
+          local = local_playlist?(playlist)
+          copy_from_local_playlist(index)                 if local
+          copy_from_foreign_playlist(playlist, index) unless local
+        end
+        driver_should_override :copy_from_local_playlist
+        driver_should_override :copy_from_foreign_playlist
+
         # move
         #   URL: 'move://[old-playlist/]old-index
         #   Hash: {type: :move, [playlist: old-playlist,] index: old-index}
