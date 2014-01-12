@@ -14,7 +14,7 @@ module Bra
           #
           # BAPS extensions to the Playlist API
           # (see Bra::DriverCommon::Requests::PlaylistHandler for the main API)
-          # 
+          #
 
           # x_baps_file
           #   URL: 'x_baps_file://directory/filename'
@@ -36,7 +36,7 @@ module Bra
           #          record_id: id,
           #          track_id:  id,
           #          title:     title,
-          #          artist:    artis,
+          #          artist:    artist,
           #         }
           #
           #   Loads a track from the BAPS Record Library, with the given IDs
