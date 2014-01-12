@@ -30,6 +30,15 @@ module Bra
           self.send(@action)
         end
 
+        # Requests that a DELETE on this handler be sent to the item's children
+        def self.delete_by_deleting_children
+          class_eval do
+            def delete
+              @object.children.each { |_, child| child.delete(@payload) }
+            end
+          end
+        end
+
         def self.use_payload_processor_for(action, *ids)
           add_id_hook(action, ids) do |handler, object, payload|
             payload.process(handler)
@@ -67,12 +76,8 @@ module Bra
           HOOKS[action] << block
         end
 
-        def self.on_delete
-          class_eval do
-            def delete
-              yield
-            end
-          end
+        def self.on_delete(&block)
+          define_method(:delete) { instance_exec(&block) }
         end
 
         # Generates NotSupportedByDriver stubs for the given methods

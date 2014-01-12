@@ -76,9 +76,7 @@ module Bra
         end
 
         handler 'PlaylistSet', :playlist_set do
-          on_delete do
-            object.children.each { |child| child.delete(payload) }
-          end
+          delete_by_deleting_children
         end
 
         handler 'Item', :item do
