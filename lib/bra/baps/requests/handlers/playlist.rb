@@ -51,9 +51,50 @@ module Bra
             add_item_request(:text) { |rq| rq.string(summary, details) }
           end
 
+          # Moves an item inside the playlist being handled by this handler
+          #
+          # This is an implementation of the playlist API type 'move'.
+          # BAPS does not support foreign playlist moves; use 'copy' instead.
+          #
+          # The destination index is the ID from the POST payload.
+          #
+          # @api semipublic
+          # @example  Move from index 5 to the handled playlist.
+          #   handler.move_from_local_playlist(5)
+          #
+          # @param old_index [Integer]  The source playlist index, starting
+          #   from 0.
+          #
+          # @return [void]
           def move_from_local_playlist(old_index)
+            new_index = payload_id
             request Codes::Playlist::MOVE_ITEM_IN_PLAYLIST, caller_id do
-              uint32 old_index, payload_id
+              uint32 old_index, new_index
+            end
+          end
+
+          # Copies an item from another playlist to the one being handled
+          #
+          # This is an implementation of the playlist API type 'copy'.
+          # BAPS does not support foreign playlist moves; use 'move' instead.
+          #
+          # The target ID is ignored by this call, because BAPS does not
+          # support it.
+          #
+          # @api semipublic
+          # @example  Copy from index 5 on playlist 0 to the handled playlist.
+          #   handler.copy_from_foreign_playlist(0, 5)
+          #
+          # @param old_playlist [Integer]  The source playlist ID.  BAPS only
+          #   supports integral playlist IDs.
+          # @param old_index [Integer]  The source playlist index, starting
+          #   from 0.
+          #
+          # @return [void]
+          def copy_from_foreign_playlist(old_playlist, old_index)
+            new_playlist = caller_id
+            request Codes::Playlist::COPY_ITEM_TO_PLAYLIST, old_playlist do
+              uint32 old_index, new_playlist
             end
           end
 
