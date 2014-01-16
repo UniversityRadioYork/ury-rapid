@@ -48,7 +48,7 @@ module Bra
           #
 
           def text(summary, details)
-            add_item_request(:text) { |rq| rq.string(summary, details) }
+            add_item_request(:text) { string(summary, details) }
           end
 
           # Moves an item inside the playlist being handled by this handler
