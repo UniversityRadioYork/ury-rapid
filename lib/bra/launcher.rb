@@ -8,8 +8,10 @@ module Bra
   class Launcher
     extend Forwardable
 
-    def initialize(options = {})
+    def initialize(config, options = {})
       @user_config = {}
+
+      instance_eval(config)
 
       make_builders(options_with_defaults(options))
     end
