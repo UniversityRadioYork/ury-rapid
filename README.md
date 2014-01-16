@@ -1,14 +1,14 @@
-bra - lifts and separates playout systems
-=========================================
+bra
+===
 
 * For more extensive narrative documentation, see https://github.com/UniversityRadioYork/bra/wiki.
-* For auto-generated RDocs, see http://rubydoc.info/github/UniversityRadioYork/bra.
+* For auto-generated YARD documentation, see http://rubydoc.info/github/UniversityRadioYork/bra.
 
-__bra__ is (will be) a Web-ready abstraction layer for radio playout systems, based on a REST-like API and eventual push-based message pipeline.
+__bra__ is (will be) a Web-ready abstraction layer for radio playout systems, based on a REST-like API and push-based message pipeline.
 
 It basically sits on top of a playout system, keeping an internal model of what's going on based on information from that playout system's native API, and using that model to satisfy requests (for data and commands) via an HTTP-based interface.
 
-This is in very early development.  Expect it not to do a lot.
+This is still in development and is constantly changing, so don't depend on it just yet!
 
 
 Why are we doing this?
