@@ -8,8 +8,9 @@ module Bra
   class Launcher
     extend Forwardable
 
-    def initialize(config, options = {})
-      split_config(config)
+    def initialize(options = {})
+      @user_config = {}
+
       make_builders(options_with_defaults(options))
     end
 
@@ -19,6 +20,26 @@ module Bra
 
     def self.launch(*args)
       new(*args).run
+    end
+
+    # Configures a driver and adds it to the launcher's state
+    def driver
+      @driver_config = yield
+    end
+
+    # Configures a server and adds it to the launcher's state.
+    def server
+      @server_config = yield
+    end
+
+    # Configures the model.
+    def model
+      @model_config = yield
+    end
+
+    # Configures a user and adds them to the user table.
+    def user(name)
+      @user_config[name] = yield
     end
 
     private
