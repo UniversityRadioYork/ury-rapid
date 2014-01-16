@@ -11,7 +11,7 @@ module Bra
       VERSION = [MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION].join('.')
 
       # The default configuration file (can be overridden at run-time)
-      CONFIG_FILE = 'config.yml'
+      CONFIG_FILE = 'config.rb'
     end
   end
 end

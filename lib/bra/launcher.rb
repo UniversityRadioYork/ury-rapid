@@ -25,17 +25,19 @@ module Bra
     end
 
     # Configures a driver and adds it to the launcher's state
-    def driver
+    def driver(name, implementation_class)
+      @driver_maker = implementation_class.method(:new)
       @driver_config = yield
     end
 
     # Configures a server and adds it to the launcher's state.
-    def server
+    def server(name, implementation_class)
       @server_config = yield
     end
 
     # Configures the model.
-    def model
+    def model(implementation_class)
+      @model_maker = implementation_class.method(:new)
       @model_config = yield
     end
 
@@ -48,13 +50,6 @@ module Bra
 
     DEFAULT_MODEL_STRUCTURE = 'bra/model/structures/standard'
     DEFAULT_DRIVER          = 'bra/baps/driver'
-
-    def split_config(config)
-      @driver_config = config[:driver]
-      @server_config = config[:server]
-      @model_config  = config[:model]
-      @user_config   = config[:users]
-    end
 
     def make_builders(options)
       @app_maker                = options[:app]
@@ -79,9 +74,9 @@ module Bra
 
     def app_arguments
       logger = make_logger
-      new_driver = driver(logger)
-      new_driver_view, new_server_view = model(logger, new_driver)
-      new_server = server
+      new_driver = mkdriver(logger)
+      new_driver_view, new_server_view = mkmodel(logger, new_driver)
+      new_server = mkserver
       [new_driver, new_driver_view, new_server, new_server_view]
     end
 
@@ -89,7 +84,7 @@ module Bra
     # Driver
     #
 
-    def driver(logger)
+    def mkdriver(logger)
       make_driver(@driver_config, logger)
     end
 
@@ -97,7 +92,7 @@ module Bra
     # Model
     #
 
-    def model(logger, driver)
+    def mkmodel(logger, driver)
       config = model_configurator(logger).configure_with(driver)
       model = config.make
       [make_driver_view(config, model), make_server_view(model)]
@@ -117,7 +112,7 @@ module Bra
     # Server
     #
 
-    def server
+    def mkserver
       make_server(@server_config, auth)
     end
 
