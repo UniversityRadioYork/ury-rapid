@@ -1,5 +1,3 @@
-require 'yaml'
-
 require 'bra/launcher'
 require 'bra/common/constants'
 
@@ -19,6 +17,6 @@ module Bra
   end
 
   def self.load_config_from(file)
-    YAML.load_file(file).deep_symbolize_keys!
+    File.read(file)
   end
 end
