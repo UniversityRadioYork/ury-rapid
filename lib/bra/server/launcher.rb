@@ -5,13 +5,52 @@ require 'bra/server/app'
 module Bra
   module Server
     # Object for launching the bra server.
+    #
+    # This object exposes a DSL to the bra configuration.
     class Launcher
-      def initialize(config, authenticator)
-        @config = config
+      def initialize(authenticator)
         @authenticator = authenticator
-        @rack, @host, @port, @root = config.values_at(*%i{rack host port root})
+        @rack = 'thin'
+        @host = '0.0.0.0'
+        @port = 8181
+        @root = '/'
+        @config = {cors: {}}
 
         check_server_em_compatible
+      end
+
+      # Sets the host address and port of the server
+      def host(address, port)
+        @host = address
+        @port = port
+      end
+
+      # Sets the URL root of the server
+      def url_root(root)
+        @root = root
+      end
+
+      # Sets the file system root of the server
+      def file_root(root)
+        @config[:root_directory] = root
+      end
+
+      # Sets the CORS Allow-Headers of the server
+      def allow_headers(*headers)
+        cors('Allow-Headers', headers)
+      end
+
+      def cors(header, value)
+        @config[:cors][header.to_sym] = value
+      end
+
+      # Sets the CORS Allow-Credentials header
+      def allow_credentials
+        cors('Allow-Credentials', [])
+      end
+
+      def allow_methods(*methods)
+        cors('Allow-Methods', methods)
       end
 
       # Starts the server

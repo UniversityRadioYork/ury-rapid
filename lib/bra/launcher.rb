@@ -14,6 +14,7 @@ module Bra
       instance_eval(config)
 
       make_builders(options_with_defaults(options))
+      @auth = make_auth(@user_config)
     end
 
     def run
@@ -31,8 +32,9 @@ module Bra
     end
 
     # Configures a server and adds it to the launcher's state.
-    def server(name, implementation_class)
-      @server_config = yield
+    def server(name, implementation_class, &block)
+      @server = implementation_class.new(@auth)
+      @server.instance_exec(&block)
     end
 
     # Configures the model.
@@ -76,8 +78,7 @@ module Bra
       logger = make_logger
       new_driver = mkdriver(logger)
       new_driver_view, new_server_view = mkmodel(logger, new_driver)
-      new_server = mkserver
-      [new_driver, new_driver_view, new_server, new_server_view]
+      [new_driver, new_driver_view, @server, new_server_view]
     end
 
     #
