@@ -8,7 +8,8 @@ module Bra
     #
     # This object exposes a DSL to the bra configuration.
     class Launcher
-      def initialize(authenticator)
+      def initialize(model_view, authenticator)
+	      @model_view    = model_view
         @authenticator = authenticator
         @rack = 'thin'
         @host = '0.0.0.0'
@@ -58,9 +59,9 @@ module Bra
       # This should be called within an EventMachine instance.
       #
       # @return [void]
-      def run(model_view)
+      def run
         Rack::Server.start(
-          app: dispatch(model_view), server: @rack, Host: @host, Port: @port
+          app: dispatch, server: @rack, Host: @host, Port: @port
         )
       end
 
@@ -71,12 +72,12 @@ module Bra
       # @api private
       #
       # @return [Object]  The dispatch.
-      def dispatch(model_view)
-        build_rack(@root, make_app(model_view))
+      def dispatch
+        build_rack(@root, make_app)
       end
 
-      def make_app(model_view)
-        App.new(@config, model_view, @authenticator)
+      def make_app
+        App.new(@config, @model_view, @authenticator)
       end
 
       def build_rack(root, app)

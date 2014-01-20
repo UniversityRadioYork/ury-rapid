@@ -10,21 +10,20 @@ module Bra
   #
   # This will usually be launched from bin/bra.
   class App
-    def initialize(drivers, driver_view, server, server_view, reactor = nil)
-      @drivers     = drivers
-      @server      = server
-      @server_view = server_view
-      @driver_view = driver_view
-      @reactor     = reactor || EventMachine
+    def initialize(drivers, servers, model_view, reactor = nil)
+      @drivers    = drivers
+      @servers    = servers
+      @model_view = model_view
+      @reactor    = reactor || EventMachine
     end
 
     # Runs th bra application in a new EventMachine instance
     def run
-      @driver_view.log(:info, 'Now starting bra.')
-      @driver_view.log(:info, "Version: #{Bra::Common::Constants::VERSION}.")
+      @model_view.log(:info, 'Now starting bra.')
+      @model_view.log(:info, "Version: #{Bra::Common::Constants::VERSION}.")
 
       @reactor.run do
-        @server.run(@server_view)
+        @servers.each(&:run)
         @drivers.each(&:run)
 
         Signal.trap('INT', &method(:close))

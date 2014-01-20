@@ -10,11 +10,14 @@ module Bra
 
     def initialize(config, options = {})
       @drivers = []
+      @servers = []
+
       @user_config = {}
 
       instance_eval(config)
 
       make_builders(options_with_defaults(options))
+
       @auth = make_auth(@user_config)
     end
 
@@ -33,8 +36,7 @@ module Bra
 
     # Configures a server and adds it to the launcher's state.
     def server(name, implementation_class, &block)
-      @server = implementation_class.new(@auth)
-      @server.instance_exec(&block)
+      @servers << [name, implementation_class, block]
     end
 
     # Configures the model.
@@ -77,8 +79,10 @@ module Bra
     def app_arguments
       logger = make_logger
       config, global_driver_view, new_server_view = mkmodel(logger)
+      auth = make_auth(@user_config)
       drivers = make_drivers(logger, global_driver_view, config)
-      [drivers, global_driver_view, @server, new_server_view]
+      servers = make_servers(logger, global_driver_view, auth)
+      [drivers, servers, global_driver_view]
     end
 
     #
@@ -130,12 +134,12 @@ module Bra
     # Server
     #
 
-    def mkserver
-      make_server(@server_config, auth)
-    end
-
-    def auth
-      make_auth(@user_config)
+    def make_servers(logger, global_driver_view, auth)
+      @servers.map do |name, server_class, server_config|
+        server_class.new(global_driver_view, auth).tap do |server|
+          server.instance_eval(&server_config)
+        end
+      end
     end
 
     #
