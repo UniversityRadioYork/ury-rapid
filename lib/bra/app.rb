@@ -10,10 +10,11 @@ module Bra
   #
   # This will usually be launched from bin/bra.
   class App
-    def initialize(drivers, server, server_view, reactor = nil)
-      @drivers      = drivers
+    def initialize(drivers, driver_view, server, server_view, reactor = nil)
+      @drivers     = drivers
       @server      = server
       @server_view = server_view
+      @driver_view = driver_view
       @reactor     = reactor || EventMachine
     end
 
