@@ -8,7 +8,7 @@ module Bra
       # This contains:
       #   - A player set, with IDs set in the model config under 'players'
       #   - A playlist set, with IDs set in the model config under 'playlists'
-      class Structure < Bra::Model::Creator
+      class PlayoutModel < Bra::Model::Creator
         include Bra::Common::Types::Validators
 
         # Create the model from the given configuration

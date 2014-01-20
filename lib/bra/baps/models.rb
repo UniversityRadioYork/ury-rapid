@@ -1,4 +1,4 @@
-require 'bra/model/creator'
+require 'bra/model/structures/playout_model'
 
 module Bra
   module Baps
@@ -15,17 +15,13 @@ module Bra
           @baps_config = baps_config
         end
 
-        def create
-          root do
-            log :log
+        def playout_extensions
+          log :log
 
-            hash :x_baps, :x_baps do
-              hash :server, :x_baps_server do
-                constants @baps_config, :x_baps_server_constant
-              end
+          hash :x_baps, :x_baps do
+            hash :server, :x_baps_server do
+              constants @baps_config, :x_baps_server_constant
             end
-
-
           end
         end
       end
