@@ -15,8 +15,8 @@ module Bra
           @baps_config = baps_config
         end
 
-        def extend(model)
-          root model do
+        def create
+          root do
             hash :x_baps, :x_baps do
               hash :server, :x_baps_server do
                 constants @baps_config, :x_baps_server_constant

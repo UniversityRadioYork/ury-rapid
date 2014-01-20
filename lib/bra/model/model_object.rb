@@ -56,6 +56,15 @@ module Bra
         flat
       end
 
+      # The flat representation of this model object
+      # 
+      # Usually, this is just the mapping of #flat to this object's children.
+      # Objects should override this if they are not simply containers of other
+      # children.
+      def flat
+        children.transform_values(&:flat)
+      end
+
       # Takes a PUT payload intended for this object and POSTs it to its parent
       def post_to_parent(payload)
         parent.post(payload)

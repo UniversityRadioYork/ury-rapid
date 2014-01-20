@@ -9,6 +9,7 @@ module Bra
     extend Forwardable
 
     def initialize(config, options = {})
+      @drivers = []
       @user_config = {}
 
       instance_eval(config)
@@ -27,8 +28,7 @@ module Bra
 
     # Configures a driver and adds it to the launcher's state
     def driver(name, implementation_class)
-      @driver_maker = implementation_class.method(:new)
-      @driver_config = yield
+      @drivers << [name, implementation_class, yield]
     end
 
     # Configures a server and adds it to the launcher's state.
@@ -76,27 +76,44 @@ module Bra
 
     def app_arguments
       logger = make_logger
-      new_driver = mkdriver(logger)
-      new_driver_view, new_server_view = mkmodel(logger, new_driver)
-      [new_driver, new_driver_view, @server, new_server_view]
+      config, global_driver_view, new_server_view = mkmodel(logger)
+      drivers = make_drivers(logger, global_driver_view, config)
+      [drivers, global_driver_view, @server, new_server_view]
     end
 
     #
     # Driver
     #
 
-    def mkdriver(logger)
-      make_driver(@driver_config, logger)
+    def make_drivers(logger, model_view, model_config)
+      @drivers.map do |name, driver_class, driver_config|
+        driver_class.new(driver_config, logger)
+                    .tap { |d| init_driver(name, model_view, d, model_config) }
+      end
+    end
+
+    def init_driver(name, model_view, driver, model_config)
+      sub_model, register_driver_view = driver.sub_model(model_config)
+      add_driver_model(model_view, name, sub_model)
+      init_driver_model_view(model_config, sub_model, register_driver_view)
+    end
+
+    def init_driver_model_view(model_config, sub_model, register_driver_view)
+      register_driver_view.call(make_driver_view(model_config, sub_model))
+    end
+
+    def add_driver_model(model_view, name, sub_model)
+      model_view.post('', name, sub_model)
     end
 
     #
     # Model
     #
 
-    def mkmodel(logger, driver)
-      config = model_configurator(logger).configure_with(driver)
+    def mkmodel(logger)
+      config = model_configurator(logger)
       model = config.make
-      [make_driver_view(config, model), make_server_view(model)]
+      [config, make_driver_view(config, model), make_server_view(model)]
     end
 
     def model_configurator(logger)

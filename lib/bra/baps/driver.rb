@@ -40,17 +40,11 @@ class Driver
     @client = Bra::Baps::Client.new(queue, logger, *client_config)
   end
 
-  # Prepare model configuration with driver specifics ready for initialisation
-  #
-  # This returns its changes, but may or may not mutate the original
-  # model_config.
-  #
-  # @return [Config] The prepared configuration.
-  def configure_model(config)
-    # Add in the BAPS-specific model handlers, so that model actions
-    # trigger BAPS commands.
-    extend_model(config)
-    add_handlers(config)
+  def sub_model(model_config)
+    [
+      create_extender(model_config).create,
+      ->(driver_view) { @driver_view = driver_view }
+    ]
   end
 
   # Begin running the driver, given a view of the completed model
@@ -65,7 +59,7 @@ class Driver
     #
     # We'd make the responder earlier, but we need access to the model,
     # which we only get definitive access to here.
-    responder = Bra::Baps::Responses::Responder.new(model_view, @requester)
+    responder = Bra::Baps::Responses::Responder.new(@model_view, @requester)
 
     # Now we can run the client, passing it the responder so it can send
     # BAPS responses to it.  The client will get BAPS requests sent to it
@@ -85,10 +79,6 @@ class Driver
   def log_initialisation
     @logger.info('Initialising BAPS driver...')
     @logger.info("BAPS server: #{@config[:host]}:#{@config[:port]}")
-  end
-
-  def extend_model(model_config)
-    model_config.add_extension(create_extender(model_config))
   end
 
   def create_extender(model_config)
