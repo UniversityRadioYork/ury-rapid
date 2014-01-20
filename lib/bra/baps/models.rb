@@ -17,6 +17,8 @@ module Bra
 
         def create
           root do
+            log :log
+
             hash :x_baps, :x_baps do
               hash :server, :x_baps_server do
                 constants @baps_config, :x_baps_server_constant
