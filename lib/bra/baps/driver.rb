@@ -50,16 +50,14 @@ class Driver
   # Begin running the driver, given a view of the completed model
   #
   # This function is always run within an EventMachine run block.
-  #
-  # @param model_view [DriverModelView]  The driver's view of the model.
-  def run(model_view)
+  def run
     # The responder receives responses from the BAPS server via the client
     # and reacts on them, either updating the model or asking the requester to
     # intervene.
     #
     # We'd make the responder earlier, but we need access to the model,
     # which we only get definitive access to here.
-    responder = Bra::Baps::Responses::Responder.new(@model_view, @requester)
+    responder = Bra::Baps::Responses::Responder.new(@driver_view, @requester)
 
     # Now we can run the client, passing it the responder so it can send
     # BAPS responses to it.  The client will get BAPS requests sent to it
