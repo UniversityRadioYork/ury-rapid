@@ -24,6 +24,7 @@ doc/
 
 # Config and secrets
 config.yml
+config.rb
 test.sh
 
 # Backups and swapfiles
