@@ -30,8 +30,8 @@ module Bra
     end
 
     # Configures a driver and adds it to the launcher's state
-    def driver(name, implementation_class)
-      @drivers << [name, implementation_class, yield]
+    def driver(name, implementation_class, &block)
+      @drivers << [name, implementation_class, block]
     end
 
     # Configures a server and adds it to the launcher's state.
@@ -78,10 +78,10 @@ module Bra
 
     def app_arguments
       logger = make_logger
-      config, global_driver_view, new_server_view = mkmodel(logger)
+      config, global_driver_view, global_server_view = mkmodel(logger)
       auth = make_auth(@user_config)
       drivers = make_drivers(logger, global_driver_view, config)
-      servers = make_servers(logger, global_driver_view, auth)
+      servers = make_servers(logger, global_server_view, auth)
       [drivers, servers, global_driver_view]
     end
 
@@ -91,7 +91,8 @@ module Bra
 
     def make_drivers(logger, model_view, model_config)
       @drivers.map do |name, driver_class, driver_config|
-        driver_class.new(driver_config, logger)
+        driver_class.new(logger)
+                    .tap { |d| d.instance_exec(&driver_config) }
                     .tap { |d| init_driver(name, model_view, d, model_config) }
       end
     end
