@@ -1,0 +1,81 @@
+#
+# |__   __  __
+# |  | |   |  |
+# |__| |   |__|_
+#
+# Configuration File
+#
+
+require 'bra/model/structures/standard'
+require 'bra/baps/driver'
+require 'bra/server/app'
+
+#
+# The [driver] is the part of bra that interfaces with the playout system.  It
+# is contained in a separate module space and loaded in by BRA.
+#
+driver :studio, Bra::Baps::Driver do
+  # Place driver specific configuration here.
+  host 'studio', 1350
+  username 'user'
+  password 'user'
+  num_channels 3
+end
+
+#
+# The [server] is the part of bra that interacts with the clients via HTTP.
+#
+server :server, Bra::Server::Launcher do
+  # The host and port on which bra should listen for requests
+  host '0.0.0.0', 8181
+
+  # This setting allows you to mount the HTTP server on a subdirectory, which
+  # is useful if you're proxying through to the server in Apache or suchlike.
+  url_root '/bra/'
+
+  # This should be changed to point to the directory containing the
+  # /assets/ and /views/ subdirectories.
+  file_root '/path/to/files/bra/server/'
+
+  # Cross-origin resource sharing config.
+  allow_headers 'accept', 'authorization'
+  allow_credentials
+  allow_methods '*'
+end
+
+# This is where users for the server's authentication system can be defined,
+# and their permissions set.  The [users] section maps usernames to
+# information about that username.
+user :admin do 
+  {
+    password: 'hunter2',
+    privileges: {
+      root: %i{get},
+      player_set: %i{get put post delete},
+      player: %i{get put post},
+      playlist_set: %i{get put post delete},
+      playlist: %i{get put post delete},
+      item: %i{get put post delete},
+      state: %i{get put post delete},
+      load_state: %i{get put post delete},
+      cue: %i{get put post delete},
+      intro: %i{get put post delete},
+      duration: %i{get put post delete},
+      position: %i{get put post delete},
+      volume: %i{get put post delete},
+      # BAPS2
+      x_baps: %i{get},
+      x_baps_server: %i{get},
+      x_baps_server_constant: %i{get},
+      # Info
+      info: %i{get},
+      version: %i{get},
+      channel_mode: %i{get}
+    }
+  }
+end
+
+# The [model] is the part of bra that tracks the playout system's state and
+# allows it to be viewed and manipulated as a collection of objects.
+#
+model Bra::Model::Structures::Standard 
