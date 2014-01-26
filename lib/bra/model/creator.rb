@@ -17,18 +17,28 @@ module Bra
       extend Forwardable
 
       # Initialise a Creator
-      #
-      # @param config [Config]  The model configuration.
-      def initialize(config)
-        @config = config
+      def initialize(update_channel, logger, options)
+        @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
+        @logger = logger
+        @options = options
+        @update_channel = update_channel
+        @component_creator = Bra::Model::ComponentCreator.new(self)
+
         @target = nil
       end
 
       protected
 
+      def_delegator :@component_creator, :public_send, :create_model_object
+      def_delegator :@options, [], :option
+
+      #
+      # Model creation DSL
+      #
+
       # Creates a log object
       def log(id)
-        child id, @config.log
+        child id, create_model_object(:log, @logger)
       end
 
       # Creates multiple Constants with the same handler target from a hash
@@ -119,7 +129,24 @@ module Bra
         @target = target
       end
 
-      def_delegators :@config, :option, :register, :create_model_object
+      def register(object)
+        register_handler(object)
+        register_update_channel(object)
+      end
+
+      private
+
+      def register_handler(object)
+        object.register_handler(handler_for(object))
+      end
+
+      def register_update_channel(object)
+        object.register_update_channel(@update_channel)
+      end
+
+      def handler_for(object)
+        @handlers[object.handler_target]
+      end
     end
   end
 end

@@ -56,14 +56,17 @@ module Bra
         @password = password
       end
 
+      def num_channels(channels)
+        @channel_ids = (0...channels).to_a
+      end
+
       #
       # End configuration DSL
       #
 
-
-      def sub_model(model_config)
+      def sub_model(update_channel)
         [
-          create_extender(model_config).create,
+          create_extender(update_channel),
           ->(driver_view) { @driver_view = driver_view }
         ]
       end
@@ -107,13 +110,18 @@ module Bra
         @logger.info("BAPS server: #{@config[:host]}:#{@config[:port]}")
       end
 
-      def create_extender(model_config)
+      def create_extender(update_channel)
         Bra::Baps::Model::Creator.new(
-          model_config,
-          host: @host,
-          port: @port,
-          username: @username,
-          password: @password
+          update_channel,
+          @logger,
+          players: @channel_ids,
+          playlists: @channel_ids,
+          server_config: {
+            host: @host,
+            port: @port,
+            username: @username,
+            password: @password
+          }
         )
       end
     end

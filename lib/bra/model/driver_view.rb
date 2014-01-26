@@ -9,9 +9,10 @@ module Bra
     class DriverView < View
       extend Forwardable
 
-      def initialize(config, model)
-        @config = config
+      def initialize(model, structure)
         super(model)
+
+        @structure = structure
       end
 
       # Gets a model object, given its URL relative to the model root
@@ -25,8 +26,8 @@ module Bra
         end
       end
 
-      def_delegator :@config, :register
-      def_delegator :@config, :create_model_object
+      def_delegator :@structure, :register
+      def_delegator :@structure, :create_model_object
     end
   end
 end

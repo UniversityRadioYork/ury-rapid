@@ -19,6 +19,7 @@ module Bra
       make_builders(options_with_defaults(options))
 
       @auth = make_auth(@user_config)
+      @update_channel = make_channel
     end
 
     def run
@@ -98,13 +99,14 @@ module Bra
     end
 
     def init_driver(name, model_view, driver, model_config)
-      sub_model, register_driver_view = driver.sub_model(model_config)
+      sub_structure, register_driver_view = driver.sub_model(@update_channel)
+      sub_model = sub_structure.create
       add_driver_model(model_view, name, sub_model)
-      init_driver_model_view(model_config, sub_model, register_driver_view)
+      init_driver_model_view(sub_structure, sub_model, register_driver_view)
     end
 
-    def init_driver_model_view(model_config, sub_model, register_driver_view)
-      register_driver_view.call(make_driver_view(model_config, sub_model))
+    def init_driver_model_view(sub_structure, sub_model, register_driver_view)
+      register_driver_view.call(make_driver_view(sub_model, sub_structure))
     end
 
     def add_driver_model(model_view, name, sub_model)
@@ -116,9 +118,9 @@ module Bra
     #
 
     def mkmodel(logger)
-      config = model_configurator(logger)
-      model = config.make
-      [config, make_driver_view(config, model), make_server_view(model)]
+      structure = @model_structure.new(@update_channel, logger, @model_config)
+      model = structure.create
+      [model, make_driver_view(model, structure), make_server_view(model)]
     end
 
     def model_configurator(logger)

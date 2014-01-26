@@ -27,21 +27,7 @@ module Bra
         def info(id)
           hash(id, :info) do
             constant :version, Bra::Common::Constants::VERSION, :version
-            constant :channel_mode, channel_mode?, :channel_mode
           end
-        end
-
-        # Determines whether the model is in 'channel mode'
-        #
-        # Channel mode means that the players and playlists are linked in
-        # channels; this means the set of player and playlist IDs are equal.
-        #
-        # Some user interfaces will only work when bra is in channel mode, so
-        # this is provided to allow them to check.
-        #
-        # @return [Boolean] True if the model is in channel mode; false if not.
-        def channel_mode?
-          option(:players) == option(:playlists)
         end
       end
     end
