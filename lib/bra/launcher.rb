@@ -41,9 +41,9 @@ module Bra
     end
 
     # Configures the model.
-    def model(implementation_class)
+    def model(implementation_class, &block)
       @model_structure = implementation_class
-      @model_config = yield
+      @model_config = block
     end
 
     # Configures a user and adds them to the user table.

@@ -111,6 +111,12 @@ module Bra
       end
 
       def create_extender(update_channel)
+        make_structure(update_channel).tap do |structure|
+          @requester.add_handlers(structure)
+        end
+      end
+
+      def make_structure(update_channel)
         Bra::Baps::Model::Creator.new(
           update_channel,
           @logger,

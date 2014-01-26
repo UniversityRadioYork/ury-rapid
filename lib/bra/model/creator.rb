@@ -27,6 +27,10 @@ module Bra
         @target = nil
       end
 
+      def add_handlers(handlers)
+        @handlers.merge!(handlers)
+      end
+
       protected
 
       def_delegator :@component_creator, :public_send, :create_model_object
