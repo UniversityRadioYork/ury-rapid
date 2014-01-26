@@ -41,7 +41,7 @@ module Bra
 
     # Configures the model.
     def model(implementation_class)
-      @model_maker = implementation_class.method(:new)
+      @model_structure = implementation_class
       @model_config = yield
     end
 
@@ -123,12 +123,8 @@ module Bra
 
     def model_configurator(logger)
       make_model_configurator(
-        model_structure, make_channel, logger, @model_config
+        @model_structure, make_channel, logger, @model_config
       )
-    end
-
-    def model_structure
-      make_model_structure(@model_config)
     end
 
     #
@@ -163,7 +159,6 @@ module Bra
         driver_view:        Bra::Model::DriverView.method(:new),
         model_configurator: Bra::Model::Config.method(:new),
         server_view:        Bra::Model::ServerView.method(:new),
-        model_structure:    method(:structure_from_config)
       }
     end
 
@@ -215,13 +210,6 @@ module Bra
       require driver_module
 
       Driver.new(driver_config, logger)
-    end
-
-    def structure_from_config(structure_config)
-      structure_module = structure_config[:source] || DEFAULT_MODEL_STRUCTURE
-      require structure_module
-
-      Structure
     end
 
     #
