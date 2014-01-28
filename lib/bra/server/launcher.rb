@@ -15,7 +15,7 @@ module Bra
         @host = '0.0.0.0'
         @port = 8181
         @root = '/'
-        @config = {cors: {}}
+        @config = {}
 
         check_server_em_compatible
       end
@@ -34,24 +34,6 @@ module Bra
       # Sets the file system root of the server
       def file_root(root)
         @config[:root_directory] = root
-      end
-
-      # Sets the CORS Allow-Headers of the server
-      def allow_headers(*headers)
-        cors('Allow-Headers', headers)
-      end
-
-      def cors(header, value)
-        @config[:cors][header.to_sym] = value
-      end
-
-      # Sets the CORS Allow-Credentials header
-      def allow_credentials
-        cors('Allow-Credentials', [])
-      end
-
-      def allow_methods(*methods)
-        cors('Allow-Methods', methods)
       end
 
       # Starts the server

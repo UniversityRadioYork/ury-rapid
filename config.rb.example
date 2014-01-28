@@ -36,11 +36,6 @@ server :server, Bra::Server::Launcher do
   # This should be changed to point to the directory containing the
   # /assets/ and /views/ subdirectories.
   file_root '/path/to/files/bra/server/'
-
-  # Cross-origin resource sharing config.
-  allow_headers 'accept', 'authorization'
-  allow_credentials
-  allow_methods '*'
 end
 
 # This is where users for the server's authentication system can be defined,

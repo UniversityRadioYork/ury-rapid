@@ -84,26 +84,11 @@ module Server
         error(401, 'Not authorised.')
       end
 
-      # Handle CORS headers
-      #
-      # Such a senseless waste of precious bytes.
-      #
-      # @return [void]
-      def cors
-        @config[:cors].each do |header, items|
-          headers "Access-Control-#{header}" => items.join(', ')
-        end
-      end
-
       # threaded - False: Will take requests on the reactor thread
       #            True:  Will queue request for background thread
       configure do
         set :threaded, false
       end
-
-      # Respond to HTTP OPTIONS with CORS headers, to allow out-of-request
-      # CORS checks.
-      options('/*/?') { cors }
 
       # Special files.
       get('/stylesheets/*') { serve_text('css', 'stylesheets') }
@@ -128,7 +113,6 @@ module Server
 
       # Sets up a connection to the model updates stream.
       def model_updates_stream
-        cors
         send(request.websocket? ? :websocket_update : :stream_update)
       end
 
@@ -173,7 +157,6 @@ module Server
       end
 
       def wrap
-        cors
         yield
       rescue Kankri::InsufficientPrivilegeError
         forbidden
