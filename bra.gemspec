@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'activesupport'
   spec.add_runtime_dependency 'compass'
-  spec.add_runtime_dependency 'compo', '~> 0.2'
+  spec.add_runtime_dependency 'compo', '~> 0.3', '>=0.3.1'
   spec.add_runtime_dependency 'eventmachine'
   spec.add_runtime_dependency 'haml'
   spec.add_runtime_dependency 'kankri', '~> 0.1'

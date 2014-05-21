@@ -1,4 +1,4 @@
-require 'bra/model/finder'
+require 'compo'
 
 module Bra
   module Model
@@ -28,7 +28,7 @@ module Bra
       #
       # @return [ModelObject]  The found model object.
       def find(url, &block)
-        Finder.find(@root, url, &block)
+        Compo::UrlFinder.find(@root, url, &block)
       end
     end
   end
