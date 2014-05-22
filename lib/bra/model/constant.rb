@@ -4,7 +4,7 @@ require 'compo'
 module Bra
   module Model
     # A model object containing a constant value
-    class Constant < Compo::Leaf
+    class Constant < Compo::Branches::Constant
       extend Forwardable
       include ModelObject
 
@@ -21,22 +21,10 @@ module Bra
       #   privilege retrieval).
       #
       def initialize(value, handler_target = nil)
-        super(handler_target)
-        @value = value
+        super(handler_target, value)
       end
 
-      # Returns the current value of this Constant
-      #
-      # @api public
-      # @example  Retrieving a Constant's value.
-      #   const = Constant.new(:spoon)
-      #   const.value
-      #   #=> :spoon
-      #
-      # @return [Object]  The Constant's internal value.
-      attr_reader :value
       alias_method :flat, :value
-
       def_delegator :@value, :to_s
     end
   end

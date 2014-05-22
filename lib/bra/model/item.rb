@@ -7,7 +7,7 @@ require 'bra/model/model_object'
 module Bra
   module Model
     # An item in the playout system.
-    class Item < Compo::Leaf
+    class Item < Compo::Branches::Leaf
       include Bra::Common::Types::Validators
       include ModelObject
 

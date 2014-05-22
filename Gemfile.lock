@@ -5,7 +5,7 @@ PATH
       activesupport
       colored
       compass
-      compo (~> 0.3, >= 0.3.1)
+      compo (~> 0.4)
       eventmachine
       haml
       kankri (~> 0.1)
@@ -34,7 +34,7 @@ GEM
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.2.19)
-    compo (0.3.1)
+    compo (0.4.0)
     daemons (1.1.9)
     diff-lcs (1.2.5)
     docile (1.1.1)

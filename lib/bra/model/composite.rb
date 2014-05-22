@@ -48,7 +48,7 @@ module Bra
 
     # A model object whose children are arranged as a hash from their IDs to
     # themselves.
-    class HashModelObject < Compo::HashBranch
+    class HashModelObject < Compo::Branches::Hash
       include CompositeModelObject
 
       def initialize(handler_target = nil)
@@ -64,7 +64,7 @@ module Bra
     #
     # A ListModelObject stores its children in an Array, with the object IDs
     # being the numeric indices into that Array.
-    class ListModelObject < Compo::ArrayBranch
+    class ListModelObject < Compo::Branches::Array
       include CompositeModelObject
 
       def initialize(handler_target = nil)

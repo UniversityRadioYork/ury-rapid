@@ -23,8 +23,8 @@ module Bra
       include Kankri::PrivilegeSubject
       include Updatable
 
-      def initialize(handler_target = nil)
-        super()
+      def initialize(handler_target = nil, *args)
+        super(*args)
         @handler_target = handler_target || default_handler_target
         @update_channel = NoUpdateChannel.new
       end
@@ -114,7 +114,7 @@ module Bra
       # Default implementation of DELETE on model objects
       #
       # This instructs the object's children to delete themselves.  Since
-      # #each is a no-op on Compo::Leaf, this is safe to use with any model
+      # #each is a no-op on Compo::Branches::Leaf, this is safe to use with any model
       # object.
       #
       # @return [void]
