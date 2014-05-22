@@ -41,6 +41,10 @@ module Bra
         Bra::Model::Log.new(logger)
       end
 
+      def constant(value, handler_target)
+        Bra::Model::Constant.new(handler_target, value).tap(&method(:register))
+      end
+      
       private
 
       def item_type(options)
@@ -63,10 +67,6 @@ module Bra
 
       def validate_then_constant(validator, raw_value, handler_target)
         constant(send(validator, raw_value), handler_target)
-      end
-
-      def constant(value, handler_target)
-        Bra::Model::Constant.new(handler_target, value).tap(&method(:register))
       end
 
       def_delegator :@registrar, :register

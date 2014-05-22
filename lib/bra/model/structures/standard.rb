@@ -26,7 +26,8 @@ module Bra
         # Builds the bra information model.
         def info(id)
           hash(id, :info) do
-            constant :version, Bra::Common::Constants::VERSION, :version
+            component :version, :constant, Bra::Common::Constants::VERSION, :version
+            component :channel_mode, :constant, channel_mode?, :channel_mode
           end
         end
       end

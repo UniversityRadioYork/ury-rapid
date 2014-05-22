@@ -33,31 +33,9 @@ module Bra
 
       protected
 
-      def_delegator :@component_creator, :public_send, :create_model_object
-      def_delegator :@options, [], :option
-
-      #
-      # Model creation DSL
-      #
-
       # Creates a log object
       def log(id)
         child id, create_model_object(:log, @logger)
-      end
-
-      # Creates multiple Constants with the same handler target from a hash
-      def constants(hash, handler_target)
-        hash.each { |key, value| constant(key, value, handler_target) }
-      end
-
-      # Creates a Constant with the given ID, value and handler target
-      def constant(id, value, handler_target)
-        child id, Constant.new(handler_target, value)
-      end
-
-      # Creates a Variable with the given parameters
-      def var(id, initial_value, handler_target, validator)
-        child id, Variable.new(initial_value, validator, handler_target)
       end
 
       def hashes(set_id, set_target, child_ids, child_target, &block)
