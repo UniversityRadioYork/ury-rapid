@@ -66,7 +66,7 @@ module Bra
       end
 
       def constant(value, handler_target)
-        Bra::Model::Constant.new(value, handler_target).tap(&method(:register))
+        Bra::Model::Constant.new(handler_target, value).tap(&method(:register))
       end
 
       def_delegator :@registrar, :register

@@ -52,7 +52,7 @@ module Bra
 
       # Creates a Constant with the given ID, value and handler target
       def constant(id, value, handler_target)
-        child id, Constant.new(value, handler_target)
+        child id, Constant.new(handler_target, value)
       end
 
       # Creates a Variable with the given parameters
