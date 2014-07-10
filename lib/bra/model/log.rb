@@ -11,7 +11,7 @@ module Bra
     # data bra holds.
     #
     # In future, the log may be readable using the bra API.
-    class Log < Compo::Leaf
+    class Log < Compo::Branches::Leaf
       include ModelObject
 
       # Initialises the Log

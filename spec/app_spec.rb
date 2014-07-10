@@ -2,12 +2,11 @@ require 'bra/app'
 require 'bra/model'
 
 describe Bra::App do
-  subject { Bra::App.new(driver, driver_view, server, server_view, reactor) }
+  subject { Bra::App.new([driver], [server], driver_view, reactor) }
 
   let(:driver)      { double(:driver) }
-  let(:driver_view) { double(:driver_view) }
   let(:server)      { double(:server) }
-  let(:server_view) { double(:server_view) }
+  let(:driver_view) { double(:driver_view) }
   let(:reactor)     { double(:reactor) }
 
   describe '#run' do
@@ -26,13 +25,13 @@ describe Bra::App do
       subject.run
     end
 
-    it 'calls #run on the server with the server view' do
-      expect(server).to receive(:run).once.with(server_view)
+    it 'calls #run on the server' do
+      expect(server).to receive(:run).once.with(no_args)
       subject.run
     end
 
-    it 'calls #run on the driver with the driver view' do
-      expect(driver).to receive(:run).once.with(driver_view)
+    it 'calls #run on the driver' do
+      expect(driver).to receive(:run).once.with(no_args)
       subject.run
     end
   end

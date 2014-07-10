@@ -14,7 +14,7 @@ module Bra
 
       @user_config = {}
 
-      instance_eval(config)
+      instance_eval(&config)
 
       make_builders(options_with_defaults(options))
 
@@ -60,8 +60,6 @@ module Bra
       @app_maker                = options[:app]
       @auth_maker               = options[:auth]
       @channel_maker            = options[:channel]
-      @driver_maker             = options[:driver]
-      @server_maker             = options[:server]
       @logger_maker             = options[:logger]
       make_model_builders(options)
     end
@@ -80,9 +78,8 @@ module Bra
     def app_arguments
       logger = make_logger
       config, global_driver_view, global_server_view = mkmodel(logger)
-      auth = make_auth(@user_config)
       drivers = make_drivers(logger, global_driver_view, config)
-      servers = make_servers(logger, global_server_view, auth)
+      servers = make_servers(logger, global_server_view)
       [drivers, servers, global_driver_view]
     end
 
@@ -133,9 +130,9 @@ module Bra
     # Server
     #
 
-    def make_servers(logger, global_driver_view, auth)
+    def make_servers(logger, global_driver_view)
       @servers.map do |name, server_class, server_config|
-        server_class.new(global_driver_view, auth).tap do |server|
+        server_class.new(global_driver_view, @auth).tap do |server|
           server.instance_eval(&server_config)
         end
       end
@@ -150,9 +147,7 @@ module Bra
         app:     Bra::App.method(:new),
         auth:    Kankri.method(:authenticator_from_hash),
         channel: Bra::Model::UpdateChannel.method(:new),
-        driver:  method(:driver_from_config),
         logger:  method(:default_logger),
-        server:  Bra::Server::Launcher.method(:new)
       ).reverse_merge(model_defaults)
     end
 
@@ -221,12 +216,10 @@ module Bra
     def_delegator :@app_maker,                :call, :make_app
     def_delegator :@auth_maker,               :call, :make_auth
     def_delegator :@channel_maker,            :call, :make_channel
-    def_delegator :@driver_maker,             :call, :make_driver
     def_delegator :@driver_view_maker,        :call, :make_driver_view
     def_delegator :@logger_maker,             :call, :make_logger
     def_delegator :@model_configurator_maker, :call, :make_model_configurator
     def_delegator :@model_structure_maker,    :call, :make_model_structure
-    def_delegator :@server_maker,             :call, :make_server
     def_delegator :@server_view_maker,        :call, :make_server_view
   end
 end
