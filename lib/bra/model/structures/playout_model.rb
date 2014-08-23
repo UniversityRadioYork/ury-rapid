@@ -3,7 +3,7 @@ require 'bra/model'
 module Bra
   module Model
     module Structures
-      # A basic 
+      # A basic model structure for playout system drivers
       #
       # This contains:
       #   - A player set, with IDs set in the model config under 'players'
