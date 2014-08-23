@@ -27,7 +27,6 @@ module Bra
         def info(id)
           hash(id, :info) do
             component :version, :constant, Bra::Common::Constants::VERSION, :version
-            component :channel_mode, :constant, channel_mode?, :channel_mode
           end
         end
       end
