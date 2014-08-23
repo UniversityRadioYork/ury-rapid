@@ -118,6 +118,8 @@ module Bra
 
       private
 
+      def_delegator :@component_creator, :send, :create_model_object
+
       def register_handler(object)
         object.register_handler(handler_for(object))
       end
