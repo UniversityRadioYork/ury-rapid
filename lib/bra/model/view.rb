@@ -21,7 +21,7 @@ module Bra
       def_delegator :@root, :deregister_from_updates
 
       # Logs an error message in the bra log
-      # 
+      #
       # @api  public
       # @example  Log an error.
       #   view.log(:error, 'The system is down!')
@@ -43,7 +43,7 @@ module Bra
       #
       # @return [ModelObject]  The found model object.
       def find(url, &block)
-        Compo::UrlFinder.find(@root, url, &block)
+        Compo::Finders::Url.find(@root, url, &block)
       end
     end
   end
