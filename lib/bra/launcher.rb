@@ -14,7 +14,7 @@ module Bra
 
       @user_config = {}
 
-      instance_eval(&config)
+      instance_eval(config)
 
       make_builders(options_with_defaults(options))
 
