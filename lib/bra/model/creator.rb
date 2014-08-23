@@ -33,6 +33,9 @@ module Bra
 
       protected
 
+      # Fetches an option from this model structure's options set
+      def_delegator :@options, :[], :option
+
       # Creates a log object
       def log(id)
         child id, create_model_object(:log, @logger)

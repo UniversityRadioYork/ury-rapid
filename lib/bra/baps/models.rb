@@ -15,12 +15,14 @@ module Bra
 
           hash :x_baps, :x_baps do
             hash :server, :x_baps_server do
-              constants option(:server_config), :x_baps_server_constant
+              option(:server_config).each do |(key, value)|
+                component key, :constant, value, :x_baps_server_constant
+              end
             end
           end
 
           hash :info, :info do
-            constant :channel_mode, true, :channel_mode
+            component :channel_mode, :constant, true, :channel_mode
           end
         end
       end
