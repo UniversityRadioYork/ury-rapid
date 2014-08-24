@@ -34,8 +34,8 @@ module Bra
         #   responder = Responder.new(model, queue)
         #   model = responder.model
         #
-        # @return [Model]
-        #   The Model on which this Responder operates.
+        # @return [Bra::Model::DriverView]
+        #   The model view on which this Responder operates.
         attr_reader :model
 
         # Initialises the responder
@@ -44,8 +44,8 @@ module Bra
         # @example  Initialise a responder
         #   responder = Responder.new(model, queue)
         #
-        # @param model [Model]
-        #   The Model on this Responder will operate.
+        # @param model [Bra::Model::DriverView]
+        #   The model view on this Responder will operate.
         # @param requester [Requester]
         #   The Requester via which this Responder can send BAPS login
         #   requests.
