@@ -46,6 +46,7 @@ user :admin do
     password: 'hunter2',
     privileges: {
       root: %i(get),
+      playout_root: %i(get),
       player_set: %i(get put post delete),
       player: %i(get put post),
       playlist_set: %i(get put post delete),
