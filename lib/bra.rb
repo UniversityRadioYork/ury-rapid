@@ -3,7 +3,12 @@ require 'bra/common/constants'
 
 module Bra
   def self.from_config_file(file = nil)
-    Bra::Launcher.launch(get_config(file))
+    config = get_config(file)
+    unless config.nil?
+        Bra::Launcher.launch(config)
+    else
+        $stderr.puts('No config file. Dying.')
+    end
   end
 
   private
@@ -17,6 +22,7 @@ module Bra
   end
 
   def self.load_config_from(file)
-    File.read(file)
+    return nil unless File.exists?(file)
+    file.read(file)
   end
 end
