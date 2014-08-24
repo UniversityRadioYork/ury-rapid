@@ -7,14 +7,10 @@
     %link{ href: url('/stylesheets/print.css'), media:'print', rel:'stylesheet', type:'text/css' }
   %body
     %header
-      %hgroup
-        %h1 bra
-        %h2 API Inspector
+      %h1 bra
+      %h2 API Inspector
 
     = yield
-
-    %footer
-      = haml :legend
 
     %script{ src: '//code.jquery.com/jquery-2.0.3.min.js' }
     %script{ src: url('/scripts/main.js') }

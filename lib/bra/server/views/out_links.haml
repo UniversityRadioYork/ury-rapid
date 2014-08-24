@@ -4,6 +4,8 @@
   item - The item for which links are to be rendered.
 
 %a.out{ href: url(resource_url.rpartition('/').first),
-        title: "Exit this resource." } Out
+        title: "Exit this resource." }
+  %i{ class: 'fa fa-level-up' }
 %a.json{ href: "#{url(resource_url)}?json",
-         title: "See the JSON for this resource." } JSON
+         title: "See the JSON for this resource." }
+  %i{ class: 'fa fa-code' }

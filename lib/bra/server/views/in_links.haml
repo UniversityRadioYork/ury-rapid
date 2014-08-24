@@ -4,6 +4,8 @@
   item - The item for which links are to be rendered.
 
 %a.in{ href: url(resource_url),
-       title: "Enter this resource." } In
+       title: "Enter this resource." }
+  %i{ class: 'fa fa-level-down' }
 %a.json{ href: "#{url(resource_url)}?json",
-         title: "See the JSON for this resource." } JSON
+         title: "See the JSON for this resource." }
+  %i{ class: 'fa fa-code' }

@@ -8,16 +8,35 @@
 @import "compass/typography/links/link-colors";
 @import "compass/css3";
 
-@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic');
-@import url('//fonts.googleapis.com/css?family=Comfortaa:700');
-@import url('//fonts.googleapis.com/css?family=Share+Tech+Mono');
+@import url(//fonts.googleapis.com/css?family=Anonymous+Pro|Merriweather|Rokkitt:700);
 
 $size-border: 0.12rem;
-$size-padding: 0.8rem;
-$size-padding-thin: 0.2rem;
-$size-inout: $size-padding * (2 / 3);
+$size-padding: 0.9rem;
+$size-padding-thin: 0.4rem;
+$size-in-out: $size-padding * (3/4);
 
-// Tango colour palette
+// Google colour palette
+$colour-red:         ( 700: #d01716, 500: #e51c23, 50: #fde0dc );
+$colour-pink:        ( 700: #c2185b, 500: #e91e63, 50: #fce4ec );
+$colour-purple:      ( 700: #7b1fa2, 500: #9c27b0, 50: #f3e5f5 );
+$colour-deep-purple: ( 700: #512da8, 500: #673ab7, 50: #ede7f6 );
+$colour-indigo:      ( 700: #303f9f, 500: #3f51b5, 50: #e8eaf6 );
+$colour-blue:        ( 700: #455ede, 500: #5677fc, 50: #e7e9fd );
+$colour-light-blue:  ( 700: #0288d1, 500: #03a9f4, 50: #e1f5fe );
+$colour-cyan:        ( 700: #0097a7, 500: #00bcd4, 50: #e0f7fa );
+$colour-teal:        ( 700: #00796b, 500: #009688, 50: #e0f2f1 );
+$colour-green:       ( 700: #0a7e07, 500: #259b24, 50: #d0f8ce );
+$colour-light-green: ( 700: #689f38, 500: #8bc34a, 50: #f1f8e9 );
+$colour-lime:        ( 700: #afb42b, 500: #cddc39, 50: #f9fbe7 );
+$colour-yellow:      ( 700: #fbc02d, 500: #ffeb3b, 50: #fffde7 );
+$colour-amber:       ( 700: #ffa000, 500: #ffc107, 50: #fff8e1 );
+$colour-orange:      ( 700: #f57c00, 500: #ff9800, 50: #fff3e0 );
+$colour-deep-orange: ( 700: #e64a19, 500: #ff5722, 50: #fbe9e7 );
+$colour-brown:       ( 700: #5d4037, 500: #795548, 50: #efebe9 );
+$colour-grey:        ( 700: #616161, 500: #9e9e9e, 50: #fafafa );
+$colour-blue-grey:   ( 700: #455a64, 500: #607d8b, 50: #eceff1 );
+
+// Tango colour palette (deprecated)
 $colour-butter-light:      #fce94f;
 $colour-orange-light:      #fcaf3e;
 $colour-chocolate-light:   #e9b96e;
@@ -27,7 +46,6 @@ $colour-plum-light:        #ad7fa8;
 $colour-scarlet-red-light: #ef2929;
 
 $colour-butter:      #edd400;
-$colour-orange:      #f57900;
 $colour-chocolate:   #c17d11;
 $colour-chameleon:   #73d216;
 $colour-sky-blue:    #3465a4;
@@ -49,59 +67,84 @@ $colour-aluminium-4: #888a85;
 $colour-aluminium-5: #555753;
 $colour-aluminium-6: #2e3436;
 
+// Font Awesome icons
+$fa-music:        "\f001";
+$fa-check:        "\f00c";
+$fa-times:        "\f00d";
+$fa-volume-up:    "\f028";
+$fa-play:         "\f04b";
+$fa-pause:        "\f04c";
+$fa-stop:         "\f04d";
+$fa-folder-open:  "\f07c";
+$fa-square-o:     "\f096";
+$fa-list-ol:      "\f0cb";
+$fa-file-text-o:  "\f0f6";
+$fa-code:         "\f121";
+$fa-info:         "\f129";
+$fa-ellipsis-h:   "\f141";
+$fa-file-audio-o: "\f1c7";
+
+@mixin fa($icon) {
+    content: $icon;
+    font-family: "FontAwesome";
+}
+@mixin fa-before($icon) {
+  &:before {
+    @include fa($icon);
+    padding-right: 0.3em;
+  }
+}
+@mixin fa-after($icon) {
+  &:after {
+    @include fa($icon);
+    padding-left: 0.3em;
+  }
+}
+@mixin fa-heading($icon) {
+    &>h1 {
+        @include fa-before($icon);
+    }
+}
+@mixin fa-paragraph($icon) {
+    &>p {
+        @include fa-after($icon);
+    }
+}
 // Semantic colour names
-$colour-outer-fg:           $colour-aluminium-1;
-$colour-outer-bg:           $colour-sky-blue-dark;
-$colour-container-bg:       $colour-aluminium-1;
-$colour-container-fg:       $colour-aluminium-6;
-$colour-set-bg:             $colour-aluminium-3;
-$colour-set-fg:             $colour-aluminium-6;
-$colour-variable-bg:        $colour-aluminium-2;
-$colour-variable-fg:        $colour-aluminium-6;
-$colour-border:             $colour-aluminium-6;
+$colour-outer-fg:           black;
+$colour-outer-bg:           map-get($colour-purple, 50);
+$colour-header-fg:          map-get($colour-purple, 50);
+$colour-header-bg:          map-get($colour-purple, 700);
+$colour-toolbar-fg:         map-get($colour-purple, 50);
+$colour-toolbar-bg:         map-get($colour-purple, 500);
 
-$colour-playing-bg: $colour-chameleon-light;
-$colour-playing-fg: $colour-aluminium-6;
-$colour-paused-bg:  $colour-butter-light;
-$colour-paused-fg:  $colour-aluminium-6;
-$colour-stopped-bg: $colour-scarlet-red-light;
-$colour-stopped-fg: $colour-aluminium-6;
+$colour-root-playout-fg: map-get($colour-pink, 50);
+$colour-root-playout-bg: map-get($colour-pink, 500);
 
-$colour-ok-bg:      $colour-sky-blue-dark;
-$colour-ok-fg:      $colour-aluminium-1;
-$colour-loading-bg: $colour-plum-dark;
-$colour-loading-fg: $colour-aluminium-1;
-$colour-failed-bg:  $colour-scarlet-red-dark;
-$colour-failed-fg:  $colour-aluminium-1;
-$colour-empty-bg:   $colour-aluminium-4;
-$colour-empty-fg:   $colour-aluminium-1;
-
-$colour-file-bg:    $colour-sky-blue-light;
-$colour-file-fg:    $colour-aluminium-6;
-$colour-library-bg: $colour-plum-light;
-$colour-library-fg: $colour-aluminium-6;
-$colour-text-bg:    $colour-chocolate-light;
-$colour-text-fg:    $colour-aluminium-6;
-
-$colour-nav-json:      $colour-aluminium-5;
-$colour-nav-in-out:    $colour-aluminium-2;
-$colour-nav-highlight: $colour-orange-light;
-
-$colour-console-bg: $colour-aluminium-6;
-$colour-console-fg: $colour-chameleon;
+$colour-console-bg: map-get($colour-blue-grey, 700);
+$colour-console-fg: map-get($colour-blue-grey, 50);
 
 @mixin border {
-    border: $size-border solid $colour-border;
+    //border: $size-border solid $colour-border;
     padding: $size-padding;
 }
 
 @mixin font-normal {
-    font-family: 'Source Sans Pro', helvetica, arial, sans-serif;
+    font-family: Merriweather, helvetica, arial, sans-serif;
 }
 
 @mixin font-title {
-    font-family: Comfortaa, helvetica, arial, sans-serif;
+    font-family: Rokkitt, helvetica, arial, sans-serif;
 }
+
+@mixin font-console {
+    font-family: "Anonymous Pro", monospace;
+}
+
+@mixin dark-text {
+    color: rgba(0, 0, 0, 0.87);
+}
+
 
 a {
     @include link-colors(
@@ -130,26 +173,27 @@ html {
             font-size: 1rem !important;
             margin: $size-padding auto !important;
 
-            color: $colour-container-fg;
-            background-color: $colour-container-bg;
-
             text-align: left;
             max-width: 80%;
             display: table;
         }
 
         >header {
-            margin: $size-padding;
+            color: $colour-header-fg;
+            background-color: $colour-header-bg;
+            text-align: left;
 
-            >hgroup {
-                >h1 {
-                    display: inline;
-                    font-size: 3rem;
-                }
-                >h2 {
-                    display: inline;
-                    font-size: 1.2rem;
-                }
+            >h1 {
+                display: inline-block;
+                font-size: 3rem;
+                line-height: 0.8em;
+                margin: 0;
+                padding: $size-padding-thin;
+            }
+            >h2 {
+                display: inline;
+                margin: 0;
+                font-size: 1.2rem;
             }
         }
 
@@ -175,8 +219,21 @@ section, nav {
 
     font-size: 0.9em;
 
-    background-color: $colour-container-bg;
-    color: $colour-container-fg;
+    >h1 {
+        // Transfer the margin into padding, so we can style the entire heading
+        // bar without a nasty padding border around it.
+
+        margin-left: -($size-padding);
+        padding-left: $size-padding-thin;
+
+        margin-right: -($size-padding);
+        padding-right: $size-padding-thin;
+
+        margin-top: -($size-padding);
+        padding-top: $size-padding-thin;
+
+        padding-bottom: $size-padding-thin;
+    }
 }
 
 section {
@@ -188,11 +245,6 @@ p:not(:last-child) {
 
 nav h1 {
     display: none;
-}
-
-.set {
-    background-color: $colour-set-bg !important;
-    color: $colour-set-fg !important;
 }
 
 // Make players and playlists line up horizontally.
@@ -215,10 +267,7 @@ nav h1 {
     }
 }
 
-section.variable, section.constant {
-    background-color: $colour-variable-bg;
-    color: $colour-variable-fg;
-
+section.constant {
     // Remove lower margin on the value.
     p {
         margin: 0;
@@ -235,60 +284,21 @@ div>section, section>section {
             @include font-normal;
             font-weight: bold;
             font-size: 1em;
-            margin: 0;
+            margin: 4pt;
             margin-right: $size-padding-thin;
+            padding: 0 !important;
+            border-bottom: none !important;
         }
         p {
             display: inline;
             flex: 1;
             text-align: right;
-            margin: 0;
+            margin: 4pt;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
     }
-}
-
-.playing {
-    background-color: $colour-playing-bg !important;
-    color: $colour-playing-fg !important;
-}
-.paused {
-    background-color: $colour-paused-bg !important;
-    color: $colour-paused-fg !important;
-}
-.stopped {
-    background-color: $colour-stopped-bg !important;
-    color: $colour-stopped-fg !important;
-}
-.file {
-    background-color: $colour-file-bg !important;
-    color: $colour-file-fg !important;
-}
-.text {
-    background-color: $colour-text-bg !important;
-    color: $colour-text-fg !important;
-}
-.library {
-    background-color: $colour-library-bg !important;
-    color: $colour-library-fg !important;
-}
-.loading {
-    background-color: $colour-loading-bg !important;
-    color: $colour-loading-fg !important;
-}
-.ok {
-    background-color: $colour-ok-bg !important;
-    color: $colour-ok-fg !important;
-}
-.failed {
-    background-color: $colour-failed-bg !important;
-    color: $colour-failed-fg !important;
-}
-.empty {
-    background-color: $colour-empty-bg !important;
-    color: $colour-empty-fg !important;
 }
 
 .item {
@@ -302,7 +312,7 @@ div>section, section>section {
 li.item, p.item {
   position: relative;
   padding: $size-padding-thin;
-  padding-right: ($size-padding-thin + $size-inout);
+  padding-right: ($size-padding-thin + $size-in-out);
 
   // Stop line-breaking and force an ellipsis instead.
   text-overflow: ellipsis;
@@ -341,33 +351,31 @@ nav.resources {
 
 .in, .out, .json {
     position: absolute;
-    font-size: 0px;
-    border: $size-border solid $colour-border;
-    background-color: $colour-nav-in-out;
-    width: $size-inout;
-    height: $size-inout;
+    font-size: $size-in-out;
+    line-height: $size-in-out;
+    text-align: center;
+    width: $size-in-out;
+    height: $size-in-out;
+    padding: $size-border;
     display: block;
-
-    &:hover {
-        background-color: $colour-nav-highlight;
-    }
 }
 .in {
     bottom: 0;
     right: 0;
-    border-bottom: 0;
-    border-right: 0;
+    padding-bottom: 0;
+    padding-right: 0;
 }
 .out {
-    top: -($size-inout);
-    left: -($size-inout);
+    top: 0;
+    left: 0;
+    padding-top: 0;
+    padding-left: 0;
 }
 .json {
-    background-color: $colour-nav-json;
-    border-top: 0;
-    border-right: 0;
     top: 0;
     right: 0;
+    padding-top: 0;
+    padding-right: 0;
 }
 
 .legend {
@@ -400,12 +408,12 @@ nav.resources {
 // Console themeing.
 pre.json_code, pre#update-console {
     @include border;
+    @include font-console;
 
     padding: $size-padding;
 
     background-color: $colour-console-bg;
     color: $colour-console-fg;
-    font-family: "Share Tech Mono";
     margin-bottom: $size-padding;
 }
 
@@ -418,13 +426,9 @@ dd {
 
 // Toolbar
 #toolbar {
-    border: none;
-    border-bottom: $size-padding-thin solid $colour-outer-fg;
-    background: transparent;
-    color: $colour-outer-fg;
-    margin: $size-padding;
+    background-color: $colour-toolbar-bg;
+    color: $colour-toolbar-fg;
     padding: 0;
-    padding-bottom: $size-padding-thin;
     display: flex;
     align-items: center;
 
@@ -433,6 +437,7 @@ dd {
         font-size: 1.1rem;
         vertical-align: middle;
         margin: 0;
+        padding-left: $size-padding-thin;
     }
 
     h1 {
@@ -454,11 +459,136 @@ dd {
         cursor: pointer;
         padding: $size-padding-thin;
 
-        background-color: $colour-container-bg;
         text-align: center;
 
         &:not(:first-child) {
             margin-right: $size-padding-thin;
         }
+    }
+}
+
+// General style mixins
+@mixin set-style($col) {
+    background-color: map-get($col, 500) !important;
+    border: $size-border solid map-get($col, 700);
+    color: map-get($col, 50) !important;
+
+    >h1 {
+        background-color: map-get($col, 700);
+    }
+
+    a {
+        color: map-get($col, 50);
+
+        &:hover {
+            background-color: map-get($col, 50);
+            color: map-get($col, 700);
+        }
+    }
+}
+@mixin set-member-style($col) {
+    @include dark-text;
+    background-color: map-get($col, 50) !important;
+    border: $size-border solid map-get($col, 700);
+
+    >h1 {
+        border-bottom: $size-border solid map-get($col, 700);
+    }
+
+    a {
+        color: map-get($col, 700);
+
+        &:hover {
+            background-color: map-get($col, 700);
+            color: map-get($col, 50);
+        }
+    }
+}
+
+section.json_inspector {
+    @include fa-heading($fa-code);
+    @include set-style($colour-blue-grey);
+}
+
+section.playout_root {
+    @include fa-heading($fa-volume-up);
+    @include set-style($colour-pink);
+}
+
+section.info {
+    @include fa-heading($fa-info);
+    @include set-style($colour-indigo);
+
+    //.constant {
+    //    @include set-member-style($colour-indigo);
+    //}
+}
+
+.set {
+    @include fa-heading($fa-folder-open);
+    @include set-style($colour-grey);
+}
+.constant {
+    @include set-member-style($colour-grey);
+}
+
+section.player_set {
+    @include set-style($colour-amber);
+}
+section.player_set section.player, body>section.player {
+    @include fa-heading($fa-play);
+    @include set-member-style($colour-amber);
+
+    .constant {
+        @include set-member-style($colour-amber);
+    }
+}
+
+section.playlist_set {
+    @include set-style($colour-deep-orange);
+}
+section.playlist_set section.playlist, body>section.playlist {
+    @include fa-heading($fa-list-ol);
+    @include set-member-style($colour-orange);
+}
+
+// Play states
+$p-playing: ( name: "playing", colour: $colour-green,  fa: $fa-play  );
+$p-paused:  ( name: "paused",  colour: $colour-yellow, fa: $fa-pause );
+$p-stopped: ( name: "stopped", colour: $colour-red,    fa: $fa-stop  );
+@each $p in $p-playing, $p-paused, $p-stopped {
+    section.player section.constant.#{map-get($p, name)},
+    body>section.constant.#{map-get($p, name)} {
+        @include set-member-style(map-get($p, colour));
+        @include fa-paragraph(map-get($p, fa));
+    }
+}
+
+// Load states
+$l-ok:      ( name: "ok",      colour: $colour-light-green, fa: $fa-check      );
+$l-loading: ( name: "loading", colour: $colour-light-blue,  fa: $fa-ellipsis-h );
+$l-failed:  ( name: "failed",  colour: $colour-deep-purple, fa: $fa-times      );
+$l-empty:   ( name: "empty",   colour: $colour-brown,       fa: $fa-square-o   );
+@each $l in $l-ok, $l-loading, $l-failed, $l-empty {
+    section.player section.constant.#{map-get($l, name)},
+    body>section.constant.#{map-get($l, name)} {
+        @include set-member-style(map-get($l, colour));
+        @include fa-paragraph(map-get($l, fa));
+    }
+}
+
+// Item types
+$i-file:    ( name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o );
+$i-text:    ( name: "text",    colour: $colour-lime, fa: $fa-file-text-o  );
+$i-library: ( name: "library", colour: $colour-teal, fa: $fa-music        );
+@each $i in $i-file, $i-text, $i-library {
+    section.player section.item.#{map-get($i, name)},
+    body>section.item.#{map-get($i, name)} {
+        @include set-member-style(map-get($i, colour));
+        @include fa-heading(map-get($i, fa));
+    }
+    section.playlist li.item.#{map-get($i, name)} {
+        @include set-member-style(map-get($i, colour));
+        @include fa-before(map-get($i, fa));
     }
 }
