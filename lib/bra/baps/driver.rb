@@ -79,8 +79,7 @@ module Bra
         # client object, which is what hooks into the BRA EventMachine
         # instance.  We need to give it access to parts of the driver config so
         # it knows where and how to connect to BAPS.
-        client_config = [@host, @port, @username, @password]
-        client = Bra::Baps::Client.new(@queue, @logger, *client_config)
+        client = Bra::Baps::Client.new(@queue, @logger, @host, @port)
 
         # The responder receives responses from the BAPS server via the client
         # and reacts on them, either updating the model or asking the requester

@@ -15,32 +15,22 @@ module Bra
     class Client
       # Creates a BAPS client
       #
-      # @api semipublic
-      #
-      # @example Creating a BAPS client.
+      # @api      semipublic
+      # @example  Creating a BAPS client.
       #   queue = EventMachine::Queue.new
-      #   client = Bra::Baps::Client.new(
-      #     queue,
-      #     'localhost',
-      #     1234,
-      #     'example',
-      #     'hunter2'
-      #   )
+      #   client = Bra::Baps::Client.new(queue, 'localhost', 1234)
       #
-      # @param queue [Queue] The requests queue that will connect to this
-      #   client.
-      # @param logger [Logger] The logger, for logging error messages.
-      # @param hostname [String] The host of the BAPS server to which this will
-      #   connect.
-      # @param port [Fixnum] The port of the BAPS server to which this will
-      #   connect.
-      # @param username [String] The username with which the login will occur.
-      # @param password [String] The password with which the login will occur.
-      def initialize(queue, logger, hostname, port, username, password)
+      # @param queue [Queue]
+      #   The requests queue that will connect to this client.
+      # @param logger [Logger]
+      #   The logger, for logging error messages.
+      # @param hostname [String]
+      #   The host of the BAPS server to which this Client will connect.
+      # @param port [Fixnum]
+      #   The port of the BAPS server to which this Client will connect.
+      def initialize(queue, logger, hostname, port)
         @hostname = hostname
         @port = port
-        @username = username
-        @password = password
 
         @channel = EventMachine::Channel.new
         @reader = Reader.new
