@@ -43,15 +43,12 @@ module Bra
         end
       end
 
-
       # Exception generated when the model is improperly configured
       class BadModel < RuntimeError
         def to_s
           'Model is improperly configured.'
         end
       end
-
-
 
       # Exception generated when an update is generated on a model object with
       # no update channel configured
@@ -61,7 +58,7 @@ module Bra
         end
 
         def to_s
-          "Object #{model_object.url} tried to notify an update," +
+          "Object #{model_object.url} tried to notify an update," \
           'but has no updates channel.'
         end
 

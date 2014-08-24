@@ -22,10 +22,10 @@ module Bra
         def_types :float32, :uint32, :string, :load_body, :config_setting
 
         # Some common arguments
-        def_argument_shortcuts :uint32, %i{position count index}
-        def_argument_shortcuts :uint32, %i{old_index new_index}
-        def_argument_shortcuts :uint32, %i{id choice_id option_id}
-        def_argument_shortcuts :string, %i{title description message client}
+        def_argument_shortcuts :uint32, %i(position count index)
+        def_argument_shortcuts :uint32, %i(old_index new_index)
+        def_argument_shortcuts :uint32, %i(id choice_id option_id)
+        def_argument_shortcuts :string, %i(title description message client)
 
         def_struct :unary
         def_struct :marker, position
@@ -34,9 +34,9 @@ module Bra
 
         structures do
           group Codes::Playback do
-            unary  PLAY
-            unary  STOP
-            unary  PAUSE
+            unary PLAY
+            unary STOP
+            unary PAUSE
             marker POSITION
             struct VOLUME, float32(:volume)
             struct LOAD,   index, load_body(:type)
@@ -50,7 +50,7 @@ module Bra
             struct ITEM_COUNT,            count
             struct ITEM_DATA,             index, uint32(:type), title
             # GET is unused
-            unary  RESET
+            unary RESET
             # COPY_ITEM_TO_PLAYLIST is request only
           end
           group Codes::Config do

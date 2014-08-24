@@ -3,7 +3,6 @@ require 'eventmachine'
 
 module Bra
   module Baps
-
     # An object that handles the connection from bra to the BAPS server
     class Connection < EventMachine::Connection
       extend Forwardable
@@ -55,10 +54,9 @@ module Bra
       # @return [void]
       #
       def unbind
-        unless @closing
-          @logger.fatal('Lost connection to BAPS, dying.')
-          EventMachine.stop
-        end
+        return if @closing
+        @logger.fatal('Lost connection to BAPS, dying.')
+        EventMachine.stop
       end
 
       private

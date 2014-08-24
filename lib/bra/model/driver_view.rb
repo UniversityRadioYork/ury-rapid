@@ -20,7 +20,7 @@ module Bra
         find(url) { |resource| resource }
       end
 
-      %w{put post delete}.each do |action|
+      %w(put post delete).each do |action|
         define_method(action) do |url, *args|
           find(url) { |resource| resource.send("driver_#{action}", *args) }
         end

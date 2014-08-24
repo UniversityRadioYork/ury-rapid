@@ -32,15 +32,15 @@ module Bra
       private
 
       def add_handler_targets(handler_class)
-        handler_class.register_into(self) if has_targets?(handler_class)
+        handler_class.register_into(self) if targets?(handler_class)
       end
 
-      def has_targets?(handler_class)
-        valid_class?(handler_class) && handler_class.has_targets?
+      def targets?(handler_class)
+        valid_class?(handler_class) && handler_class.targets?
       end
 
       def valid_class?(handler_class)
-        handler_class.respond_to?(:has_targets?)
+        handler_class.respond_to?(:targets?)
       end
 
       # Compiles a list of all handlers to register

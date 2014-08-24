@@ -17,13 +17,13 @@ describe Bra::Baps::Reader do
       end
     end
     context 'when called before an incremental data send' do
-      let(:value) { 32767 }
+      let(:value) { 32_767 }
       it 'requests a 16-bit integer' do
         test_split_data(:uint16, Bra::Baps::FormatStrings::UINT16)
       end
     end
     context 'when called after a single, full data send' do
-      let(:value) { 65535 }
+      let(:value) { 65_535 }
       it 'requests a 16-bit integer' do
         test_post_data(:uint16, Bra::Baps::FormatStrings::UINT16)
       end

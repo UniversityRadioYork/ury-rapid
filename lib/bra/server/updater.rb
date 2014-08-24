@@ -32,16 +32,15 @@ module Bra
 
       attr_reader :running
 
-      def register(&block)
+      def register(&_)
         @id = @model.register_for_updates(&method(:pack_and_send))
         @running = true
       end
 
       def pack_and_send(update)
         resource, repr = update
-        if @privileges && resource.can?(:get, @privileges)
-          send_json(type: :update, resource.url => repr)
-        end
+        return unless @privileges && resource.can?(:get, @privileges)
+        send_json(type: :update, resource.url => repr)
       end
 
       def error(message)

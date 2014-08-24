@@ -80,7 +80,7 @@ describe Bra::Model::ComponentCreator do
   end
 
   shared_examples 'a successful number volume call' do |examples|
-    it "returns an object whose #flat is equal to its input" do
+    it 'returns an object whose #flat is equal to its input' do
       examples.each do |example|
         expect(subject.volume(example).flat).to eq(example)
       end
@@ -88,7 +88,7 @@ describe Bra::Model::ComponentCreator do
   end
 
   shared_examples 'a successful string volume call' do |examples|
-    it "returns an object whose #flat is equal to Rational(input)" do
+    it 'returns an object whose #flat is equal to Rational(input)' do
       examples.each do |example|
         expect(subject.volume(example).flat).to eq(Rational(example))
       end
@@ -111,12 +111,12 @@ describe Bra::Model::ComponentCreator do
       context 'and it represents a valid rational between 0 and 1.0' do
         it_behaves_like(
           'a successful string volume call',
-          %w{0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0}
+          %w(0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0)
         )
       end
 
       context 'and it represents a valid integer between 0 and 1' do
-        it_behaves_like 'a successful string volume call', %w{0 1}
+        it_behaves_like 'a successful string volume call', %w(0 1)
       end
     end
 
@@ -154,7 +154,7 @@ describe Bra::Model::ComponentCreator do
     context 'when the value is a string' do
       context 'and it represents a valid natural' do
         it 'returns an object whose #flat equals its input as an Integer' do
-          %w{0 1 10 100 1000}.each do |example|
+          %w(0 1 10 100 1000).each do |example|
             expect(subject.marker(:foo, example).flat).to eq(Integer(example))
           end
         end
@@ -236,4 +236,3 @@ describe Bra::Model::ComponentCreator do
     end
   end
 end
-

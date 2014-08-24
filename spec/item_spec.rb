@@ -9,11 +9,10 @@ describe Bra::Model::Item do
   describe '#flat' do
     it 'flattens the Item into a hash representation' do
       expect(subject.flat).to eq(
-        { name:     attrs[:name],
-          type:     attrs[:type],
-          origin:   attrs[:origin],
-          duration: attrs[:duration]
-        }
+        name:     attrs[:name],
+        type:     attrs[:type],
+        origin:   attrs[:origin],
+        duration: attrs[:duration]
       )
     end
   end

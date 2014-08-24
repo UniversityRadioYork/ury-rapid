@@ -44,7 +44,7 @@ module Bra
         end
       end
 
-      def self.has_targets?
+      def self.targets?
         defined?(self::TARGETS) && !(self::TARGETS.empty?)
       end
 
@@ -52,7 +52,7 @@ module Bra
       def self.register_into(set)
         self::TARGETS.each do |target|
           set.register_handler(target, ->(*args) { new(set, *args).run })
-          set.log(:info, "Registered #{to_s} for #{target}.")
+          set.log(:info, "Registered #{self} for #{target}.")
         end
       end
 

@@ -76,4 +76,3 @@ module Bra
     end
   end
 end
-

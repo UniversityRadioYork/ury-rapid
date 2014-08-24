@@ -10,15 +10,17 @@ require 'bra/server'
 
 require 'kankri'
 
-# Extends Sinatra's requests to include WebSocket extensions
-#
-# This doesn't seem to happen by default in some cases.
-class Sinatra::Request
-  include SinatraWebsocket::Ext::Sinatra::Request
+module Sinatra
+  # Extends Sinatra's requests to include WebSocket extensions
+  #
+  # This doesn't seem to happen by default in some cases.
+  class Request
+    include SinatraWebsocket::Ext::Sinatra::Request
+  end
 end
 
 module Bra
-module Server
+  module Server
     # The Sinatra application that powers the server component of bra
     class App < Sinatra::Base
       register Sinatra::Contrib
@@ -35,7 +37,6 @@ module Server
 
         config[:root_directory].try { |root| settings.set :root, root }
       end
-
 
       helpers InspectorHelpers
       helpers Sinatra::Streaming
@@ -58,7 +59,7 @@ module Server
       end
 
       def get_credentials(auth)
-        fail_authentication unless has_credentials?(auth)
+        fail_authentication unless credentials?(auth)
         auth.credentials
       end
 
@@ -66,7 +67,7 @@ module Server
         fail(Kankri::AuthenticationFailure)
       end
 
-      def has_credentials?(auth)
+      def credentials?(auth)
         auth.provided? && auth.basic? && auth.credentials
       end
 
@@ -150,7 +151,7 @@ module Server
         wrap { @model.get(request_url, &method(:handle_get)) }
       end
 
-      %i{put post delete}.each do |action|
+      %i(put post delete).each do |action|
         define_method(action) do
           wrap { @model.send(action, request_url, privilege_set, raw_payload) }
         end
@@ -230,7 +231,7 @@ module Server
         catch(:halt) do
           respond_with(
             :error,
-            { status: :error, error: message, http_code: code }
+            status: :error, error: message, http_code: code
           )
         end
       end
@@ -243,7 +244,7 @@ module Server
       # @return [String]  The OK message, rendered according to the client's
       #   Accept headers.
       def ok
-        respond_with :ok, { status: :ok }
+        respond_with :ok, status: :ok
       end
     end
   end

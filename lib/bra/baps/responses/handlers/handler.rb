@@ -7,7 +7,6 @@ module Bra
         # Extension to normal response handlers, including BAPS specific
         # functions
         class Handler < Bra::DriverCommon::Responses::Handler
-
           protected
 
           # Generates an URL to a channel player given a BAPS response

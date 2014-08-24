@@ -11,7 +11,7 @@ module Bra
         find(url) { |object| yield object }
       end
 
-      %i{put post delete}.each do |action|
+      %i(put post delete).each do |action|
         define_method(action) do |url, privilege_set, raw_payload|
           find(url) do |object|
             payload = make_payload(action, privilege_set, raw_payload, object)

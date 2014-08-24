@@ -27,7 +27,7 @@ module Bra
         end
 
         def run
-          self.send(@action)
+          send(@action)
         end
 
         # Requests that a DELETE on this handler be sent to the item's children
@@ -40,25 +40,25 @@ module Bra
         end
 
         def self.use_payload_processor_for(action, *ids)
-          add_id_hook(action, ids) do |handler, object, payload|
+          add_id_hook(action, ids) do |handler, _object, payload|
             payload.process(handler)
           end
         end
 
         def self.post_by_putting_to_child_for(*ids)
-          add_id_hook(:post, ids) do |handler, object, payload|
+          add_id_hook(:post, ids) do |_handler, object, payload|
             object.get_child(payload.id).put(payload)
           end
         end
 
         def self.put_by_payload_processor
-          add_hook(:put) do |handler, object, payload|
+          add_hook(:put) do |handler, _object, payload|
             payload.process(handler)
           end
         end
 
         def self.put_by_posting_to_parent
-          add_hook(:put) do |handler, object, payload|
+          add_hook(:put) do |_handler, object, payload|
             object.post_to_parent(payload)
           end
         end
@@ -83,7 +83,7 @@ module Bra
         # Generates NotSupportedByDriver stubs for the given methods
         def self.driver_should_override(*methods)
           methods.each do |method|
-            define_method(method) do |*args|
+            define_method(method) do |*_args|
               fail(Bra::Common::Exceptions::NotSupportedByDriver)
             end
           end
@@ -98,7 +98,7 @@ module Bra
         def_delegator :@parent, :request
 
         # Default to a 'not supported' exception on all actions.
-        %i{put post delete}.each do |action|
+        %i(put post delete).each do |action|
           define_method(action) do |*|
             run_hooks(action) || fail(
               Bra::Common::Exceptions::NotSupportedByBra

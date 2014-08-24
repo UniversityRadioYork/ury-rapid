@@ -43,7 +43,7 @@ module Bra
       # @param payload [String]  The payload: for the Log, this should be the
       #   string to log.
       def driver_post(id, payload)
-        fail(ArgumentError) unless %i{debug info warn fatal error}.include?(id)
+        fail(ArgumentError) unless %i(debug info warn fatal error).include?(id)
         @logger.send(id, payload)
       end
     end

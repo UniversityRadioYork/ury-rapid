@@ -5,6 +5,7 @@ module Bra
   module Baps
     module Responses
       module Handlers
+        # Base class for BAPS2 playback response handlers
         class PlayerHandler < Handler
           def run
             do_post unless ignore_response?
@@ -21,7 +22,7 @@ module Bra
           end
         end
 
-        # Handles a BAPS channel state change
+        # Handler for BAPS2 channel state changes
         class State < PlayerHandler
           def_targets(
             Codes::Playback::PLAY,
@@ -54,6 +55,7 @@ module Bra
           end
         end
 
+        # Handler for BAPS2 channel volume changes
         class Volume < PlayerHandler
           def_targets Codes::Playback::VOLUME
 
@@ -72,7 +74,7 @@ module Bra
           end
         end
 
-        # Handles a BAPS channel marker change
+        # Handler for BAPS2 channel marker changes
         class Marker < PlayerHandler
           def_targets(
             Codes::Playback::POSITION,
@@ -83,7 +85,7 @@ module Bra
           CODES_TO_MARKERS = {
             Codes::Playback::POSITION => :position,
             Codes::Playback::CUE      => :cue,
-            Codes::Playback::INTRO    => :intro,
+            Codes::Playback::INTRO    => :intro
           }
 
           private
@@ -101,7 +103,7 @@ module Bra
           end
         end
 
-        # Handles a BAPS item load
+        # Handler for BAPS2 channel loads
         class Load < LoaderHandler
           def_targets Codes::Playback::LOAD
 

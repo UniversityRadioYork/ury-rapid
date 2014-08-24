@@ -92,7 +92,7 @@ module Bra
             stopped: {
               # BAPS allows us to pause while the song is stopped.  This makes
               # little sense, and bra disallows it, so we ignore it.
-              playing: Codes::Playback::PLAY,
+              playing: Codes::Playback::PLAY
             }
           }
         end

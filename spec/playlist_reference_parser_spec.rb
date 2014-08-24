@@ -23,7 +23,7 @@ describe MockPrp do
   describe '#parse_playlist_reference_url' do
     context 'when given a String representing an Integer' do
       it 'returns an Array containing #local_playlist_id and the Integer' do
-        [0, 1, 10, 100, 23456].each do |example|
+        [0, 1, 10, 100, 23_456].each do |example|
           expect(
             subject.parse_playlist_reference_url(example.to_s)
           ).to eq([subject.local_playlist_id, example])
@@ -34,7 +34,7 @@ describe MockPrp do
     context 'when given a String with a slash followed by an Integer' do
       context 'and the prefix represents an Integer' do
         it 'returns an Array of the prefix as an Integer and the Integer' do
-          [0, 1, 10, 100, 23456].each do |number|
+          [0, 1, 10, 100, 23_456].each do |number|
             [2, 4, 6, 8, 999].each do |playlist|
               expect(
                 subject.parse_playlist_reference_url("#{playlist}/#{number}")
@@ -45,8 +45,8 @@ describe MockPrp do
       end
       context 'and the prefix does not represent an Integer' do
         it 'returns an Array of the prefix as a Symbol and the Integer' do
-          [0, 1, 10, 100, 23456].each do |number|
-            %w{flibble dibble purple doggie doo}.each do |playlist|
+          [0, 1, 10, 100, 23_456].each do |number|
+            %w(flibble dibble purple doggie doo).each do |playlist|
               expect(
                 subject.parse_playlist_reference_url("#{playlist}/#{number}")
               ).to eq([playlist.to_sym, number])
@@ -58,7 +58,7 @@ describe MockPrp do
 
     context 'when given a String with a slash followed by a non-Integer' do
       specify do
-        expect { subject.parse_playlist_reference_url("squir/tle") }.to(
+        expect { subject.parse_playlist_reference_url('squir/tle') }.to(
           raise_error
         )
       end

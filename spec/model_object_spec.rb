@@ -70,7 +70,7 @@ describe Bra::Model::ModelObject do
     end
   end
 
-  %i{put post delete}.each do |action|
+  %i(put post delete).each do |action|
     describe "##{action}" do
       let(:payload) { Bra::Common::Payload.new(:body, privilege_set) }
       before(:each) do

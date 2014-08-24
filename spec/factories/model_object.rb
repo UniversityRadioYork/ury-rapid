@@ -8,7 +8,7 @@ end
 FactoryGirl.define do
   factory :model_object, class: MockModelObject do
     handler_target nil
-    
+
     ignore do
       channel Bra::Model::UpdateChannel.new
     end

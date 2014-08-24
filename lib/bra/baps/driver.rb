@@ -19,8 +19,6 @@ module Bra
       def initialize(logger)
         @logger = logger
 
-        #log_initialisation
-
         # We need a queue for requests to the BAPS server to be funneled
         # through.  This will later need to be given to the actual BAPS client
         # to read from, and also to the requester to write to.
@@ -28,8 +26,8 @@ module Bra
         # @requester and @client.
         @queue = EventMachine::Queue.new
 
-        # The requester contains all the logic for instructing BAPS to make model
-        # changes happen.
+        # The requester contains all the logic for instructing BAPS to make
+        # model changes happen.
         @requester = Bra::Baps::Requests::Requester.new(@queue, @logger)
 
         # Default configuration values.
@@ -45,16 +43,14 @@ module Bra
 
       def host(host, port)
         @host = host
-        @prt = port
+        @port = port
       end
 
-      def username(username)
-        @username = username
-      end
+      attr_writer :username
+      alias_method :username, :username=
 
-      def password(password)
-        @password = password
-      end
+      attr_writer :password
+      alias_method :password, :password=
 
       def num_channels(channels)
         @channel_ids = (0...channels).to_a
@@ -83,21 +79,24 @@ module Bra
         client = Bra::Baps::Client.new(@queue, @logger, *client_config)
 
         # The responder receives responses from the BAPS server via the client
-        # and reacts on them, either updating the model or asking the requester to
-        # intervene.
+        # and reacts on them, either updating the model or asking the requester
+        # to intervene.
         #
         # We'd make the responder earlier, but we need access to the model,
         # which we only get definitive access to here.
-        responder = Bra::Baps::Responses::Responder.new(@driver_view, @requester)
+        responder = Bra::Baps::Responses::Responder.new(
+          @driver_view,
+          @requester
+        )
 
         # Now we can run the client, passing it the responder so it can send
         # BAPS responses to it.  The client will get BAPS requests sent to it
         # via the queue, thus completing the communication paths.
         client.run(responder)
 
-        # Finally, get the ball rolling by asking the requester to initiate log-in.
-        # This sets up a chain reaction between the requester and responder that
-        # brings up the server connection.
+        # Finally, get the ball rolling by asking the requester to initiate
+        # log-in.  This sets up a chain reaction between the requester and
+        # responder that brings up the server connection.
         @requester.login_initiate
       end
 
@@ -122,13 +121,17 @@ module Bra
           @logger,
           players: @channel_ids,
           playlists: @channel_ids,
-          server_config: {
-            host: @host,
-            port: @port,
-            username: @username,
-            password: @password
-          }
+          server_config: server_config
         )
+      end
+
+      def server_config
+        {
+          host: @host,
+          port: @port,
+          username: @username,
+          password: @password
+        }
       end
     end
   end

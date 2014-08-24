@@ -12,7 +12,11 @@ module Bra
       class Creator < Bra::Model::Structures::PlayoutModel
         def playout_extensions
           log :log
+          x_baps_extension
+          info_extension
+        end
 
+        def x_baps_extension
           hash :x_baps, :x_baps do
             hash :server, :x_baps_server do
               option(:server_config).each do |(key, value)|
@@ -20,7 +24,9 @@ module Bra
               end
             end
           end
+        end
 
+        def info_extension
           hash :info, :info do
             component :channel_mode, :constant, true, :channel_mode
           end

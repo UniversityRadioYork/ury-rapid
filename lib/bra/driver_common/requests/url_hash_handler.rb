@@ -42,7 +42,7 @@ module Bra
         end
 
         # Set up the main Poster methods to reference the jump tables above
-        %i{url hash}.each do |style|
+        %i(url hash).each do |style|
           define_method(style) do |type, rest|
             instance_exec(rest, &processed_payload_handler(style, type))
           end
@@ -50,7 +50,7 @@ module Bra
 
         # Shorthand for creating a type that takes playlist references
         def self.playlist_reference_type(type, &block)
-          self.url_and_hash_type(
+          url_and_hash_type(
             type,
             ->(url) { parse_playlist_reference_url(url) },
             ->(hash) { parse_playlist_reference_hash(hash) },
@@ -84,7 +84,7 @@ module Bra
           self.class.types[style].fetch(type, method(:unsupported_type))
         end
 
-        def unsupported_type(*args)
+        def unsupported_type(*_args)
           fail(Bra::Common::Exceptions::InvalidPayload, 'Invalid payload type.')
         end
       end

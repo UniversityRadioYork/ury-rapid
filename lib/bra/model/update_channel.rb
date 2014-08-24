@@ -39,11 +39,11 @@ module Bra
     # A null object signifying an absence of update channel
     class NoUpdateChannel
       def notify_update(object)
-        fail(Bra::Common::Exceptions::MissingUpdateChannel, object)        
+        fail(Bra::Common::Exceptions::MissingUpdateChannel, object)
       end
 
       def notify_delete(object)
-        fail(Bra::Common::Exceptions::MissingUpdateChannel, object)        
+        fail(Bra::Common::Exceptions::MissingUpdateChannel, object)
       end
     end
 

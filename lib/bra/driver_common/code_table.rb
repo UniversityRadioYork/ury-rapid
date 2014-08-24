@@ -42,7 +42,7 @@ module Bra
       def find_code_in(submodule, code)
         ( submodule.constants
           .find { |name| submodule.const_get(name) == code }
-          .try  { |name| "#{submodule.to_s}::#{name}" }
+          .try  { |name| "#{submodule}::#{name}" }
         )
       end
     end

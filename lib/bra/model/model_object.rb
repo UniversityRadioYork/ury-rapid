@@ -6,7 +6,7 @@ require 'bra/model/update_channel'
 
 module Bra
   module Model
-    # An object in the bra playout system model.
+    # An object in the bra playout system model
     #
     # ModelObjects are composable entities, each assigned an ID by its parent,
     # that form a model tree traversable by relative URLs.
@@ -57,7 +57,7 @@ module Bra
       end
 
       # The flat representation of this model object
-      # 
+      #
       # Usually, this is just the mapping of #flat to this object's children.
       # Objects should override this if they are not simply containers of other
       # children.
@@ -70,9 +70,8 @@ module Bra
         parent.post(payload)
       end
 
-      %i{put post delete}.each do |action|
+      %i(put post delete).each do |action|
         # Define payload-based server methods.
-
         define_method(action) do |payload|
           fail_if_cannot(action, payload.privilege_set)
           @handler.call(action, self, payload)
@@ -105,17 +104,16 @@ module Bra
       #
       # @return [void]
       def driver_post(id, resource)
-        unless resource.nil?
-          resource.move_to(self, id)
-          resource.notify_update
-        end
+        return if resource.nil?
+        resource.move_to(self, id)
+        resource.notify_update
       end
 
       # Default implementation of DELETE on model objects
       #
       # This instructs the object's children to delete themselves.  Since
-      # #each is a no-op on Compo::Branches::Leaf, this is safe to use with any model
-      # object.
+      # #each is a no-op on Compo::Branches::Leaf, this is safe to use with any
+      # model object.
       #
       # @return [void]
       def driver_delete

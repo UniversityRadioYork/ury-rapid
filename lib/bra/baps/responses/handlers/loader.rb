@@ -35,7 +35,7 @@ module Bra
         # A method object for loading an Item object into the model
         class ItemLoader
           # Stop handler loaders from trying to load handlers from this class.
-          def self.has_targets?
+          def self.targets?
             false
           end
 
@@ -78,7 +78,7 @@ module Bra
           extend Forwardable
 
           # Stop handler loaders from trying to load handlers from this class.
-          def self.has_targets?
+          def self.targets?
             false
           end
 

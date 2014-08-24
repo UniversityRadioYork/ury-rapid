@@ -13,7 +13,7 @@ describe Bra::Common::Payload do
   describe '#id' do
     context 'when the payload body is a Hash with one key' do
       context 'and the key is a String representing an Integer' do
-        let(:body) { { "300" => :body } }
+        let(:body) { { '300' => :body } }
         it 'returns that key as an Integer' do
           expect(subject.id).to eq(300)
         end
@@ -61,7 +61,7 @@ describe Bra::Common::Payload do
       context 'and the hash has a Symbol parameter' do
         let(:body) { { type: :test_type, foo: :bar } }
         it 'calls #hash on the argument, with the type and rest of the hash' do
-          expect(receiver).to receive(:hash).with(body[:type], { foo: :bar })
+          expect(receiver).to receive(:hash).with(body[:type], foo: :bar)
 
           subject.process(receiver)
         end
@@ -77,7 +77,7 @@ describe Bra::Common::Payload do
         let(:body) { { type: 'XBaps', foo: :bar } }
         it 'calls #hash on the argument, with downcase Symbol type and body' do
           expect(receiver).to receive(:hash).with(
-            body[:type].downcase.intern, { foo: :bar }
+            body[:type].downcase.intern, foo: :bar
           )
 
           subject.process(receiver)

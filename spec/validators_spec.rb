@@ -25,7 +25,7 @@ describe Bra::Common::Types::Validators do
   end
 
   describe '#validate_symbol' do
-    let(:symbols) { %i{winner taco} }
+    let(:symbols) { %i(winner taco) }
     context 'when the input is a symbol in the range' do
       it 'returns the symbol' do
         expect(subject.validate_symbol(:winner, symbols)).to eq(:winner)

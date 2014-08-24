@@ -10,7 +10,6 @@ module Bra
       def_delegator :@handlers, :merge!, :add_handlers
       def_delegator :@options, :[], :option
 
-
       # Creates a model object that represents the bra log
       def log
         create_model_object(:log, @logger)

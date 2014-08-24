@@ -1,6 +1,7 @@
 require 'bra/launcher'
 require 'bra/common/constants'
 
+# The Bra system.
 module Bra
   def self.from_config_file(file = nil)
     Bra::Launcher.launch(get_config(file))

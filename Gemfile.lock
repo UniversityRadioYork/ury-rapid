@@ -110,7 +110,7 @@ PLATFORMS
 
 DEPENDENCIES
   bra!
-  bundler (~> 1.6)
+  bundler (~> 1.7)
   factory_girl (~> 4)
   rake
   rspec

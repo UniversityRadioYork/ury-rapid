@@ -40,7 +40,7 @@ module Bra
           #   Loads a track from the BAPS Record Library, with the given IDs
           #   and metadata.
           hash_type :x_baps_direct do |item|
-            direct(*item.values_at(*%i{record_id track_id title artist}))
+            direct(*item.values_at(*%i(record_id track_id title artist)))
           end
 
           #
@@ -101,7 +101,7 @@ module Bra
           private
 
           def add_item_request(type_symbol, &block)
-            type = Types::Track::const_get(type_symbol.upcase)
+            type = Types::Track.const_get(type_symbol.upcase)
             request Codes::Playlist::ADD_ITEM, caller_id do
               uint32 type
               instance_exec(&block)

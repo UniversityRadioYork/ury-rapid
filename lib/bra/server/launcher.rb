@@ -9,7 +9,7 @@ module Bra
     # This object exposes a DSL to the bra configuration.
     class Launcher
       def initialize(model_view, authenticator)
-	      @model_view    = model_view
+        @model_view    = model_view
         @authenticator = authenticator
         @rack = 'thin'
         @host = '0.0.0.0'
@@ -27,9 +27,8 @@ module Bra
       end
 
       # Sets the URL root of the server
-      def url_root(root)
-        @root = root
-      end
+      attr_writer :root
+      alias_method :url_root, :root=
 
       # Sets the file system root of the server
       def file_root(root)
@@ -86,7 +85,7 @@ module Bra
         COMPATIBLE_SERVERS.include?(@rack)
       end
 
-      COMPATIBLE_SERVERS = %w{thin hatetepe goliath}
+      COMPATIBLE_SERVERS = %w(thin hatetepe goliath)
     end
   end
 end

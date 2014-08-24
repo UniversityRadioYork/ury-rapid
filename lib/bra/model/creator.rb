@@ -54,7 +54,6 @@ module Bra
       end
 
       def set(set_id, set_target, child_class, child_ids, child_target, &block)
-        puts "#{set_id} #{set_target} #{child_class} #{child_ids} #{child_target}"
         hash(set_id, set_target) do
           children(child_ids, child_class, child_target, &block)
         end

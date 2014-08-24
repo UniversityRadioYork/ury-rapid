@@ -34,10 +34,10 @@ describe Bra::Launcher do
     }
   end
 
-  MAKERS = %i{
+  MAKERS = %i(
     app auth channel logger model_configurator model_structure
     driver_view server_view
-  }
+  )
 
   MAKERS.each do |maker|
     sym = "#{maker}_maker".to_sym

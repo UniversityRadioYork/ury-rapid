@@ -41,31 +41,31 @@ end
 # This is where users for the server's authentication system can be defined,
 # and their permissions set.  The [users] section maps usernames to
 # information about that username.
-user :admin do 
+user :admin do
   {
     password: 'hunter2',
     privileges: {
-      root: %i{get},
-      player_set: %i{get put post delete},
-      player: %i{get put post},
-      playlist_set: %i{get put post delete},
-      playlist: %i{get put post delete},
-      item: %i{get put post delete},
-      state: %i{get put post delete},
-      load_state: %i{get put post delete},
-      cue: %i{get put post delete},
-      intro: %i{get put post delete},
-      duration: %i{get put post delete},
-      position: %i{get put post delete},
-      volume: %i{get put post delete},
+      root: %i(get),
+      player_set: %i(get put post delete),
+      player: %i(get put post),
+      playlist_set: %i(get put post delete),
+      playlist: %i(get put post delete),
+      item: %i(get put post delete),
+      state: %i(get put post delete),
+      load_state: %i(get put post delete),
+      cue: %i(get put post delete),
+      intro: %i(get put post delete),
+      duration: %i(get put post delete),
+      position: %i(get put post delete),
+      volume: %i(get put post delete),
       # BAPS2
-      x_baps: %i{get},
-      x_baps_server: %i{get},
-      x_baps_server_constant: %i{get},
+      x_baps: %i(get),
+      x_baps_server: %i(get),
+      x_baps_server_constant: %i(get),
       # Info
-      info: %i{get},
-      version: %i{get},
-      channel_mode: %i{get}
+      info: %i(get),
+      version: %i(get),
+      channel_mode: %i(get)
     }
   }
 end
@@ -73,4 +73,4 @@ end
 # The [model] is the part of bra that tracks the playout system's state and
 # allows it to be viewed and manipulated as a collection of objects.
 #
-model Bra::Model::Structures::Standard 
+model Bra::Model::Structures::Standard

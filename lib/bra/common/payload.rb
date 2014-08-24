@@ -80,7 +80,7 @@ module Bra
 
       # The order of these is important - place specific types before more
       # general ones
-      TYPES = %i{hash url integer float string}
+      TYPES = %i(hash url integer float string)
 
       def run
         TYPES.any?(&method(:try_type))
@@ -146,7 +146,7 @@ module Bra
       # @return [Boolean] true if the body was a URL and was handled; false
       #   otherwise.
       def validate_url
-        is_valid_url?.tap { |valid| yield(*split_url) if valid }
+        valid_url?.tap { |valid| yield(*split_url) if valid }
       end
 
       # Yields the protocol and body of an object if it is a raw string
@@ -158,7 +158,7 @@ module Bra
       # @return [Boolean] true if the body was a string and was handled; false
       #   otherwise.
       def validate_string
-        is_valid_string?.tap { |valid| yield @body.to_s if valid }
+        valid_string?.tap { |valid| yield @body.to_s if valid }
       end
 
       # Yields the protocol and body of an object if it is an integer
@@ -170,7 +170,7 @@ module Bra
       # @return [Boolean] true if the body was an integer and was handled;
       #   false otherwise.
       def validate_integer
-        is_valid_integer?.tap { |valid| yield Integer(@body) if valid }
+        valid_integer?.tap { |valid| yield Integer(@body) if valid }
       end
 
       # Yields the protocol and body of an object if it is a float
@@ -182,7 +182,7 @@ module Bra
       # @return [Boolean] true if the body was n float and was handled;
       #   false otherwise.
       def validate_float
-        is_valid_float?.tap { |valid| yield Float(@body) if valid }
+        valid_float?.tap { |valid| yield Float(@body) if valid }
       end
 
       # Yields the type and body of an object if it is a hash
@@ -199,21 +199,21 @@ module Bra
       # @return [Boolean] true if the body was a hash and was handled; false
       #   otherwise.
       def validate_hash
-        is_valid_hash?.tap { |valid| yield(*split_hash) if valid }
+        valid_hash?.tap { |valid| yield(*split_hash) if valid }
       end
 
       # Whether the payload is a valid hash format payload
-      def is_valid_hash?
+      def valid_hash?
         @body.is_a?(Hash)
       end
 
       # Whether the payload is a valid URL or pseudo-URL
-      def is_valid_url?
-        is_valid_string? && @body.to_s.include?(PROTOCOL_SPLITTER)
+      def valid_url?
+        valid_string? && @body.to_s.include?(PROTOCOL_SPLITTER)
       end
 
       # Whether the payload is a valid plain string
-      def is_valid_string?
+      def valid_string?
         @body.respond_to?(:to_s)
       end
 
@@ -221,7 +221,7 @@ module Bra
       #
       # This includes values that can be coerced into integers, such as
       # integral strings.
-      def is_valid_integer?
+      def valid_integer?
         # A nicer way of doing this would be appreciated.
         # Could use respond_to?(:to_i), but this is too lenient.
         Integer(@body)
@@ -234,7 +234,7 @@ module Bra
       #
       # This includes values that can be coerced into floats, such as
       # decimal strings.
-      def is_valid_float?
+      def valid_float?
         # A nicer way of doing this would be appreciated.
         Float(@body)
         true

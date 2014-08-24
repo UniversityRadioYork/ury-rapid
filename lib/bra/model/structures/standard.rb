@@ -19,14 +19,15 @@ module Bra
         def create
           root do
             info :info
-            log  :log
+            log :log
           end
         end
 
         # Builds the bra information model.
         def info(id)
           hash(id, :info) do
-            component :version, :constant, Bra::Common::Constants::VERSION, :version
+            ver = Bra::Common::Constants::VERSION
+            component :version, :constant, ver, :version
           end
         end
       end

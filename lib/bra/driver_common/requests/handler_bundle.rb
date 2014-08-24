@@ -26,7 +26,7 @@ module Bra
         # Constructs a new handler with the given arguments
         def handler_with_class(base_class, name, *targets, &block)
           cls = Class.new(base_class) do
-            def_targets *targets
+            def_targets(*targets)
 
             class_eval(&block)
           end

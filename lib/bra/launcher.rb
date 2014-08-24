@@ -77,8 +77,8 @@ module Bra
 
     def app_arguments
       logger = make_logger
-      config, global_driver_view, global_server_view = mkmodel(logger)
-      drivers = make_drivers(logger, global_driver_view, config)
+      global_driver_view, global_server_view = mkmodel(logger)
+      drivers = make_drivers(logger, global_driver_view)
       servers = make_servers(logger, global_server_view)
       [drivers, servers, global_driver_view]
     end
@@ -87,15 +87,15 @@ module Bra
     # Driver
     #
 
-    def make_drivers(logger, model_view, model_config)
+    def make_drivers(logger, model_view)
       @drivers.map do |name, driver_class, driver_config|
         driver_class.new(logger)
                     .tap { |d| d.instance_exec(&driver_config) }
-                    .tap { |d| init_driver(name, model_view, d, model_config) }
+                    .tap { |d| init_driver(name, model_view, d) }
       end
     end
 
-    def init_driver(name, model_view, driver, model_config)
+    def init_driver(name, model_view, driver)
       sub_structure, register_driver_view = driver.sub_model(@update_channel)
       sub_model = sub_structure.create
       add_driver_model(model_view, name, sub_model)
@@ -117,7 +117,7 @@ module Bra
     def mkmodel(logger)
       structure = @model_structure.new(@update_channel, logger, @model_config)
       model = structure.create
-      [model, make_driver_view(model, structure), make_server_view(model)]
+      [make_driver_view(model, structure), make_server_view(model)]
     end
 
     def model_configurator(logger)
@@ -130,8 +130,8 @@ module Bra
     # Server
     #
 
-    def make_servers(logger, global_driver_view)
-      @servers.map do |name, server_class, server_config|
+    def make_servers(_logger, global_driver_view)
+      @servers.map do |_name, server_class, server_config|
         server_class.new(global_driver_view, @auth).tap do |server|
           server.instance_eval(&server_config)
         end
@@ -147,7 +147,7 @@ module Bra
         app:     Bra::App.method(:new),
         auth:    Kankri.method(:authenticator_from_hash),
         channel: Bra::Model::UpdateChannel.method(:new),
-        logger:  method(:default_logger),
+        logger:  method(:default_logger)
       ).reverse_merge(model_defaults)
     end
 
@@ -155,7 +155,7 @@ module Bra
       {
         driver_view:        Bra::Model::DriverView.method(:new),
         model_configurator: Bra::Model::Config.method(:new),
-        server_view:        Bra::Model::ServerView.method(:new),
+        server_view:        Bra::Model::ServerView.method(:new)
       }
     end
 
@@ -167,11 +167,10 @@ module Bra
       # TODO: Allow redirecting
       output = STDERR
       Logger.new(STDERR).tap do |logger|
-        logger.formatter = proc do |severity, datetime, progname, msg|
-          [ format_date(datetime, output),
-            format_severity(severity, output),
-            msg
-          ].join(' ') + "\n"
+        logger.formatter = proc do |severity, datetime, _progname, msg|
+          [format_date(datetime, output),
+           format_severity(severity, output),
+           msg].join(' ') + "\n"
         end
       end
     end

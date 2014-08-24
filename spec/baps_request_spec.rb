@@ -25,9 +25,9 @@ describe Bra::Baps::Requests::Request do
   describe '#uint16' do
     context 'with a 16-bit integer' do
       it 'adds the integer in BAPS format to its payload' do
-        request.uint16(65535).to(queue)
+        request.uint16(65_535).to(queue)
         expect(queue.pop).to eq(
-          [103, 2, 65535].pack(
+          [103, 2, 65_535].pack(
             Bra::Baps::FormatStrings::UINT16 +
             Bra::Baps::FormatStrings::UINT32 +
             Bra::Baps::FormatStrings::UINT16
@@ -37,8 +37,8 @@ describe Bra::Baps::Requests::Request do
     end
     context 'with multiple 16-bit integers' do
       it 'behaves as if each had been added separately' do
-        request.uint16(1).uint16(100).uint16(65536).to(queue)
-        request_two.uint16(1, 100, 65536).to(queue)
+        request.uint16(1).uint16(100).uint16(65_536).to(queue)
+        request_two.uint16(1, 100, 65_536).to(queue)
         a = queue.pop
         b = queue.pop
         expect(a).to eq(b)
@@ -49,9 +49,9 @@ describe Bra::Baps::Requests::Request do
   describe '#uint32' do
     context 'with a 32-bit integer' do
       it 'adds the integer in BAPS format to its payload' do
-        request.uint32(65535).to(queue)
+        request.uint32(65_535).to(queue)
         expect(queue.pop).to eq(
-          [103, 4, 65535].pack(
+          [103, 4, 65_535].pack(
             Bra::Baps::FormatStrings::UINT16 +
             Bra::Baps::FormatStrings::UINT32 +
             Bra::Baps::FormatStrings::UINT32
@@ -61,8 +61,8 @@ describe Bra::Baps::Requests::Request do
     end
     context 'with multiple 32-bit integers' do
       it 'behaves as if each had been added separately' do
-        request.uint32(1).uint32(100).uint32(65536).to(queue)
-        request_two.uint32(1, 100, 65536).to(queue)
+        request.uint32(1).uint32(100).uint32(65_536).to(queue)
+        request_two.uint32(1, 100, 65_536).to(queue)
         a = queue.pop
         b = queue.pop
         expect(a).to eq(b)

@@ -29,14 +29,14 @@ module Bra
         private
 
         def base_structure
-          hashes    :players, :player_set, option(:players), :player do
+          hashes :players, :player_set, option(:players), :player do
             component :state,      :play_state, :stopped
             component :load_state, :load_state, :empty
             component :volume,     :volume,     0.0
             markers
           end
 
-          lists     :playlists, :playlist_set, option(:playlists), :playlist
+          lists :playlists, :playlist_set, option(:playlists), :playlist
         end
 
         def markers

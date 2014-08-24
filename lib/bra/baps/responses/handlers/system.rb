@@ -23,8 +23,6 @@ module Bra
             @response[symbol]
           end
 
-          private
-
           DETAILS_SYM = {
             Codes::System::CLIENT_CHANGE => :client,
             Codes::System::LOG_MESSAGE => :message
@@ -65,10 +63,10 @@ module Bra
 
           def run
             code = @response.subcode
-            is_ok(code) ? continue : die(code, @response.details)
+            ok?(code) ? continue : die(code, @response.details)
           end
 
-          def is_ok(code)
+          def ok?(code)
             code == LoginErrors::OK
           end
 
