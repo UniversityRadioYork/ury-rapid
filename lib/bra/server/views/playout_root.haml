@@ -1,7 +1,9 @@
 -# playout_root.haml - Sub-root objects
 
 %section.playout_root{ class: inspector.resource_handler_target }
-  %h1=inspector.title
+  %h1
+    %i{ class: 'fa fa-volume-up' }
+    = inspector.title
 
   %div.playout_root_contents
     - if inspector.resource
