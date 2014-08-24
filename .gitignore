@@ -23,10 +23,12 @@ _yardoc
 doc/
 
 # Config and secrets
-config.yml
 config.rb
 test.sh
 
 # Backups and swapfiles
 *.sw[a-z]
 *~
+
+# I'm on a mac
+*.DS_Store
