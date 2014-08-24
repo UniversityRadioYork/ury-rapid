@@ -23,6 +23,6 @@ module Bra
 
   def self.load_config_from(file)
     return nil unless File.exists?(file)
-    file.read(file)
+    File.read(file)
   end
 end
