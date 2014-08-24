@@ -60,6 +60,10 @@ module Bra
       # End configuration DSL
       #
 
+      # Asks the driver to construct an instance of its model
+      #
+      # This is intended to be called by the BRA launcher when initialising the
+      # drivers.
       def sub_model(update_channel)
         [
           create_extender(update_channel),
