@@ -27,18 +27,28 @@ module Bra
         def_delegators :@requester, :login_authenticate, :login_synchronise
         def_delegator :@model, :log
 
+        # Retrieves the model on which this Responder will operate
+        #
+        # @api      semipublic
+        # @example  Gets the model.
+        #   responder = Responder.new(model, queue)
+        #   model = responder.model
+        #
+        # @return [Model]
+        #   The Model on which this Responder operates.
         attr_reader :model
 
         # Initialises the responder
         #
-        # @api semipublic
-        #
-        # @example Initialise a responder
+        # @api      semipublic
+        # @example  Initialise a responder
         #   responder = Responder.new(model, queue)
         #
-        # @param model [Model] The Model this Responder will operate on.
-        # @param requester [Requester] The Requester via which this Responder
-        #   can send BAPS login requests.
+        # @param model [Model]
+        #   The Model on this Responder will operate.
+        # @param requester [Requester]
+        #   The Requester via which this Responder can send BAPS login
+        #   requests.
         def initialize(model, requester)
           @model = model
           @requester = requester
@@ -50,31 +60,69 @@ module Bra
 
         # Registers the responder's callbacks with a incoming responses channel
         #
-        # @api semipublic
-        #
-        # @example Register an EventMachine channel
+        # @api      semipublic
+        # @example  Register an EventMachine channel
         #   responder = Responder.new(model, queue)
         #   channel = EventMachine::Channel.new
         #   # Attach channel to rest of BAPS here
         #   responder.register(channel)
         #
-        # @param channel [Channel] The source channel for responses coming from
-        #   BAPS's chat system.
+        # @param channel [Channel]
+        #   The source channel for responses coming from BAPS's chat system.
         #
         # @return [void]
         def register(channel)
           channel.subscribe(&method(:handle_response))
         end
 
+        # Handles a response
+        #
+        # If the response has no handler, the null handler #unhandled is used.
+        #
+        # @api      semipublic
+        # @example  Get the handler for a specific BAPS code
+        #   responder = Responder.new(model, queue)
+        #   responder.handle_response(a_response)
+        #
+        # @param response [Object]
+        #   A BAPS response to handle.
+        #
+        # @return [void]
         def handle_response(response)
           handler_for_code(response.code).call(response)
         end
 
+        # Finds the handler for a specific BAPS response code 
+        #
+        # If there is no handler for the given code, #unhandled is returned.
+        #
+        # @api      semipublic
+        # @example  Get the handler for a specific BAPS code
+        #   responder = Responder.new(model, queue)
+        #   responder.handler_for_code(0x100)
+        #
+        # @param code [Code]
+        #   A BAPS response code.
+        #
+        # @return [Proc]
+        #   A handler function that may be called with the response to handle.
         def handler_for_code(code)
           @handlers.fetch(code, method(:unhandled))
         end
 
-        # Mock handler for when a BAPS code has no registered handler.
+        # Mock handler for when a BAPS code has no registered handler
+        #
+        # This handler logs a warning, and does nothing else.
+        #
+        # @api      semipublic
+        # @example  'Handle' an unhandled response
+        #   responder = Responder.new(model, queue)
+        #   responder.unhandled(a_response)
+        #
+        # @param response [Object]
+        #   A response to 'handle'.
+        #
+        # @return [void]
         def unhandled(response)
           message = "Unhandled response: #{response.name}"
           if response.code.is_a?(Numeric)
