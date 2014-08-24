@@ -14,7 +14,8 @@ module Bra
 
       @user_config = {}
 
-      instance_eval(config)
+      instance_eval(&config) if config.is_a?(Proc)
+      instance_eval(config) unless config.is_a?(Proc)
 
       make_builders(options_with_defaults(options))
 
