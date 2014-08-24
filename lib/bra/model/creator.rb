@@ -90,6 +90,10 @@ module Bra
         build(object || new_hash(:root), &block)
       end
 
+      def sub_root(object = nil, &block)
+        build(object || new_hash(:sub_root), &block)
+      end
+
       def build(object, &block)
         object = object.new if object.is_a?(Class)
         register(object)

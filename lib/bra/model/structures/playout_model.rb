@@ -15,7 +15,7 @@ module Bra
         #
         # @return [Root]  The finished model.
         def create
-          root do
+          sub_root do
             base_structure
             playout_extensions
           end
