@@ -90,8 +90,8 @@ module Bra
         build(object || new_hash(:root), &block)
       end
 
-      def sub_root(object = nil, &block)
-        build(object || new_hash(:sub_root), &block)
+      def playout_root(object = nil, &block)
+        build(object || new_hash(:playout_root), &block)
       end
 
       def build(object, &block)

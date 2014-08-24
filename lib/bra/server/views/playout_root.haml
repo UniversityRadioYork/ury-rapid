@@ -1,9 +1,9 @@
--# sub_root.haml - Sub-root objects
+-# playout_root.haml - Sub-root objects
 
-%section.sub_root{ class: inspector.resource_handler_target }
+%section.playout_root{ class: inspector.resource_handler_target }
   %h1=inspector.title
 
-  %div.sub_root_contents
+  %div.playout_root_contents
     - if inspector.resource
       - inspector.resource.keys.each do |child|
         = child(inspector, child)
