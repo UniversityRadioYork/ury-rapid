@@ -1,6 +1,7 @@
 require 'active_support/core_ext/object/try'
 
 require 'bra/baps/codes'
+require 'bra/baps/responses/command_word'
 require 'bra/baps/responses/structures'
 require 'bra/baps/types'
 require 'bra/common/exceptions'
@@ -50,12 +51,6 @@ module Bra
           word
         end
 
-        private
-
-        # Masks for splitting a BAPS command code into its main and sub-code
-        MAIN_CODE_MASK = 0xFFF0
-        SUBCODE_MASK   = 0x000F
-
         # Attempt to scrape a command word off the top of the buffer
         #
         # If successful, the parser then interprets the word and sets up to
@@ -69,7 +64,7 @@ module Bra
           # unknown message, but BAPS is quite dodgy at implementing this in
           # places, so we don't do it in practice.
           @reader.command do |code|
-            parse_command(code)
+            parse_command(CommandWord.new(code))
             word
           end
         end
@@ -78,63 +73,13 @@ module Bra
         #
         # @api private
         #
-        # @param raw_code [Integer] The raw code word from the BAPS server.
+        # @param raw_code [CommandWord] The raw code word from the BAPS server.
         #
         # @return [void]
         def parse_command(raw_code)
-          code, subcode = split_command_word(raw_code)
+          code, subcode = raw_code.split
           @expected = structure_with_code(code)
           @response = response_with_code(code, subcode)
-        end
-
-        # Splits a command word into its code and subcode
-        #
-        # BAPS uses various bit-masks of its command word for various purposes.
-        # The high bits generally encode the command type, while the low bits
-        # encode the target channel, sub-commands, and other things.
-        #
-        # For our purposes, the subcode is the last four bits of the command
-        # word.  This means that some subcommands in BAPS are full commands in
-        # the bra BAPS driver, but most of the commands where this happens
-        # aren't supported by us anyway.
-        #
-        # @api private
-        #
-        # @param command_word [Integer]
-        #   The raw BAPS command word to split.
-        #
-        # @return [Array]
-        #   A pair of main command code and command sub-code.
-        def split_command_word(command_word)
-          [main_code(command_word), subcode(command_word)]
-        end
-
-        # Extracts the BAPS command code from a command word
-        #
-        # @api private
-        #
-        # @param command_word [Integer]
-        #   The raw BAPS command word to split.
-        #
-        # @return [Integer]
-        #   The command code of the BAPS response from which this command code
-        #   was received.
-        def main_code(command_word)
-          command_word & MAIN_CODE_MASK
-        end
-
-        # Extracts the BAPS command sub-code from a command word
-        #
-        # @api private
-        #
-        # @param command_word [Integer]
-        #   The raw BAPS command word to split.
-        #
-        # @return [Integer]
-        #   The command code of the BAPS response from which this sub-code
-        #   was received.
-        def subcode(command_word)
-          command_word & SUBCODE_MASK
         end
 
         # Retrieves the expected set of arguments for the given BAPS command
