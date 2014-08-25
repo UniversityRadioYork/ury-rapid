@@ -14,8 +14,7 @@ module Bra
 
       @user_config = {}
 
-      instance_eval(&config) if config.is_a?(Proc)
-      instance_eval(config) unless config.is_a?(Proc)
+      run_config(config)
 
       make_builders(options_with_defaults(options))
 
@@ -56,6 +55,22 @@ module Bra
 
     DEFAULT_MODEL_STRUCTURE = 'bra/model/structures/standard'
     DEFAULT_DRIVER          = 'bra/baps/driver'
+
+    # Runs the configuration passed to the Launcher
+    #
+    # This instance-evaluates the configuration, either as a Proc or as a
+    # String.
+    #
+    # @api  private
+    #
+    # @param config [String|Proc]
+    #   The String or Proc representing the configuration.
+    #
+    # @return [void]
+    def run_config(config)
+      instance_eval(&config) if config.is_a?(Proc)
+      instance_eval(config) unless config.is_a?(Proc)
+    end
 
     def make_builders(options)
       @app_maker                = options[:app]
