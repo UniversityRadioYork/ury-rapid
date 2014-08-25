@@ -38,22 +38,30 @@ module Bra
     #
 
     # Configures a driver and adds it to the launcher's state
+    #
+    # @api  public
     def driver(name, implementation_class, &block)
       @drivers << [name, implementation_class, block]
     end
 
     # Configures a server and adds it to the launcher's state.
+    #
+    # @api  public
     def server(name, implementation_class, &block)
       @servers << [name, implementation_class, block]
     end
 
     # Configures the model.
+    #
+    # @api  public
     def model(implementation_class, &block)
       @model_structure = implementation_class
       @model_config = block
     end
 
     # Configures a user and adds them to the user table.
+    #
+    # @api  public
     def user(name)
       @user_config[name] = yield
     end
