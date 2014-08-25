@@ -10,20 +10,23 @@ module Bra
     module Responses
       # An interpreter that reads and converts raw command data from the BAPS
       # server into response messages.
+      #
+      # The Parser sits between the Reader, which buffers and allows access to
+      # raw BAPS protocol values, and the responses channel, which takes
+      # completed response messages and sends them to the Responder.
       class Parser
-        # Initialises the parser
+        # Initialises this Parser
         #
-        # @api semipublic
-        #
-        # @example Initialising a response parser.
+        # @api      semipublic
+        # @example  Initialising a response parser
         #   channel = EventMachine::Channel.new
         #   reader = Reader.new
         #   rp = Parser.new(channel, reader)
         #
-        # @param channel [Channel] An EventMachine channel that should receive
-        #   parsed responses.
-        # @param reader [Reader] An object that can convert raw buffered data
-        #   to BAPS meta-protocol tokens.
+        # @param channel [Channel]
+        #   An EventMachine channel that should receive parsed responses.
+        # @param reader [Reader]
+        #   An object that converts raw buffered data to BAPS protocol tokens.
         def initialize(channel, reader)
           @channel = channel
           @reader = reader
@@ -36,6 +39,13 @@ module Bra
           )
         end
 
+        # Starts this Parser
+        #
+        # @api      semipublic
+        # @example  Starts a Parser
+        #   rp.start
+        #
+        # @return [void]
         def start
           word
         end
@@ -77,47 +87,83 @@ module Bra
           @response = response_with_code(code, subcode)
         end
 
-        # Splits a command word into its code and subcode.
+        # Splits a command word into its code and subcode
         #
         # BAPS uses various bit-masks of its command word for various purposes.
         # The high bits generally encode the command type, while the low bits
         # encode the target channel, sub-commands, and other things.
         #
         # For our purposes, the subcode is the last four bits of the command
-        # word.  This means that some subcommnds in BAPS are full commands in
+        # word.  This means that some subcommands in BAPS are full commands in
         # the bra BAPS driver, but most of the commands where this happens
         # aren't supported by us anyway.
         #
         # @api private
         #
-        # @param code [Integer] The raw BAPS command word to split.
+        # @param command_word [Integer]
+        #   The raw BAPS command word to split.
         #
-        # @return [Array] A pair of main command code and command sub-code.
-        def split_command_word(code)
-          [main_code(code), subcode(code)]
+        # @return [Array]
+        #   A pair of main command code and command sub-code.
+        def split_command_word(command_word)
+          [main_code(command_word), subcode(command_word)]
         end
 
-        def main_code(code)
-          code & MAIN_CODE_MASK
+        # Extracts the BAPS command code from a command word
+        #
+        # @api private
+        #
+        # @param command_word [Integer]
+        #   The raw BAPS command word to split.
+        #
+        # @return [Integer]
+        #   The command code of the BAPS response from which this command code
+        #   was received.
+        def main_code(command_word)
+          command_word & MAIN_CODE_MASK
         end
 
-        def subcode(code)
-          code & SUBCODE_MASK
+        # Extracts the BAPS command sub-code from a command word
+        #
+        # @api private
+        #
+        # @param command_word [Integer]
+        #   The raw BAPS command word to split.
+        #
+        # @return [Integer]
+        #   The command code of the BAPS response from which this sub-code
+        #   was received.
+        def subcode(command_word)
+          command_word & SUBCODE_MASK
         end
 
         # Retrieves the expected set of arguments for the given BAPS command
         #
         # @api private
         #
-        # @param code [Integer] The BAPS command code whose arguments are
-        #  sought.
+        # @param code [Integer]
+        #   The BAPS command code whose arguments are sought.
         #
-        # @return [Array] The expected structure of the BAPS response.
+        # @return [Array]
+        #   The expected structure of the BAPS response.
         def structure_with_code(code)
           structure = Baps::Responses::Structures.structure(code)
           structure.nil? ? unknown_response(code) : structure.clone
         end
 
+        # Fails if the response with the given code is not understood
+        #
+        # In order to understand the structure of the following bytes from the
+        # BAPS server, every response received must be one for which the BAPS
+        # driver has a known expected format.  Thus, if an unknown response is
+        # found, the driver cannot continue and fails.
+        #
+        # @api private
+        #
+        # @param code [Integer]
+        #   The BAPS command code of the unknown response.
+        #
+        # @return [void]
         def unknown_response(code)
           fail(Bra::Common::Exceptions::InvalidPlayoutResponse, code.to_s(16))
         end
@@ -126,10 +172,13 @@ module Bra
         #
         # @api private
         #
-        # @param code [Integer] The BAPS command code this response represents.
-        # @param subcode [Integer] The sub-code of the BAPS command.
+        # @param code [Integer]
+        #   The BAPS command code this response represents.
+        # @param subcode [Integer]
+        #   The sub-code of the BAPS command.
         #
-        # @return [Hash] An initial response, ready for adding fields to.
+        # @return [Hash]
+        #   An initial response, ready for accepting argument fields.
         def response_with_code(code, subcode)
           OpenStruct.new(name: code_name(code), code: code, subcode: subcode)
         end
@@ -195,11 +244,10 @@ module Bra
         #
         # @api private
         #
-        # @param name [Symbol] The name of the argument to which the track
-        #   type is bound.
+        # @param name [Symbol]
+        #   The name of the argument to which the track type is bound.
         #
-        # @return [void] Whether or not there was enough data to process a
-        #   data word.
+        # @return [void]
         def load_body(name)
           @reader.uint32 do |track_type|
             add_arguments(track_type)
@@ -208,8 +256,14 @@ module Bra
           end
         end
 
-        private
-
+        # Adds the correct expected arguments for a load body
+        #
+        # @api private
+        #
+        # @param track_type [Fixnum]
+        #   The 32-bit integer representing the track type.
+        #
+        # @return [void]
         def add_arguments(track_type)
           @expected.unshift(*LOAD_ARGUMENTS[track_type])
         end
