@@ -9,8 +9,8 @@ module Bra
     extend Forwardable
 
     def initialize(config, options = {})
-      @drivers = []
-      @servers = []
+      @drivers = {}
+      @servers = {}
 
       @user_config = {}
 
@@ -41,14 +41,14 @@ module Bra
     #
     # @api  public
     def driver(name, implementation_class, &block)
-      @drivers << [name, implementation_class, block]
+      @drivers[name] = [implementation_class, block]
     end
 
     # Configures a server and adds it to the launcher's state.
     #
     # @api  public
     def server(name, implementation_class, &block)
-      @servers << [name, implementation_class, block]
+      @servers[name] = [implementation_class, block]
     end
 
     # Configures the model.
@@ -123,7 +123,7 @@ module Bra
     #
 
     def make_drivers(logger, model_view)
-      @drivers.map do |name, driver_class, driver_config|
+      @drivers.map do |name, (driver_class, driver_config)|
         driver_class.new(logger)
                     .tap { |d| d.instance_exec(&driver_config) }
                     .tap { |d| init_driver(name, model_view, d) }
@@ -166,7 +166,7 @@ module Bra
     #
 
     def make_servers(_logger, global_driver_view)
-      @servers.map do |_name, server_class, server_config|
+      @servers.map do |_name, (server_class, server_config)|
         server_class.new(global_driver_view, @auth).tap do |server|
           server.instance_eval(&server_config)
         end
