@@ -10,7 +10,10 @@ module Bra
 
     def initialize(config, options = {})
       @drivers = {}
+      @enabled_drivers = []
+
       @servers = {}
+      @enabled_servers = []
 
       @user_config = {}
 
@@ -37,19 +40,63 @@ module Bra
     # files.
     #
 
-    # Configures a driver and adds it to the launcher's state
+    ## Drivers ##
+
+    # Configures a driver
+    #
+    # This does not enable the driver; use #enable_driver.
     #
     # @api  public
     def driver(name, implementation_class, &block)
       @drivers[name] = [implementation_class, block]
     end
 
-    # Configures a server and adds it to the launcher's state.
+    # Enables a driver at launch-time
+    #
+    # The driver must have been previously configured, with #driver.
+    #
+    # @api      public
+    # @example  Enables the driver 'production' at launch time.
+    #   # In config.rb
+    #   enable_driver :production
+    #
+    # @return [void]
+    def enable_driver(name)
+      unless @drivers.key?(name)
+        $STDERR.puts("Ignored 'enable_driver #{name}': #{name} not configured.")
+        return
+      end
+      @enabled_drivers << name
+    end
+
+    ## Servers ##
+
+    # Configures a server
     #
     # @api  public
     def server(name, implementation_class, &block)
       @servers[name] = [implementation_class, block]
     end
+
+    # Enables a server at launch-time
+    #
+    # The server must have been previously configured, with #server.
+    #
+    # @api      public
+    # @example  Enables the server 'http' at launch time.
+    #   # In config.rb
+    #   enable_server :http
+    #
+    # @return [void]
+    def enable_server(name)
+      unless @servers.key?(name)
+        $STDERR.puts("Ignored 'enable_server #{name}': #{name} not configured.")
+        return
+      end
+      @enabled_servers << name
+    end
+
+    ## Models ##
 
     # Configures the model.
     #
@@ -122,8 +169,12 @@ module Bra
     # Driver
     #
 
+    # Initialises all drivers that are enabled at launch-time
+    #
+    # See #driver and #enable_driver in the configuration DSL.
     def make_drivers(logger, model_view)
-      @drivers.map do |name, (driver_class, driver_config)|
+      @enabled_drivers.map do |name|
+        driver_class, driver_config = @drivers.fetch(name)
         driver_class.new(logger)
                     .tap { |d| d.instance_exec(&driver_config) }
                     .tap { |d| init_driver(name, model_view, d) }
@@ -165,8 +216,12 @@ module Bra
     # Server
     #
 
+    # Initialises all server that are enabled at launch-time
+    #
+    # See #server and #enable_server in the configuration DSL.
     def make_servers(_logger, global_driver_view)
-      @servers.map do |_name, (server_class, server_config)|
+      @enabled_servers.map do |name|
+        server_class, server_config = @servers.fetch(name)
         server_class.new(global_driver_view, @auth).tap do |server|
           server.instance_eval(&server_config)
         end

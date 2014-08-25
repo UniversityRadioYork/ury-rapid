@@ -75,3 +75,9 @@ end
 # allows it to be viewed and manipulated as a collection of objects.
 #
 model Bra::Model::Structures::Standard
+
+# To appear at launch-time, drivers and servers need to be enabled in this
+# config file.
+enable_driver :studio
+enable_server :server
+

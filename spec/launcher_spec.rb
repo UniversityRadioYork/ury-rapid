@@ -14,8 +14,12 @@ describe Bra::Launcher do
     scl = server_class
     proc do
       driver(di, dcl) { dc }
+      enable_driver di
+
       model mcl
       server(si, scl) { sc }
+      enable_server si
+
       user(un) { uc }
     end
   end
