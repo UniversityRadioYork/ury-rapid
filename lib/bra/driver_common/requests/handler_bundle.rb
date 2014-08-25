@@ -5,6 +5,10 @@ require 'bra/driver_common/requests/playlist_handler'
 module Bra
   module DriverCommon
     module Requests
+      # Convenience module for handler bundles
+      #
+      # HandlerBundle can be included by modules that contain request handlers,
+      # to allow a DSL-esque style of describing them.
       module HandlerBundle
         # Constructs a new handler
         def handler(name, *targets, &block)
@@ -24,6 +28,8 @@ module Bra
         private
 
         # Constructs a new handler with the given arguments
+        #
+        # @api private
         def handler_with_class(base_class, name, *targets, &block)
           cls = Class.new(base_class) do
             def_targets(*targets)
