@@ -9,11 +9,8 @@ module Bra
     extend Forwardable
 
     def initialize(config, options = {})
-      @drivers = {}
-      @enabled_drivers = []
-
-      @servers = {}
-      @enabled_servers = []
+      @drivers = ModuleSet.new()
+      @servers = ModuleSet.new()
 
       @user_config = {}
 
@@ -47,9 +44,7 @@ module Bra
     # This does not enable the driver; use #enable_driver.
     #
     # @api  public
-    def driver(name, implementation_class, &block)
-      @drivers[name] = [implementation_class, block]
-    end
+    def_delegator :@drivers, :configure, :driver
 
     # Enables a driver at launch-time
     #
@@ -61,22 +56,14 @@ module Bra
     #   enable_driver :production
     #
     # @return [void]
-    def enable_driver(name)
-      unless @drivers.key?(name)
-        $STDERR.puts("Ignored 'enable_driver #{name}': #{name} not configured.")
-        return
-      end
-      @enabled_drivers << name
-    end
+    def_delegator :@drivers, :enable, :enable_driver
 
     ## Servers ##
 
     # Configures a server
     #
     # @api  public
-    def server(name, implementation_class, &block)
-      @servers[name] = [implementation_class, block]
-    end
+    def_delegator :@servers, :configure, :server
 
     # Enables a server at launch-time
     #
@@ -88,13 +75,7 @@ module Bra
     #   enable_server :http
     #
     # @return [void]
-    def enable_server(name)
-      unless @servers.key?(name)
-        $STDERR.puts("Ignored 'enable_server #{name}': #{name} not configured.")
-        return
-      end
-      @enabled_servers << name
-    end
+    def_delegator :@servers, :enable, :enable_server
 
     ## Models ##
 
@@ -173,12 +154,10 @@ module Bra
     #
     # See #driver and #enable_driver in the configuration DSL.
     def make_drivers(logger, model_view)
-      @enabled_drivers.map do |name|
-        driver_class, driver_config = @drivers.fetch(name)
-        driver_class.new(logger)
-                    .tap { |d| d.instance_exec(&driver_config) }
-                    .tap { |d| init_driver(name, model_view, d) }
-      end
+      @drivers.constructor_arguments = [logger]
+      @drivers.module_create_hook =
+        ->(name, d) { init_driver(name, model_view, d) }
+      @drivers.start_enabled
     end
 
     def init_driver(name, model_view, driver)
@@ -220,12 +199,8 @@ module Bra
     #
     # See #server and #enable_server in the configuration DSL.
     def make_servers(_logger, global_driver_view)
-      @enabled_servers.map do |name|
-        server_class, server_config = @servers.fetch(name)
-        server_class.new(global_driver_view, @auth).tap do |server|
-          server.instance_eval(&server_config)
-        end
-      end
+      @servers.constructor_arguments = [global_driver_view, @auth]
+      @servers.start_enabled
     end
 
     #
@@ -310,5 +285,98 @@ module Bra
     def_delegator :@model_configurator_maker, :call, :make_model_configurator
     def_delegator :@model_structure_maker,    :call, :make_model_structure
     def_delegator :@server_view_maker,        :call, :make_server_view
+  end
+
+  # A set of BRA modules
+  #
+  # A ModuleSet holds a set of configured BRA modules (drivers or servers), as
+  # well as information about which modules are enabled at launch-time.
+  class ModuleSet
+    # Initialises a ModuleSet
+    #
+    # The ModuleSet, by default, passes nothing to module constructors, and
+    # does nothing with the modules after construction.  Use
+    # #constructor_arguments= and #module_create_hook= to override this.
+    #
+    # @api      semipublic
+    # @example  Create a new ModuleSet
+    #   ms = ModuleSet.new
+    def initialize
+      @modules = {}
+      @enabled_modules = []
+      @constructor_arguments = []
+      @module_create_hook = ->(*) {}
+    end
+
+    # Adds a module and its configuration to the ModuleSet
+    #
+    # @api      semipublic
+    # @example  Configure a module
+    #   ms.configure(:a_module_name, Module::Class::Here) do
+    #     # Module DSL goes here
+    #   end
+    #
+    # @param name [Symbol]
+    #   The name to give to this module instance.
+    #
+    # @param implementation_class [Class]
+    #   The module class.
+    #
+    # @return [void]
+    def configure(name, implementation_class, &block)
+      @modules[name] = [implementation_class, block]
+    end
+
+    # Enables a configured module at load-time
+    #
+    # @api      semipublic
+    # @example  Enable a module
+    #   ms.enable(:a_module_name)
+    #
+    # @param name [Symbol]
+    #   The name of the module to enable at load-time.
+    #
+    # @return [void]
+    def enable(name)
+      unless @modules.key?(name)
+        $STDERR.puts("Ignored request to enable #{name}': not configured.")
+        return
+      end
+      @enabled_modules << name
+    end
+
+    # Starts all enabled modules
+    #
+    # @api      semipublic
+    # @example  Start all enabled modules
+    #   ms.start_enabled
+    #
+    # @return [Array]
+    #   The modules that have been started.
+    def start_enabled
+      @enabled_modules.map(&method(:start))
+    end
+
+    # Starts a specific module
+    #
+    # @api      semipublic
+    # @example  Start the module :foo
+    #   ms.start(:foo)
+    #
+    # @param name [Symbol]
+    #   The name of the module to start.
+    #
+    # @return [Object]
+    #   The module that has been started.
+    def start(name)
+      module_class, module_config = @modules.fetch(name)
+      module_class.new(*@constructor_arguments).tap do |mod|
+        mod.instance_eval(&module_config)
+        @module_create_hook.call(name, mod)
+      end
+    end
+
+    attr_writer :constructor_arguments
+    attr_writer :module_create_hook
   end
 end
