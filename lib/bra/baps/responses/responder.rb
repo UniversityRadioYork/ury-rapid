@@ -92,7 +92,7 @@ module Bra
           handler_for_code(response.code).call(response)
         end
 
-        # Finds the handler for a specific BAPS response code 
+        # Finds the handler for a specific BAPS response code
         #
         # If there is no handler for the given code, #unhandled is returned.
         #

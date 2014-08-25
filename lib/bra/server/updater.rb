@@ -49,7 +49,7 @@ module Bra
       # privileges to GET the updated resource.
       #
       # @api  private
-      #   
+      #
       # @param update [List]
       #   A pair of the resource that has been updated, and a representation of
       #   the update on the resource that should be sent through the Updater.
@@ -147,7 +147,7 @@ module Bra
       # @param authenticator [Object]
       #   An object providing authentication services, to be used for
       #   authenticating on the WebSocket.
-      # @param init_privileges [Object] 
+      # @param init_privileges [Object]
       #   The initial set of privileges to give to this Updater.  These may be
       #   replaced by the client by sending an authentication request.
       def initialize(model, websocket, authenticator, init_privileges)
@@ -216,7 +216,7 @@ module Bra
       end
 
       # Tries to authenticate on the WebSocket
-      # 
+      #
       # This is part of the in-band authentication handling for a WebSocket:
       # an `auth` request via the WebSocket triggers a #try_auth.
       #
