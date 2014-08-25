@@ -30,6 +30,13 @@ module Bra
       new(*args).run
     end
 
+    #
+    # Configuration DSL
+    #
+    # This section of the Launcher code is intended to be used in configuration
+    # files.
+    #
+
     # Configures a driver and adds it to the launcher's state
     def driver(name, implementation_class, &block)
       @drivers << [name, implementation_class, block]
@@ -50,6 +57,10 @@ module Bra
     def user(name)
       @user_config[name] = yield
     end
+
+    #
+    # End configuration DSL
+    #
 
     private
 
