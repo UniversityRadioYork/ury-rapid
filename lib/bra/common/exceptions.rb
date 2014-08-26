@@ -20,6 +20,9 @@ module Bra
       # Exception generated when the client gives an invalid payload
       InvalidPayload = Class.new(RuntimeError)
 
+      # Exception generated when errors are found in the user configuration
+      BadConfig = Class.new(RuntimeError)
+
       # Exception generated when the client requests something unsupported
       class NotSupported < RuntimeError
         def to_s

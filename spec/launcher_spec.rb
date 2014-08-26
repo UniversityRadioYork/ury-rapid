@@ -1,7 +1,7 @@
 require 'bra/launcher'
 
 describe Bra::Launcher do
-  subject { Bra::Launcher.new(config, overrides) }
+  subject { Bra::Launcher.new(config) }
   let(:config) do
     dc = driver_config
     mcl = model_class
@@ -12,32 +12,40 @@ describe Bra::Launcher do
     dcl = driver_class
     si = server_id
     scl = server_class
+
+    appm = app_maker
+    authm = auth_maker
+    cm = channel_maker
+    dvm = driver_view_maker
+    lm = logger_maker
+    svm = server_view_maker
     proc do
-      driver(di, dcl) { dc }
+      drivers do
+        configure(di, dcl) { dc }
+        enable di
+      end
+
+      servers do
+        configure(si, scl) { sc }
+        enable si
+      end
+
       model mcl
-      server(si, scl) { sc }
+
       user(un) { uc }
+
+      make_app_with appm
+      make_auth_with authm
+      make_channel_with cm
+      make_logger_with lm
+      make_driver_view_with dvm
+      make_server_view_with svm
     end
   end
 
   let(:user_name) { double(:user_name) }
 
-  let(:overrides) do
-    { app:                app_maker,
-      auth:               auth_maker,
-      channel:            channel_maker,
-      driver_view:        driver_view_maker,
-      logger:             logger_maker,
-      model_configurator: model_configurator_maker,
-      model_structure:    model_structure_maker,
-      server_view:        server_view_maker
-    }
-  end
-
-  MAKERS = %i(
-    app auth channel logger model_configurator model_structure
-    driver_view server_view
-  )
+  MAKERS = %i(app auth channel logger driver_view server_view)
 
   MAKERS.each do |maker|
     sym = "#{maker}_maker".to_sym
@@ -45,7 +53,9 @@ describe Bra::Launcher do
     let(maker) { double(maker) }
   end
 
-  let(:model) { double(:model) }
+  let(:model)                  { double(:model)                  }
+  let(:model_class)            { double(:model_class)            }
+  let(:model_structure)        { double(:model_structure)        }
 
   let(:server)                 { double(:server)                 }
   let(:server_id)              { double(:server_id)              }
@@ -59,7 +69,6 @@ describe Bra::Launcher do
   let(:register_driver_view)   { double(:register_driver_view)   }
 
   let(:driver_config) { double(:driver_config) }
-  let(:model_class) { double(:model_class) }
   let(:server_config) { double(:server_config) }
   let(:user_config) { double(:user_config) }
 
@@ -72,16 +81,9 @@ describe Bra::Launcher do
 
       allow(driver_view_maker).to receive(:call).and_return(driver_view)
       allow(server_view_maker).to receive(:call).and_return(server_view)
-      allow(model_configurator_maker).to receive(:call).and_return(
-        model_configurator
-      )
 
       allow(driver_view).to receive(:post)
 
-      allow(model_configurator).to receive(:configure_with).and_return(
-        model_configurator
-      )
-      allow(model_configurator).to receive(:make).and_return(model)
       allow(app).to receive(:run)
 
       allow(model_class).to receive(:new).and_return(model_structure)

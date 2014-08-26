@@ -1,6 +1,7 @@
-require 'colored'
-
 require 'bra/app'
+require 'bra/common/exceptions'
+require 'bra/common/module_set'
+require 'bra/logger'
 require 'bra/model/config'
 
 module Bra
@@ -8,16 +9,14 @@ module Bra
   class Launcher
     extend Forwardable
 
-    def initialize(config, options = {})
-      @drivers = []
-      @servers = []
+    def initialize(config)
+      @drivers = Bra::Common::ModuleSet.new()
+      @servers = Bra::Common::ModuleSet.new()
 
       @user_config = {}
 
-      instance_eval(&config) if config.is_a?(Proc)
-      instance_eval(config) unless config.is_a?(Proc)
-
-      make_builders(options_with_defaults(options))
+      init_default_makers
+      run_config(config)
 
       @auth = make_auth(@user_config)
       @update_channel = make_channel
@@ -31,45 +30,79 @@ module Bra
       new(*args).run
     end
 
-    # Configures a driver and adds it to the launcher's state
-    def driver(name, implementation_class, &block)
-      @drivers << [name, implementation_class, block]
-    end
+    #
+    # Configuration DSL
+    #
+    # This section of the Launcher code is intended to be used in configuration
+    # files.
+    #
 
-    # Configures a server and adds it to the launcher's state.
-    def server(name, implementation_class, &block)
-      @servers << [name, implementation_class, block]
-    end
+    # Configures the driver set for this instance of BRA
+    #
+    # See ModuleSet for the DSL accepted by this method.
+    def_delegator :@drivers, :instance_eval, :drivers
+
+    # Configures the server set for this instance of BRA
+    #
+    # See ModuleSet for the DSL accepted by this method.
+    def_delegator :@servers, :instance_eval, :servers
 
     # Configures the model.
+    #
+    # @api  public
     def model(implementation_class, &block)
       @model_structure = implementation_class
       @model_config = block
     end
 
     # Configures a user and adds them to the user table.
+    #
+    # @api  public
     def user(name)
       @user_config[name] = yield
     end
 
-    private
+    ## Makers ##
 
-    DEFAULT_MODEL_STRUCTURE = 'bra/model/structures/standard'
-    DEFAULT_DRIVER          = 'bra/baps/driver'
-
-    def make_builders(options)
-      @app_maker                = options[:app]
-      @auth_maker               = options[:auth]
-      @channel_maker            = options[:channel]
-      @logger_maker             = options[:logger]
-      make_model_builders(options)
+    # Programmatically build 'make_X_with' DSL methods for each
+    # maker.
+    %w(app auth channel driver_view server_view logger).each do |m|
+      attr_writer "#{m}_maker".to_sym
+      alias_method "make_#{m}_with".to_sym, "#{m}_maker=".to_sym
     end
 
-    def make_model_builders(options)
-      @driver_view_maker        = options[:driver_view]
-      @model_configurator_maker = options[:model_configurator]
-      @model_structure_maker    = options[:model_structure]
-      @server_view_maker        = options[:server_view]
+    #
+    # End configuration DSL
+    #
+
+    private
+
+    # Initialises the default set of maker functions
+    #
+    # These can be overridden in the configuration DSL.
+    def init_default_makers
+      @app_maker         = Bra::App.method(:new)
+      @auth_maker        = Kankri.method(:authenticator_from_hash)
+      @channel_maker     = Bra::Model::UpdateChannel.method(:new)
+      @driver_view_maker = Bra::Model::DriverView.method(:new)
+      @server_view_maker = Bra::Model::ServerView.method(:new)
+      @logger_maker      = Bra::Logger.method(:default_logger)
+    end
+
+    # Runs the configuration passed to the Launcher
+    #
+    # This instance-evaluates the configuration, either as a Proc or as a
+    # String.
+    #
+    # @api  private
+    #
+    # @param config [String|Proc]
+    #   The String or Proc representing the configuration.
+    #
+    # @return [void]
+    def run_config(config)
+      instance_eval(&config) if config.is_a?(Proc)
+      instance_eval(config) unless config.is_a?(Proc)
     end
 
     def app
@@ -88,12 +121,14 @@ module Bra
     # Driver
     #
 
+    # Initialises all drivers that are enabled at launch-time
+    #
+    # See #driver and #enable_driver in the configuration DSL.
     def make_drivers(logger, model_view)
-      @drivers.map do |name, driver_class, driver_config|
-        driver_class.new(logger)
-                    .tap { |d| d.instance_exec(&driver_config) }
-                    .tap { |d| init_driver(name, model_view, d) }
-      end
+      @drivers.constructor_arguments = [logger]
+      @drivers.module_create_hook =
+        ->(name, d) { init_driver(name, model_view, d) }
+      @drivers.start_enabled
     end
 
     def init_driver(name, model_view, driver)
@@ -121,92 +156,16 @@ module Bra
       [make_driver_view(model, structure), make_server_view(model)]
     end
 
-    def model_configurator(logger)
-      make_model_configurator(
-        @model_structure, make_channel, logger, @model_config
-      )
-    end
-
     #
     # Server
     #
 
+    # Initialises all server that are enabled at launch-time
+    #
+    # See #server and #enable_server in the configuration DSL.
     def make_servers(_logger, global_driver_view)
-      @servers.map do |_name, server_class, server_config|
-        server_class.new(global_driver_view, @auth).tap do |server|
-          server.instance_eval(&server_config)
-        end
-      end
-    end
-
-    #
-    # Default options
-    #
-
-    def options_with_defaults(options)
-      options.reverse_merge(
-        app:     Bra::App.method(:new),
-        auth:    Kankri.method(:authenticator_from_hash),
-        channel: Bra::Model::UpdateChannel.method(:new),
-        logger:  method(:default_logger)
-      ).reverse_merge(model_defaults)
-    end
-
-    def model_defaults
-      {
-        driver_view:        Bra::Model::DriverView.method(:new),
-        model_configurator: Bra::Model::Config.method(:new),
-        server_view:        Bra::Model::ServerView.method(:new)
-      }
-    end
-
-    #
-    # Default logger (TODO: move this elsewhere?)
-    #
-
-    def default_logger
-      # TODO: Allow redirecting
-      output = STDERR
-      Logger.new(STDERR).tap do |logger|
-        logger.formatter = proc do |severity, datetime, _progname, msg|
-          [format_date(datetime, output),
-           format_severity(severity, output),
-           msg].join(' ') + "\n"
-        end
-      end
-    end
-
-    # Colourises the severity if the logging output is a terminal
-    def format_severity(severity, output)
-      "[#{output.is_a?(String) ? severity : coloured_severity(severity)}]"
-    end
-
-    def format_date(datetime, output)
-      dt = datetime.strftime('%d/%m/%y %H:%M:%S')
-      output.is_a?(String) ? dt : dt.green
-    end
-
-    SEVERITIES = {
-      'DEBUG' => :green,
-      'INFO' => :blue,
-      'WARN' => :yellow,
-      'ERROR' => :red,
-      'FATAL' => :magenta
-    }
-
-    def coloured_severity(severity)
-      severity.send(SEVERITIES.fetch(severity, :white))
-    end
-
-    #
-    # External module includers
-    #
-
-    def driver_from_config(driver_config, logger)
-      driver_module = driver_config[:source] || DEFAULT_DRIVER
-      require driver_module
-
-      Driver.new(driver_config, logger)
+      @servers.constructor_arguments = [global_driver_view, @auth]
+      @servers.start_enabled
     end
 
     #
@@ -218,8 +177,6 @@ module Bra
     def_delegator :@channel_maker,            :call, :make_channel
     def_delegator :@driver_view_maker,        :call, :make_driver_view
     def_delegator :@logger_maker,             :call, :make_logger
-    def_delegator :@model_configurator_maker, :call, :make_model_configurator
-    def_delegator :@model_structure_maker,    :call, :make_model_structure
     def_delegator :@server_view_maker,        :call, :make_server_view
   end
 end
