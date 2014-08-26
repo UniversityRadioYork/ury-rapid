@@ -8,15 +8,14 @@ module Bra
   class Launcher
     extend Forwardable
 
-    def initialize(config, options = {})
+    def initialize(config)
       @drivers = ModuleSet.new()
       @servers = ModuleSet.new()
 
       @user_config = {}
 
+      init_default_makers
       run_config(config)
-
-      make_builders(options_with_defaults(options))
 
       @auth = make_auth(@user_config)
       @update_channel = make_channel
@@ -94,6 +93,15 @@ module Bra
       @user_config[name] = yield
     end
 
+    ## Makers ##
+
+    # Programmatically build 'make_X_with' DSL methods for each
+    # maker.
+    %w(app auth channel driver_view server_view logger).each do |m|
+      attr_writer "#{m}_maker".to_sym
+      alias_method "make_#{m}_with".to_sym, "#{m}_maker=".to_sym
+    end
+
     #
     # End configuration DSL
     #
@@ -102,6 +110,18 @@ module Bra
 
     DEFAULT_MODEL_STRUCTURE = 'bra/model/structures/standard'
     DEFAULT_DRIVER          = 'bra/baps/driver'
+
+    # Initialises the default set of maker functions
+    #
+    # These can be overridden in the configuration DSL.
+    def init_default_makers
+      @app_maker         = Bra::App.method(:new),
+      @auth_maker        = Kankri.method(:authenticator_from_hash)
+      @channel_maker     = Bra::Model::UpdateChannel.method(:new)
+      @driver_view_maker = Bra::Model::DriverView.method(:new)
+      @server_view_maker = Bra::Model::ServerView.method(:new)
+      @logger_maker      = method(:default_logger)
+    end
 
     # Runs the configuration passed to the Launcher
     #
@@ -117,21 +137,6 @@ module Bra
     def run_config(config)
       instance_eval(&config) if config.is_a?(Proc)
       instance_eval(config) unless config.is_a?(Proc)
-    end
-
-    def make_builders(options)
-      @app_maker                = options[:app]
-      @auth_maker               = options[:auth]
-      @channel_maker            = options[:channel]
-      @logger_maker             = options[:logger]
-      make_model_builders(options)
-    end
-
-    def make_model_builders(options)
-      @driver_view_maker        = options[:driver_view]
-      @model_configurator_maker = options[:model_configurator]
-      @model_structure_maker    = options[:model_structure]
-      @server_view_maker        = options[:server_view]
     end
 
     def app
@@ -201,27 +206,6 @@ module Bra
     def make_servers(_logger, global_driver_view)
       @servers.constructor_arguments = [global_driver_view, @auth]
       @servers.start_enabled
-    end
-
-    #
-    # Default options
-    #
-
-    def options_with_defaults(options)
-      options.reverse_merge(
-        app:     Bra::App.method(:new),
-        auth:    Kankri.method(:authenticator_from_hash),
-        channel: Bra::Model::UpdateChannel.method(:new),
-        logger:  method(:default_logger)
-      ).reverse_merge(model_defaults)
-    end
-
-    def model_defaults
-      {
-        driver_view:        Bra::Model::DriverView.method(:new),
-        model_configurator: Bra::Model::Config.method(:new),
-        server_view:        Bra::Model::ServerView.method(:new)
-      }
     end
 
     #
