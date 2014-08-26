@@ -1,6 +1,7 @@
 require 'colored'
 
 require 'bra/app'
+require 'bra/common/exceptions'
 require 'bra/model/config'
 
 module Bra
@@ -268,10 +269,12 @@ module Bra
     #
     # @return [void]
     def enable(name)
-      unless @modules.key?(name)
-        $STDERR.puts("Ignored request to enable #{name}': not configured.")
-        return
-      end
+      fail(
+        Bra::Exceptions::BadConfig.new(
+          "Tried to enable non-configured module #{name}'."
+        )
+      ) unless @modules.key?(name)
+
       @enabled_modules << name
     end
 

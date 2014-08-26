@@ -1,17 +1,27 @@
 require 'bra/launcher'
 
 describe Bra::ModuleSet do
+  subject { Bra::ModuleSet.new }
+
   class DummyModule
   end
 
-  describe '#start' do
-    subject { Bra::ModuleSet.new }
+  before(:each) do
+    subject.configure(:module1, DummyModule) do
+    end
+  end
 
-    before(:each) do
-      subject.configure(:module1, DummyModule) do
-      end
+  describe "#enable" do
+    context 'when the module is not configured' do
+      specify { expect { subject.enable(:module2).to raise_error } }
     end
 
+    context 'when the module is configured' do
+      specify { expect { subject.enable(:module1).to_not raise_error } }
+    end
+  end
+
+  describe '#start' do
     context 'when the module is not configured' do
       specify { expect { subject.start(:module2).to raise_error } }
     end
