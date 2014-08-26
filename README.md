@@ -32,9 +32,9 @@ Requirements
 Usage
 -----
 
-`ruby main.rb` (for best results, consider using rerun).
+`bundle exec bin/bra`
 
-bra is configured via a YAML file called `config.yml`.  An example file is provided, but may be out of date.  Check the code if in doubt.
+bra is configured via a ruby file called `config.rb`.  An example file is provided, but may be out of date.  Check the code if in doubt.
 
 
 Licence

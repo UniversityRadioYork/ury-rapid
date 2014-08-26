@@ -5,7 +5,7 @@ require 'bra/driver_common/requests/playlist_reference_parser'
 module Bra
   module DriverCommon
     module Requests
-      # Base class for handlers that handle requests on playyers
+      # Base class for handlers that handle requests on players
       #
       # This provides boilerplate code for working with the standard bra player
       # API.
