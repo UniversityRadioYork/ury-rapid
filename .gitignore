@@ -32,3 +32,7 @@ test.sh
 
 # I'm on a mac
 *.DS_Store
+
+# I use ST3
+*.sublime-project
+*.sublime-workspace
