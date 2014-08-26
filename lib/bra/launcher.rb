@@ -108,9 +108,6 @@ module Bra
 
     private
 
-    DEFAULT_MODEL_STRUCTURE = 'bra/model/structures/standard'
-    DEFAULT_DRIVER          = 'bra/baps/driver'
-
     # Initialises the default set of maker functions
     #
     # These can be overridden in the configuration DSL.
@@ -190,12 +187,6 @@ module Bra
       [make_driver_view(model, structure), make_server_view(model)]
     end
 
-    def model_configurator(logger)
-      make_model_configurator(
-        @model_structure, make_channel, logger, @model_config
-      )
-    end
-
     #
     # Server
     #
@@ -247,17 +238,6 @@ module Bra
     end
 
     #
-    # External module includers
-    #
-
-    def driver_from_config(driver_config, logger)
-      driver_module = driver_config[:source] || DEFAULT_DRIVER
-      require driver_module
-
-      Driver.new(driver_config, logger)
-    end
-
-    #
     # Constructor delegators
     #
 
@@ -266,8 +246,6 @@ module Bra
     def_delegator :@channel_maker,            :call, :make_channel
     def_delegator :@driver_view_maker,        :call, :make_driver_view
     def_delegator :@logger_maker,             :call, :make_logger
-    def_delegator :@model_configurator_maker, :call, :make_model_configurator
-    def_delegator :@model_structure_maker,    :call, :make_model_structure
     def_delegator :@server_view_maker,        :call, :make_server_view
   end
 
