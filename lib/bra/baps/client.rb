@@ -1,7 +1,7 @@
 require 'eventmachine'
 
 require 'bra/baps/codes'
-require 'bra/baps/connection'
+require 'bra/driver_common/connection'
 require 'bra/baps/reader'
 require 'bra/baps/responses/parser'
 
