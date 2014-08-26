@@ -27,7 +27,7 @@ module Bra
       # The given block will be fired with the string as soon as it is read
       # into the Reader's buffer.
       #
-      # @api
+      # @api      public
       # @example  Read a String, and print it out
       #   reader.string { |s| p s }
       #
@@ -44,6 +44,21 @@ module Bra
         end
       end
 
+      # Requests that the Reader read a BAPS command header
+      #
+      # A BAPS command is begun with a 16-bit command word, which is yielded
+      # to the given block, and a 32-bit payload length, which is ignored (as
+      # it is untrustworthy, and we hopefully need not skip payloads as we
+      # understand every common BAPS command).
+      #
+      # @api      public
+      # @example  Read a command word, and print it out
+      #   reader.command { |word| p word }
+      #
+      # @yieldparam [Integer]
+      #   The 16-bit command word as read from the header.
+      #
+      # @return [void]
       def command(&block)
         uint16(&block)
         uint32 { |_| nil }  # Ignore the incoming data count.
