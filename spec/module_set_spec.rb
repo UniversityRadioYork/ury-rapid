@@ -1,7 +1,7 @@
-require 'bra/launcher'
+require 'bra/common/module_set'
 
-describe Bra::ModuleSet do
-  subject { Bra::ModuleSet.new }
+describe Bra::Common::ModuleSet do
+  subject { Bra::Common::ModuleSet.new }
 
   class DummyModule
   end
