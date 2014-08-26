@@ -11,31 +11,42 @@ require 'bra/baps/driver'
 require 'bra/server/app'
 
 #
-# The [driver] is the part of bra that interfaces with the playout system.  It
-# is contained in a separate module space and loaded in by BRA.
+# Drivers form the part of bra that interfaces with the playout system.
+# The [drivers] config section allows configuring and launch-time enabling of
+# drivers.
 #
-driver :studio, Bra::Baps::Driver do
-  # Place driver specific configuration here.
-  host 'studio', 1350
-  username 'user'
-  password 'user'
-  num_channels 3
+drivers do 
+  configure :studio, Bra::Baps::Driver do
+    # Place driver specific configuration here.
+    host 'studio', 1350
+    username 'user'
+    password 'user'
+    num_channels 3
+  end
+
+  enable :studio
 end
 
 #
-# The [server] is the part of bra that interacts with the clients via HTTP.
+# Servers form the part of bra that interacts with external clients.
+# The [servers] config section allows configuring and launch-time enabling of
+# servers.
 #
-server :server, Bra::Server::Launcher do
-  # The host and port on which bra should listen for requests
-  host '0.0.0.0', 8181
+servers do
+  configure :server, Bra::Server::Launcher do
+    # The host and port on which bra should listen for requests
+    host '0.0.0.0', 8181
 
-  # This setting allows you to mount the HTTP server on a subdirectory, which
-  # is useful if you're proxying through to the server in Apache or suchlike.
-  url_root '/bra/'
+    # This setting allows you to mount the HTTP server on a subdirectory, which
+    # is useful if you're proxying through to the server in Apache or suchlike.
+    url_root '/bra/'
 
-  # This should be changed to point to the directory containing the
-  # /assets/ and /views/ subdirectories.
-  file_root '/path/to/files/bra/server/'
+    # This should be changed to point to the directory containing the
+    # /assets/ and /views/ subdirectories.
+    file_root '/path/to/files/bra/server/'
+  end
+
+  enable :server
 end
 
 # This is where users for the server's authentication system can be defined,
@@ -75,9 +86,3 @@ end
 # allows it to be viewed and manipulated as a collection of objects.
 #
 model Bra::Model::Structures::Standard
-
-# To appear at launch-time, drivers and servers need to be enabled in this
-# config file.
-enable_driver :studio
-enable_server :server
-

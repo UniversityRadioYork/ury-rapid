@@ -36,47 +36,15 @@ module Bra
     # files.
     #
 
-    ## Drivers ##
+    # Configures the driver set for this instance of BRA
+    #
+    # See ModuleSet for the DSL accepted by this method.
+    def_delegator :@drivers, :instance_eval, :drivers
 
-    # Configures a driver
+    # Configures the server set for this instance of BRA
     #
-    # This does not enable the driver; use #enable_driver.
-    #
-    # @api  public
-    def_delegator :@drivers, :configure, :driver
-
-    # Enables a driver at launch-time
-    #
-    # The driver must have been previously configured, with #driver.
-    #
-    # @api      public
-    # @example  Enables the driver 'production' at launch time.
-    #   # In config.rb
-    #   enable_driver :production
-    #
-    # @return [void]
-    def_delegator :@drivers, :enable, :enable_driver
-
-    ## Servers ##
-
-    # Configures a server
-    #
-    # @api  public
-    def_delegator :@servers, :configure, :server
-
-    # Enables a server at launch-time
-    #
-    # The server must have been previously configured, with #server.
-    #
-    # @api      public
-    # @example  Enables the server 'http' at launch time.
-    #   # In config.rb
-    #   enable_server :http
-    #
-    # @return [void]
-    def_delegator :@servers, :enable, :enable_server
-
-    ## Models ##
+    # See ModuleSet for the DSL accepted by this method.
+    def_delegator :@servers, :instance_eval, :servers
 
     # Configures the model.
     #
@@ -112,7 +80,7 @@ module Bra
     #
     # These can be overridden in the configuration DSL.
     def init_default_makers
-      @app_maker         = Bra::App.method(:new),
+      @app_maker         = Bra::App.method(:new)
       @auth_maker        = Kankri.method(:authenticator_from_hash)
       @channel_maker     = Bra::Model::UpdateChannel.method(:new)
       @driver_view_maker = Bra::Model::DriverView.method(:new)

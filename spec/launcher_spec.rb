@@ -20,12 +20,17 @@ describe Bra::Launcher do
     lm = logger_maker
     svm = server_view_maker
     proc do
-      driver(di, dcl) { dc }
-      enable_driver di
+      drivers do
+        configure(di, dcl) { dc }
+        enable di
+      end
+
+      servers do
+        configure(si, scl) { sc }
+        enable si
+      end
 
       model mcl
-      server(si, scl) { sc }
-      enable_server si
 
       user(un) { uc }
 
