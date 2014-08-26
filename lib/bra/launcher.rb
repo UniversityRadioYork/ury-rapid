@@ -1,8 +1,7 @@
-require 'colored'
-
 require 'bra/app'
 require 'bra/common/exceptions'
 require 'bra/common/module_set'
+require 'bra/logger'
 require 'bra/model/config'
 
 module Bra
@@ -87,7 +86,7 @@ module Bra
       @channel_maker     = Bra::Model::UpdateChannel.method(:new)
       @driver_view_maker = Bra::Model::DriverView.method(:new)
       @server_view_maker = Bra::Model::ServerView.method(:new)
-      @logger_maker      = method(:default_logger)
+      @logger_maker      = Bra::Logger.method(:default_logger)
     end
 
     # Runs the configuration passed to the Launcher
@@ -167,44 +166,6 @@ module Bra
     def make_servers(_logger, global_driver_view)
       @servers.constructor_arguments = [global_driver_view, @auth]
       @servers.start_enabled
-    end
-
-    #
-    # Default logger (TODO: move this elsewhere?)
-    #
-
-    def default_logger
-      # TODO: Allow redirecting
-      output = STDERR
-      Logger.new(STDERR).tap do |logger|
-        logger.formatter = proc do |severity, datetime, _progname, msg|
-          [format_date(datetime, output),
-           format_severity(severity, output),
-           msg].join(' ') + "\n"
-        end
-      end
-    end
-
-    # Colourises the severity if the logging output is a terminal
-    def format_severity(severity, output)
-      "[#{output.is_a?(String) ? severity : coloured_severity(severity)}]"
-    end
-
-    def format_date(datetime, output)
-      dt = datetime.strftime('%d/%m/%y %H:%M:%S')
-      output.is_a?(String) ? dt : dt.green
-    end
-
-    SEVERITIES = {
-      'DEBUG' => :green,
-      'INFO' => :blue,
-      'WARN' => :yellow,
-      'ERROR' => :red,
-      'FATAL' => :magenta
-    }
-
-    def coloured_severity(severity)
-      severity.send(SEVERITIES.fetch(severity, :white))
     end
 
     #
