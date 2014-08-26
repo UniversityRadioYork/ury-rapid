@@ -5,7 +5,7 @@ module Bra
   module Baps
     # A low-level reading interface to the BAPS meta-protocol
     #
-    # The BapsReader works by operating on an internal buffer which can have
+    # The Reader works by operating on an internal buffer which can have
     # new data fed to it.
     class Reader < DriverCommon::ResponseBuffer
       # Create helpers for requesting BAPS primitive types.
