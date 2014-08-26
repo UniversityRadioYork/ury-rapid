@@ -1,5 +1,6 @@
 bra
 ===
+![Travis build status](https://travis-ci.org/UniversityRadioYork/bra.svg)
 
 * For more extensive narrative documentation, see https://github.com/UniversityRadioYork/bra/wiki.
 * For auto-generated YARD documentation, see http://rubydoc.info/github/UniversityRadioYork/bra.
