@@ -3,7 +3,7 @@ require 'eventmachine'
 
 module Bra
   module Baps
-    # An object that handles the connection from bra to the BAPS server
+    # An object that handles the connection from bra to a server
     class Connection < EventMachine::Connection
       extend Forwardable
 
@@ -14,9 +14,9 @@ module Bra
       #   conn = Connection.new(parser, request_queue)
       #
       # @param reader [Reader] An object that interprets and acts upon
-      #   raw responses from the BAPS server.
+      #   raw responses from the server.
       # @param request_queue [EventMachine::Queue] A queue that holds raw
-      #   requests to the BAPS server.
+      #   requests to the server.
       # @param logger [Object]  The logger, for logging errors.
       def initialize(reader, request_queue, logger)
         @reader         = reader
@@ -52,10 +52,12 @@ module Bra
       #   conn.unbind
       #
       # @return [void]
+      # 
+      # @todo Make BRA able to handle this instead of just dying
       #
       def unbind
         return if @closing
-        @logger.fatal('Lost connection to BAPS, dying.')
+        @logger.fatal('Lost connection, dying.')
         EventMachine.stop
       end
 
