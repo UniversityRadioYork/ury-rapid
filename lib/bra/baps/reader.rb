@@ -5,7 +5,7 @@ module Bra
   module Baps
     # A low-level reading interface to the BAPS meta-protocol
     #
-    # The BapsReader works by operating on an internal buffer which can have
+    # The Reader works by operating on an internal buffer which can have
     # new data fed to it.
     class Reader < DriverCommon::ResponseBuffer
       # Create helpers for requesting BAPS primitive types.
@@ -22,7 +22,21 @@ module Bra
         end
       end
 
-      def string
+      # Requests that the Reader read a BAPS-formatted string
+      #
+      # The given block will be fired with the string as soon as it is read
+      # into the Reader's buffer.
+      #
+      # @api      public
+      # @example  Read a String, and print it out
+      #   reader.string { |s| p s }
+      #
+      # @yieldparam [String]
+      #   The read string.
+      #
+      # @return [void]
+      def string 
+        # BAPS strings are preceded by their length, Pascal-style.
         uint32 do |length|
           request(length, true) do |bytes|
             yield bytes
@@ -30,6 +44,21 @@ module Bra
         end
       end
 
+      # Requests that the Reader read a BAPS command header
+      #
+      # A BAPS command is begun with a 16-bit command word, which is yielded
+      # to the given block, and a 32-bit payload length, which is ignored (as
+      # it is untrustworthy, and we hopefully need not skip payloads as we
+      # understand every common BAPS command).
+      #
+      # @api      public
+      # @example  Read a command word, and print it out
+      #   reader.command { |word| p word }
+      #
+      # @yieldparam [Integer]
+      #   The 16-bit command word as read from the header.
+      #
+      # @return [void]
       def command(&block)
         uint16(&block)
         uint32 { |_| nil }  # Ignore the incoming data count.
