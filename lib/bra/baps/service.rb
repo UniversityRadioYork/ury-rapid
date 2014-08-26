@@ -7,15 +7,15 @@ require 'bra/baps/responses/responder'
 
 module Bra
   module Baps
-    # The top-level driver interface for the BAPS BRA driver
-    class Driver
+    # The top-level service interface for the BAPS BRA service
+    class Service
       extend Forwardable
 
-      # Initialise the driver given its driver configuration
+      # Initialise the service given its service configuration
       #
-      # @param config [Hash]  The configuration hash for the driver.
+      # @param config [Hash]  The configuration hash for the service.
       # @param logger [Object]  An object that can be used to log messages from
-      #   the driver.
+      #   the service.
       def initialize(logger)
         @logger = logger
 
@@ -60,24 +60,24 @@ module Bra
       # End configuration DSL
       #
 
-      # Asks the driver to construct an instance of its model
+      # Asks the service to construct an instance of its model
       #
       # This is intended to be called by the BRA launcher when initialising the
-      # drivers.
+      # services.
       def sub_model(update_channel)
         [
           create_extender(update_channel),
-          ->(driver_view) { @driver_view = driver_view }
+          ->(service_view) { @service_view = service_view }
         ]
       end
 
-      # Begin running the driver, given a view of the completed model
+      # Begin running the service, given a view of the completed model
       #
       # This function is always run within an EventMachine run block.
       def run
         # Most of the actual low-level BAPS poking is contained inside this
         # client object, which is what hooks into the BRA EventMachine
-        # instance.  We need to give it access to parts of the driver config so
+        # instance.  We need to give it access to parts of the service config so
         # it knows where and how to connect to BAPS.
         client = Bra::Baps::Client.new(@queue, @logger, @host, @port)
 
@@ -88,7 +88,7 @@ module Bra
         # We'd make the responder earlier, but we need access to the model,
         # which we only get definitive access to here.
         responder = Bra::Baps::Responses::Responder.new(
-          @driver_view,
+          @service_view,
           @requester
         )
 
@@ -108,7 +108,7 @@ module Bra
       def_delegator :@requester, :add_handlers
 
       def log_initialisation
-        @logger.info('Initialising BAPS driver...')
+        @logger.info('Initialising BAPS service...')
         @logger.info("BAPS server: #{@config[:host]}:#{@config[:port]}")
       end
 

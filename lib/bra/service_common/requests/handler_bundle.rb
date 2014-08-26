@@ -1,9 +1,9 @@
-require 'bra/driver_common/requests/handler'
-require 'bra/driver_common/requests/player_handler'
-require 'bra/driver_common/requests/playlist_handler'
+require 'bra/service_common/requests/handler'
+require 'bra/service_common/requests/player_handler'
+require 'bra/service_common/requests/playlist_handler'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Requests
       # Convenience module for handler bundles
       #

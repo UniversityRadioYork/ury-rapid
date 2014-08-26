@@ -1,5 +1,5 @@
 require 'bra/baps/codes'
-require 'bra/driver_common/handler_set'
+require 'bra/service_common/handler_set'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.
@@ -19,7 +19,7 @@ module Bra
       # The BAPS responder also has the ability to respond directly to the BAPS
       # server by sending requests to the outgoing requests queue.  This is
       # used, for example, to complete the BAPS login procedure.
-      class Responder < DriverCommon::HandlerSet
+      class Responder < ServiceCommon::HandlerSet
         extend Forwardable
 
         HANDLER_MODULE = Responses::Handlers
@@ -34,7 +34,7 @@ module Bra
         #   responder = Responder.new(model, queue)
         #   model = responder.model
         #
-        # @return [Bra::Model::DriverView]
+        # @return [Bra::Model::ServiceView]
         #   The model view on which this Responder operates.
         attr_reader :model
 
@@ -44,7 +44,7 @@ module Bra
         # @example  Initialise a responder
         #   responder = Responder.new(model, queue)
         #
-        # @param model [Bra::Model::DriverView]
+        # @param model [Bra::Model::ServiceView]
         #   The model view on this Responder will operate.
         # @param requester [Requester]
         #   The Requester via which this Responder can send BAPS login

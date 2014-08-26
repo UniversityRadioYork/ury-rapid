@@ -6,7 +6,7 @@ module Bra
     # An object that represents bra's error/debugging log
     #
     # This is part of the model to allow easy access to the logger in areas
-    # such as the server and driver, without needing to pass it in
+    # such as the server and service, without needing to pass it in
     # explicitly.  It also allows the log to be treated like any other bit of
     # data bra holds.
     #
@@ -34,7 +34,7 @@ module Bra
       #
       # @api  public
       # @example  Posting an error message to the log.
-      #   log.driver_post(:error, 'Somebody famous has died.')
+      #   log.service_post(:error, 'Somebody famous has died.')
       #
       # @param id [Symbol]  The target ID: for the Log, this is overloaded
       #   to mean the severity of the error message, which must be one of those
@@ -42,7 +42,7 @@ module Bra
       #
       # @param payload [String]  The payload: for the Log, this should be the
       #   string to log.
-      def driver_post(id, payload)
+      def service_post(id, payload)
         fail(ArgumentError) unless %i(debug info warn fatal error).include?(id)
         @logger.send(id, payload)
       end

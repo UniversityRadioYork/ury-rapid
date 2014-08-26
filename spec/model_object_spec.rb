@@ -97,7 +97,7 @@ describe Bra::Model::ModelObject do
   end
 
   #
-  # Driver actions (TODO: specify)
+  # Service actions (TODO: specify)
   #
 
   #

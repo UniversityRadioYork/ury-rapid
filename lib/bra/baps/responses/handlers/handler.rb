@@ -1,4 +1,4 @@
-require 'bra/driver_common/responses/handler'
+require 'bra/service_common/responses/handler'
 
 module Bra
   module Baps
@@ -6,7 +6,7 @@ module Bra
       module Handlers
         # Extension to normal response handlers, including BAPS specific
         # functions
-        class Handler < Bra::DriverCommon::Responses::Handler
+        class Handler < Bra::ServiceCommon::Responses::Handler
           protected
 
           # Generates an URL to a channel player given a BAPS response

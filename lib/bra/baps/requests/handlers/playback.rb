@@ -1,11 +1,11 @@
 require 'bra/common/types'
-require 'bra/driver_common/requests/handler_bundle'
+require 'bra/service_common/requests/handler_bundle'
 
 module Bra
   module Baps
     module Requests
       module Handlers
-        extend Bra::DriverCommon::Requests::HandlerBundle
+        extend Bra::ServiceCommon::Requests::HandlerBundle
 
         player_handler 'Player', :player do
           def item_from_local_playlist(index)

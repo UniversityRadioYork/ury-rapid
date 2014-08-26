@@ -4,7 +4,7 @@ module Bra
       module Handlers
         # Handler for dealing with BAPS system notifications that bra logs
         # but otherwise ignores.
-        class Log < Bra::DriverCommon::Responses::Handler
+        class Log < Bra::ServiceCommon::Responses::Handler
           def_targets(
             Codes::System::CLIENT_CHANGE,
             Codes::System::LOG_MESSAGE
@@ -36,7 +36,7 @@ module Bra
         end
 
         # Handler for BAPS responses carrying login seeds.
-        class Seed < Bra::DriverCommon::Responses::Handler
+        class Seed < Bra::ServiceCommon::Responses::Handler
           def_targets Codes::System::SEED
 
           def run
@@ -50,7 +50,7 @@ module Bra
         end
 
         # Handler for BAPS responses carrying login responses.
-        class LoginResult < Bra::DriverCommon::Responses::Handler
+        class LoginResult < Bra::ServiceCommon::Responses::Handler
           def_targets Codes::System::LOGIN_RESULT
 
           # TODO(mattbw): Move these somewhere more relevant?

@@ -1,4 +1,4 @@
-require 'bra/driver_common/responses/structure_builder'
+require 'bra/service_common/responses/structure_builder'
 
 module Bra
   module Baps
@@ -9,13 +9,13 @@ module Bra
       # format that can be read by the controller, we need to know their
       # structure (which parameters they take, and in which order).
       #
-      # The Responses module defines each response known to the BAPS driver
-      # (out of necessity; if the driver receives a response it doesn't know,
-      # the driver cannot parse the rest of the stream and dies), as well as
+      # The Responses module defines each response known to the BAPS service
+      # (out of necessity; if the service receives a response it doesn't know,
+      # the service cannot parse the rest of the stream and dies), as well as
       # its parameters in order of receipt and their corresponding names in the
       # response hashes produced by the response parser.
       module Structures
-        extend Bra::DriverCommon::Responses::StructureBuilder
+        extend Bra::ServiceCommon::Responses::StructureBuilder
 
         # These are the types used in BAPS, and correspond to the types used
         # in the response parser.

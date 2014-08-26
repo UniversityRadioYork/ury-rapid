@@ -3,24 +3,24 @@ require 'bra/launcher'
 describe Bra::Launcher do
   subject { Bra::Launcher.new(config) }
   let(:config) do
-    dc = driver_config
+    dc = service_config
     mcl = model_class
     sc = server_config
     un = user_name
     uc = user_config
-    di = driver_id
-    dcl = driver_class
+    di = service_id
+    dcl = service_class
     si = server_id
     scl = server_class
 
     appm = app_maker
     authm = auth_maker
     cm = channel_maker
-    dvm = driver_view_maker
+    dvm = service_view_maker
     lm = logger_maker
     svm = server_view_maker
     proc do
-      drivers do
+      services do
         configure(di, dcl) { dc }
         enable di
       end
@@ -38,14 +38,14 @@ describe Bra::Launcher do
       make_auth_with authm
       make_channel_with cm
       make_logger_with lm
-      make_driver_view_with dvm
+      make_service_view_with dvm
       make_server_view_with svm
     end
   end
 
   let(:user_name) { double(:user_name) }
 
-  MAKERS = %i(app auth channel logger driver_view server_view)
+  MAKERS = %i(app auth channel logger service_view server_view)
 
   MAKERS.each do |maker|
     sym = "#{maker}_maker".to_sym
@@ -61,14 +61,14 @@ describe Bra::Launcher do
   let(:server_id)              { double(:server_id)              }
   let(:server_class)           { double(:server_class)           }
 
-  let(:driver)                 { double(:driver)                 }
-  let(:driver_id)              { double(:driver_id)              }
-  let(:driver_class)           { double(:driver_class)           }
-  let(:driver_model_structure) { double(:driver_model_structure) }
-  let(:driver_model)           { double(:driver_model)           }
-  let(:register_driver_view)   { double(:register_driver_view)   }
+  let(:service)                 { double(:service)                 }
+  let(:service_id)              { double(:service_id)              }
+  let(:service_class)           { double(:service_class)           }
+  let(:service_model_structure) { double(:service_model_structure) }
+  let(:service_model)           { double(:service_model)           }
+  let(:register_service_view)   { double(:register_service_view)   }
 
-  let(:driver_config) { double(:driver_config) }
+  let(:service_config) { double(:service_config) }
   let(:server_config) { double(:server_config) }
   let(:user_config) { double(:user_config) }
 
@@ -79,22 +79,22 @@ describe Bra::Launcher do
       allow(channel_maker).to receive(:call).and_return(channel)
       allow(logger_maker).to receive(:call).and_return(logger)
 
-      allow(driver_view_maker).to receive(:call).and_return(driver_view)
+      allow(service_view_maker).to receive(:call).and_return(service_view)
       allow(server_view_maker).to receive(:call).and_return(server_view)
 
-      allow(driver_view).to receive(:post)
+      allow(service_view).to receive(:post)
 
       allow(app).to receive(:run)
 
       allow(model_class).to receive(:new).and_return(model_structure)
       allow(model_structure).to receive(:create).and_return(model)
 
-      allow(driver_class).to receive(:new).and_return(driver)
-      allow(driver).to receive(:sub_model).and_return(
-        [driver_model_structure, register_driver_view]
+      allow(service_class).to receive(:new).and_return(service)
+      allow(service).to receive(:sub_model).and_return(
+        [service_model_structure, register_service_view]
       )
-      allow(driver_model_structure).to receive(:create).and_return(driver_model)
-      allow(register_driver_view).to receive(:call)
+      allow(service_model_structure).to receive(:create).and_return(service_model)
+      allow(register_service_view).to receive(:call)
 
       allow(server_class).to receive(:new).and_return(server)
     end
@@ -104,8 +104,8 @@ describe Bra::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the drivers, servers, and driver view' do
-      test_maker(app_maker, [driver], [server], driver_view)
+    it 'calls the app maker with the services, servers, and service view' do
+      test_maker(app_maker, [service], [server], service_view)
     end
     it 'calls the authenticator maker with the user configuration' do
       test_maker(auth_maker, user_name => user_config)
@@ -117,9 +117,9 @@ describe Bra::Launcher do
       test_maker(logger_maker, no_args)
     end
 
-    it 'initialises the driver class with the logger' do
+    it 'initialises the service class with the logger' do
       subject.run
-      expect(driver_class).to have_received(:new).once.with(logger)
+      expect(service_class).to have_received(:new).once.with(logger)
     end
     it 'initialises the server class with the global server view and auth' do
       subject.run
@@ -133,16 +133,16 @@ describe Bra::Launcher do
         nil
       )
     end
-    it 'calls the driver view maker with the global model and structure' do
+    it 'calls the service view maker with the global model and structure' do
       subject.run
-      expect(driver_view_maker).to have_received(:call).with(
+      expect(service_view_maker).to have_received(:call).with(
         model, model_structure
       )
     end
-    it 'calls the driver view maker with the driver model and structure' do
+    it 'calls the service view maker with the service model and structure' do
       subject.run
-      expect(driver_view_maker).to have_received(:call).with(
-        driver_model, driver_model_structure
+      expect(service_view_maker).to have_received(:call).with(
+        service_model, service_model_structure
       )
     end
     it 'calls the server view maker with the model' do

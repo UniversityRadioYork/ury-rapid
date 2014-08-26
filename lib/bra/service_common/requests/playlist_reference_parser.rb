@@ -1,5 +1,5 @@
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Requests
       # Mixin for anything that needs to parse playlist references
       #

@@ -2,7 +2,7 @@ module Bra
   module Common
     # A set of BRA modules
     #
-    # A ModuleSet holds a set of configured BRA modules (drivers or servers),
+    # A ModuleSet holds a set of configured BRA modules (services or servers),
     # as well as information about which modules are enabled at launch-time.
     class ModuleSet
       # Initialises a ModuleSet

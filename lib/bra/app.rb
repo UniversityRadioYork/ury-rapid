@@ -10,8 +10,8 @@ module Bra
   #
   # This will usually be launched from bin/bra.
   class App
-    def initialize(drivers, servers, model_view, reactor = nil)
-      @drivers    = drivers
+    def initialize(services, servers, model_view, reactor = nil)
+      @services    = services
       @servers    = servers
       @model_view = model_view
       @reactor    = reactor || EventMachine
@@ -24,7 +24,7 @@ module Bra
 
       @reactor.run do
         @servers.each(&:run)
-        @drivers.each(&:run)
+        @services.each(&:run)
 
         Signal.trap('INT', &method(:close))
         Signal.trap('TERM', &method(:close))

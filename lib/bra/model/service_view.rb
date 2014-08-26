@@ -3,10 +3,10 @@ require 'bra/model/view'
 
 module Bra
   module Model
-    # The driver's view of the model
+    # The service's view of the model
     #
-    # This provides the driver with a get/put/post/delete API.
-    class DriverView < View
+    # This provides the service with a get/put/post/delete API.
+    class ServiceView < View
       extend Forwardable
 
       def initialize(model, structure)
@@ -22,7 +22,7 @@ module Bra
 
       %w(put post delete).each do |action|
         define_method(action) do |url, *args|
-          find(url) { |resource| resource.send("driver_#{action}", *args) }
+          find(url) { |resource| resource.send("service_#{action}", *args) }
         end
       end
 

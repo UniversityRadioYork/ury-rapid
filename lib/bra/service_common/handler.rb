@@ -1,11 +1,11 @@
 require 'bra/common/exceptions'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     # Base class for request and response handlers.
     #
-    # See Bra::DriverCommon::Requests::Handler and
-    # Bra::DriverCommon::Responses::Handler for the more specific base classes.
+    # See Bra::ServiceCommon::Requests::Handler and
+    # Bra::ServiceCommon::Responses::Handler for the more specific base classes.
     class Handler
       extend Forwardable
 
@@ -63,9 +63,9 @@ module Bra
         fail(Bra::Common::Exceptions::NotSupportedByBra)
       end
 
-      # Raises an error signifying an action is unimplemented by the driver
-      def unimplemented_by_driver
-        fail(Bra::Common::Exceptions::NotSupportedByDriver)
+      # Raises an error signifying an action is unimplemented by the service
+      def unimplemented_by_service
+        fail(Bra::Common::Exceptions::NotSupportedByService)
       end
     end
   end

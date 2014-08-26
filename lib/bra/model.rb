@@ -1,7 +1,7 @@
 require 'bra/model/composite'
 require 'bra/model/constant'
 require 'bra/model/creator'
-require 'bra/model/driver_view'
+require 'bra/model/service_view'
 require 'bra/model/item'
 require 'bra/model/log'
 require 'bra/model/model_object'

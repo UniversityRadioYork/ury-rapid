@@ -1,4 +1,4 @@
-require 'bra/driver_common/code_table'
+require 'bra/service_common/code_table'
 
 module Bra
   module Baps
@@ -10,7 +10,7 @@ module Bra
     # For the format of responses from the BAPS server, see
     # Bra::Baps::Responses::Structures.
     module Codes
-      extend Bra::DriverCommon::CodeTable
+      extend Bra::ServiceCommon::CodeTable
 
       # Response codes for the Playback section of the BAPS command set
       module Playback

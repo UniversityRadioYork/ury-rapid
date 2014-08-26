@@ -10,7 +10,7 @@ module Bra
     extend Forwardable
 
     def initialize(config)
-      @drivers = Bra::Common::ModuleSet.new()
+      @services = Bra::Common::ModuleSet.new()
       @servers = Bra::Common::ModuleSet.new()
 
       @user_config = {}
@@ -37,10 +37,10 @@ module Bra
     # files.
     #
 
-    # Configures the driver set for this instance of BRA
+    # Configures the service set for this instance of BRA
     #
     # See ModuleSet for the DSL accepted by this method.
-    def_delegator :@drivers, :instance_eval, :drivers
+    def_delegator :@services, :instance_eval, :services
 
     # Configures the server set for this instance of BRA
     #
@@ -66,7 +66,7 @@ module Bra
 
     # Programmatically build 'make_X_with' DSL methods for each
     # maker.
-    %w(app auth channel driver_view server_view logger).each do |m|
+    %w(app auth channel service_view server_view logger).each do |m|
       attr_writer "#{m}_maker".to_sym
       alias_method "make_#{m}_with".to_sym, "#{m}_maker=".to_sym
     end
@@ -84,7 +84,7 @@ module Bra
       @app_maker         = Bra::App.method(:new)
       @auth_maker        = Kankri.method(:authenticator_from_hash)
       @channel_maker     = Bra::Model::UpdateChannel.method(:new)
-      @driver_view_maker = Bra::Model::DriverView.method(:new)
+      @service_view_maker = Bra::Model::ServiceView.method(:new)
       @server_view_maker = Bra::Model::ServerView.method(:new)
       @logger_maker      = Bra::Logger.method(:default_logger)
     end
@@ -111,38 +111,38 @@ module Bra
 
     def app_arguments
       logger = make_logger
-      global_driver_view, global_server_view = mkmodel(logger)
-      drivers = make_drivers(logger, global_driver_view)
+      global_service_view, global_server_view = mkmodel(logger)
+      services = make_services(logger, global_service_view)
       servers = make_servers(logger, global_server_view)
-      [drivers, servers, global_driver_view]
+      [services, servers, global_service_view]
     end
 
     #
-    # Driver
+    # Service
     #
 
-    # Initialises all drivers that are enabled at launch-time
+    # Initialises all services that are enabled at launch-time
     #
-    # See #driver and #enable_driver in the configuration DSL.
-    def make_drivers(logger, model_view)
-      @drivers.constructor_arguments = [logger]
-      @drivers.module_create_hook =
-        ->(name, d) { init_driver(name, model_view, d) }
-      @drivers.start_enabled
+    # See #service and #enable_service in the configuration DSL.
+    def make_services(logger, model_view)
+      @services.constructor_arguments = [logger]
+      @services.module_create_hook =
+        ->(name, d) { init_service(name, model_view, d) }
+      @services.start_enabled
     end
 
-    def init_driver(name, model_view, driver)
-      sub_structure, register_driver_view = driver.sub_model(@update_channel)
+    def init_service(name, model_view, service)
+      sub_structure, register_service_view = service.sub_model(@update_channel)
       sub_model = sub_structure.create
-      add_driver_model(model_view, name, sub_model)
-      init_driver_model_view(sub_structure, sub_model, register_driver_view)
+      add_service_model(model_view, name, sub_model)
+      init_service_model_view(sub_structure, sub_model, register_service_view)
     end
 
-    def init_driver_model_view(sub_structure, sub_model, register_driver_view)
-      register_driver_view.call(make_driver_view(sub_model, sub_structure))
+    def init_service_model_view(sub_structure, sub_model, register_service_view)
+      register_service_view.call(make_service_view(sub_model, sub_structure))
     end
 
-    def add_driver_model(model_view, name, sub_model)
+    def add_service_model(model_view, name, sub_model)
       model_view.post('', name, sub_model)
     end
 
@@ -153,7 +153,7 @@ module Bra
     def mkmodel(logger)
       structure = @model_structure.new(@update_channel, logger, @model_config)
       model = structure.create
-      [make_driver_view(model, structure), make_server_view(model)]
+      [make_service_view(model, structure), make_server_view(model)]
     end
 
     #
@@ -163,8 +163,8 @@ module Bra
     # Initialises all server that are enabled at launch-time
     #
     # See #server and #enable_server in the configuration DSL.
-    def make_servers(_logger, global_driver_view)
-      @servers.constructor_arguments = [global_driver_view, @auth]
+    def make_servers(_logger, global_service_view)
+      @servers.constructor_arguments = [global_service_view, @auth]
       @servers.start_enabled
     end
 
@@ -175,7 +175,7 @@ module Bra
     def_delegator :@app_maker,                :call, :make_app
     def_delegator :@auth_maker,               :call, :make_auth
     def_delegator :@channel_maker,            :call, :make_channel
-    def_delegator :@driver_view_maker,        :call, :make_driver_view
+    def_delegator :@service_view_maker,        :call, :make_service_view
     def_delegator :@logger_maker,             :call, :make_logger
     def_delegator :@server_view_maker,        :call, :make_server_view
   end

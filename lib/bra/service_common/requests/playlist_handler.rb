@@ -1,7 +1,7 @@
-require 'bra/driver_common/requests/url_hash_handler'
+require 'bra/service_common/requests/url_hash_handler'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Requests
       # Base class for handlers that handle requests on playlists
       #
@@ -30,18 +30,18 @@ module Bra
         #   Copies the item from the given playlist reference to the playlist
         #   and index it is being POSTed to.
         #
-        #   Drivers MAY choose not to implement non-local playlist copies, but
+        #   Services MAY choose not to implement non-local playlist copies, but
         #   SHOULD implement some form of copy.
         #
-        #   Drivers may implement this by overriding #copy_from_local_playlist
+        #   Services may implement this by overriding #copy_from_local_playlist
         #   and #copy_from_foreign_playlist.
         playlist_reference_type(:copy) do |playlist, index|
           local = local_playlist?(playlist)
           copy_from_local_playlist(index)                 if local
           copy_from_foreign_playlist(playlist, index) unless local
         end
-        driver_should_override :copy_from_local_playlist
-        driver_should_override :copy_from_foreign_playlist
+        service_should_override :copy_from_local_playlist
+        service_should_override :copy_from_foreign_playlist
 
         # move
         #   URL: 'move://[old-playlist/]old-index
@@ -50,18 +50,18 @@ module Bra
         #   Moves the item from the given playlist reference to the playlist
         #   and index it is being POSTed to.
         #
-        #   Drivers MAY choose not to implement non-local playlist moves, but
+        #   Services MAY choose not to implement non-local playlist moves, but
         #   SHOULD implement some form of move.
         #
-        #   Drivers may implement this by overriding #move_from_local_playlist
+        #   Services may implement this by overriding #move_from_local_playlist
         #   and #move_from_foreign_playlist.
         playlist_reference_type(:move) do |playlist, index|
           local = local_playlist?(playlist)
           move_from_local_playlist(index)                 if local
           move_from_foreign_playlist(playlist, index) unless local
         end
-        driver_should_override :move_from_local_playlist
-        driver_should_override :move_from_foreign_playlist
+        service_should_override :move_from_local_playlist
+        service_should_override :move_from_foreign_playlist
 
         # text
         #   Hash: {type: :text, summary: 'summary', details: 'string'}
@@ -69,9 +69,9 @@ module Bra
         #   Adds a text item into the playlist, if the playout system supports
         #   text items.
         #
-        #   Drivers may implement this by overriding #text.
+        #   Services may implement this by overriding #text.
         hash_type(:text) { |hash| text(hash[:summary], hash[:details]) }
-        driver_should_override :text
+        service_should_override :text
       end
     end
   end
