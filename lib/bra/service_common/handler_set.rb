@@ -1,8 +1,8 @@
 module Bra
-  module DriverCommon
-    # Base class for driver classes that manage a set of handlers
+  module ServiceCommon
+    # Base class for service classes that manage a set of handlers
     #
-    # A handler is a class that provides some function in handling driver
+    # A handler is a class that provides some function in handling service
     # requests or responses, from server and playout system actions
     # respectively.
     #

@@ -1,17 +1,17 @@
-require 'bra/driver_common/requests/handler_bundle'
+require 'bra/service_common/requests/handler_bundle'
 
 module Bra
   module Baps
     module Requests
       module Handlers
-        extend Bra::DriverCommon::Requests::HandlerBundle
+        extend Bra::ServiceCommon::Requests::HandlerBundle
 
         playlist_handler 'Playlist', :playlist do
           on_delete { request Codes::Playlist::RESET, playlist_id }
 
           #
           # BAPS extensions to the Playlist API
-          # (see Bra::DriverCommon::Requests::PlaylistHandler for the main API)
+          # (see Bra::ServiceCommon::Requests::PlaylistHandler for the main API)
           #
 
           # x_baps_file
@@ -122,7 +122,7 @@ module Bra
 
         handler 'Item', :item do
           on_delete do
-            unsupported_by_driver unless in_playlist?
+            unsupported_by_service unless in_playlist?
 
             request Codes::Playlist::DELETE_ITEM, caller_parent_id do
               uint32 caller_id

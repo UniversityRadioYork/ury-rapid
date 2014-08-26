@@ -16,8 +16,8 @@ module Bra
     # further down in the tree from the target).
     #
     # With the exception of GET, each verb is further subdivided into a form
-    # that can trigger driver handlers to translate model change requests into
-    # playout server actions, and a 'driver' form that bypasses these handlers.
+    # that can trigger service handlers to translate model change requests into
+    # playout server actions, and a 'service' form that bypasses these handlers.
     module ModelObject
       extend Forwardable
       include Kankri::PrivilegeSubject
@@ -34,7 +34,7 @@ module Bra
       # @param handler [Object] A handler object.  This may contain the methods
       #   put and delete, which handle PUTs and DELETEs respectively.  These
       #   methods shall return true if the model should update itself, and
-      #   false if the model should wait until instructed by the driver.
+      #   false if the model should wait until instructed by the service.
       #
       # @return [self]
       def register_handler(handler)
@@ -77,24 +77,24 @@ module Bra
           @handler.call(action, self, payload)
         end
 
-        # Define error-raising stubs for the driver modifiers.
-        define_method("driver_#{action}") do |*|
+        # Define error-raising stubs for the service modifiers.
+        define_method("service_#{action}") do |*|
           fail(Bra::Common::Exceptions::NotSupportedByBra)
         end
       end
 
-      # Default implementation of driver_put
+      # Default implementation of service_put
       #
       # This will just POST into the parent.
       #
       # @param resource [Object] The resource to PUT.
       #
       # @return [void]
-      def driver_put(resource)
-        parent.driver_post(id, resource)
+      def service_put(resource)
+        parent.service_post(id, resource)
       end
 
-      # Default implementation of driver_post
+      # Default implementation of service_post
       #
       # This will, by default, move the incoming resource to this object
       # under the given ID, replacing any existing resource.
@@ -103,7 +103,7 @@ module Bra
       # @param resource [Object] The resource to POST.
       #
       # @return [void]
-      def driver_post(id, resource)
+      def service_post(id, resource)
         return if resource.nil?
         resource.move_to(self, id)
         resource.notify_update
@@ -116,8 +116,8 @@ module Bra
       # model object.
       #
       # @return [void]
-      def driver_delete
-        each { |_, value| value.driver_delete }
+      def service_delete
+        each { |_, value| value.service_delete }
       end
 
       def_delegator :@parent, :id, :parent_id

@@ -32,7 +32,7 @@ module Bra
         #
         # For our purposes, the subcode is the last four bits of the command
         # word.  This means that some subcommands in BAPS are full commands in
-        # the bra BAPS driver, but most of the commands where this happens
+        # the bra BAPS service, but most of the commands where this happens
         # aren't supported by us anyway.
         #
         # @api      public

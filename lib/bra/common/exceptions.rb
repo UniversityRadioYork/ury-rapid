@@ -38,11 +38,11 @@ module Bra
         end
       end
 
-      # Exception generated when the client requests something that the driver
+      # Exception generated when the client requests something that the service
       # cannot support
-      class NotSupportedByDriver < NotSupported
+      class NotSupportedByService < NotSupported
         def to_s
-          'Action not supported: Not implemented by driver.'
+          'Action not supported: Not implemented by service.'
         end
       end
 

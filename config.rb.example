@@ -7,17 +7,17 @@
 #
 
 require 'bra/model/structures/standard'
-require 'bra/baps/driver'
+require 'bra/baps/service'
 require 'bra/server/app'
 
 #
-# Drivers form the part of bra that interfaces with the playout system.
-# The [drivers] config section allows configuring and launch-time enabling of
-# drivers.
+# Services form the part of bra that interfaces with the playout system.
+# The [services] config section allows configuring and launch-time enabling of
+# services.
 #
-drivers do 
-  configure :studio, Bra::Baps::Driver do
-    # Place driver specific configuration here.
+services do 
+  configure :studio, Bra::Baps::Service do
+    # Place service specific configuration here.
     host 'studio', 1350
     username 'user'
     password 'user'

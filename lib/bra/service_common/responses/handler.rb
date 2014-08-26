@@ -1,8 +1,8 @@
 require 'bra/common/exceptions'
-require 'bra/driver_common/handler'
+require 'bra/service_common/handler'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Responses
       # Abstract class for handlers for a given model object
       #
@@ -10,7 +10,7 @@ module Bra
       # attempts to modify the model object, the handler translates it into a
       # playout system command to perform the actual playout system event the
       # model change represents.
-      class Handler < Bra::DriverCommon::Handler
+      class Handler < Bra::ServiceCommon::Handler
         extend Forwardable
 
         def initialize(parent, response)

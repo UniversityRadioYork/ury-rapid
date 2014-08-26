@@ -46,20 +46,20 @@ module Bra
         { name: @name, type: @type, origin: @origin, duration: @duration }
       end
 
-      # PUTs a new item representation into this Item from the driver end
+      # PUTs a new item representation into this Item from the service end
       #
       # This just asks the parent to POST the new item over this one, for the
       # sake of convenience.
       #
       # @param new_item [Item] The new Item.
-      def driver_put(new_item)
-        parent.driver_post(id, new_item)
+      def service_put(new_item)
+        parent.service_post(id, new_item)
       end
 
-      # Performs a DELETE on this object from the driver end
+      # Performs a DELETE on this object from the service end
       #
       # @return [void]
-      def driver_delete
+      def service_delete
         # Must notify before changing parent, as the notification requires
         # a valid full URL.
         notify_delete

@@ -4,7 +4,7 @@ describe Bra::Model::Log do
   let(:logger) { double(:logger) }
   subject { Bra::Model::Log.new(logger) }
 
-  describe '#driver_post' do
+  describe '#service_post' do
     context 'when the ID is a valid log level' do
       it 'calls the corresponding method on the logger with the payload' do
         expect(logger).to receive(:debug).ordered.with('Hey')
@@ -13,16 +13,16 @@ describe Bra::Model::Log do
         expect(logger).to receive(:error).ordered.with('how are')
         expect(logger).to receive(:fatal).ordered.with('you doing?')
 
-        subject.driver_post(:debug, 'Hey')
-        subject.driver_post(:info, 'there')
-        subject.driver_post(:warn, 'officer,')
-        subject.driver_post(:error, 'how are')
-        subject.driver_post(:fatal, 'you doing?')
+        subject.service_post(:debug, 'Hey')
+        subject.service_post(:info, 'there')
+        subject.service_post(:warn, 'officer,')
+        subject.service_post(:error, 'how are')
+        subject.service_post(:fatal, 'you doing?')
       end
     end
 
     context 'when the ID is not a valid log level' do
-      specify { expect { subject.driver_post(:nope, 'No way') }.to raise_error }
+      specify { expect { subject.service_post(:nope, 'No way') }.to raise_error }
     end
   end
 end

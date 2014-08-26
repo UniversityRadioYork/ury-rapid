@@ -1,7 +1,7 @@
 require 'eventmachine'
 
 require 'bra/baps/codes'
-require 'bra/driver_common/connection'
+require 'bra/service_common/connection'
 require 'bra/baps/reader'
 require 'bra/baps/responses/parser'
 
@@ -9,7 +9,7 @@ module Bra
   module Baps
     # A high-level representation of a client on the legacy BAPS server
     #
-    # The BAPS driver connects to the BAPS server as a regular client on TCP
+    # The BAPS service connects to the BAPS server as a regular client on TCP
     # sockets.  The actual reading and writing is done by objects controlled by
     # the Client, which attaches to an input responder and output queue.
     class Client

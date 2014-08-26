@@ -1,8 +1,8 @@
 require 'bra/common/exceptions'
-require 'bra/driver_common/requests/handler'
+require 'bra/service_common/requests/handler'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Requests
       # A request handler that understands URL and hash-based payloads
       #

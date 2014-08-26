@@ -1,6 +1,6 @@
 require 'digest'
 
-require 'bra/driver_common/handler_set'
+require 'bra/service_common/handler_set'
 require 'bra/baps/requests/request'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
@@ -21,7 +21,7 @@ module Bra
       #
       # The Requester delegates the request generation to several SubRequester
       # objects, which are defined elsewhere.
-      class Requester < DriverCommon::HandlerSet
+      class Requester < ServiceCommon::HandlerSet
         extend Forwardable
 
         HANDLER_MODULE = Requests::Handlers

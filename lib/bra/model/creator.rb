@@ -7,7 +7,7 @@ module Bra
     # This performs dependency injection and ensures any model modification
     # handlers specified in the options are set up.
     #
-    # It does not handle driver-specific model additions beyond method hook
+    # It does not handle service-specific model additions beyond method hook
     # registrations; to add new model trees to the model, pass the result of
     # the model creator to other functions.
     #
@@ -18,7 +18,7 @@ module Bra
 
       # Initialise a Creator
       def initialize(update_channel, logger, options)
-        @handlers = Hash.new(Bra::DriverCommon::Requests::NullHandler.new)
+        @handlers = Hash.new(Bra::ServiceCommon::Requests::NullHandler.new)
         @logger = logger
         @options = options
         @update_channel = update_channel

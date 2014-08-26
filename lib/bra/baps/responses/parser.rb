@@ -100,8 +100,8 @@ module Bra
         #
         # In order to understand the structure of the following bytes from the
         # BAPS server, every response received must be one for which the BAPS
-        # driver has a known expected format.  Thus, if an unknown response is
-        # found, the driver cannot continue and fails.
+        # service has a known expected format.  Thus, if an unknown response is
+        # found, the service cannot continue and fails.
         #
         # @api private
         #

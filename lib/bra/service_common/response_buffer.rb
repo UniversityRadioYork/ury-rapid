@@ -1,5 +1,5 @@
 module Bra
-  module DriverCommon
+  module ServiceCommon
     # A simple buffer for binary playout system responses
     #
     # The ResponseBuffer takes in requests for binary data, and fulfils them

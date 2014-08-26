@@ -32,7 +32,7 @@ module Bra
       #
       # @return [void]
       def log(severity, message)
-        find('log') { |log| log.driver_post(severity, message) }
+        find('log') { |log| log.service_post(severity, message) }
       end
 
       protected

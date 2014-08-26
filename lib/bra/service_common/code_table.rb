@@ -1,5 +1,5 @@
 module Bra
-  module DriverCommon
+  module ServiceCommon
     # Helper module for modules representing playout system command codes
     module CodeTable
       # Given a code, return a vaguely descriptive textual description

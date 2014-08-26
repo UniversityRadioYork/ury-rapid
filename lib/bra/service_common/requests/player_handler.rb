@@ -1,9 +1,9 @@
-require 'bra/driver_common/requests/handler'
-require 'bra/driver_common/requests/url_hash_handler'
-require 'bra/driver_common/requests/playlist_reference_parser'
+require 'bra/service_common/requests/handler'
+require 'bra/service_common/requests/url_hash_handler'
+require 'bra/service_common/requests/playlist_reference_parser'
 
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Requests
       # Base class for handlers that handle requests on players
       #
@@ -38,17 +38,17 @@ module Bra
         #   this player is substituted.  This can be useful in playout systems
         #   with linked players and playlists.
         #
-        #   Drivers MAY choose not to implement this command.
+        #   Services MAY choose not to implement this command.
         #
-        #   Drivers may implement this by overriding #item_from_local_playlist
+        #   Services may implement this by overriding #item_from_local_playlist
         #   and #item_from_foreign_playlist.
         playlist_reference_type :playlist do |playlist, index|
           local = local_playlist?(playlist)
           item_from_local_playlist(index)                 if local
           item_from_foreign_playlist(playlist, index) unless local
         end
-        driver_should_override :item_from_local_playlist
-        driver_should_override :item_from_foreign_playlist
+        service_should_override :item_from_local_playlist
+        service_should_override :item_from_foreign_playlist
       end
     end
   end

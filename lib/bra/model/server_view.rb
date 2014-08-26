@@ -5,7 +5,7 @@ module Bra
   module Model
     # The server's view of the model
     #
-    # This provides the driver with a get/put/post/delete API.
+    # This provides the service with a get/put/post/delete API.
     class ServerView < View
       def get(url)
         find(url) { |object| yield object }

@@ -1,5 +1,5 @@
 require 'bra/baps/format_strings'
-require 'bra/driver_common/response_buffer'
+require 'bra/service_common/response_buffer'
 
 module Bra
   module Baps
@@ -7,7 +7,7 @@ module Bra
     #
     # The Reader works by operating on an internal buffer which can have
     # new data fed to it.
-    class Reader < DriverCommon::ResponseBuffer
+    class Reader < ServiceCommon::ResponseBuffer
       # Create helpers for requesting BAPS primitive types.
       # Each type results in a one-member unpacked array, so discard the
       # array before yielding.

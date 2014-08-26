@@ -1,4 +1,4 @@
-require 'bra/driver_common/requests/null_handler'
+require 'bra/service_common/requests/null_handler'
 require 'bra/model/component_creator'
 
 module Bra

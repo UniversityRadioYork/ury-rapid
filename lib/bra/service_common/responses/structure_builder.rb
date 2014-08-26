@@ -1,5 +1,5 @@
 module Bra
-  module DriverCommon
+  module ServiceCommon
     module Responses
       # DSL for defining response structures
       #

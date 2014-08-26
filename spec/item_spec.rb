@@ -29,7 +29,7 @@ describe Bra::Model::Item do
     end
   end
 
-  describe '#driver_delete' do
+  describe '#service_delete' do
     context 'when the Item is in a parent object' do
       let(:parent) { build(:playlist) }
       let(:channel) { double(:channel) }
@@ -43,37 +43,37 @@ describe Bra::Model::Item do
 
       it 'removes the Item from that object' do
         expect(parent.children).to eq(0 => subject)
-        subject.driver_delete
+        subject.service_delete
         expect(parent.children).to eq({})
       end
 
       it 'notifies the channel' do
         expect(channel).to receive(:notify_delete).with(subject).once
 
-        subject.driver_delete
+        subject.service_delete
       end
 
       it 'sets the ID of the Item to nil' do
         expect(subject.id).to eq(0)
-        subject.driver_delete
+        subject.service_delete
         expect(subject.id).to be_nil
       end
     end
   end
 
-  describe '#driver_put' do
+  describe '#service_put' do
     let(:parent) { build(:playlist) }
 
-    it 'calls #driver_post on the parent with its current ID' do
+    it 'calls #service_post on the parent with its current ID' do
       payload = double(:payload)
       subject.move_to(parent, 0)
 
-      allow(parent).to receive(:driver_post)
-      expect(parent).to receive(:driver_post).with(0, payload)
+      allow(parent).to receive(:service_post)
+      expect(parent).to receive(:service_post).with(0, payload)
 
-      subject.driver_put(payload)
+      subject.service_put(payload)
     end
   end
 
-  # TODO(mattbw): Add artists etc. if drivers ever support them?
+  # TODO(mattbw): Add artists etc. if services ever support them?
 end
