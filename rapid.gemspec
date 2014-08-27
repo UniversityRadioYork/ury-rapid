@@ -5,7 +5,7 @@ require 'rapid/common/constants'
 require 'English'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'Rapid'
+  spec.name          = 'rapid'
   spec.version       = Rapid::Common::Constants::VERSION
   spec.authors       = ['Matt Windsor']
   spec.email         = ['computing@ury.org.uk']
