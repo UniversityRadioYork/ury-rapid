@@ -8,7 +8,7 @@ require 'ury-rapid/baps/responses/responder'
 module Rapid
   module Baps
     # The top-level service interface for the BAPS Rapid service
-    class Service
+    class Service < Rapid::ServerCommon::Service
       extend Forwardable
 
       # Initialise the service given its service configuration
