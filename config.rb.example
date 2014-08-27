@@ -40,7 +40,7 @@ servers do
 
     # This should be changed to point to the directory containing the
     # /assets/ and /views/ subdirectories.
-    file_root '/path/to/files/ury-rapid/server/'
+    file_root 'lib/ury-rapid/server'
   end
 
   enable :server
