@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-require 'rapid/common/payload'
-require 'rapid/model'
+require 'ury-rapid/common/payload'
+require 'ury-rapid/model'
 
 describe Rapid::Model::ModelObject do
   subject { build(:model_object) }

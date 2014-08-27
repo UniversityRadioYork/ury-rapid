@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rapid'
+require 'ury-rapid'
 
 Rapid.from_config_file(ARGV[0])

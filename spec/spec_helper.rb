@@ -10,11 +10,11 @@ RSpec.configure do |config|
 end
 
 SimpleCov.start do
-  add_group 'Server', 'lib/rapid/server'
-  add_group 'Common', 'lib/rapid/common'
-  add_group 'Models', 'lib/rapid/model'
-  add_group 'ServiceCommon', 'lib/rapid/service_common'
-  add_group 'BAPS', 'lib/rapid/baps'
+  add_group 'Server', 'lib/ury-rapid/server'
+  add_group 'Common', 'lib/ury-rapid/common'
+  add_group 'Models', 'lib/ury-rapid/model'
+  add_group 'ServiceCommon', 'lib/ury-rapid/service_common'
+  add_group 'BAPS', 'lib/ury-rapid/baps'
   add_filter 'spec'
 end
 

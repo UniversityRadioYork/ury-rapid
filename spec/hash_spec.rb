@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'rapid/common/hash'
+require 'ury-rapid/common/hash'
 
 describe Hash do
   describe '.new_with_default_block' do

@@ -1,4 +1,4 @@
-require 'rapid/model'
+require 'ury-rapid/model'
 
 FactoryGirl.define do
   factory :item, class: Rapid::Model::Item do

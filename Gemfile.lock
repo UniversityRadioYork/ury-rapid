@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rapid (0.4.1)
+    ury-rapid (0.4.1)
       activesupport
       colored
       compass
@@ -117,6 +117,6 @@ DEPENDENCIES
   bundler (~> 1.7)
   factory_girl (~> 4)
   rake
-  rapid!
   rspec (~> 3)
   simplecov
+  ury-rapid!

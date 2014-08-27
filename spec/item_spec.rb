@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'rapid/model/item'
+require 'ury-rapid/model/item'
 
 describe Rapid::Model::Item do
   subject { build(:item) }

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'rapid/model'
+require 'ury-rapid/model'
 
 describe Rapid::Model::HashModelObject do
   subject { Rapid::Model::HashModelObject.new(target) }

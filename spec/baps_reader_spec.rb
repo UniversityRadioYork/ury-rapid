@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'rapid/baps/reader'
+require 'ury-rapid/baps/reader'
 
 describe Rapid::Baps::Reader do
   let(:callback) { double(:callback) }

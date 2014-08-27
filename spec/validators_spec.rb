@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-require 'rapid/common/exceptions'
-require 'rapid/common/types'
+require 'ury-rapid/common/exceptions'
+require 'ury-rapid/common/types'
 
 describe Rapid::Common::Types::Validators do
   describe '#validate_volume' do

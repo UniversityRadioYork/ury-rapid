@@ -3,9 +3,9 @@
 # Configuration File
 #
 
-require 'rapid/model/structures/standard'
-require 'rapid/baps/service'
-require 'rapid/server/app'
+require 'ury-rapid/model/structures/standard'
+require 'ury-rapid/baps/service'
+require 'ury-rapid/server/app'
 
 #
 # Services form the part of Rapid that interfaces with the playout system.
@@ -40,7 +40,7 @@ servers do
 
     # This should be changed to point to the directory containing the
     # /assets/ and /views/ subdirectories.
-    file_root '/path/to/files/rapid/server/'
+    file_root '/path/to/files/ury-rapid/server/'
   end
 
   enable :server

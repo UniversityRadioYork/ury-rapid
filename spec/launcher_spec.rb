@@ -1,4 +1,4 @@
-require 'rapid/launcher'
+require 'ury-rapid/launcher'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }

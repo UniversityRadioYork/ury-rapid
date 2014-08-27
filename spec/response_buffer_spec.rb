@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'rapid/service_common/response_buffer'
+require 'ury-rapid/service_common/response_buffer'
 
 describe Rapid::ServiceCommon::ResponseBuffer do
   describe '#request' do
