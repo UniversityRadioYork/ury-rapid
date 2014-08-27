@@ -1,8 +1,8 @@
-require 'bra/model/log'
+require 'rapid/model/log'
 
-describe Bra::Model::Log do
+describe Rapid::Model::Log do
   let(:logger) { double(:logger) }
-  subject { Bra::Model::Log.new(logger) }
+  subject { Rapid::Model::Log.new(logger) }
 
   describe '#service_post' do
     context 'when the ID is a valid log level' do

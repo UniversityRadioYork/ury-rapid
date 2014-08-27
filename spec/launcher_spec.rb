@@ -1,7 +1,7 @@
-require 'bra/launcher'
+require 'rapid/launcher'
 
-describe Bra::Launcher do
-  subject { Bra::Launcher.new(config) }
+describe Rapid::Launcher do
+  subject { Rapid::Launcher.new(config) }
   let(:config) do
     dc = service_config
     mcl = model_class

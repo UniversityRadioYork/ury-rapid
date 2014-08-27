@@ -1,7 +1,7 @@
-require 'bra/common/module_set'
+require 'rapid/common/module_set'
 
-describe Bra::Common::ModuleSet do
-  subject { Bra::Common::ModuleSet.new }
+describe Rapid::Common::ModuleSet do
+  subject { Rapid::Common::ModuleSet.new }
 
   class DummyModule
   end

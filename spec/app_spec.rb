@@ -1,8 +1,8 @@
-require 'bra/app'
-require 'bra/model'
+require 'rapid/app'
+require 'rapid/model'
 
-describe Bra::App do
-  subject { Bra::App.new([service], [server], service_view, reactor) }
+describe Rapid::App do
+  subject { Rapid::App.new([service], [server], service_view, reactor) }
 
   let(:service)      { double(:service) }
   let(:server)      { double(:server) }

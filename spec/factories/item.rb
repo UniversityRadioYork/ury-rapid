@@ -1,14 +1,14 @@
-require 'bra/model'
+require 'rapid/model'
 
 FactoryGirl.define do
-  factory :item, class: Bra::Model::Item do
+  factory :item, class: Rapid::Model::Item do
     type :library
     name 'Brown Girl In The Ring'
     origin 'playlist://0/0'
     duration 31_415
 
     ignore do
-      channel Bra::Model::UpdateChannel.new
+      channel Rapid::Model::UpdateChannel.new
     end
 
     after :build do |item, evaluator|

@@ -1,0 +1,29 @@
+%section.index
+  %h1 Index
+  %p
+    Welcome to the Rapid API inspector.
+  %p
+    For machine readable API output, please set the
+    %strong Accept
+    header (application/json is preferred).
+
+%section.model
+  %h1=inspector.title
+
+  - if inspector.resource
+    - inspector.resource.keys.each do |child|
+      = child(inspector, child)
+
+  = navigation(inspector)
+
+%section.updates
+  %h1 Update Console
+  %p
+    If JavaScript and WebSockets are enabled, raw Rapid update notifications
+    will appear here.  This can be used to test that the WebSocket updates
+    system is working.
+  %p#status
+    No connection (yet).
+  %pre#update-console
+  %script{ src: url('/scripts/update.js') }
+

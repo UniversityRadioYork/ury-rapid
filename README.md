@@ -33,7 +33,7 @@ Requirements
 Usage
 -----
 
-`bundle exec bin/bra`
+`bundle exec bin/rapid`
 
 rapid is configured via a ruby file called `config.rb`.  An example file is provided, but may be out of date.  Check the code if in doubt.
 

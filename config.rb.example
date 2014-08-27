@@ -1,22 +1,19 @@
 #
-# |__   __  __
-# |  | |   |  |
-# |__| |   |__|_
-#
+# rapid
 # Configuration File
 #
 
-require 'bra/model/structures/standard'
-require 'bra/baps/service'
-require 'bra/server/app'
+require 'rapid/model/structures/standard'
+require 'rapid/baps/service'
+require 'rapid/server/app'
 
 #
-# Services form the part of bra that interfaces with the playout system.
+# Services form the part of Rapid that interfaces with the playout system.
 # The [services] config section allows configuring and launch-time enabling of
 # services.
 #
 services do 
-  configure :studio, Bra::Baps::Service do
+  configure :studio, Rapid::Baps::Service do
     # Place service specific configuration here.
     host 'studio', 1350
     username 'user'
@@ -28,22 +25,22 @@ services do
 end
 
 #
-# Servers form the part of bra that interacts with external clients.
+# Servers form the part of Rapid that interacts with external clients.
 # The [servers] config section allows configuring and launch-time enabling of
 # servers.
 #
 servers do
-  configure :server, Bra::Server::Launcher do
-    # The host and port on which bra should listen for requests
+  configure :server, Rapid::Server::Launcher do
+    # The host and port on which Rapid should listen for requests
     host '0.0.0.0', 8181
 
     # This setting allows you to mount the HTTP server on a subdirectory, which
     # is useful if you're proxying through to the server in Apache or suchlike.
-    url_root '/bra/'
+    url_root '/rapid/'
 
     # This should be changed to point to the directory containing the
     # /assets/ and /views/ subdirectories.
-    file_root '/path/to/files/bra/server/'
+    file_root '/path/to/files/rapid/server/'
   end
 
   enable :server
@@ -82,7 +79,7 @@ user :admin do
   }
 end
 
-# The [model] is the part of bra that tracks the playout system's state and
+# The [model] is the part of Rapid that tracks the playout system's state and
 # allows it to be viewed and manipulated as a collection of objects.
 #
-model Bra::Model::Structures::Standard
+model Rapid::Model::Structures::Standard

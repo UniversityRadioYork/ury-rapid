@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-
-require 'bra'
-
-Bra.from_config_file(ARGV[0])

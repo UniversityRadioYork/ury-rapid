@@ -1,4 +1,4 @@
 --markup rdoc
---title 'bra Documentation'
+--title 'Rapid Documentation'
 --readme README.md
 **/*.rb - *.md

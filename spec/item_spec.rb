@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require 'bra/model/item'
+require 'rapid/model/item'
 
-describe Bra::Model::Item do
+describe Rapid::Model::Item do
   subject { build(:item) }
   let(:attrs) { attributes_for(:item) }
 

@@ -1,0 +1,16 @@
+!!! 5
+%html
+  %head
+    %title Rapid API Inspector
+    %link{ href: '//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css', rel: 'stylesheet', type: 'text/css' }
+    %link{ href: url('/stylesheets/screen.css'), media: 'screen, projection', rel: 'stylesheet', type: 'text/css' }
+    %link{ href: url('/stylesheets/print.css'), media:'print', rel:'stylesheet', type:'text/css' }
+  %body
+    %header
+      %h1 Rapid
+      %h2 API Inspector
+
+    = yield
+
+    %script{ src: '//code.jquery.com/jquery-2.0.3.min.js' }
+    %script{ src: url('/scripts/main.js') }

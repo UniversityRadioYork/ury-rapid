@@ -1,8 +1,8 @@
-require 'bra/service_common/requests/playlist_reference_parser'
+require 'rapid/service_common/requests/playlist_reference_parser'
 
 # Mock implementation of PlaylistReferenceParser.
 class MockPrp
-  include Bra::ServiceCommon::Requests::PlaylistReferenceParser
+  include Rapid::ServiceCommon::Requests::PlaylistReferenceParser
 
   def local_playlist_id
     :local_id
