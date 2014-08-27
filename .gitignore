@@ -24,6 +24,7 @@ doc/
 
 # Config and secrets
 config.rb
+!lib/ury-rapid/model/config.rb
 test.sh
 
 # Backups and swapfiles
