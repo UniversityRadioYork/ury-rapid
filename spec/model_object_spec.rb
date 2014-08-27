@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require 'bra/common/payload'
-require 'bra/model'
+require 'ury-rapid/common/payload'
+require 'ury-rapid/model'
 
-describe Bra::Model::ModelObject do
+describe Rapid::Model::ModelObject do
   subject { build(:model_object) }
   let(:target) { nil }
   let(:old_parent) { double(:old_parent) }
@@ -21,7 +21,7 @@ describe Bra::Model::ModelObject do
       subject { build(:model_object, channel: nil) }
       specify do
         expect { subject.send(method) }.to raise_error(
-          Bra::Common::Exceptions::MissingUpdateChannel
+          Rapid::Common::Exceptions::MissingUpdateChannel
         ) { |e| expect(e.model_object).to eq(subject) }
       end
     end
@@ -72,7 +72,7 @@ describe Bra::Model::ModelObject do
 
   %i(put post delete).each do |action|
     describe "##{action}" do
-      let(:payload) { Bra::Common::Payload.new(:body, privilege_set) }
+      let(:payload) { Rapid::Common::Payload.new(:body, privilege_set) }
       before(:each) do
         subject.register_handler(handler)
         allow(handler).to receive(:call)

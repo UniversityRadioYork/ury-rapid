@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bra (0.4.1)
+    ury-rapid (0.4.1)
       activesupport
       colored
       compass
@@ -111,11 +111,12 @@ GEM
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
-  bra!
   bundler (~> 1.7)
   factory_girl (~> 4)
   rake
   rspec (~> 3)
   simplecov
+  ury-rapid!

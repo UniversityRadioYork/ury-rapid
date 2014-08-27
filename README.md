@@ -2,7 +2,7 @@ rapid
 =====
 ![Travis build status](https://travis-ci.org/UniversityRadioYork/rapid.svg)
 
-* For more extensive narrative documentation, see https://github.com/UniversityRadioYork/rapid/wiki.
+* For more extensive narrative documentation, see https://github.com/UniversityRadioYork/ury-rapid/wiki.
 * For auto-generated YARD documentation, see http://rubydoc.info/github/UniversityRadioYork/rapid.
 
 __rapid__ (formerly _bra_) is (will be) a Web-ready abstraction layer for radio playout systems, based on a REST-like API and push-based message pipeline.
@@ -33,7 +33,7 @@ Requirements
 Usage
 -----
 
-`bundle exec bin/bra`
+`bundle exec bin/rapid`
 
 rapid is configured via a ruby file called `config.rb`.  An example file is provided, but may be out of date.  Check the code if in doubt.
 

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require 'bra/common/payload'
+require 'ury-rapid/common/payload'
 
-describe Bra::Common::Payload do
-  subject { Bra::Common::Payload.new(body, privilege_set, default_id) }
+describe Rapid::Common::Payload do
+  subject { Rapid::Common::Payload.new(body, privilege_set, default_id) }
   let(:body) { double(:body) }
   let(:privilege_set) { double(:privilege_set) }
   let(:default_id) { double(:default_id) }

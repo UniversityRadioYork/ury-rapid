@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 require 'forwardable'
-require 'bra/baps/requests/request'
-require 'bra/baps/format_strings'
+require 'ury-rapid/baps/requests/request'
+require 'ury-rapid/baps/format_strings'
 
 # Simple queue for testing requests.
 class MockQueue
@@ -16,9 +16,9 @@ class MockQueue
   def_delegator :@contents, :shift, :pop
 end
 
-describe Bra::Baps::Requests::Request do
-  let(:request) { Bra::Baps::Requests::Request.new(100, 3) }
-  let(:request_two) { Bra::Baps::Requests::Request.new(100, 3) }
+describe Rapid::Baps::Requests::Request do
+  let(:request) { Rapid::Baps::Requests::Request.new(100, 3) }
+  let(:request_two) { Rapid::Baps::Requests::Request.new(100, 3) }
   let(:queue) { MockQueue.new }
   let(:header) { MockQueue.new }
 
@@ -28,9 +28,9 @@ describe Bra::Baps::Requests::Request do
         request.uint16(65_535).to(queue)
         expect(queue.pop).to eq(
           [103, 2, 65_535].pack(
-            Bra::Baps::FormatStrings::UINT16 +
-            Bra::Baps::FormatStrings::UINT32 +
-            Bra::Baps::FormatStrings::UINT16
+            Rapid::Baps::FormatStrings::UINT16 +
+            Rapid::Baps::FormatStrings::UINT32 +
+            Rapid::Baps::FormatStrings::UINT16
           )
         )
       end
@@ -52,9 +52,9 @@ describe Bra::Baps::Requests::Request do
         request.uint32(65_535).to(queue)
         expect(queue.pop).to eq(
           [103, 4, 65_535].pack(
-            Bra::Baps::FormatStrings::UINT16 +
-            Bra::Baps::FormatStrings::UINT32 +
-            Bra::Baps::FormatStrings::UINT32
+            Rapid::Baps::FormatStrings::UINT16 +
+            Rapid::Baps::FormatStrings::UINT32 +
+            Rapid::Baps::FormatStrings::UINT32
           )
         )
       end
@@ -79,10 +79,10 @@ describe Bra::Baps::Requests::Request do
 
         expect(queue.pop).to eq(
           [103, 4 + size, size, str].pack(
-            Bra::Baps::FormatStrings::UINT16 +
-            Bra::Baps::FormatStrings::UINT32 +
-            Bra::Baps::FormatStrings::UINT32 +
-            Bra::Baps::FormatStrings::STRING_BODY + size.to_s
+            Rapid::Baps::FormatStrings::UINT16 +
+            Rapid::Baps::FormatStrings::UINT32 +
+            Rapid::Baps::FormatStrings::UINT32 +
+            Rapid::Baps::FormatStrings::STRING_BODY + size.to_s
           )
         )
       end

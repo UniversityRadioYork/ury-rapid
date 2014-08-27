@@ -1,8 +1,8 @@
-require 'bra/model'
+require 'ury-rapid/model'
 
 # A minimal mock implementation of a ModelObject.
 class MockModelObject
-  include Bra::Model::ModelObject
+  include Rapid::Model::ModelObject
 end
 
 FactoryGirl.define do
@@ -10,7 +10,7 @@ FactoryGirl.define do
     handler_target nil
 
     ignore do
-      channel Bra::Model::UpdateChannel.new
+      channel Rapid::Model::UpdateChannel.new
     end
 
     after :build do |item, evaluator|
