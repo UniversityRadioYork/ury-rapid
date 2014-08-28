@@ -4,6 +4,8 @@ describe Rapid::Common::ModuleSet do
   subject { Rapid::Common::ModuleSet.new }
 
   class DummyModule
+    def run
+    end
   end
 
   before(:each) do
@@ -67,7 +69,10 @@ describe Rapid::Common::ModuleSet do
 
     context 'when the module is configured' do
       before(:each) do
-        allow(DummyModule).to receive(:new)
+        dmnew = DummyModule.method(:new)
+        allow(DummyModule).to receive(:new) do |*args|
+          dmnew.call(*args)
+        end
       end
 
       specify { expect { subject.start(:module1).to_not raise_error } }
