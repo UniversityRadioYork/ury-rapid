@@ -81,12 +81,12 @@ module Rapid
     #
     # These can be overridden in the configuration DSL.
     def init_default_makers
-      @app_maker         = Rapid::App.method(:new)
-      @auth_maker        = Kankri.method(:authenticator_from_hash)
-      @channel_maker     = Rapid::Model::UpdateChannel.method(:new)
+      @app_maker          = Rapid::App.method(:new)
+      @auth_maker         = Kankri.method(:authenticator_from_hash)
+      @channel_maker      = Rapid::Model::UpdateChannel.method(:new)
       @service_view_maker = Rapid::Model::ServiceView.method(:new)
-      @server_view_maker = Rapid::Model::ServerView.method(:new)
-      @logger_maker      = Rapid::Logger.method(:default_logger)
+      @server_view_maker  = Rapid::Model::ServerView.method(:new)
+      @logger_maker       = Rapid::Logger.method(:default_logger)
     end
 
     # Runs the configuration passed to the Launcher
@@ -112,23 +112,24 @@ module Rapid
     def app_arguments
       logger = make_logger
       global_service_view, global_server_view = mkmodel(logger)
-      services = make_services(logger, global_service_view)
-      servers = make_servers(logger, global_server_view)
-      [services, servers, global_service_view]
+      prepare_service_set(logger, global_service_view)
+      prepare_server_set(logger, global_server_view)
+      [@services, @servers, global_service_view]
     end
 
     #
     # Service
     #
 
-    # Initialises all services that are enabled at launch-time
+    # Prepares the service set for sending to the app
     #
     # See #service and #enable_service in the configuration DSL.
-    def make_services(logger, model_view)
+    #
+    # @return [void]
+    def prepare_service_set(logger, model_view)
       @services.constructor_arguments = [logger]
       @services.module_create_hook =
         ->(name, d) { init_service(name, model_view, d) }
-      @services.start_enabled
     end
 
     def init_service(name, model_view, service)
@@ -160,23 +161,24 @@ module Rapid
     # Server
     #
 
-    # Initialises all server that are enabled at launch-time
+    # Prepares the server set for sending to the app
     #
     # See #server and #enable_server in the configuration DSL.
-    def make_servers(_logger, global_service_view)
+    #
+    # @return [void]
+    def prepare_server_set(_logger, global_service_view)
       @servers.constructor_arguments = [global_service_view, @auth]
-      @servers.start_enabled
     end
 
     #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,                :call, :make_app
-    def_delegator :@auth_maker,               :call, :make_auth
-    def_delegator :@channel_maker,            :call, :make_channel
-    def_delegator :@service_view_maker,        :call, :make_service_view
-    def_delegator :@logger_maker,             :call, :make_logger
-    def_delegator :@server_view_maker,        :call, :make_server_view
+    def_delegator :@app_maker,           :call, :make_app
+    def_delegator :@auth_maker,          :call, :make_auth
+    def_delegator :@channel_maker,       :call, :make_channel
+    def_delegator :@service_view_maker,  :call, :make_service_view
+    def_delegator :@logger_maker,        :call, :make_logger
+    def_delegator :@server_view_maker,   :call, :make_server_view
   end
 end

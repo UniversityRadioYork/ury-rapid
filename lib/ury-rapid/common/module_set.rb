@@ -78,6 +78,8 @@ module Rapid
 
       # Starts a specific module
       #
+      # This must be performed in the EventMachine run loop.
+      #
       # @api      semipublic
       # @example  Start the module :foo
       #   ms.start(:foo)
