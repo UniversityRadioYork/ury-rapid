@@ -133,6 +133,8 @@ module Rapid
     end
 
     def init_service(name, model_view, service)
+      return unless service.respond_to?(:sub_model)
+
       sub_structure, register_service_view = service.sub_model(@update_channel)
       sub_model = sub_structure.create
       add_service_model(model_view, name, sub_model)
