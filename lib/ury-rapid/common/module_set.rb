@@ -54,9 +54,8 @@ module Rapid
       # @return [void]
       def enable(name)
         fail(
-          Rapid::Exceptions::BadConfig.new(
-            "Tried to enable non-configured module #{name}'."
-          )
+          Rapid::Exceptions::BadConfig,
+          "Tried to enable non-configured module #{name}'."
         ) unless @modules.key?(name)
 
         @enabled_modules << name
@@ -103,10 +102,9 @@ module Rapid
       # @example  Start all enabled modules
       #   ms.start_enabled
       #
-      # @return [Array]
-      #   The modules that have been started.
+      # @return [void]
       def start_enabled
-        @enabled_modules.map(&method(:start))
+        @enabled_modules.each(&method(:start))
       end
 
       def_delegator :@enabled_modules, :to_a, :enabled
