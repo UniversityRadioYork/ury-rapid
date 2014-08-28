@@ -86,12 +86,8 @@ module Rapid
         ids.each { |id| child(id, child_class.new(*new_args), &block) }
       end
 
-      def root(object = nil, &block)
-        build(object || new_hash(:root), &block)
-      end
-
-      def playout_root(object = nil, &block)
-        build(object || new_hash(:playout_root), &block)
+      def root(target = :root, &block)
+        build(new_hash(target), &block)
       end
 
       def build(object, &block)

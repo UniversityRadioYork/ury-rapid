@@ -515,6 +515,11 @@ section.playout_root {
     @include set-style($colour-pink);
 }
 
+section.group_root {
+    @include fa-heading($fa-folder-open);
+    @include set-style($colour-grey);
+}
+
 section.info {
     @include fa-heading($fa-info);
     @include set-style($colour-indigo);

@@ -230,7 +230,9 @@ module Rapid
         #
         # @return [Constant]  The finished model.
         def create
-          root {}
+          # The model is created empty, but will have the models of any modules
+          # in the module group inserted into it.
+          root(:group_root) {}
         end
       end
     end
