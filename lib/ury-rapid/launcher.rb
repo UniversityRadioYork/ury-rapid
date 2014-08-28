@@ -113,7 +113,7 @@ module Rapid
       logger = make_logger
       global_service_view, global_server_view = mkmodel(logger)
       prepare_service_set(logger, global_service_view)
-      prepare_server_set(logger, global_server_view)
+      prepare_server_set(logger, global_server_view, global_service_view)
       [@services, @servers, global_service_view]
     end
 
@@ -129,19 +129,15 @@ module Rapid
     def prepare_service_set(logger, model_view)
       @services.constructor_arguments = [logger]
       @services.module_create_hook =
-        ->(name, d) { init_service(name, model_view, d) }
+        ->(name, d) { prepare_module(name, model_view, d) }
     end
 
-    def init_service(name, model_view, service)
-      return unless service.respond_to?(:sub_model)
+    def prepare_module(name, model_view, mod)
+      return unless mod.respond_to?(:sub_model)
 
-      sub_structure, register_service_view = service.sub_model(@update_channel)
+      sub_structure, register_service_view = mod.sub_model(@update_channel)
       sub_model = sub_structure.create
       add_service_model(model_view, name, sub_model)
-      init_service_model_view(sub_structure, sub_model, register_service_view)
-    end
-
-    def init_service_model_view(sub_structure, sub_model, register_service_view)
       register_service_view.call(make_service_view(sub_model, sub_structure))
     end
 
@@ -168,8 +164,10 @@ module Rapid
     # See #server and #enable_server in the configuration DSL.
     #
     # @return [void]
-    def prepare_server_set(_logger, global_server_view)
+    def prepare_server_set(_logger, global_server_view, global_service_view)
       @servers.constructor_arguments = [global_server_view, @auth]
+      @services.module_create_hook =
+        ->(name, d) { prepare_module(name, global_service_view, d) }
     end
 
     #
