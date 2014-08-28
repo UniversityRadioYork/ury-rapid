@@ -78,6 +78,7 @@ $fa-stop:         "\f04d";
 $fa-folder-open:  "\f07c";
 $fa-square-o:     "\f096";
 $fa-list-ol:      "\f0cb";
+$fa-sitemap:      "\f0e8";
 $fa-file-text-o:  "\f0f6";
 $fa-code:         "\f121";
 $fa-info:         "\f129";
@@ -516,8 +517,8 @@ section.playout_root {
 }
 
 section.group_root {
-    @include fa-heading($fa-folder-open);
-    @include set-style($colour-grey);
+    @include fa-heading($fa-sitemap);
+    @include set-style($colour-purple);
 }
 
 section.info {

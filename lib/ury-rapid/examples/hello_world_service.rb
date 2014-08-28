@@ -98,7 +98,7 @@ module Rapid
         #
         # @return [Constant]  The finished model.
         def create
-          root do
+          root :sub_root do
             component :message, :constant, @message, :message
           end
         end
