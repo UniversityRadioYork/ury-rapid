@@ -3,6 +3,7 @@
 # Configuration File
 #
 
+require 'ury-rapid/examples/hello_world_service'
 require 'ury-rapid/model/structures/standard'
 require 'ury-rapid/baps/service'
 require 'ury-rapid/server/app'
@@ -12,7 +13,12 @@ require 'ury-rapid/server/app'
 # The [services] config section allows configuring and launch-time enabling of
 # services.
 #
-services do 
+services do
+  configure :hello, Rapid::Examples::HelloWorldService do
+    message 'It works!'
+  end
+  enable :hello
+
   configure :studio, Rapid::Baps::Service do
     # Place service specific configuration here.
     host 'studio', 1350
@@ -20,8 +26,7 @@ services do
     password 'user'
     num_channels 3
   end
-
-  enable :studio
+  # enable :studio
 end
 
 #

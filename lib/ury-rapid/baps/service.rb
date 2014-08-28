@@ -8,7 +8,7 @@ require 'ury-rapid/baps/responses/responder'
 module Rapid
   module Baps
     # The top-level service interface for the BAPS Rapid service
-    class Service < Rapid::ServerCommon::Service
+    class Service < Rapid::ServiceCommon::Service
       extend Forwardable
 
       # Initialise the service given its service configuration
@@ -101,7 +101,7 @@ module Rapid
         @logger.info("BAPS server: #{@config[:host]}:#{@config[:port]}")
       end
 
-      def create_extender(update_channel)
+      def sub_model_structure(update_channel)
         make_structure(update_channel).tap do |structure|
           @requester.add_handlers(structure)
         end

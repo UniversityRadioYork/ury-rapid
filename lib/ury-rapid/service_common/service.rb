@@ -48,7 +48,7 @@ module Rapid
       protected
 
       attr_reader :logger
-      attr_reader :service_view
+      attr_accessor :service_view
     end
   end
 end
