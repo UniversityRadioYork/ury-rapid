@@ -78,7 +78,8 @@ module Rapid
 
       # Starts a specific module
       #
-      # This must be performed in the EventMachine run loop.
+      # This should be performed in the EventMachine run loop, as certain
+      # modules will spin up EventMachine tasks here.
       #
       # @api      semipublic
       # @example  Start the module :foo
@@ -87,14 +88,13 @@ module Rapid
       # @param name [Symbol]
       #   The name of the module to start.
       #
-      # @return [Object]
-      #   The module that has been started.
+      # @return [void]
       def start(name)
         module_class, module_config = @modules.fetch(name)
-        module_class.new(*@constructor_arguments).tap do |mod|
-          mod.instance_eval(&module_config)
-          @module_create_hook.call(name, mod)
-        end
+        mod = module_class.new(*@constructor_arguments)
+        mod.instance_eval(&module_config)
+        @module_create_hook.call(name, mod)
+        mod.run
       end
 
       # Starts all enabled modules

@@ -2,17 +2,17 @@ require 'ury-rapid/app'
 require 'ury-rapid/model'
 
 describe Rapid::App do
-  subject { Rapid::App.new([service], [server], service_view, reactor) }
+  subject { Rapid::App.new(service_set, server_set, service_view, reactor) }
 
-  let(:service)      { double(:service) }
-  let(:server)      { double(:server) }
+  let(:service_set)  { double(:service) }
+  let(:server_set)   { double(:server) }
   let(:service_view) { double(:service_view) }
-  let(:reactor)     { double(:reactor) }
+  let(:reactor)      { double(:reactor) }
 
   describe '#run' do
     before(:each) do
-      allow(service).to receive(:run)
-      allow(server).to receive(:run)
+      allow(service_set).to receive(:start_enabled)
+      allow(server_set).to receive(:start_enabled)
       allow(reactor).to receive(:run).and_yield
 
       # Logging messages go through the service view, which has access to the
@@ -21,18 +21,18 @@ describe Rapid::App do
     end
 
     it 'calls #run on the reactor' do
-      expect(reactor).to receive(:run).once.with(no_args)
       subject.run
+      expect(reactor).to have_received(:run).once.with(no_args)
     end
 
-    it 'calls #run on the server' do
-      expect(server).to receive(:run).once.with(no_args)
+    it 'calls #start_enabled on the server set' do
       subject.run
+      expect(server_set).to have_received(:start_enabled).once.with(no_args)
     end
 
-    it 'calls #run on the service' do
-      expect(service).to receive(:run).once.with(no_args)
+    it 'calls #start_enabled on the service set' do
       subject.run
+      expect(service_set).to have_received(:start_enabled).once.with(no_args)
     end
   end
 end
