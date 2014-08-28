@@ -83,6 +83,13 @@ describe Rapid::Common::ModuleSet do
   end
 
   describe '#start' do
+    let(:mb) { double(:model_builder) }
+
+    before(:each) do
+      allow(mb).to receive(:build)
+      subject.model_builder = mb
+    end
+
     context 'when the module is not configured' do
       specify { expect { subject.start(:module2).to raise_error } }
     end
@@ -100,6 +107,14 @@ describe Rapid::Common::ModuleSet do
       it 'instantiates the DummyModule' do
         subject.start(:module1)
         expect(DummyModule).to have_received(:new).once
+      end
+
+      it 'calls #build on the model builder with a module name and instance' do
+        subject.start(:module1)
+        expect(mb).to have_received(:build).once.with(
+          :module1,
+          a_kind_of(DummyModule)
+        )
       end
     end
   end

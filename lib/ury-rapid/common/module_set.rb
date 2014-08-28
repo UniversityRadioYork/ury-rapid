@@ -1,3 +1,5 @@
+require 'ury-rapid/common/exceptions'
+
 module Rapid
   module Common
     # A set of Rapid modules
@@ -20,7 +22,36 @@ module Rapid
         @modules = {}
         @enabled_modules = Set[]
         @constructor_arguments = []
-        @module_create_hook = ->(*) {}
+        @model_builder = nil
+      end
+
+      # Creates a sub-group of this ModuleSet
+      #
+      # @api      semipublic
+      # @example  Create a sub-group named :my_group with a module configured
+      #   ms.group(:my_group) do
+      #     ms.configure(:a_module_name, Module::Class::Here) do
+      #       # Module DSL goes here
+      #     end
+      #   end
+      #
+      # @param name [Symbol]
+      #   The name to give to this sub-group.
+      #
+      # @return [void]
+      def group(name, &block)
+        # This needs to be a procedure as the model builder won't have been
+        # assigned to this ModuleSet at the time #group is called, but it will
+        # have been when the #configure block is called.
+        builder_proc = ->() { @model_builder }
+
+        configure(name, ModuleSubgroup) do
+          builder = builder_proc.call
+          fail("Found nil model builder at group #{name}.") if builder.nil?
+
+          send(:model_builder=, builder)
+          instance_eval(&block)
+        end
       end
 
       # Adds a module and its configuration to the ModuleSet
@@ -54,7 +85,7 @@ module Rapid
       # @return [void]
       def enable(name)
         fail(
-          Rapid::Exceptions::BadConfig,
+          Rapid::Common::Exceptions::BadConfig,
           "Tried to enable non-configured module #{name}'."
         ) unless @modules.key?(name)
 
@@ -92,7 +123,7 @@ module Rapid
         module_class, module_config = @modules.fetch(name)
         mod = module_class.new(*@constructor_arguments)
         mod.instance_eval(&module_config)
-        @module_create_hook.call(name, mod)
+        @model_builder.build(name, mod)
         mod.run
       end
 
@@ -125,7 +156,83 @@ module Rapid
       end
 
       attr_writer :constructor_arguments
-      attr_writer :module_create_hook
+      attr_writer :model_builder
+    end
+
+    # Class for module sub-groups
+    class ModuleSubgroup < ModuleSet
+      def initialize(constructor_arguments)
+        super()
+        @constructor_arguments = constructor_arguments
+      end
+
+      # Runs the subgroup.
+      #
+      # Running the subgroup entails starting all of the subgroup's enabled
+      # modules.
+      #
+      # @api      semipublic
+      # @example  Runs a subgroup.
+      #   ms.run
+      #
+      # @return [void]
+      def run
+        start_enabled
+      end
+
+      # Asks the module subgroup to prepare its sub-model structure
+      #
+      # @api      semipublic
+      # @example  Request the sub-model structure of the sub-group
+      #   sub_model, register_view_proc = subgroup.sub_model
+      #
+      # @param update_channel [Rapid::Model::UpdateChannel]
+      #   The update channel that should be used when creating the sub-model
+      #   structure.
+      #
+      # @return [Array]
+      #   A tuple of the completed sub-model structure, and a proc that should
+      #   be called with a ServiceView of the completed model.
+      def sub_model(update_channel)
+        [sub_model_structure(update_channel), method(:service_view=)]
+      end
+
+      # Constructs the sub-model structure for this subgroup
+      #
+      # @api  private
+      #
+      # @param update_channel [Rapid::Model::UpdateChannel]
+      #   The update channel that should be used when creating the sub-model
+      #   structure.
+      #
+      # @return [Object]
+      #   The sub-model structure.
+      def sub_model_structure(update_channel)
+        Structure.new(update_channel)
+      end
+
+      def service_view=(new_view)
+        @service_view = new_view
+        @model_builder = @model_builder.replace_service_view(@service_view)
+      end
+
+      # The structure used by subgroups
+      class Structure < Rapid::Model::Creator
+        def initialize(update_channel)
+          super(update_channel, nil, {})
+        end
+
+        # Create the model from the given configuration
+        #
+        # @api      semipublic
+        # @example  Create the model
+        #   struct.create
+        #
+        # @return [Constant]  The finished model.
+        def create
+          root {}
+        end
+      end
     end
   end
 end
