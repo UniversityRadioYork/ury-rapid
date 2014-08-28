@@ -5,6 +5,8 @@ module Rapid
     # A ModuleSet holds a set of configured Rapid modules (services or servers),
     # as well as information about which modules are enabled at launch-time.
     class ModuleSet
+      extend Forwardable
+
       # Initialises a ModuleSet
       #
       # The ModuleSet, by default, passes nothing to module constructors, and
@@ -16,7 +18,7 @@ module Rapid
       #   ms = ModuleSet.new
       def initialize
         @modules = {}
-        @enabled_modules = []
+        @enabled_modules = Set[]
         @constructor_arguments = []
         @module_create_hook = ->(*) {}
       end
@@ -60,16 +62,18 @@ module Rapid
         @enabled_modules << name
       end
 
-      # Starts all enabled modules
+      # Enables all previously configured modules
       #
       # @api      semipublic
-      # @example  Start all enabled modules
-      #   ms.start_enabled
+      # @example  Enable a module
+      #   ms.enable(:a_module_name)
       #
-      # @return [Array]
-      #   The modules that have been started.
-      def start_enabled
-        @enabled_modules.map(&method(:start))
+      # @param name [Symbol]
+      #   The name of the module to enable at load-time.
+      #
+      # @return [void]
+      def enable_all
+        @modules.each_key(&method(:enable))
       end
 
       # Starts a specific module
@@ -90,6 +94,20 @@ module Rapid
           @module_create_hook.call(name, mod)
         end
       end
+
+      # Starts all enabled modules
+      #
+      # @api      semipublic
+      # @example  Start all enabled modules
+      #   ms.start_enabled
+      #
+      # @return [Array]
+      #   The modules that have been started.
+      def start_enabled
+        @enabled_modules.map(&method(:start))
+      end
+
+      def_delegator :@enabled_modules, :to_a, :enabled
 
       attr_writer :constructor_arguments
       attr_writer :module_create_hook
