@@ -25,6 +25,10 @@ describe Rapid::Common::ModuleSet do
         expect { subject.enable_all }.to_not change { subject.enabled }
         expect(subject.enabled).to be_empty
       end
+
+      it 'removes no modules from #disabled' do
+        expect { subject.enable_all }.to_not change { subject.disabled }
+      end
     end
 
     context 'when some modules are configured' do
@@ -34,6 +38,12 @@ describe Rapid::Common::ModuleSet do
         expect { subject.enable_all }.to change { subject.enabled }
                                      .from([])
         expect(subject.enabled).to contain_exactly(*modules)
+      end
+
+      it 'empties #disabled' do
+        expect(subject.disabled).to contain_exactly(*modules)
+        expect { subject.enable_all }.to change { subject.disabled }
+                                     .to([])
       end
     end
   end
@@ -51,13 +61,23 @@ describe Rapid::Common::ModuleSet do
                                            .from([])
         expect(subject.enabled).to include(:module1)
       end
+
+      it 'removes the module from #disabled' do
+        expect(subject.disabled).to include(:module1)
+        expect { subject.enable(:module1) }.to change { subject.disabled }
+        expect(subject.disabled).to_not include(:module1)
+      end
     end
 
     context 'when the module has already been enabled' do
       before(:each) { subject.enable(:module1) }
 
-      it 'does not change #enabled' do
+      specify do
         expect { subject.enable(:module1) }.to_not change { subject.enabled }
+      end
+
+      specify do
+        expect { subject.enable(:module1) }.to_not change { subject.disabled }
       end
     end
   end

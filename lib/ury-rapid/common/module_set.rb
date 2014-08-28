@@ -109,6 +109,21 @@ module Rapid
 
       def_delegator :@enabled_modules, :to_a, :enabled
 
+      # Lists the disabled modules
+      #
+      # @api      semipublic
+      # @example  List the disabled modules
+      #   # Assuming :a, :b, and :c are disabled
+      #   ms.disable
+      #   #=> [:a, :b, :c]
+      #
+      # @return [Array]
+      #   An array containing the names of the disabled, but configured,
+      #   modules available in this module set.
+      def disabled
+        @modules.each_key.reject { |n| @enabled_modules.include?(n) }.to_a
+      end
+
       attr_writer :constructor_arguments
       attr_writer :module_create_hook
     end
