@@ -17,7 +17,7 @@ module Rapid
       # @param logger [Object]  An object that can be used to log messages from
       #   the service.
       def initialize(logger)
-        @logger = logger
+        super(logger)
 
         # We need a queue for requests to the BAPS server to be funneled
         # through.  This will later need to be given to the actual BAPS client
@@ -59,17 +59,6 @@ module Rapid
       #
       # End configuration DSL
       #
-
-      # Asks the service to construct an instance of its model
-      #
-      # This is intended to be called by the Rapid launcher when initialising
-      # the services.
-      def sub_model(update_channel)
-        [
-          create_extender(update_channel),
-          ->(service_view) { @service_view = service_view }
-        ]
-      end
 
       # Begin running the service, given a view of the completed model
       #
