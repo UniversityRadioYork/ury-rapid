@@ -168,8 +168,8 @@ module Rapid
     # See #server and #enable_server in the configuration DSL.
     #
     # @return [void]
-    def prepare_server_set(_logger, global_service_view)
-      @servers.constructor_arguments = [global_service_view, @auth]
+    def prepare_server_set(_logger, global_server_view)
+      @servers.constructor_arguments = [global_server_view, @auth]
     end
 
     #
