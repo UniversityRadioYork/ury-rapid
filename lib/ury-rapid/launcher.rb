@@ -1,7 +1,6 @@
 require 'ury-rapid/app'
 require 'ury-rapid/common/exceptions'
 require 'ury-rapid/logger'
-require 'ury-rapid/model/config'
 require 'ury-rapid/modules/set'
 
 module Rapid

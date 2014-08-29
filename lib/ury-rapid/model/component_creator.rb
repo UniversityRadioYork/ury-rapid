@@ -78,9 +78,10 @@ module Rapid
 
       # Creates a new playlist item.
       #
-      # @param options [Hash]  A hash containing the keys :type, :name, :origin,
-      #   and :duration, which correspond to the type, name, origin, and
-      #   duration of the item respectively.
+      # @param options [Hash]
+      #   A hash containing the keys :type, :name, :origin, and :duration,
+      #   which correspond to the type, name, origin, and duration of the item
+      #   respectively.
       #
       # @return [Item]  An Item model object holding the playlist item.
       def item(options)
@@ -114,7 +115,8 @@ module Rapid
       #
       # @return [Constant]  A Constant model object holding the constant.
       def constant(value, handler_target)
-        Rapid::Model::Constant.new(handler_target, value).tap(&method(:register))
+        Rapid::Model::Constant.new(handler_target, value)
+                              .tap(&method(:register))
       end
 
       private

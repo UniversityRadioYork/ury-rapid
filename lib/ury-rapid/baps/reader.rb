@@ -35,7 +35,7 @@ module Rapid
       #   The read string.
       #
       # @return [void]
-      def string 
+      def string
         # BAPS strings are preceded by their length, Pascal-style.
         uint32 do |length|
           request(length, true) do |bytes|

@@ -76,7 +76,7 @@ module Rapid
         #
         # @api public
         # @example  Send a request.
-        #   requester.request(Rapid::Baps::Codes::Playlist::LOAD, channel) do |r|
+        #   requester.request(Rapid::Baps::Codes::Playlist::LOAD, chan) do |r|
         #     r.uint32(index)
         #   end
         #

@@ -85,7 +85,10 @@ module Rapid
         end
 
         def unsupported_type(*_args)
-          fail(Rapid::Common::Exceptions::InvalidPayload, 'Invalid payload type.')
+          fail(
+            Rapid::Common::Exceptions::InvalidPayload,
+            'Invalid payload type.'
+          )
         end
       end
     end
