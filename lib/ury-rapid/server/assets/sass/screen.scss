@@ -86,30 +86,30 @@ $fa-ellipsis-h:   "\f141";
 $fa-file-audio-o: "\f1c7";
 
 @mixin fa($icon) {
-    content: $icon;
-    font-family: "FontAwesome";
+  content: $icon;
+  font-family: "FontAwesome";
 }
 @mixin fa-before($icon) {
   &:before {
-    @include fa($icon);
-    padding-right: 0.3em;
+  @include fa($icon);
+  padding-right: 0.3em;
   }
 }
 @mixin fa-after($icon) {
   &:after {
-    @include fa($icon);
-    padding-left: 0.3em;
+  @include fa($icon);
+  padding-left: 0.3em;
   }
 }
 @mixin fa-heading($icon) {
-    &>h1 {
-        @include fa-before($icon);
-    }
+  &>h1 {
+    @include fa-before($icon);
+  }
 }
 @mixin fa-paragraph($icon) {
-    &>p {
-        @include fa-after($icon);
-    }
+  &>p {
+    @include fa-after($icon);
+  }
 }
 // Semantic colour names
 $colour-outer-fg:           black;
@@ -126,188 +126,188 @@ $colour-console-bg: map-get($colour-blue-grey, 700);
 $colour-console-fg: map-get($colour-blue-grey, 50);
 
 @mixin border {
-    //border: $size-border solid $colour-border;
-    padding: $size-padding;
+  //border: $size-border solid $colour-border;
+  padding: $size-padding;
 }
 
 @mixin font-normal {
-    font-family: Merriweather, helvetica, arial, sans-serif;
+  font-family: Merriweather, helvetica, arial, sans-serif;
 }
 
 @mixin font-title {
-    font-family: Rokkitt, helvetica, arial, sans-serif;
+  font-family: Rokkitt, helvetica, arial, sans-serif;
 }
 
 @mixin font-console {
-    font-family: "Anonymous Pro", monospace;
+  font-family: "Anonymous Pro", monospace;
 }
 
 @mixin dark-text {
-    color: rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.87);
 }
 
 
 a {
-    @include link-colors(
-        $colour-sky-blue,
-        $colour-scarlet-red-light,
-        $colour-scarlet-red-light,
-        $colour-plum
-    );
+  @include link-colors(
+    $colour-sky-blue,
+    $colour-scarlet-red-light,
+    $colour-scarlet-red-light,
+    $colour-plum
+  );
 }
 
 html {
-    @include font-normal;
+  @include font-normal;
 
-    text-align: center;
-    font-size: 16pt;
+  text-align: center;
+  font-size: 16pt;
 
-    strong {
-        font-weight: bold;
+  strong {
+    font-weight: bold;
+  }
+
+  background-color: $colour-outer-bg;
+  color: $colour-outer-fg;
+
+  body {
+    >section, >nav, >footer>section {
+      font-size: 1rem !important;
+      margin: $size-padding auto !important;
+
+      text-align: left;
+      max-width: 80%;
+      display: table;
     }
 
-    background-color: $colour-outer-bg;
-    color: $colour-outer-fg;
+    >header {
+      color: $colour-header-fg;
+      background-color: $colour-header-bg;
+      text-align: left;
 
-    body {
-        >section, >nav, >footer>section {
-            font-size: 1rem !important;
-            margin: $size-padding auto !important;
-
-            text-align: left;
-            max-width: 80%;
-            display: table;
-        }
-
-        >header {
-            color: $colour-header-fg;
-            background-color: $colour-header-bg;
-            text-align: left;
-
-            >h1 {
-                display: inline-block;
-                font-size: 3rem;
-                line-height: 0.8em;
-                margin: 0;
-                padding: $size-padding-thin;
-            }
-            >h2 {
-                display: inline;
-                margin: 0;
-                font-size: 1.2rem;
-            }
-        }
-
-        >footer {
-            >p.legal {
-                font-size: 0.8rem;
-            }
-        }
+      >h1 {
+        display: inline-block;
+        font-size: 3rem;
+        line-height: 0.8em;
+        margin: 0;
+        padding: $size-padding-thin;
+      }
+      >h2 {
+        display: inline;
+        margin: 0;
+        font-size: 1.2rem;
+      }
     }
+
+    >footer {
+      >p.legal {
+        font-size: 0.8rem;
+      }
+    }
+  }
 }
 
 h1, h2, h3 {
-    @include font-title;
-    text-align: left;
-    margin-bottom: $size-padding;
-    font-size: 1.2em;
+  @include font-title;
+  text-align: left;
+  margin-bottom: $size-padding;
+  font-size: 1.2em;
 }
 
 section, nav {
-    @include border;
+  @include border;
 
-    position: relative;
+  position: relative;
 
-    font-size: 0.9em;
+  font-size: 0.9em;
 
-    >h1 {
-        // Transfer the margin into padding, so we can style the entire heading
-        // bar without a nasty padding border around it.
+  >h1 {
+    // Transfer the margin into padding, so we can style the entire heading
+    // bar without a nasty padding border around it.
 
-        margin-left: -($size-padding);
-        padding-left: $size-padding-thin;
+    margin-left: -($size-padding);
+    padding-left: $size-padding-thin;
 
-        margin-right: -($size-padding);
-        padding-right: $size-padding-thin;
+    margin-right: -($size-padding);
+    padding-right: $size-padding-thin;
 
-        margin-top: -($size-padding);
-        padding-top: $size-padding-thin;
+    margin-top: -($size-padding);
+    padding-top: $size-padding-thin;
 
-        padding-bottom: $size-padding-thin;
-    }
+    padding-bottom: $size-padding-thin;
+  }
 }
 
 section {
-    margin: $size-padding-thin;
+  margin: $size-padding-thin;
 }
 p:not(:last-child) {
-    margin-bottom: $size-padding;
+  margin-bottom: $size-padding;
 }
 
 nav h1 {
-    display: none;
+  display: none;
 }
 
 // Make players and playlists line up horizontally.
 .player_set, .playlist_set {
-    &>div.set_contents {
-        border-collapse: separate;
-        border-spacing: $size-padding;
+  &>div.set_contents {
+    border-collapse: separate;
+    border-spacing: $size-padding;
 
-        display: flex;
-        flex: 1;
-        align-items: stretch;
-        margin: 0 auto;
+    display: flex;
+    flex: 1;
+    align-items: stretch;
+    margin: 0 auto;
 
-        >section {
-            display: flex;
-            flex-direction: column;
+    >section {
+      display: flex;
+      flex-direction: column;
 
-            flex: 1;
-        }
+      flex: 1;
     }
+  }
 }
 
 section.constant {
-    // Remove lower margin on the value.
-    p {
-        margin: 0;
-    }
+  // Remove lower margin on the value.
+  p {
+    margin: 0;
+  }
 }
 
 // Nested variables have some special formatting.
 div>section, section>section {
-    &.variable, &.constant {
-        display: flex !important;
+  &.variable, &.constant {
+    display: flex !important;
 
-        h1 {
-            display: inline;
-            @include font-normal;
-            font-weight: bold;
-            font-size: 1em;
-            margin: 4pt;
-            margin-right: $size-padding-thin;
-            padding: 0 !important;
-            border-bottom: none !important;
-        }
-        p {
-            display: inline;
-            flex: 1;
-            text-align: right;
-            margin: 4pt;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    h1 {
+      display: inline;
+      @include font-normal;
+      font-weight: bold;
+      font-size: 1em;
+      margin: 4pt;
+      margin-right: $size-padding-thin;
+      padding: 0 !important;
+      border-bottom: none !important;
     }
+    p {
+      display: inline;
+      flex: 1;
+      text-align: right;
+      margin: 4pt;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .item {
-    @include border;
+  @include border;
 
-    >section, >nav, >ol {
-        //background-color: $colour-lol;
-    }
+  >section, >nav, >ol {
+    //background-color: $colour-lol;
+  }
 }
 
 li.item, p.item {
@@ -322,240 +322,240 @@ li.item, p.item {
 }
 
 p.item {
-    margin: $size-padding-thin;
+  margin: $size-padding-thin;
 }
 
 ol.playlist-items {
-    // Prevent duplicate borders.
-    li {
-        &:not(:first-child) {
-            border-top: 0;
-        }
+  // Prevent duplicate borders.
+  li {
+    &:not(:first-child) {
+      border-top: 0;
     }
+  }
 }
 
 nav.main-menu {
-    border: none;
-    text-align: center;
+  border: none;
+  text-align: center;
 
-    li {
-        @include border;
+  li {
+    @include border;
 
-        display: inline-block;
-        padding: $size-padding;
-    }
+    display: inline-block;
+    padding: $size-padding;
+  }
 }
 
 nav.resources {
-    clear: both;
+  clear: both;
 }
 
 .in, .out, .json {
-    position: absolute;
-    font-size: $size-in-out;
-    line-height: $size-in-out;
-    text-align: center;
-    width: $size-in-out;
-    height: $size-in-out;
-    padding: $size-border;
-    display: block;
+  position: absolute;
+  font-size: $size-in-out;
+  line-height: $size-in-out;
+  text-align: center;
+  width: $size-in-out;
+  height: $size-in-out;
+  padding: $size-border;
+  display: block;
 }
 .in {
-    bottom: 0;
-    right: 0;
-    padding-bottom: 0;
-    padding-right: 0;
+  bottom: 0;
+  right: 0;
+  padding-bottom: 0;
+  padding-right: 0;
 }
 .out {
-    top: 0;
-    left: 0;
-    padding-top: 0;
-    padding-left: 0;
+  top: 0;
+  left: 0;
+  padding-top: 0;
+  padding-left: 0;
 }
 .json {
-    top: 0;
-    right: 0;
-    padding-top: 0;
-    padding-right: 0;
+  top: 0;
+  right: 0;
+  padding-top: 0;
+  padding-right: 0;
 }
 
 .legend {
-    h1 {
-        display: none;
+  h1 {
+    display: none;
+  }
+  >section {
+    border: none;
+    padding: 0;
+    text-align: center;
+    &:last-child {
+      margin-bottom: $size-padding;
     }
-    >section {
-        border: none;
-        padding: 0;
-        text-align: center;
-        &:last-child {
-            margin-bottom: $size-padding;
-        }
-    }
-    p, span {
-        position: relative;
-        @include border;
-        display: inline-block;
-    }
-    p {
-        margin: $size-padding;
-        padding: $size-padding;
-        margin-bottom: 0;
-    }
-    span {
-        padding: $size-padding-thin;
-    }
+  }
+  p, span {
+    position: relative;
+    @include border;
+    display: inline-block;
+  }
+  p {
+    margin: $size-padding;
+    padding: $size-padding;
+    margin-bottom: 0;
+  }
+  span {
+    padding: $size-padding-thin;
+  }
 }
 
 // Console themeing.
 pre.json_code, pre#update-console {
-    @include border;
-    @include font-console;
+  @include border;
+  @include font-console;
 
-    padding: $size-padding;
+  padding: $size-padding;
 
-    background-color: $colour-console-bg;
-    color: $colour-console-fg;
-    margin-bottom: $size-padding;
+  background-color: $colour-console-bg;
+  color: $colour-console-fg;
+  margin-bottom: $size-padding;
 }
 
 dt {
-    font-weight:bold;
+  font-weight:bold;
 }
 dd {
-    margin-left: $size-padding;
+  margin-left: $size-padding;
 }
 
 // Toolbar
 #toolbar {
-    background-color: $colour-toolbar-bg;
-    color: $colour-toolbar-fg;
-    padding: 0;
-    display: flex;
-    align-items: center;
+  background-color: $colour-toolbar-bg;
+  color: $colour-toolbar-fg;
+  padding: 0;
+  display: flex;
+  align-items: center;
 
-    h1, .toolbar-button {
-        @include font-title;
-        font-size: 1.1rem;
-        vertical-align: middle;
-        margin: 0;
-        padding-left: $size-padding-thin;
-    }
+  h1, .toolbar-button {
+    @include font-title;
+    font-size: 1.1rem;
+    vertical-align: middle;
+    margin: 0;
+    padding-left: $size-padding-thin;
+  }
 
-    h1 {
-        flex: 3;
-        display: inline;
-        text-align: left;
-    }
-    label {
-        flex: 2;
-        text-align: right;
-        margin-right: $size-padding-thin;
-    }
-    #toolbar-data {
-        flex: 6;
-        margin-right: $size-padding-thin;
-    }
-    .toolbar-button {
-        flex: 1;
-        cursor: pointer;
-        padding: $size-padding-thin;
+  h1 {
+    flex: 3;
+    display: inline;
+    text-align: left;
+  }
+  label {
+    flex: 2;
+    text-align: right;
+    margin-right: $size-padding-thin;
+  }
+  #toolbar-data {
+    flex: 6;
+    margin-right: $size-padding-thin;
+  }
+  .toolbar-button {
+    flex: 1;
+    cursor: pointer;
+    padding: $size-padding-thin;
 
-        text-align: center;
+    text-align: center;
 
-        &:not(:first-child) {
-            margin-right: $size-padding-thin;
-        }
+    &:not(:first-child) {
+      margin-right: $size-padding-thin;
     }
+  }
 }
 
 // General style mixins
 @mixin set-style($col) {
-    background-color: map-get($col, 500) !important;
-    border: $size-border solid map-get($col, 700);
-    color: map-get($col, 50) !important;
+  background-color: map-get($col, 500) !important;
+  border: $size-border solid map-get($col, 700);
+  color: map-get($col, 50) !important;
 
-    >h1 {
-        background-color: map-get($col, 700);
+  >h1 {
+    background-color: map-get($col, 700);
+  }
+
+  a {
+    color: map-get($col, 50);
+
+    &:hover {
+      background-color: map-get($col, 50);
+      color: map-get($col, 700);
     }
-
-    a {
-        color: map-get($col, 50);
-
-        &:hover {
-            background-color: map-get($col, 50);
-            color: map-get($col, 700);
-        }
-    }
+  }
 }
 @mixin set-member-style($col) {
-    @include dark-text;
-    background-color: map-get($col, 50) !important;
-    border: $size-border solid map-get($col, 700);
+  @include dark-text;
+  background-color: map-get($col, 50) !important;
+  border: $size-border solid map-get($col, 700);
 
-    >h1 {
-        border-bottom: $size-border solid map-get($col, 700);
+  >h1 {
+    border-bottom: $size-border solid map-get($col, 700);
+  }
+
+  a {
+    color: map-get($col, 700);
+
+    &:hover {
+      background-color: map-get($col, 700);
+      color: map-get($col, 50);
     }
-
-    a {
-        color: map-get($col, 700);
-
-        &:hover {
-            background-color: map-get($col, 700);
-            color: map-get($col, 50);
-        }
-    }
+  }
 }
 
 section.json_inspector {
-    @include fa-heading($fa-code);
-    @include set-style($colour-blue-grey);
+  @include fa-heading($fa-code);
+  @include set-style($colour-blue-grey);
 }
 
 section.playout_root {
-    @include fa-heading($fa-volume-up);
-    @include set-style($colour-pink);
+  @include fa-heading($fa-volume-up);
+  @include set-style($colour-pink);
 }
 
 section.group_root {
-    @include fa-heading($fa-sitemap);
-    @include set-style($colour-purple);
+  @include fa-heading($fa-sitemap);
+  @include set-style($colour-purple);
 }
 
 section.info {
-    @include fa-heading($fa-info);
-    @include set-style($colour-indigo);
+  @include fa-heading($fa-info);
+  @include set-style($colour-indigo);
 
-    //.constant {
-    //    @include set-member-style($colour-indigo);
-    //}
+  //.constant {
+  //    @include set-member-style($colour-indigo);
+  //}
 }
 
 .set {
-    @include fa-heading($fa-folder-open);
-    @include set-style($colour-grey);
+  @include fa-heading($fa-folder-open);
+  @include set-style($colour-grey);
 }
 .constant {
-    @include set-member-style($colour-grey);
+  @include set-member-style($colour-grey);
 }
 
 section.player_set {
-    @include set-style($colour-amber);
+  @include set-style($colour-amber);
 }
 section.player_set section.player, body>section.player {
-    @include fa-heading($fa-play);
-    @include set-member-style($colour-amber);
+  @include fa-heading($fa-play);
+  @include set-member-style($colour-amber);
 
-    .constant {
-        @include set-member-style($colour-amber);
-    }
+  .constant {
+    @include set-member-style($colour-amber);
+  }
 }
 
 section.playlist_set {
-    @include set-style($colour-deep-orange);
+  @include set-style($colour-deep-orange);
 }
 section.playlist_set section.playlist, body>section.playlist {
-    @include fa-heading($fa-list-ol);
-    @include set-member-style($colour-orange);
+  @include fa-heading($fa-list-ol);
+  @include set-member-style($colour-orange);
 }
 
 // Play states
@@ -563,11 +563,11 @@ $p-playing: ( name: "playing", colour: $colour-green,  fa: $fa-play  );
 $p-paused:  ( name: "paused",  colour: $colour-yellow, fa: $fa-pause );
 $p-stopped: ( name: "stopped", colour: $colour-red,    fa: $fa-stop  );
 @each $p in $p-playing, $p-paused, $p-stopped {
-    section.player section.constant.#{map-get($p, name)},
-    body>section.constant.#{map-get($p, name)} {
-        @include set-member-style(map-get($p, colour));
-        @include fa-paragraph(map-get($p, fa));
-    }
+  section.player section.constant.#{map-get($p, name)},
+  body>section.constant.#{map-get($p, name)} {
+    @include set-member-style(map-get($p, colour));
+    @include fa-paragraph(map-get($p, fa));
+  }
 }
 
 // Load states
@@ -576,11 +576,11 @@ $l-loading: ( name: "loading", colour: $colour-light-blue,  fa: $fa-ellipsis-h )
 $l-failed:  ( name: "failed",  colour: $colour-deep-purple, fa: $fa-times      );
 $l-empty:   ( name: "empty",   colour: $colour-brown,       fa: $fa-square-o   );
 @each $l in $l-ok, $l-loading, $l-failed, $l-empty {
-    section.player section.constant.#{map-get($l, name)},
-    body>section.constant.#{map-get($l, name)} {
-        @include set-member-style(map-get($l, colour));
-        @include fa-paragraph(map-get($l, fa));
-    }
+  section.player section.constant.#{map-get($l, name)},
+  body>section.constant.#{map-get($l, name)} {
+    @include set-member-style(map-get($l, colour));
+    @include fa-paragraph(map-get($l, fa));
+  }
 }
 
 // Item types
@@ -588,13 +588,13 @@ $i-file:    ( name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o );
 $i-text:    ( name: "text",    colour: $colour-lime, fa: $fa-file-text-o  );
 $i-library: ( name: "library", colour: $colour-teal, fa: $fa-music        );
 @each $i in $i-file, $i-text, $i-library {
-    section.player section.item.#{map-get($i, name)},
-    body>section.item.#{map-get($i, name)} {
-        @include set-member-style(map-get($i, colour));
-        @include fa-heading(map-get($i, fa));
-    }
-    section.playlist li.item.#{map-get($i, name)} {
-        @include set-member-style(map-get($i, colour));
-        @include fa-before(map-get($i, fa));
-    }
+  section.player section.item.#{map-get($i, name)},
+  body>section.item.#{map-get($i, name)} {
+    @include set-member-style(map-get($i, colour));
+    @include fa-heading(map-get($i, fa));
+  }
+  section.playlist li.item.#{map-get($i, name)} {
+    @include set-member-style(map-get($i, colour));
+    @include fa-before(map-get($i, fa));
+  }
 }
