@@ -46,7 +46,7 @@ module Rapid
         # been when the #configure block is called.
         builder_proc = ->() { @model_builder }
 
-        configure(name, ModuleSubgroup) do
+        configure(name, Subgroup) do
           builder = builder_proc.call
           fail("Found nil model builder at group #{name}.") if builder.nil?
 

@@ -1,4 +1,6 @@
 require 'ury-rapid/model'
+require 'ury-rapid/service_common/requests/null_handler'
+require 'ury-rapid/model/component_creator'
 
 module Rapid
   module Model
