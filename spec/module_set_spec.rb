@@ -1,7 +1,7 @@
-require 'ury-rapid/common/module_set'
+require 'ury-rapid/modules/set'
 
-describe Rapid::Common::ModuleSet do
-  subject { Rapid::Common::ModuleSet.new }
+describe Rapid::Modules::Set do
+  subject { Rapid::Modules::Set.new }
 
   class DummyModule
     def run

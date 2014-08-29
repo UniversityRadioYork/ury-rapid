@@ -1,5 +1,5 @@
 require 'ury-rapid/launcher'
-require 'ury-rapid/common/module_set'
+require 'ury-rapid/modules/set'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
@@ -109,10 +109,10 @@ describe Rapid::Launcher do
     it 'calls the app maker with the module sets and service view' do
       subject.run
       expect(app_maker).to have_received(:call).once.with(
-        a_kind_of(Rapid::Common::ModuleSet)
+        a_kind_of(Rapid::Modules::Set)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(service_id) }),
-        a_kind_of(Rapid::Common::ModuleSet)
+        a_kind_of(Rapid::Modules::Set)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(server_id) }),
         service_view

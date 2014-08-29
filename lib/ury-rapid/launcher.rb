@@ -1,8 +1,8 @@
 require 'ury-rapid/app'
 require 'ury-rapid/common/exceptions'
-require 'ury-rapid/common/module_set'
 require 'ury-rapid/logger'
 require 'ury-rapid/model/config'
+require 'ury-rapid/modules/set'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -10,8 +10,8 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @services = Rapid::Common::ModuleSet.new
-      @servers = Rapid::Common::ModuleSet.new
+      @services = Rapid::Modules::Set.new
+      @servers = Rapid::Modules::Set.new
 
       @user_config = {}
 
@@ -39,12 +39,12 @@ module Rapid
 
     # Configures the service set for this instance of Rapid
     #
-    # See ModuleSet for the DSL accepted by this method.
+    # See Rapid::Modules::Set for the DSL accepted by this method.
     def_delegator :@services, :instance_eval, :services
 
     # Configures the server set for this instance of Rapid
     #
-    # See ModuleSet for the DSL accepted by this method.
+    # See Rapid::Modules::Set for the DSL accepted by this method.
     def_delegator :@servers, :instance_eval, :servers
 
     # Configures the model.

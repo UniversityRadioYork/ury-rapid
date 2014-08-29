@@ -1,31 +1,32 @@
 require 'ury-rapid/common/exceptions'
 
 module Rapid
-  module Common
+  module Modules
     # A set of Rapid modules
     #
-    # A ModuleSet holds a set of configured Rapid modules (services or servers),
-    # as well as information about which modules are enabled at launch-time.
-    class ModuleSet
+    # A module set holds a set of configured Rapid modules (services or
+    # servers), as well as information about which modules are enabled at
+    # launch-time.
+    class Set
       extend Forwardable
 
-      # Initialises a ModuleSet
+      # Initialises a Set
       #
-      # The ModuleSet, by default, passes nothing to module constructors, and
+      # The Set, by default, passes nothing to module constructors, and
       # does nothing with the modules after construction.  Use
       # #constructor_arguments= and #module_create_hook= to override this.
       #
       # @api      semipublic
-      # @example  Create a new ModuleSet
-      #   ms = ModuleSet.new
+      # @example  Create a new Set
+      #   ms = Set.new
       def initialize
         @modules = {}
-        @enabled_modules = Set[]
+        @enabled_modules = ::Set[]
         @constructor_arguments = []
         @model_builder = nil
       end
 
-      # Creates a sub-group of this ModuleSet
+      # Creates a sub-group of this module set
       #
       # @api      semipublic
       # @example  Create a sub-group named :my_group with a module configured
@@ -41,8 +42,8 @@ module Rapid
       # @return [void]
       def group(name, &block)
         # This needs to be a procedure as the model builder won't have been
-        # assigned to this ModuleSet at the time #group is called, but it will
-        # have been when the #configure block is called.
+        # assigned to this set at the time #group is called, but it will have
+        # been when the #configure block is called.
         builder_proc = ->() { @model_builder }
 
         configure(name, ModuleSubgroup) do
@@ -54,7 +55,7 @@ module Rapid
         end
       end
 
-      # Adds a module and its configuration to the ModuleSet
+      # Adds a module and its configuration to this set
       #
       # @api      semipublic
       # @example  Configure a module
@@ -160,7 +161,7 @@ module Rapid
     end
 
     # Class for module sub-groups
-    class ModuleSubgroup < ModuleSet
+    class Subgroup < Set
       def initialize(constructor_arguments)
         super()
         @constructor_arguments = constructor_arguments

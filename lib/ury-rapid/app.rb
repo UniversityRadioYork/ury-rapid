@@ -12,9 +12,9 @@ module Rapid
   class App
     # Initialises the Rapid application
     #
-    # @param services [ModuleSet]
+    # @param services [Rapid::Modules::Set]
     #   The set of service modules.  Enabled services will be run by the app.
-    # @param servers [ModuleSet]
+    # @param servers [Rapid::Modules::Set]
     #   The set of server modules.  Enabled services will be run by the app.
     # @param model_view [ServiceView]
     #   A service view of the entire model.
