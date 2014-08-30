@@ -52,7 +52,7 @@ module Rapid
       #   conn.unbind
       #
       # @return [void]
-      # 
+      #
       # @todo Make Rapid able to handle this instead of just dying
       #
       def unbind

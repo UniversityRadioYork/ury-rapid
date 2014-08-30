@@ -1,8 +1,7 @@
 require 'ury-rapid/app'
 require 'ury-rapid/common/exceptions'
-require 'ury-rapid/common/module_set'
 require 'ury-rapid/logger'
-require 'ury-rapid/model/config'
+require 'ury-rapid/modules/set'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -10,8 +9,7 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @services = Rapid::Common::ModuleSet.new()
-      @servers = Rapid::Common::ModuleSet.new()
+      @modules = Rapid::Modules::Set.new
 
       @user_config = {}
 
@@ -37,15 +35,10 @@ module Rapid
     # files.
     #
 
-    # Configures the service set for this instance of Rapid
+    # Configures the modules set for this instance of Rapid
     #
-    # See ModuleSet for the DSL accepted by this method.
-    def_delegator :@services, :instance_eval, :services
-
-    # Configures the server set for this instance of Rapid
-    #
-    # See ModuleSet for the DSL accepted by this method.
-    def_delegator :@servers, :instance_eval, :servers
+    # See Rapid::Modules::Set for the DSL accepted by this method.
+    def_delegator :@modules, :instance_eval, :modules
 
     # Configures the model.
     #
@@ -81,12 +74,12 @@ module Rapid
     #
     # These can be overridden in the configuration DSL.
     def init_default_makers
-      @app_maker         = Rapid::App.method(:new)
-      @auth_maker        = Kankri.method(:authenticator_from_hash)
-      @channel_maker     = Rapid::Model::UpdateChannel.method(:new)
+      @app_maker          = Rapid::App.method(:new)
+      @auth_maker         = Kankri.method(:authenticator_from_hash)
+      @channel_maker      = Rapid::Model::UpdateChannel.method(:new)
       @service_view_maker = Rapid::Model::ServiceView.method(:new)
-      @server_view_maker = Rapid::Model::ServerView.method(:new)
-      @logger_maker      = Rapid::Logger.method(:default_logger)
+      @server_view_maker  = Rapid::Model::ServerView.method(:new)
+      @logger_maker       = Rapid::Logger.method(:default_logger)
     end
 
     # Runs the configuration passed to the Launcher
@@ -112,38 +105,33 @@ module Rapid
     def app_arguments
       logger = make_logger
       global_service_view, global_server_view = mkmodel(logger)
-      services = make_services(logger, global_service_view)
-      servers = make_servers(logger, global_server_view)
-      [services, servers, global_service_view]
+      prepare_module_set(logger, global_server_view, global_service_view)
+      [@modules, global_service_view]
     end
 
     #
-    # Service
+    # Modules
     #
 
-    # Initialises all services that are enabled at launch-time
+    # Prepares the module set for sending to the app
     #
-    # See #service and #enable_service in the configuration DSL.
-    def make_services(logger, model_view)
-      @services.constructor_arguments = [logger]
-      @services.module_create_hook =
-        ->(name, d) { init_service(name, model_view, d) }
-      @services.start_enabled
+    # See #module and #enable_module in the configuration DSL.
+    #
+    # @return [void]
+    def prepare_module_set(logger, global_server_view, global_service_view)
+      @modules.constructor_arguments = [logger, global_server_view, @auth]
+      @modules.model_builder = ModelBuilder.new(
+        global_service_view, @update_channel, @service_view_maker
+      )
     end
 
-    def init_service(name, model_view, service)
-      sub_structure, register_service_view = service.sub_model(@update_channel)
+    def prepare_module(name, model_view, mod)
+      return unless mod.respond_to?(:sub_model)
+
+      sub_structure, register_service_view = mod.sub_model(@update_channel)
       sub_model = sub_structure.create
       add_service_model(model_view, name, sub_model)
-      init_service_model_view(sub_structure, sub_model, register_service_view)
-    end
-
-    def init_service_model_view(sub_structure, sub_model, register_service_view)
       register_service_view.call(make_service_view(sub_model, sub_structure))
-    end
-
-    def add_service_model(model_view, name, sub_model)
-      model_view.post('', name, sub_model)
     end
 
     #
@@ -157,26 +145,87 @@ module Rapid
     end
 
     #
-    # Server
-    #
-
-    # Initialises all server that are enabled at launch-time
-    #
-    # See #server and #enable_server in the configuration DSL.
-    def make_servers(_logger, global_service_view)
-      @servers.constructor_arguments = [global_service_view, @auth]
-      @servers.start_enabled
-    end
-
-    #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,                :call, :make_app
-    def_delegator :@auth_maker,               :call, :make_auth
-    def_delegator :@channel_maker,            :call, :make_channel
-    def_delegator :@service_view_maker,        :call, :make_service_view
-    def_delegator :@logger_maker,             :call, :make_logger
-    def_delegator :@server_view_maker,        :call, :make_server_view
+    def_delegator :@app_maker,           :call, :make_app
+    def_delegator :@auth_maker,          :call, :make_auth
+    def_delegator :@channel_maker,       :call, :make_channel
+    def_delegator :@service_view_maker,  :call, :make_service_view
+    def_delegator :@logger_maker,        :call, :make_logger
+    def_delegator :@server_view_maker,   :call, :make_server_view
+  end
+
+  # A class for building the model of a module, given a view into its parent
+  class ModelBuilder
+    extend Forwardable
+
+    # Initialises the ModelBuilder
+    #
+    # @api      semipublic
+    # @example  Creates a ModelBuilder building into the model pointed to by
+    #           model_view.
+    #   mb = ModelBuilder.new(model_view)
+    #
+    # @param service_view [ServiceView]
+    #   A service view to use to insert the model into the model tree.
+    # @param update_channel [UpdateChannel]
+    #   The update channel to provide to the module's model structure.
+    # @param service_view_maker [Proc]
+    #   A proc that, when called with a model and its structure, returns a
+    #   service view of that model.
+    def initialize(service_view, update_channel, service_view_maker)
+      @service_view       = service_view
+      @update_channel     = update_channel
+      @service_view_maker = service_view_maker
+    end
+
+    # Builds the model for a module, inserting it into the model tree
+    #
+    # The model will be inserted under the ID `name`.
+    #
+    # The ModelBuilder will safely ignore modules that do not implement
+    # #sub_model.
+    #
+    # @api      semipublic
+    # @example  Builds the model, if any, of the module `foo`, at ID `bar`
+    #   mb.build(:bar, foo)
+    #
+    # @param name [Symbol]
+    #   The ID into which the sub-model should be inserted into the model tree
+    #   pointed to by @service_view.
+    # @param mod [Object]
+    #   The module whose model is to be registered into the model tree.
+    #
+    # @return [void]
+    def build(name, mod)
+      return unless mod.respond_to?(:sub_model)
+
+      sub_structure, register_service_view = mod.sub_model(@update_channel)
+      sub_model = sub_structure.create
+      add_model(name, sub_model)
+      sub_service_view = make_service_view(sub_model, sub_structure)
+      register_service_view.call(sub_service_view)
+    end
+
+    # Replaces the service view in this ModelBuilder
+    #
+    # @return [ModelBuilder]
+    #   A new ModelBuilder with the given service view.
+    def replace_service_view(new_view)
+      ModelBuilder.new(new_view, @update_channel, @service_view_maker)
+    end
+
+    private
+
+    # Adds the completed sub-model into the model tree
+    #
+    # The sub-model is placed into whichever part of the model this
+    # ModelBuilder is viewing.
+    def add_model(name, sub_model)
+      @service_view.post('', name, sub_model)
+    end
+
+    def_delegator :@service_view_maker, :call, :make_service_view
   end
 end

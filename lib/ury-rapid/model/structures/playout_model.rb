@@ -15,7 +15,7 @@ module Rapid
         #
         # @return [Root]  The finished model.
         def create
-          playout_root do
+          root :playout_root do
             base_structure
             playout_extensions
           end

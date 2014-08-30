@@ -22,7 +22,7 @@ describe Rapid::Model::Log do
     end
 
     context 'when the ID is not a valid log level' do
-      specify { expect { subject.service_post(:nope, 'No way') }.to raise_error }
+      specify { expect { subject.service_post(:nope, 'Nope') }.to raise_error }
     end
   end
 end

@@ -8,7 +8,7 @@ module Rapid
     #
     # This object exposes a DSL to the Rapid configuration.
     class Launcher
-      def initialize(model_view, authenticator)
+      def initialize(_logger, model_view, authenticator)
         @model_view    = model_view
         @authenticator = authenticator
         @rack = 'thin'

@@ -1,4 +1,5 @@
 require 'ury-rapid/launcher'
+require 'ury-rapid/modules/set'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
@@ -20,12 +21,9 @@ describe Rapid::Launcher do
     lm = logger_maker
     svm = server_view_maker
     proc do
-      services do
+      modules do
         configure(di, dcl) { dc }
         enable di
-      end
-
-      servers do
         configure(si, scl) { sc }
         enable si
       end
@@ -93,7 +91,8 @@ describe Rapid::Launcher do
       allow(service).to receive(:sub_model).and_return(
         [service_model_structure, register_service_view]
       )
-      allow(service_model_structure).to receive(:create).and_return(service_model)
+      allow(service_model_structure).to receive(:create)
+                                    .and_return(service_model)
       allow(register_service_view).to receive(:call)
 
       allow(server_class).to receive(:new).and_return(server)
@@ -104,8 +103,15 @@ describe Rapid::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the services, servers, and service view' do
-      test_maker(app_maker, [service], [server], service_view)
+    it 'calls the app maker with the module set and service view' do
+      subject.run
+      expect(app_maker).to have_received(:call).once.with(
+        a_kind_of(Rapid::Modules::Set)
+          .and(respond_to(:enabled))
+          .and(satisfy { |ms| ms.enabled.include?(service_id) })
+          .and(satisfy { |ms| ms.enabled.include?(server_id) }),
+        service_view
+      )
     end
     it 'calls the authenticator maker with the user configuration' do
       test_maker(auth_maker, user_name => user_config)
@@ -117,14 +123,6 @@ describe Rapid::Launcher do
       test_maker(logger_maker, no_args)
     end
 
-    it 'initialises the service class with the logger' do
-      subject.run
-      expect(service_class).to have_received(:new).once.with(logger)
-    end
-    it 'initialises the server class with the global server view and auth' do
-      subject.run
-      expect(server_class).to have_received(:new).once.with(server_view, auth)
-    end
     it 'initialises the model class with the update channel, logger and nil' do
       subject.run
       expect(model_class).to have_received(:new).once.with(
@@ -137,12 +135,6 @@ describe Rapid::Launcher do
       subject.run
       expect(service_view_maker).to have_received(:call).with(
         model, model_structure
-      )
-    end
-    it 'calls the service view maker with the service model and structure' do
-      subject.run
-      expect(service_view_maker).to have_received(:call).with(
-        service_model, service_model_structure
       )
     end
     it 'calls the server view maker with the model' do

@@ -75,8 +75,6 @@ module Rapid
           @raw & SUBCODE_MASK
         end
 
-        private
-
         # Masks for splitting a BAPS command code into its main and sub-code
         MAIN_CODE_MASK = 0xFFF0
         SUBCODE_MASK   = 0x000F
