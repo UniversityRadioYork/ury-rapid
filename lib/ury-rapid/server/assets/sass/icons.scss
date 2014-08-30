@@ -1,0 +1,66 @@
+// Aliases for Font Awesome icons.
+//
+// Font Awesome is set up to be invoked from the HTML, by adding tags with
+// CSS classes into the markup.  We don't want to pollute the Inspector with
+// semantically meaningless icon tags, so we define variables mapping to the
+// Unicode codes for Font Awesome icons, as well as some mixins to make using
+// them relatively easy.
+
+// Variables defining the Unicode content for Font Awesome icons
+$fa-music:        '\f001';
+$fa-check:        '\f00c';
+$fa-times:        '\f00d';
+$fa-volume-up:    '\f028';
+$fa-play:         '\f04b';
+$fa-pause:        '\f04c';
+$fa-stop:         '\f04d';
+$fa-folder-open:  '\f07c';
+$fa-square-o:     '\f096';
+$fa-list-ol:      '\f0cb';
+$fa-sitemap:      '\f0e8';
+$fa-file-text-o:  '\f0f6';
+$fa-code:         '\f121';
+$fa-info:         '\f129';
+$fa-ellipsis-h:   '\f141';
+$fa-file-audio-o: '\f1c7';
+
+// Sets the content of the selector to a Font Awesome icon
+//
+// Usually, usage of one of the below mixins is better.
+@mixin fa($icon) {
+  content: $icon;
+  font-family: 'FontAwesome';
+}
+
+// Adds the given Font Awesome icon before this selector
+@mixin fa-before($icon) {
+  &:before {
+    @include fa($icon);
+
+    padding-right: .3em;
+  }
+}
+
+// Adds the given Font Awesome icon after this selector
+@mixin fa-after($icon) {
+  &:after {
+    @include fa($icon);
+
+    padding-left: .3em;
+  }
+}
+
+// Adds the given Font Awesome icon before any h1 inside this selector
+@mixin fa-heading($icon) {
+  >h1 {
+    @include fa-before($icon);
+  }
+}
+
+// Adds the given Font Awesome icon after any paragraph inside this selector
+@mixin fa-paragraph($icon) {
+  >p {
+    @include fa-after($icon);
+  }
+}
+
