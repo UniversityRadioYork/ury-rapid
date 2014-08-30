@@ -3,10 +3,9 @@
 @import 'compass/typography/links/link-colors';
 @import 'compass/css3';
 
-@import url(//fonts.googleapis.com/css?family=Anonymous+Pro|Merriweather|Rokkitt:700);
-
-@import 'icons';
 @import 'colour-palette';
+@import 'fonts';
+@import 'icons';
 
 $size-border: .12rem;
 $size-padding: .9rem;
@@ -31,22 +30,9 @@ $colour-console-fg: map-get($colour-blue-grey, 50);
   padding: $size-padding;
 }
 
-@mixin font-normal {
-  font-family: Merriweather, helvetica, arial, sans-serif;
-}
-
-@mixin font-title {
-  font-family: Rokkitt, helvetica, arial, sans-serif;
-}
-
-@mixin font-console {
-  font-family: "Anonymous Pro", monospace;
-}
-
 @mixin dark-text {
   color: rgba(0, 0, 0, .87);
 }
-
 
 a {
   @include link-colors(

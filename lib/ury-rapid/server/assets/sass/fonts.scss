@@ -1,0 +1,23 @@
+// Fonts used in the API inspector
+//
+// We use Google Fonts to source the fonts used in the inspector.
+// Any changes to the set of fonts should be reflected in the `@import url`
+// directive below.
+
+@import url(//fonts.googleapis.com/css?family=Anonymous+Pro|Merriweather|Rokkitt:700);
+
+// Mixin for anything using the default, body-text font.
+@mixin font-normal {
+  font-family: Merriweather, helvetica, arial, sans-serif;
+}
+
+// Mixin for anything using the title font.
+@mixin font-title {
+  font-family: Rokkitt, helvetica, arial, sans-serif;
+}
+
+// Mixin for anything using the console font.
+@mixin font-console {
+  font-family: "Anonymous Pro", monospace;
+}
+
