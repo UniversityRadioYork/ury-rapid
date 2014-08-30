@@ -14,15 +14,19 @@ module Rapid
       # Initialises the service
       #
       # @api      semipublic
-      # @example  Create a new service, given a logger
-      #   service = Service.new(logger)
+      # @example  Create a new HelloWorldService
+      #   service = HelloWorldService.new(logger, view, auth)
       #
       # @param logger [Object]
       #   An object that can be used to log messages from the service.
-      def initialize(logger)
-        # We need to initialise Rapid::ServiceCommon::Service with the logger
-        # provided.
-        super(logger)
+      # @param view [Rapid::Model::ServerView]
+      #   A server view of the entire model.
+      # @param auth [Object]
+      #   An authentication provider.
+      def initialize(logger, view, auth)
+        # We need to initialise Rapid::ServiceCommon::Service with the
+        # arguments provided.
+        super(logger, view, auth)
 
         # The default message, overridden using #message.
         @message = 'Hello, World!'

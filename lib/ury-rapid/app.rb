@@ -12,15 +12,12 @@ module Rapid
   class App
     # Initialises the Rapid application
     #
-    # @param services [Rapid::Modules::Set]
-    #   The set of service modules.  Enabled services will be run by the app.
-    # @param servers [Rapid::Modules::Set]
-    #   The set of server modules.  Enabled services will be run by the app.
+    # @param modules [Rapid::Modules::Set]
+    #   The set of modules.  Enabled modules will be run by the app.
     # @param model_view [ServiceView]
     #   A service view of the entire model.
-    def initialize(services, servers, model_view, reactor = nil)
-      @services   = services
-      @servers    = servers
+    def initialize(modules, model_view, reactor = nil)
+      @modules   = modules
       @model_view = model_view
       @reactor    = reactor || EventMachine
     end
@@ -31,8 +28,7 @@ module Rapid
       @model_view.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
 
       @reactor.run do
-        @servers.start_enabled
-        @services.start_enabled
+        @modules.start_enabled
 
         Signal.trap('INT', &method(:close))
         Signal.trap('TERM', &method(:close))

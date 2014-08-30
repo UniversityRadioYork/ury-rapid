@@ -14,10 +14,18 @@ module Rapid
 
       # Initialise the service given its service configuration
       #
-      # @param logger [Object]  An object that can be used to log messages from
-      #   the service.
-      def initialize(logger)
-        super(logger)
+      # @api      semipublic
+      # @example  Create a new BAPS service
+      #   service = Service.new(logger, view, auth)
+      #
+      # @param logger [Object]
+      #   An object that can be used to log messages from the service.
+      # @param view [Rapid::Model::ServerView]
+      #   A server view of the entire model.
+      # @param auth [Object]
+      #   An authentication provider.
+      def initialize(logger, view, auth)
+        super(logger, view, auth)
 
         @username = ''
         @password = ''

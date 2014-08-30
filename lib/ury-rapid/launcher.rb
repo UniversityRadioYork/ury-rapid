@@ -9,8 +9,7 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @services = Rapid::Modules::Set.new
-      @servers = Rapid::Modules::Set.new
+      @modules = Rapid::Modules::Set.new
 
       @user_config = {}
 
@@ -36,15 +35,10 @@ module Rapid
     # files.
     #
 
-    # Configures the service set for this instance of Rapid
+    # Configures the modules set for this instance of Rapid
     #
     # See Rapid::Modules::Set for the DSL accepted by this method.
-    def_delegator :@services, :instance_eval, :services
-
-    # Configures the server set for this instance of Rapid
-    #
-    # See Rapid::Modules::Set for the DSL accepted by this method.
-    def_delegator :@servers, :instance_eval, :servers
+    def_delegator :@modules, :instance_eval, :modules
 
     # Configures the model.
     #
@@ -111,23 +105,22 @@ module Rapid
     def app_arguments
       logger = make_logger
       global_service_view, global_server_view = mkmodel(logger)
-      prepare_service_set(logger, global_service_view)
-      prepare_server_set(logger, global_server_view, global_service_view)
-      [@services, @servers, global_service_view]
+      prepare_module_set(logger, global_server_view, global_service_view)
+      [@modules, global_service_view]
     end
 
     #
-    # Service
+    # Modules
     #
 
-    # Prepares the service set for sending to the app
+    # Prepares the module set for sending to the app
     #
-    # See #service and #enable_service in the configuration DSL.
+    # See #module and #enable_module in the configuration DSL.
     #
     # @return [void]
-    def prepare_service_set(logger, global_service_view)
-      @services.constructor_arguments = [logger]
-      @services.model_builder = ModelBuilder.new(
+    def prepare_module_set(logger, global_server_view, global_service_view)
+      @modules.constructor_arguments = [logger, global_server_view, @auth]
+      @modules.model_builder = ModelBuilder.new(
         global_service_view, @update_channel, @service_view_maker
       )
     end
@@ -149,22 +142,6 @@ module Rapid
       structure = @model_structure.new(@update_channel, logger, @model_config)
       model = structure.create
       [make_service_view(model, structure), make_server_view(model)]
-    end
-
-    #
-    # Server
-    #
-
-    # Prepares the server set for sending to the app
-    #
-    # See #server and #enable_server in the configuration DSL.
-    #
-    # @return [void]
-    def prepare_server_set(_logger, global_server_view, global_service_view)
-      @servers.constructor_arguments = [global_server_view, @auth]
-      @servers.model_builder = ModelBuilder.new(
-        global_service_view, @update_channel, @service_view_maker
-      )
     end
 
     #

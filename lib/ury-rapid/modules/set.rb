@@ -162,7 +162,7 @@ module Rapid
 
     # Class for module sub-groups
     class Subgroup < Set
-      def initialize(constructor_arguments)
+      def initialize(*constructor_arguments)
         super()
         @constructor_arguments = constructor_arguments
       end

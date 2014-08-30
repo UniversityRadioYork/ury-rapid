@@ -21,12 +21,9 @@ describe Rapid::Launcher do
     lm = logger_maker
     svm = server_view_maker
     proc do
-      services do
+      modules do
         configure(di, dcl) { dc }
         enable di
-      end
-
-      servers do
         configure(si, scl) { sc }
         enable si
       end
@@ -106,14 +103,12 @@ describe Rapid::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the module sets and service view' do
+    it 'calls the app maker with the module set and service view' do
       subject.run
       expect(app_maker).to have_received(:call).once.with(
         a_kind_of(Rapid::Modules::Set)
           .and(respond_to(:enabled))
-          .and(satisfy { |ms| ms.enabled.include?(service_id) }),
-        a_kind_of(Rapid::Modules::Set)
-          .and(respond_to(:enabled))
+          .and(satisfy { |ms| ms.enabled.include?(service_id) })
           .and(satisfy { |ms| ms.enabled.include?(server_id) }),
         service_view
       )

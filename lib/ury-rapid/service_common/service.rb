@@ -16,13 +16,19 @@ module Rapid
       # Initialises the service
       #
       # @api      semipublic
-      # @example  Create a new service, given a logger
-      #   service = Service.new(logger)
+      # @example  Create a new service
+      #   service = Service.new(logger, view, auth)
       #
       # @param logger [Object]
       #   An object that can be used to log messages from the service.
-      def initialize(logger)
+      # @param view [Rapid::Model::ServerView]
+      #   A server view of the entire model.
+      # @param auth [Object]
+      #   An authentication provider.
+      def initialize(logger, view, auth)
         @logger = logger
+        @view = view
+        @auth = auth
       end
 
       # Asks the service to prepare its sub-model structure
@@ -48,6 +54,8 @@ module Rapid
       protected
 
       attr_reader :logger
+      attr_reader :view
+      attr_reader :auth
       attr_accessor :service_view
     end
   end

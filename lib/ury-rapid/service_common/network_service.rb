@@ -35,13 +35,17 @@ module Rapid
       # Initialises the service
       #
       # @api      semipublic
-      # @example  Create a new network service, given a logger
-      #   service = Service.new(logger)
+      # @example  Create a new network service
+      #   service = NetworkService.new(logger, view, auth)
       #
       # @param logger [Object]
       #   An object that can be used to log messages from the service.
-      def initialize(logger)
-        super(logger)
+      # @param view [Rapid::Model::ServerView]
+      #   A server view of the entire model.
+      # @param auth [Object]
+      #   An authentication provider.
+      def initialize(logger, view, auth)
+        super(logger, view, auth)
 
         # We need a queue to hold requests to the network server.  This will
         # later need to be given to the client for reading, and also to the

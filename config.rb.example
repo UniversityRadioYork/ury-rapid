@@ -9,11 +9,11 @@ require 'ury-rapid/baps/service'
 require 'ury-rapid/server/app'
 
 #
-# Services form the part of Rapid that interfaces with the playout system.
-# The [services] config section allows configuring and launch-time enabling of
-# services.
+# Modules plug into Rapid and offer services, interfaces, and more.
+# The [modules] config section allows configuring and launch-time enabling of
+# modules.
 #
-services do
+modules do
   configure :hello, Rapid::Examples::HelloWorldService do
     message 'It works!'
   end
@@ -27,14 +27,7 @@ services do
     num_channels 3
   end
   # enable :studio
-end
 
-#
-# Servers form the part of Rapid that interacts with external clients.
-# The [servers] config section allows configuring and launch-time enabling of
-# servers.
-#
-servers do
   configure :server, Rapid::Server::Launcher do
     # The host and port on which Rapid should listen for requests
     host '0.0.0.0', 8181
