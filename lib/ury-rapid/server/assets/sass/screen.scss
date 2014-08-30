@@ -362,47 +362,7 @@ dd {
   }
 }
 
-// General style mixins
-
-@mixin set-style($col) {
-  background-color: map-get($col, 500) !important;
-  border: $size-border solid map-get($col, 700);
-  color: map-get($col, 50) !important;
-  margin: $size-padding-thin;
-
-  >h1 {
-    background-color: map-get($col, 700);
-  }
-
-  a {
-    color: map-get($col, 50);
-
-    &:hover {
-      background-color: map-get($col, 50);
-      color: map-get($col, 700);
-    }
-  }
-}
-
-@mixin set-member-style($col) {
-  @include dark-text;
-  background-color: map-get($col, 50) !important;
-  border: $size-border solid map-get($col, 700);
-  margin: $size-padding-thin;
-
-  >h1 {
-    border-bottom: $size-border solid map-get($col, 700);
-  }
-
-  a {
-    color: map-get($col, 700);
-
-    &:hover {
-      background-color: map-get($col, 700);
-      color: map-get($col, 50);
-    }
-  }
-}
+@import 'model-styles-common';
 
 // JSON inspector
 
