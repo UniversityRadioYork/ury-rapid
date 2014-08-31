@@ -4,12 +4,11 @@
 @import 'icons';
 @import 'model-styles-common';
 
-section.playout_root {
-  @include fa-heading($fa-volume-up);
-  @include set-style($colour-pink);
-}
-
-section.group_root {
-  @include fa-heading($fa-sitemap);
-  @include set-style($colour-purple);
+$r-playout: (name: "playout_root", colour: $colour-cyan, fa: $fa-volume-up);
+$r-group:   (name: "group_root",   colour: $colour-lime, fa: $fa-sitemap);
+@each $r in $r-playout, $r-group {
+  section.#{map-get($r, name)} {
+    @include fa-heading(map-get($r, fa));
+    @include set-style(map-get($r, colour));
+  }
 }
