@@ -305,32 +305,7 @@ section.json_inspector {
   @include set-style($colour-blue-grey);
 }
 
-// Info (TODO: find a way of making info constants work)
-
-section.info {
-  @include fa-heading($fa-info);
-  @include set-style($colour-indigo);
-}
-
-$s-generic:  (set: "set",          member: "generic",  colour: $colour-grey,        fa: $fa-folder-open);
-$s-player:   (set: "player_set",   member: "player",   colour: $colour-amber,       fa: $fa-play);
-$s-playlist: (set: "playlist_set", member: "playlist", colour: $colour-deep-orange, fa: $fa-list-ol);
-@each $s in $s-player, $s-playlist {
-  section.#{map-get($s, set)} {
-    @include set-style(map-get($s, colour));
-  }
-
-  section.#{map-get($s, set)} section.#{map-get($s, member)},
-  body>section.#{map-get($s, member)} {
-    @include fa-heading(map-get($s, fa));
-    @include set-member-style(map-get($s, colour));
-
-    .constant {
-      @include set-member-style(map-get($s, colour));
-    }
-  }
-}
-
 @import 'model-styles-item-types';
 @import 'model-styles-load-states';
 @import 'model-styles-play-states';
+@import 'model-styles-sets';
