@@ -312,61 +312,25 @@ section.info {
   @include set-style($colour-indigo);
 }
 
-// Generic set/constant
-
-.set {
-  @include fa-heading($fa-folder-open);
-  @include set-style($colour-grey);
-}
-
-.constant {
-  @include set-member-style($colour-grey);
-}
-
-// Player set
-
-section.player_set {
-  @include set-style($colour-amber);
-}
-
-section.player_set section.player,
-body>section.player {
-  @include fa-heading($fa-play);
-  @include set-member-style($colour-amber);
-
-  .constant {
-    @include set-member-style($colour-amber);
+$s-generic:  (set: "set",          member: "generic",  colour: $colour-grey,        fa: $fa-folder-open);
+$s-player:   (set: "player_set",   member: "player",   colour: $colour-amber,       fa: $fa-play);
+$s-playlist: (set: "playlist_set", member: "playlist", colour: $colour-deep-orange, fa: $fa-list-ol);
+@each $s in $s-player, $s-playlist {
+  section.#{map-get($s, set)} {
+    @include set-style(map-get($s, colour));
   }
-}
 
-// Playlist set
+  section.#{map-get($s, set)} section.#{map-get($s, member)},
+  body>section.#{map-get($s, member)} {
+    @include fa-heading(map-get($s, fa));
+    @include set-member-style(map-get($s, colour));
 
-section.playlist_set {
-  @include set-style($colour-deep-orange);
-}
-
-section.playlist_set section.playlist,
-body>section.playlist {
-  @include fa-heading($fa-list-ol);
-  @include set-member-style($colour-orange);
+    .constant {
+      @include set-member-style(map-get($s, colour));
+    }
+  }
 }
 
 @import 'model-styles-item-types';
 @import 'model-styles-load-states';
 @import 'model-styles-play-states';
-
-$i-file:    (name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o);
-$i-text:    (name: "text",    colour: $colour-lime, fa: $fa-file-text-o);
-$i-library: (name: "library", colour: $colour-teal, fa: $fa-music);
-@each $i in $i-file, $i-text, $i-library {
-  section.player section.item.#{map-get($i, name)},
-  body>section.item.#{map-get($i, name)} {
-    @include set-member-style(map-get($i, colour));
-    @include fa-heading(map-get($i, fa));
-  }
-
-  section.playlist li.item.#{map-get($i, name)} {
-    @include set-member-style(map-get($i, colour));
-    @include fa-before(map-get($i, fa));
-  }
-}
