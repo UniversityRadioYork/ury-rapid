@@ -351,20 +351,8 @@ body>section.playlist {
   @include set-member-style($colour-orange);
 }
 
+@import 'model-styles-load-states';
 @import 'model-styles-play-states';
-
-// Load states
-$l-ok:      (name: "ok",      colour: $colour-light-green, fa: $fa-check);
-$l-loading: (name: "loading", colour: $colour-light-blue,  fa: $fa-ellipsis-h);
-$l-failed:  (name: "failed",  colour: $colour-deep-purple, fa: $fa-times);
-$l-empty:   (name: "empty",   colour: $colour-brown,       fa: $fa-square-o);
-@each $l in $l-ok, $l-loading, $l-failed, $l-empty {
-  section.player section.constant.#{map-get($l, name)},
-  body>section.constant.#{map-get($l, name)} {
-    @include set-member-style(map-get($l, colour));
-    @include fa-paragraph(map-get($l, fa));
-  }
-}
 
 // Item types
 $i-file:    (name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o);
