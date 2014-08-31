@@ -351,10 +351,10 @@ body>section.playlist {
   @include set-member-style($colour-orange);
 }
 
+@import 'model-styles-item-types';
 @import 'model-styles-load-states';
 @import 'model-styles-play-states';
 
-// Item types
 $i-file:    (name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o);
 $i-text:    (name: "text",    colour: $colour-lime, fa: $fa-file-text-o);
 $i-library: (name: "library", colour: $colour-teal, fa: $fa-music);
