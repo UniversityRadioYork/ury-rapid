@@ -28,3 +28,47 @@ section.info {
   @include fa-heading($fa-info);
   @include set-style($colour-indigo);
 }
+
+// Make players and playlists line up horizontally.
+.player_set,
+.playlist_set {
+  >div.set_contents {
+    align-items: stretch;
+    border-collapse: separate;
+    border-spacing: $size-padding;
+    display: flex;
+    flex: 1;
+    margin: 0 auto;
+
+    >section {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+  }
+}
+
+li.item,
+p.item {
+  // Stop line-breaking and force an ellipsis instead.
+  overflow: hidden;
+  padding: $size-padding-thin;
+  padding-right: ($size-padding-thin + $size-in-out);
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+p.item {
+  margin: $size-padding-thin;
+}
+
+ol.playlist-items {
+  // Prevent duplicate borders.
+  li {
+    &:not(:first-child) {
+      border-top: 0;
+    }
+  }
+}
+
