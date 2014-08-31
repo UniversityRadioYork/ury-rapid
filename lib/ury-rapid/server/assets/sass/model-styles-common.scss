@@ -1,5 +1,6 @@
 // Common mixins for styling model elements
 
+@import 'colour-semantic';
 @import 'sizes';
 
 // Style for sets of model objects
@@ -31,7 +32,7 @@
 // This style intends to make the set members appear subordinate to their
 // sets, by using a more lightweight style.
 @mixin set-member-style($col) {
-  @include dark-text;
+  color: $colour-general-fg;
   background-color: map-get($col, 50) !important;
   border: $size-border solid map-get($col, 700);
   margin: $size-padding-thin;
