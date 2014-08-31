@@ -209,6 +209,7 @@ nav.resources {
 }
 
 @import 'nav-links';
+@import 'json-consoles';
 
 .legend {
   h1 {
@@ -244,18 +245,6 @@ nav.resources {
   }
 }
 
-// Console themeing.
-pre.json_code,
-#update-console {
-  @include border;
-  @include font-console;
-
-  background-color: $colour-console-bg;
-  color: $colour-console-fg;
-  margin-bottom: $size-padding;
-  padding: $size-padding;
-}
-
 dt {
   font-weight: bold;
 }
@@ -265,14 +254,6 @@ dd {
 }
 
 @import 'model-styles-common';
-
-// JSON inspector
-
-section.json_inspector {
-  @include fa-heading($fa-code);
-  @include set-style($colour-blue-grey);
-}
-
 @import 'model-styles-item-types';
 @import 'model-styles-load-states';
 @import 'model-styles-play-states';
