@@ -1,0 +1,51 @@
+// Toolbar styling for the API inspector
+
+@import 'colour-semantic';
+@import 'fonts';
+@import 'sizes';
+
+#toolbar {
+  align-items: center;
+  background-color: $colour-toolbar-bg;
+  color: $colour-toolbar-fg;
+  display: flex;
+  padding: 0;
+
+  h1,
+  .toolbar-button {
+    @include font-title;
+
+    font-size: 1.1rem;
+    margin: 0;
+    padding-left: $size-padding-thin;
+    vertical-align: middle;
+  }
+
+  h1 {
+    display: inline;
+    flex: 3;
+    text-align: left;
+  }
+
+  label {
+    flex: 2;
+    margin-right: $size-padding-thin;
+    text-align: right;
+  }
+
+  #toolbar-data {
+    flex: 6;
+    margin-right: $size-padding-thin;
+  }
+
+  .toolbar-button {
+    cursor: pointer;
+    flex: 1;
+    padding: $size-padding-thin;
+    text-align: center;
+
+    &:not(:first-child) {
+      margin-right: $size-padding-thin;
+    }
+  }
+}

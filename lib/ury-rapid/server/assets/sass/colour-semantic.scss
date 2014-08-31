@@ -1,0 +1,21 @@
+// Semantic colour variables.
+//
+// These should be defined as aliases for the raw colours in 'colour-
+// palette.scss'.
+
+@import 'colour-palette';
+
+$colour-outer-fg:        #000;
+$colour-outer-bg:        map-get($colour-purple, 50);
+
+$colour-header-fg:       map-get($colour-purple, 50);
+$colour-header-bg:       map-get($colour-purple, 700);
+
+$colour-toolbar-fg:      map-get($colour-purple, 50);
+$colour-toolbar-bg:      map-get($colour-purple, 500);
+
+$colour-root-playout-fg: map-get($colour-pink, 50);
+$colour-root-playout-bg: map-get($colour-pink, 500);
+
+$colour-console-bg:      map-get($colour-blue-grey, 700);
+$colour-console-fg:      map-get($colour-blue-grey, 50);
