@@ -19,6 +19,11 @@ $s-playlist: (set: "playlist_set", member: "playlist", colour: $colour-deep-oran
 
     .constant {
       @include set-member-style(map-get($s, colour));
+
+      // Remove lower margin on the value.
+      p {
+        margin: 0;
+      }
     }
   }
 }

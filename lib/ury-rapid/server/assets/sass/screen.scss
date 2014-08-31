@@ -101,13 +101,6 @@ nav h1 {
   display: none;
 }
 
-section.constant {
-  // Remove lower margin on the value.
-  p {
-    margin: 0;
-  }
-}
-
 // Nested variables have some special formatting.
 div>section,
 section>section {
