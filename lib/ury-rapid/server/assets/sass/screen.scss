@@ -6,11 +6,7 @@
 @import 'colour-palette';
 @import 'fonts';
 @import 'icons';
-
-$size-border: .12rem;
-$size-padding: .9rem;
-$size-padding-thin: .4rem;
-$size-in-out: $size-padding * (3/4);
+@import 'sizes';
 
 // Semantic colour names
 $colour-outer-fg:           #000;
@@ -369,18 +365,6 @@ dd {
 section.json_inspector {
   @include fa-heading($fa-code);
   @include set-style($colour-blue-grey);
-}
-
-// Roots
-
-section.playout_root {
-  @include fa-heading($fa-volume-up);
-  @include set-style($colour-pink);
-}
-
-section.group_root {
-  @include fa-heading($fa-sitemap);
-  @include set-style($colour-purple);
 }
 
 // Info (TODO: find a way of making info constants work)
