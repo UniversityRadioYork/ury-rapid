@@ -208,39 +208,7 @@ nav.resources {
   clear: both;
 }
 
-.in,
-.out,
-.json {
-  display: block;
-  font-size: $size-in-out;
-  height: $size-in-out;
-  line-height: $size-in-out;
-  padding: $size-border;
-  position: absolute;
-  text-align: center;
-  width: $size-in-out;
-}
-
-.in {
-  bottom: 0;
-  padding-bottom: 0;
-  padding-right: 0;
-  right: 0;
-}
-
-.out {
-  left: 0;
-  padding-left: 0;
-  padding-top: 0;
-  top: 0;
-}
-
-.json {
-  padding-right: 0;
-  padding-top: 0;
-  right: 0;
-  top: 0;
-}
+@import 'nav-links';
 
 .legend {
   h1 {
