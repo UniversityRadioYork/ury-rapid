@@ -1,0 +1,153 @@
+// General formatting for the API inspector
+
+@import 'compass/typography/links/link-colors';
+
+@import 'colour-palette';
+@import 'colour-semantic';
+@import 'fonts';
+@import 'sizes';
+
+a {
+  @include link-colors(
+    map-get($colour-light-blue, 500),
+    map-get($colour-red, 500),
+    map-get($colour-red, 500),
+    map-get($colour-deep-purple, 500)
+  );
+}
+
+html {
+  @include font-normal;
+
+  background-color: $colour-outer-bg;
+  color: $colour-outer-fg;
+  font-size: 16pt;
+  text-align: center;
+
+  strong {
+    font-weight: bold;
+  }
+}
+
+body {
+  >section,
+  >nav {
+    display: table;
+    font-size: 1rem !important;
+    margin: $size-padding auto !important;
+    max-width: 80%;
+    text-align: left;
+  }
+
+  >header {
+    background-color: $colour-header-bg;
+    color: $colour-header-fg;
+    text-align: left;
+
+    >h1 {
+      display: inline-block;
+      font-size: 3rem;
+      line-height: .8em;
+      margin: 0;
+      padding: $size-padding-thin;
+    }
+
+    >h2 {
+      display: inline;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+  }
+}
+
+h1,
+h2,
+h3 {
+  @include font-title;
+
+  font-size: 1.2em;
+  margin-bottom: $size-padding;
+  text-align: left;
+}
+
+section,
+nav {
+  font-size: .9em;
+  padding: $size-padding;
+  position: relative;
+
+  >h1 {
+    // Transfer the margin into padding, so we can style the entire heading
+    // bar without a nasty padding border around it.
+
+    margin-left: -($size-padding);
+    margin-right: -($size-padding);
+    margin-top: -($size-padding);
+    padding-bottom: $size-padding-thin;
+    padding-left: $size-padding-thin;
+    padding-right: $size-padding-thin;
+    padding-top: $size-padding-thin;
+  }
+}
+
+p:not(:last-child) {
+  margin-bottom: $size-padding;
+}
+
+nav h1 {
+  display: none;
+}
+
+// Nested variables have some special formatting.
+div>section,
+section>section {
+  &.variable,
+  &.constant {
+    display: flex !important;
+
+    h1 {
+      @include font-normal;
+
+      border-bottom: none !important;
+      display: inline;
+      font-size: 1em;
+      font-weight: bold;
+      margin: 4pt;
+      margin-right: $size-padding-thin;
+      padding: 0 !important;
+    }
+
+    p {
+      display: inline;
+      flex: 1;
+      margin: 4pt;
+      overflow: hidden;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+nav.main-menu {
+  border: 0;
+  text-align: center;
+
+  li {
+    display: inline-block;
+    padding: $size-padding;
+  }
+}
+
+nav.resources {
+  clear: both;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-left: $size-padding;
+}
+
