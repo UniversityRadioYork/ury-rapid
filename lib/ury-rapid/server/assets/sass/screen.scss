@@ -10,11 +10,6 @@
 @import 'sizes';
 @import 'ui-toolbar';
 
-// Semantic colour names
-@mixin border {
-  padding: $size-padding;
-}
-
 a {
   @include link-colors(
     map-get($colour-light-blue, 500),
@@ -80,9 +75,8 @@ h3 {
 
 section,
 nav {
-  @include border;
-
   font-size: .9em;
+  padding: $size-padding;
   position: relative;
 
   >h1 {
@@ -164,10 +158,6 @@ section>section {
   }
 }
 
-.item {
-  @include border;
-}
-
 li.item,
 p.item {
   // Stop line-breaking and force an ellipsis instead.
@@ -197,8 +187,6 @@ nav.main-menu {
   text-align: center;
 
   li {
-    @include border;
-
     display: inline-block;
     padding: $size-padding;
   }
