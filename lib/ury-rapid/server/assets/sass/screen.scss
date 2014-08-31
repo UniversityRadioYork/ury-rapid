@@ -211,40 +211,6 @@ nav.resources {
 @import 'nav-links';
 @import 'json-consoles';
 
-.legend {
-  h1 {
-    display: none;
-  }
-
-  >section {
-    border: 0;
-    padding: 0;
-    text-align: center;
-
-    &:last-child {
-      margin-bottom: $size-padding;
-    }
-  }
-
-  p,
-  span {
-    @include border;
-
-    display: inline-block;
-    position: relative;
-  }
-
-  p {
-    margin: $size-padding;
-    margin-bottom: 0;
-    padding: $size-padding;
-  }
-
-  span {
-    padding: $size-padding-thin;
-  }
-}
-
 dt {
   font-weight: bold;
 }
