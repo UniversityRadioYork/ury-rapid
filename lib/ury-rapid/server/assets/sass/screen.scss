@@ -7,7 +7,6 @@
 
 @import 'compass/reset';
 @import 'compass/utilities/general/clearfix';
-@import 'compass/typography/links/link-colors';
 @import 'compass/css3';
 
 @import 'base';
@@ -23,4 +22,5 @@
 @import 'model-styles-item-types';
 @import 'model-styles-load-states';
 @import 'model-styles-play-states';
+@import 'model-styles-root';
 @import 'model-styles-sets';

@@ -4,8 +4,8 @@
 @import 'icons';
 @import 'model-styles-common';
 
-$r-playout: (name: "playout_root", colour: $colour-cyan, fa: $fa-volume-up);
-$r-group:   (name: "group_root",   colour: $colour-lime, fa: $fa-sitemap);
+$r-playout: (name: "playout_root", colour: $colour-pink, fa: $fa-volume-up);
+$r-group:   (name: "group_root",   colour: $colour-purple, fa: $fa-sitemap);
 @each $r in $r-playout, $r-group {
   section.#{map-get($r, name)} {
     @include fa-heading(map-get($r, fa));

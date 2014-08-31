@@ -4,7 +4,20 @@
 @import 'icons';
 @import 'model-styles-common';
 
-$s-generic:  (set: "set",          member: "generic",  colour: $colour-grey,        fa: $fa-folder-open);
+// Generic sets and constants
+.set {
+  @include set-style($colour-grey);
+}
+.constant {
+  @include set-member-style($colour-grey);
+
+  // Remove lower margin on the value.
+  p {
+    margin: 0;
+  }
+}
+
+// Specific sets and their members
 $s-player:   (set: "player_set",   member: "player",   colour: $colour-amber,       fa: $fa-play);
 $s-playlist: (set: "playlist_set", member: "playlist", colour: $colour-deep-orange, fa: $fa-list-ol);
 @each $s in $s-player, $s-playlist {
@@ -16,15 +29,6 @@ $s-playlist: (set: "playlist_set", member: "playlist", colour: $colour-deep-oran
   body>section.#{map-get($s, member)} {
     @include fa-heading(map-get($s, fa));
     @include set-member-style(map-get($s, colour));
-
-    .constant {
-      @include set-member-style(map-get($s, colour));
-
-      // Remove lower margin on the value.
-      p {
-        margin: 0;
-      }
-    }
   }
 }
 
