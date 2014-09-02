@@ -1,0 +1,33 @@
+// Navigation link styles.
+
+@import 'sizes';
+
+@mixin nav-link($vertical, $horizontal) {
+  display: block;
+  font-size: $size-in-out;
+  height: $size-in-out;
+  line-height: $size-in-out;
+  padding: $size-border;
+  position: absolute;
+  text-align: center;
+  width: $size-in-out;
+
+  #{$horizontal}: 0;
+  padding-#{$horizontal}: 0;
+
+  #{$vertical}: 0;
+  padding-#{$vertical}: 0;
+}
+
+.in {
+  @include nav-link('bottom', 'right');
+}
+
+.out {
+  @include nav-link('top', 'left');
+}
+
+.json {
+  @include nav-link('top', 'right');
+}
+

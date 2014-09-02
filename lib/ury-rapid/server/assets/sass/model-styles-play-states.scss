@@ -1,0 +1,17 @@
+// Play state styles.
+
+@import 'colour-palette';
+@import 'icons';
+@import 'model-styles-common';
+
+$p-playing: (name: "playing", colour: $colour-green,  fa: $fa-play);
+$p-paused:  (name: "paused",  colour: $colour-yellow, fa: $fa-pause);
+$p-stopped: (name: "stopped", colour: $colour-red,    fa: $fa-stop);
+@each $p in $p-playing, $p-paused, $p-stopped {
+  section.player section.constant.#{map-get($p, name)},
+  body>section.constant.#{map-get($p, name)} {
+    @include set-member-style(map-get($p, colour));
+    @include fa-paragraph(map-get($p, fa));
+  }
+}
+

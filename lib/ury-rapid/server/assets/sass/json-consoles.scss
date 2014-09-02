@@ -1,0 +1,26 @@
+// JSON console/inspector styles
+
+@import 'colour-palette';
+@import 'colour-semantic';
+@import 'fonts';
+@import 'icons';
+@import 'model-styles-common';
+@import 'sizes';
+
+// Console themeing.
+pre.json_code,
+#update-console {
+  @include font-console;
+
+  background-color: $colour-console-bg;
+  color: $colour-console-fg;
+  margin-bottom: $size-padding;
+  padding: $size-padding;
+}
+
+// JSON inspector
+section.json_inspector {
+  @include fa-heading($fa-code);
+  @include set-style($colour-blue-grey);
+}
+

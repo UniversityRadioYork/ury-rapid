@@ -1,0 +1,29 @@
+// Rapid inspector colour palette.
+//
+// Each colour is defined as a map with values (50, 500, 700); the higher the
+// value, the darker the shade.
+//
+// This colour palette is a SCSS transcription of the Google Material Design
+// palette; see
+// http://www.google.co.uk/design/spec/style/color.html#color-ui-color-palette
+// for the original.
+
+$colour-red:         (700: #d01716, 500: #e51c23, 50: #fde0dc);
+$colour-pink:        (700: #c2185b, 500: #e91e63, 50: #fce4ec);
+$colour-purple:      (700: #7b1fa2, 500: #9c27b0, 50: #f3e5f5);
+$colour-deep-purple: (700: #512da8, 500: #673ab7, 50: #ede7f6);
+$colour-indigo:      (700: #303f9f, 500: #3f51b5, 50: #e8eaf6);
+$colour-blue:        (700: #455ede, 500: #5677fc, 50: #e7e9fd);
+$colour-light-blue:  (700: #0288d1, 500: #03a9f4, 50: #e1f5fe);
+$colour-cyan:        (700: #0097a7, 500: #00bcd4, 50: #e0f7fa);
+$colour-teal:        (700: #00796b, 500: #009688, 50: #e0f2f1);
+$colour-green:       (700: #0a7e07, 500: #259b24, 50: #d0f8ce);
+$colour-light-green: (700: #689f38, 500: #8bc34a, 50: #f1f8e9);
+$colour-lime:        (700: #afb42b, 500: #cddc39, 50: #f9fbe7);
+$colour-yellow:      (700: #fbc02d, 500: #ffeb3b, 50: #fffde7);
+$colour-amber:       (700: #ffa000, 500: #ffc107, 50: #fff8e1);
+$colour-orange:      (700: #f57c00, 500: #ff9800, 50: #fff3e0);
+$colour-deep-orange: (700: #e64a19, 500: #ff5722, 50: #fbe9e7);
+$colour-brown:       (700: #5d4037, 500: #795548, 50: #efebe9);
+$colour-grey:        (700: #616161, 500: #9e9e9e, 50: #fafafa);
+$colour-blue-grey:   (700: #455a64, 500: #607d8b, 50: #eceff1);

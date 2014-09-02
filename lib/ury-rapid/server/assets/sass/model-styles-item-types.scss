@@ -1,0 +1,21 @@
+// Item type styles.
+
+@import 'colour-palette';
+@import 'icons';
+@import 'model-styles-common';
+
+$i-file:    (name: "file",    colour: $colour-cyan, fa: $fa-file-audio-o);
+$i-text:    (name: "text",    colour: $colour-lime, fa: $fa-file-text-o);
+$i-library: (name: "library", colour: $colour-teal, fa: $fa-music);
+@each $i in $i-file, $i-text, $i-library {
+  section.player section.item.#{map-get($i, name)},
+  body>section.item.#{map-get($i, name)} {
+    @include set-member-style(map-get($i, colour));
+    @include fa-heading(map-get($i, fa));
+  }
+
+  section.playlist li.item.#{map-get($i, name)} {
+    @include set-member-style(map-get($i, colour));
+    @include fa-before(map-get($i, fa));
+  }
+}
