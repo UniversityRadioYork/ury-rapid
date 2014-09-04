@@ -110,7 +110,7 @@ describe Rapid::Launcher do
         a_kind_of(Rapid::Modules::Root)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(service_id) })
-          .and(satisfy { |ms| ms.enabled.include?(server_id) }),
+          .and(satisfy { |ms| ms.enabled.include?(server_id) })
       )
     end
     it 'calls the authenticator maker with the user configuration' do
@@ -121,24 +121,6 @@ describe Rapid::Launcher do
     end
     it 'calls the logger maker' do
       test_maker(logger_maker, no_args)
-    end
-
-    it 'initialises the model class with the update channel, logger and nil' do
-      subject.run
-      expect(model_class).to have_received(:new).once.with(
-        channel,
-        logger,
-        nil
-      )
-    end
-    it 'calls the service view maker with the global model and structure' do
-      subject.run
-      expect(service_view_maker).to have_received(:call).with(
-        model, model_structure
-      )
-    end
-    it 'calls the server view maker with the model' do
-      test_maker(server_view_maker, model)
     end
   end
 end

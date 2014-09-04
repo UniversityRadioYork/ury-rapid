@@ -9,7 +9,8 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @modules = Rapid::Modules::Root.new
+      @root_config      = nil
+      @root_model_class = nil
 
       @user_config = {}
 
@@ -37,13 +38,19 @@ module Rapid
 
     # Configures the modules set for this instance of Rapid
     #
-    # See Rapid::Modules::Set for the DSL accepted by this method.
-    def_delegator :@modules, :instance_eval, :modules
+    # See Rapid::Modules::Root for the DSL accepted by this method.
+    def modules(&block)
+      fail('Multiple `modules` blocks in config.') unless @root_config.nil?
+      @root_config = block
+    end
 
     # Configures the model.
     #
-    # @api  public
-    def_delegator :@modules, :model_class=, :model
+    # @api public
+    def model(class_name)
+      fail('Multiple `model` blocks in config.') unless @root_model_class.nil?
+      @root_model_class = class_name
+    end
 
     # Configures a user and adds them to the user table.
     #
@@ -103,30 +110,35 @@ module Rapid
     # @api  private
     def root_module
       logger             = make_logger
-      builder            = prepare_root(logger)
-      global_server_view = build_root_model(builder)
-      prepare_root_for_submodules(logger, global_server_view)
-      @modules
+      root, builder      = prepare_root(logger)
+      root.instance_eval(&@root_config)
+      global_server_view = build_root_model(root, builder)
+      prepare_root_for_submodules(root, logger, global_server_view)
+      root
     end
 
     # @api  private
     def prepare_root(logger)
-      @modules.logger = logger
+      root = Rapid::Modules::Root.new
+      root.logger = logger
 
-      ModelBuilder.new(
+      builder = ModelBuilder.new(
         nil, @update_channel, @service_view_maker, @server_view_maker
-      ).tap { |builder| @modules.model_builder = builder }
+      )
+
+      root.model_builder = builder
+      [root, builder]
     end
 
     # @api  private
-    def build_root_model(builder)
-      _, global_server_view = builder.build(nil, @modules)
+    def build_root_model(root, builder)
+      _, global_server_view = builder.build(nil, root)
       global_server_view
     end
 
     # @api  private
-    def prepare_root_for_submodules(logger, global_server_view)
-      @modules.constructor_arguments = [logger, global_server_view, @auth]
+    def prepare_root_for_submodules(root, logger, global_server_view)
+      root.constructor_arguments = [logger, global_server_view, @auth]
     end
 
     #
