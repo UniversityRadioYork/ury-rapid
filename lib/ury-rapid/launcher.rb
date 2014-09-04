@@ -102,24 +102,8 @@ module Rapid
     def app_arguments
       logger = make_logger
       global_service_view, global_server_view = mkmodel(logger)
-      prepare_module_set(logger, global_server_view, global_service_view)
-      [@modules, global_service_view]
-    end
-
-    #
-    # Modules
-    #
-
-    # Prepares the module set for sending to the app
-    #
-    # See #module and #enable_module in the configuration DSL.
-    #
-    # @return [void]
-    def prepare_module_set(logger, global_server_view, global_service_view)
       @modules.constructor_arguments = [logger, global_server_view, @auth]
-      @modules.model_builder = ModelBuilder.new(
-        global_service_view, @update_channel, @service_view_maker, nil
-      )
+      [@modules, global_service_view]
     end
 
     #
