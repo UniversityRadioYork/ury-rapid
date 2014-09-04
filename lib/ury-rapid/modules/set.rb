@@ -201,7 +201,7 @@ module Rapid
       # @return [Object]
       #   The sub-model structure.
       def sub_model_structure(update_channel)
-        Structure.new(update_channel)
+        Rapid::Model::Structures::ModuleSet.new(update_channel, nil, {})
       end
 
       def service_view=(new_view)
@@ -209,26 +209,6 @@ module Rapid
 
         return if @model_builder.nil?
         @model_builder = @model_builder.replace_service_view(@service_view)
-      end
-
-      # The structure used by module sets
-      class Structure < Rapid::Model::Creator
-        def initialize(update_channel)
-          super(update_channel, nil, {})
-        end
-
-        # Create the model from the given configuration
-        #
-        # @api      semipublic
-        # @example  Create the model
-        #   struct.create
-        #
-        # @return [Constant]  The finished model.
-        def create
-          # The model is created empty, but will have the models of any modules
-          # in the module group inserted into it.
-          root(:group_root) {}
-        end
       end
     end
   end
