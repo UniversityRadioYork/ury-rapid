@@ -206,6 +206,8 @@ module Rapid
 
       def service_view=(new_view)
         @service_view = new_view
+
+        return if @model_builder.nil?
         @model_builder = @model_builder.replace_service_view(@service_view)
       end
 

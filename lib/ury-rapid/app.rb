@@ -28,7 +28,7 @@ module Rapid
       @model_view.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
 
       @reactor.run do
-        @modules.start_enabled
+        @modules.run
 
         Signal.trap('INT', &method(:close))
         Signal.trap('TERM', &method(:close))

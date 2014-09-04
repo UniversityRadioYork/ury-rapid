@@ -1,7 +1,7 @@
 require 'ury-rapid/app'
 require 'ury-rapid/common/exceptions'
 require 'ury-rapid/logger'
-require 'ury-rapid/modules/set'
+require 'ury-rapid/modules/root'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -9,7 +9,7 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @modules = Rapid::Modules::Set.new
+      @modules = Rapid::Modules::Root.new
 
       @user_config = {}
 
@@ -43,10 +43,7 @@ module Rapid
     # Configures the model.
     #
     # @api  public
-    def model(implementation_class, &block)
-      @model_structure = implementation_class
-      @model_config = block
-    end
+    def_delegator :@modules, :model_class=, :model
 
     # Configures a user and adds them to the user table.
     #
@@ -139,9 +136,15 @@ module Rapid
     #
 
     def mkmodel(logger)
-      structure = @model_structure.new(@update_channel, logger, @model_config)
+      @modules.logger = logger
+      structure, register_service_view = @modules.sub_model(@update_channel)
       model = structure.create
-      [make_service_view(model, structure), make_server_view(model)]
+
+      service_view = make_service_view(model, structure)
+                     .tap { |sv| register_service_view.call(sv) }
+      server_view  = make_server_view(model)
+
+      [service_view, server_view]
     end
 
     #
