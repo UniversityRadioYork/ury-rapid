@@ -24,6 +24,7 @@ module Rapid
         @enabled_modules = ::Set[]
         @constructor_arguments = constructor_arguments
         @model_builder = nil
+        @server_view = nil
       end
 
       # Creates a sub-group of this module set
@@ -158,6 +159,7 @@ module Rapid
 
       attr_writer :constructor_arguments
       attr_writer :model_builder
+      attr_writer :server_view
 
       # Runs the module set.
       #
@@ -187,7 +189,10 @@ module Rapid
       #   A tuple of the completed sub-model structure, and a proc that should
       #   be called with a ServiceView of the completed model.
       def sub_model(update_channel)
-        [sub_model_structure(update_channel), method(:service_view=)]
+        [sub_model_structure(update_channel),
+         method(:service_view=),
+         method(:server_view=)
+        ]
       end
 
       # Constructs the sub-model structure for this set

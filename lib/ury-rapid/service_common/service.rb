@@ -45,10 +45,14 @@ module Rapid
       #   structure.
       #
       # @return [Array]
-      #   A tuple of the completed sub-model structure, and a proc that should
-      #   be called with a ServiceView of the completed model.
+      #   A triple of the completed sub-model structure, a proc that should
+      #   be called with a ServiceView of the completed model, and a proc that
+      #   should be called with its ServerView.
       def sub_model(update_channel)
-        [sub_model_structure(update_channel), method(:service_view=)]
+        [sub_model_structure(update_channel),
+         method(:service_view=),
+         ->(_) {}  # We don't need a server view of our own model.
+        ]
       end
 
       protected
