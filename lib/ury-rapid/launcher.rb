@@ -143,7 +143,7 @@ module Rapid
     #           model_view.
     #   mb = ModelBuilder.new(model_view)
     #
-    # @param service_view [ServiceView]
+    # @param parent_service_view [ServiceView]
     #   A service view to use to insert the model into the model tree.
     #   May be null, if the model is to be the root of the tree.
     # @param update_channel [UpdateChannel]
