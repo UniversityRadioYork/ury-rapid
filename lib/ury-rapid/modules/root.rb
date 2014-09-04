@@ -29,6 +29,10 @@ module Rapid
       attr_writer :model_class
       attr_writer :logger
 
+      # The root module exposes a logger, mainly for the app and launcher's
+      # benefit.
+      def_delegator :@service_view, :log
+
       # Constructs the sub-model structure for the root module
       #
       # @api  private

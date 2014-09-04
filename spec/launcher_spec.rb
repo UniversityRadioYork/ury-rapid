@@ -1,5 +1,6 @@
 require 'ury-rapid/launcher'
 require 'ury-rapid/modules/set'
+require 'ury-rapid/modules/root'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
@@ -103,14 +104,13 @@ describe Rapid::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the module set and service view' do
+    it 'calls the app maker with the root module' do
       subject.run
       expect(app_maker).to have_received(:call).once.with(
-        a_kind_of(Rapid::Modules::Set)
+        a_kind_of(Rapid::Modules::Root)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(service_id) })
           .and(satisfy { |ms| ms.enabled.include?(server_id) }),
-        service_view
       )
     end
     it 'calls the authenticator maker with the user configuration' do

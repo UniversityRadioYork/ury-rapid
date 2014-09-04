@@ -91,45 +91,54 @@ module Rapid
     #
     # @return [void]
     def run_config(config)
-      instance_eval(&config) if config.is_a?(Proc)
-      instance_eval(config) unless config.is_a?(Proc)
+      instance_eval(&config) if     config.is_a?(Proc)
+      instance_eval(config)  unless config.is_a?(Proc)
     end
 
+    # @api  private
     def app
-      make_app(*app_arguments)
+      make_app(root_module)
     end
 
-    def app_arguments
-      logger = make_logger
-      global_service_view, global_server_view = mkmodel(logger)
-      @modules.constructor_arguments = [logger, global_server_view, @auth]
-      [@modules, global_service_view]
+    # @api  private
+    def root_module
+      logger             = make_logger
+      builder            = prepare_root(logger)
+      global_server_view = build_root_model(builder)
+      prepare_root_for_submodules(logger, global_server_view)
+      @modules
     end
 
-    #
-    # Model
-    #
+    # @api  private
+    def prepare_root(logger)
+      @modules.logger = logger
 
-    def mkmodel(logger)
-      builder = ModelBuilder.new(
+      ModelBuilder.new(
         nil, @update_channel, @service_view_maker, @server_view_maker
-      )
-      @modules.model_builder = builder
-      @modules.logger        = logger
+      ).tap { |builder| @modules.model_builder = builder }
+    end
 
-      builder.build(nil, @modules)
+    # @api  private
+    def build_root_model(builder)
+      _, global_server_view = builder.build(nil, @modules)
+      global_server_view
+    end
+
+    # @api  private
+    def prepare_root_for_submodules(logger, global_server_view)
+      @modules.constructor_arguments = [logger, global_server_view, @auth]
     end
 
     #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,           :call, :make_app
-    def_delegator :@auth_maker,          :call, :make_auth
-    def_delegator :@channel_maker,       :call, :make_channel
-    def_delegator :@service_view_maker,  :call, :make_service_view
-    def_delegator :@logger_maker,        :call, :make_logger
-    def_delegator :@server_view_maker,   :call, :make_server_view
+    def_delegator :@app_maker,          :call, :make_app
+    def_delegator :@auth_maker,         :call, :make_auth
+    def_delegator :@channel_maker,      :call, :make_channel
+    def_delegator :@service_view_maker, :call, :make_service_view
+    def_delegator :@logger_maker,       :call, :make_logger
+    def_delegator :@server_view_maker,  :call, :make_server_view
   end
 
   # A class for building the model of a module, given a view into its parent

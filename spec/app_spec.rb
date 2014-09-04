@@ -2,20 +2,19 @@ require 'ury-rapid/app'
 require 'ury-rapid/model'
 
 describe Rapid::App do
-  subject { Rapid::App.new(module_set, service_view, reactor) }
+  subject { Rapid::App.new(root_module, reactor) }
 
-  let(:module_set)   { double(:module) }
-  let(:service_view) { double(:service_view) }
-  let(:reactor)      { double(:reactor) }
+  let(:root_module) { double(:module) }
+  let(:reactor)     { double(:reactor) }
 
   describe '#run' do
     before(:each) do
-      allow(module_set).to receive(:run)
+      allow(root_module).to receive(:run)
       allow(reactor).to receive(:run).and_yield
 
-      # Logging messages go through the service view, which has access to the
+      # Logging messages go through the root module, which has access to the
       # logger.  This is normal.
-      allow(service_view).to receive(:log)
+      allow(root_module).to receive(:log)
     end
 
     it 'calls #run on the reactor' do
@@ -23,9 +22,9 @@ describe Rapid::App do
       expect(reactor).to have_received(:run).once.with(no_args)
     end
 
-    it 'calls #run on the module set' do
+    it 'calls #run on the root module' do
       subject.run
-      expect(module_set).to have_received(:run).once.with(no_args)
+      expect(root_module).to have_received(:run).once.with(no_args)
     end
   end
 end
