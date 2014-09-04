@@ -119,8 +119,7 @@ module Rapid
 
     # @api  private
     def prepare_root(logger)
-      root = Rapid::Modules::Root.new
-      root.logger = logger
+      root = Rapid::Modules::Root.new(logger, @root_model_class)
 
       builder = ModelBuilder.new(
         nil, @update_channel, @service_view_maker, @server_view_maker

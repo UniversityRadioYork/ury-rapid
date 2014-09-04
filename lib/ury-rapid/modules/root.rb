@@ -18,16 +18,18 @@ module Rapid
       #
       # @api      public
       # @example  Create a new root module
-      #   root = Rapid::Modules::Root.new
-      def initialize
+      #   root = Rapid::Modules::Root.new(logger)
+      #
+      # @param logger [Object]
+      #   The logger to use for this root module.
+      # @param model_class [Class]
+      #   The class to use for the root module's model structure.
+      def initialize(logger, model_class)
         super()
 
-        @model_class = Rapid::Model::Structures::Standard
-        @logger      = nil
+        @logger      = logger
+        @model_class = model_class || Rapid::Model::Structures::Standard
       end
-
-      attr_writer :model_class
-      attr_writer :logger
 
       # The root module exposes a logger, mainly for the app and launcher's
       # benefit.
