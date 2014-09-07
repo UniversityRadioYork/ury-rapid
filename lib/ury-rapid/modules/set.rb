@@ -14,16 +14,17 @@ module Rapid
       #
       # The Set, by default, passes nothing to module constructors, and
       # does nothing with the modules after construction.  Use
-      # #constructor_arguments= and #module_create_hook= to override this.
+      # #constructor_arguments= and #module_builder= to override this.
       #
       # @api      semipublic
-      # @example  Create a new Set
+      # @example  Create a new Set with no constructor arguments provided.
       #   ms = Set.new
-      def initialize
+      def initialize(*constructor_arguments)
         @modules = {}
         @enabled_modules = ::Set[]
-        @constructor_arguments = []
+        @constructor_arguments = constructor_arguments
         @model_builder = nil
+        @server_view = nil
       end
 
       # Creates a sub-group of this module set
@@ -46,7 +47,7 @@ module Rapid
         # been when the #configure block is called.
         builder_proc = ->() { @model_builder }
 
-        configure(name, Subgroup) do
+        configure(name, Set) do
           builder = builder_proc.call
           fail("Found nil model builder at group #{name}.") if builder.nil?
 
@@ -158,22 +159,15 @@ module Rapid
 
       attr_writer :constructor_arguments
       attr_writer :model_builder
-    end
+      attr_writer :server_view
 
-    # Class for module sub-groups
-    class Subgroup < Set
-      def initialize(*constructor_arguments)
-        super()
-        @constructor_arguments = constructor_arguments
-      end
-
-      # Runs the subgroup.
+      # Runs the module set.
       #
-      # Running the subgroup entails starting all of the subgroup's enabled
+      # Running the module set entails starting all of the module set's enabled
       # modules.
       #
       # @api      semipublic
-      # @example  Runs a subgroup.
+      # @example  Runs a module set.
       #   ms.run
       #
       # @return [void]
@@ -181,11 +175,11 @@ module Rapid
         start_enabled
       end
 
-      # Asks the module subgroup to prepare its sub-model structure
+      # Asks the module set to prepare its sub-model structure
       #
       # @api      semipublic
       # @example  Request the sub-model structure of the sub-group
-      #   sub_model, register_view_proc = subgroup.sub_model
+      #   sub_model, register_view_proc = set.sub_model
       #
       # @param update_channel [Rapid::Model::UpdateChannel]
       #   The update channel that should be used when creating the sub-model
@@ -195,10 +189,13 @@ module Rapid
       #   A tuple of the completed sub-model structure, and a proc that should
       #   be called with a ServiceView of the completed model.
       def sub_model(update_channel)
-        [sub_model_structure(update_channel), method(:service_view=)]
+        [sub_model_structure(update_channel),
+         method(:service_view=),
+         method(:server_view=)
+        ]
       end
 
-      # Constructs the sub-model structure for this subgroup
+      # Constructs the sub-model structure for this set
       #
       # @api  private
       #
@@ -209,32 +206,14 @@ module Rapid
       # @return [Object]
       #   The sub-model structure.
       def sub_model_structure(update_channel)
-        Structure.new(update_channel)
+        Rapid::Model::Structures::ModuleSet.new(update_channel, nil, {})
       end
 
       def service_view=(new_view)
         @service_view = new_view
+
+        return if @model_builder.nil?
         @model_builder = @model_builder.replace_service_view(@service_view)
-      end
-
-      # The structure used by subgroups
-      class Structure < Rapid::Model::Creator
-        def initialize(update_channel)
-          super(update_channel, nil, {})
-        end
-
-        # Create the model from the given configuration
-        #
-        # @api      semipublic
-        # @example  Create the model
-        #   struct.create
-        #
-        # @return [Constant]  The finished model.
-        def create
-          # The model is created empty, but will have the models of any modules
-          # in the module group inserted into it.
-          root(:group_root) {}
-        end
       end
     end
   end

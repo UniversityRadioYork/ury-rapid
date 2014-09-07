@@ -1,26 +1,29 @@
 require 'ury-rapid/common/types'
-require 'ury-rapid/model'
+require 'ury-rapid/model/structures/module_set'
 
 module Rapid
   module Model
     module Structures
-      # A baseline model structure
+      # A baseline root model structure
       #
       # This contains:
       #   - The info node, which exposes information about the Rapid system to
       #     clients
       #   - The main system log
-      class Standard < Rapid::Model::Creator
+      class Standard < Rapid::Model::Structures::ModuleSet
         include Rapid::Common::Types::Validators
 
-        # Create the model from the given configuration
-        #
-        # @return [Root]  The finished model.
-        def create
-          root do
-            info :info
-            log :log
-          end
+        protected
+
+        # Returns the handler target to attach to this structure's root
+        def root_name
+          :root
+        end
+
+        # Adds extensions to the base module set structure
+        def extensions
+          info :info
+          log :log
         end
 
         # Builds the Rapid information model.

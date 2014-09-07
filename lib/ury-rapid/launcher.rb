@@ -1,7 +1,7 @@
 require 'ury-rapid/app'
 require 'ury-rapid/common/exceptions'
 require 'ury-rapid/logger'
-require 'ury-rapid/modules/set'
+require 'ury-rapid/modules/root'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -9,7 +9,8 @@ module Rapid
     extend Forwardable
 
     def initialize(config)
-      @modules = Rapid::Modules::Set.new
+      @root_config      = nil
+      @root_model_class = nil
 
       @user_config = {}
 
@@ -37,15 +38,18 @@ module Rapid
 
     # Configures the modules set for this instance of Rapid
     #
-    # See Rapid::Modules::Set for the DSL accepted by this method.
-    def_delegator :@modules, :instance_eval, :modules
+    # See Rapid::Modules::Root for the DSL accepted by this method.
+    def modules(&block)
+      fail('Multiple `modules` blocks in config.') unless @root_config.nil?
+      @root_config = block
+    end
 
     # Configures the model.
     #
-    # @api  public
-    def model(implementation_class, &block)
-      @model_structure = implementation_class
-      @model_config = block
+    # @api public
+    def model(class_name)
+      fail('Multiple `model` blocks in config.') unless @root_model_class.nil?
+      @root_model_class = class_name
     end
 
     # Configures a user and adds them to the user table.
@@ -94,66 +98,58 @@ module Rapid
     #
     # @return [void]
     def run_config(config)
-      instance_eval(&config) if config.is_a?(Proc)
-      instance_eval(config) unless config.is_a?(Proc)
+      instance_eval(&config) if     config.is_a?(Proc)
+      instance_eval(config)  unless config.is_a?(Proc)
     end
 
+    # @api  private
     def app
-      make_app(*app_arguments)
+      make_app(root_module)
     end
 
-    def app_arguments
-      logger = make_logger
-      global_service_view, global_server_view = mkmodel(logger)
-      prepare_module_set(logger, global_server_view, global_service_view)
-      [@modules, global_service_view]
+    # @api  private
+    def root_module
+      logger             = make_logger
+      root, builder      = prepare_root(logger)
+      root.instance_eval(&@root_config)
+      global_server_view = build_root_model(root, builder)
+      prepare_root_for_submodules(root, logger, global_server_view)
+      root
     end
 
-    #
-    # Modules
-    #
+    # @api  private
+    def prepare_root(logger)
+      root = Rapid::Modules::Root.new(logger, @root_model_class)
 
-    # Prepares the module set for sending to the app
-    #
-    # See #module and #enable_module in the configuration DSL.
-    #
-    # @return [void]
-    def prepare_module_set(logger, global_server_view, global_service_view)
-      @modules.constructor_arguments = [logger, global_server_view, @auth]
-      @modules.model_builder = ModelBuilder.new(
-        global_service_view, @update_channel, @service_view_maker
+      builder = ModelBuilder.new(
+        nil, @update_channel, @service_view_maker, @server_view_maker
       )
+
+      root.model_builder = builder
+      [root, builder]
     end
 
-    def prepare_module(name, model_view, mod)
-      return unless mod.respond_to?(:sub_model)
-
-      sub_structure, register_service_view = mod.sub_model(@update_channel)
-      sub_model = sub_structure.create
-      add_service_model(model_view, name, sub_model)
-      register_service_view.call(make_service_view(sub_model, sub_structure))
+    # @api  private
+    def build_root_model(root, builder)
+      _, global_server_view = builder.build(nil, root)
+      global_server_view
     end
 
-    #
-    # Model
-    #
-
-    def mkmodel(logger)
-      structure = @model_structure.new(@update_channel, logger, @model_config)
-      model = structure.create
-      [make_service_view(model, structure), make_server_view(model)]
+    # @api  private
+    def prepare_root_for_submodules(root, logger, global_server_view)
+      root.constructor_arguments = [logger, global_server_view, @auth]
     end
 
     #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,           :call, :make_app
-    def_delegator :@auth_maker,          :call, :make_auth
-    def_delegator :@channel_maker,       :call, :make_channel
-    def_delegator :@service_view_maker,  :call, :make_service_view
-    def_delegator :@logger_maker,        :call, :make_logger
-    def_delegator :@server_view_maker,   :call, :make_server_view
+    def_delegator :@app_maker,          :call, :make_app
+    def_delegator :@auth_maker,         :call, :make_auth
+    def_delegator :@channel_maker,      :call, :make_channel
+    def_delegator :@service_view_maker, :call, :make_service_view
+    def_delegator :@logger_maker,       :call, :make_logger
+    def_delegator :@server_view_maker,  :call, :make_server_view
   end
 
   # A class for building the model of a module, given a view into its parent
@@ -167,17 +163,23 @@ module Rapid
     #           model_view.
     #   mb = ModelBuilder.new(model_view)
     #
-    # @param service_view [ServiceView]
+    # @param parent_service_view [ServiceView]
     #   A service view to use to insert the model into the model tree.
+    #   May be null, if the model is to be the root of the tree.
     # @param update_channel [UpdateChannel]
     #   The update channel to provide to the module's model structure.
     # @param service_view_maker [Proc]
     #   A proc that, when called with a model and its structure, returns a
     #   service view of that model.
-    def initialize(service_view, update_channel, service_view_maker)
-      @service_view       = service_view
-      @update_channel     = update_channel
-      @service_view_maker = service_view_maker
+    # @param service_view_maker [Proc]
+    #   A proc that, when called with a model, returns a server view of that
+    #   model.  May be nil.
+    def initialize(service_view, update_channel, service_view_maker,
+                   server_view_maker)
+      @parent_service_view = service_view
+      @update_channel      = update_channel
+      @service_view_maker  = service_view_maker
+      @server_view_maker   = server_view_maker  || ->(_) { nil }
     end
 
     # Builds the model for a module, inserting it into the model tree
@@ -197,15 +199,19 @@ module Rapid
     # @param mod [Object]
     #   The module whose model is to be registered into the model tree.
     #
-    # @return [void]
+    # @return [Array] A pair of the service view and, if a server view maker
+    #   was provided, the server view for the model.
     def build(name, mod)
       return unless mod.respond_to?(:sub_model)
 
       sub_structure, register_service_view = mod.sub_model(@update_channel)
       sub_model = sub_structure.create
-      add_model(name, sub_model)
+      add_model(name, sub_model) unless @parent_service_view.nil?
       sub_service_view = make_service_view(sub_model, sub_structure)
       register_service_view.call(sub_service_view)
+
+      server_view = make_server_view(sub_model)
+      [sub_service_view, server_view]
     end
 
     # Replaces the service view in this ModelBuilder
@@ -213,7 +219,8 @@ module Rapid
     # @return [ModelBuilder]
     #   A new ModelBuilder with the given service view.
     def replace_service_view(new_view)
-      ModelBuilder.new(new_view, @update_channel, @service_view_maker)
+      ModelBuilder.new(new_view, @update_channel, @service_view_maker,
+                       @server_view_maker)
     end
 
     private
@@ -223,9 +230,10 @@ module Rapid
     # The sub-model is placed into whichever part of the model this
     # ModelBuilder is viewing.
     def add_model(name, sub_model)
-      @service_view.post('', name, sub_model)
+      @parent_service_view.post('', name, sub_model)
     end
 
     def_delegator :@service_view_maker, :call, :make_service_view
+    def_delegator :@server_view_maker,  :call, :make_server_view
   end
 end
