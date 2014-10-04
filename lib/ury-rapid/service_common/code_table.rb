@@ -40,10 +40,9 @@ module Rapid
       # @return [String] The (semi) human-readable name for the BAPS code.
       #
       def find_code_in(submodule, code)
-        ( submodule.constants
+        submodule.constants
           .find { |name| submodule.const_get(name) == code }
           .try  { |name| "#{submodule}::#{name}" }
-        )
       end
     end
   end
