@@ -34,7 +34,7 @@ module Rapid
 
       # Attempts to glean credentials from the Rack request
       def credentials
-        fail_authentication unless has_credentials?
+        fail_authentication unless credentials?
         @rack_request.credentials
       end
 
@@ -44,7 +44,7 @@ module Rapid
       end
 
       # Checks whether the Rack request has credentials available
-      def has_credentials?
+      def credentials?
         r = @rack_request
         r.provided? && r.basic? && r.credentials
       end
