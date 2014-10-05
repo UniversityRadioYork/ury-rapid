@@ -1,7 +1,8 @@
 require 'ury-rapid/server/inspector'
 require 'ury-rapid/server/updater'
+require 'ury-rapid/server/auth_request'
 
-# This must be required after the above two.
+# This must be required after the above.
 require 'ury-rapid/server/app'
 require 'ury-rapid/server/launcher'
 

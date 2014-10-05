@@ -48,14 +48,10 @@ module Rapid
       # @return [Array] An array of privilege symbols.  If suppress_error is
       #   true and an authentication failure occurs, this may be nil.
       def privilege_set(suppress_error = false)
-        credentials = get_credentials(rack_auth)
-        @authenticator.authenticate(*credentials)
+        rack_auth = Rack::Auth::Basic::Request.new(request.env)
+        AuthRequest.request(@authenticator, rack_auth)
       rescue Kankri::AuthenticationFailure
         not_authorised unless suppress_error
-      end
-
-      def rack_auth
-        Rack::Auth::Basic::Request.new(request.env)
       end
 
       def get_credentials(auth)
@@ -69,12 +65,6 @@ module Rapid
 
       def credentials?(auth)
         auth.provided? && auth.basic? && auth.credentials
-      end
-
-      # Fails with a HTTP 403 Forbidden status.
-      # @return [void]
-      def forbidden
-        error(403, 'Forbidden.')
       end
 
       # Fails with a HTTP 401 Not Authorised status.
@@ -120,9 +110,7 @@ module Rapid
       def stream_update
         content_type 'application/json', charset: 'utf-8'
         privs = privilege_set
-        stream(:keep_open) do |stream|
-          StreamUpdater.launch(@model, stream, privs)
-        end
+        stream(:keep_open) { |s| StreamUpdater.launch(@model, s, privs) }
       end
 
       def websocket_update
@@ -160,7 +148,7 @@ module Rapid
       def wrap
         yield
       rescue Kankri::InsufficientPrivilegeError
-        forbidden
+        error(403, 'Forbidden.')
       rescue Common::Exceptions::MissingResource
         error(404, 'Not found.')
       rescue Common::Exceptions::NotSupported => e
@@ -229,10 +217,8 @@ module Rapid
         # format for our error message, while stopping it from halting with
         # a 200 status code (we need to specify our own status code).
         catch(:halt) do
-          respond_with(
-            :error,
-            status: :error, error: message, http_code: code
-          )
+          respond_with(:error,
+                       status: :error, error: message, http_code: code)
         end
       end
 
