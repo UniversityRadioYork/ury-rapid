@@ -54,19 +54,6 @@ module Rapid
         not_authorised unless suppress_error
       end
 
-      def get_credentials(auth)
-        fail_authentication unless credentials?(auth)
-        auth.credentials
-      end
-
-      def fail_authentication
-        fail(Kankri::AuthenticationFailure)
-      end
-
-      def credentials?(auth)
-        auth.provided? && auth.basic? && auth.credentials
-      end
-
       # Fails with a HTTP 401 Not Authorised status.
       #
       # @return [void]
