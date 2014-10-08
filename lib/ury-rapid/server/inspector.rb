@@ -1,32 +1,5 @@
-require 'haml'
-
 module Rapid
   module Server
-    # Sinatra helpers for the API Inspector
-    module InspectorHelpers
-      def child(inspector, id)
-        insp = inspector.inspect_child(id)
-        inspector_haml(insp)
-      end
-
-      def navigation(inspector)
-        haml(
-          :in_out_links,
-          locals: {
-            resource_url: inspector.resource_url,
-            inner: inspector.inner
-          }
-        )
-      end
-
-      # Renders an API Inspector instance using HAML.
-      def inspector_haml(inspector)
-        haml(inspector.resource_type, locals: { inspector: inspector })
-      rescue Errno::ENOENT
-        haml(inspector.resource_general_type, locals: { inspector: inspector })
-      end
-    end
-
     # An instance of the API Inspector
     #
     # The API Inspector is Rapid's HTML output.  It allows the API space to be
