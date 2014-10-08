@@ -4,9 +4,9 @@ require 'sinatra/streaming'
 
 require 'ury-rapid/common/payload'
 
-require 'ury-rapid/server'
 require 'ury-rapid/server/helpers'
 require 'ury-rapid/server/routing'
+require 'ury-rapid/server'
 
 require 'kankri'
 

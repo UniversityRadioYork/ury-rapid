@@ -46,8 +46,8 @@ module Rapid
         # @param code [Integer]  The HTTP status code to return.
         # @param message [String]  A human-readable message to show the client.
         #
-        # @return [String]  The error message, rendered according to the client's
-        #   Accept headers.
+        # @return [String]  The error message, rendered according to the
+        #   client's Accept headers.
         def render_error(code, message)
           # This is a very hacky way of making respond_with resolve the correct
           # format for our error message, while stopping it from halting with

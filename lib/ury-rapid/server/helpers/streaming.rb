@@ -13,10 +13,9 @@ module Rapid
   module Server
     module Helpers
       # Sinatra helper for HTTP and WebSocket update streaming
-      # 
+      #
       # This depends on the Sinatra::Streaming helper set.
       module Streaming
-
         # Sets up a connection to the model updates stream.
         def model_updates_stream
           send(request.websocket? ? :websocket_update : :stream_update)

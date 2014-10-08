@@ -2,7 +2,7 @@ module Rapid
   module Server
     module Routing
       # Routes for update streams
-      # 
+      #
       # Depends on the Server::Helpers::Streaming helper set.
       module Streaming
         # Registers the streaming routes

@@ -1,5 +1,5 @@
 require 'json'
-require 'ury-rapid/server'
+require 'ury-rapid/server/helpers'
 
 module Rapid
   module Server
