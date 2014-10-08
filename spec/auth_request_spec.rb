@@ -9,14 +9,14 @@ describe Rapid::Server::AuthRequest do
     context 'when the Rack request has no provided credentials' do
       it 'raises an authentication error' do
         ar = auth_request_with_invalid_rack(false, true)
-        expect{ ar.run }.to raise_error(Kankri::AuthenticationFailure)
+        expect { ar.run }.to raise_error(Kankri::AuthenticationFailure)
       end
     end
 
     context 'when the Rack request is not HTTP BASIC' do
       it 'raises an authentication error' do
         ar = auth_request_with_invalid_rack(true, false)
-        expect{ ar.run }.to raise_error(Kankri::AuthenticationFailure)
+        expect { ar.run }.to raise_error(Kankri::AuthenticationFailure)
       end
     end
 
@@ -38,7 +38,7 @@ describe Rapid::Server::AuthRequest do
           wrong   = %w(wrong_username wrong_password)
 
           ar = auth_request_with_valid_rack(wrong, right, symbols)
-          expect{ ar.run }.to raise_error(Kankri::AuthenticationFailure)
+          expect { ar.run }.to raise_error(Kankri::AuthenticationFailure)
         end
       end
     end
