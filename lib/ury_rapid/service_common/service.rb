@@ -57,9 +57,32 @@ module Rapid
 
       protected
 
+      # Gets this service's logger object
+      #
+      # @api private
+      # @return [Object]
+      #   An object that this service can use to log.
       attr_reader :logger
+
+      # Gets this service's server view
+      #
+      # @api private
+      # @return [Rapid::Model::ServerView]
+      #   A view that can query and request changes to the entire model.
       attr_reader :view
+
+      # Gets this service's authentication provider
+      #
+      # @api private
+      # @return [Object]
+      #   This service's authentication provider.
       attr_reader :auth
+
+      # Gets this service's service view
+      #
+      # @api private
+      # @return [Rapid::Model::ServiceView]
+      #   A view that can update this service's portion of the model.
       attr_accessor :service_view
     end
   end
