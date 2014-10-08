@@ -8,7 +8,7 @@ module Rapid
         # Base class for BAPS2 playback response handlers
         class PlayerHandler < Handler
           def run
-            do_post unless ignore_response?
+            do_insert unless ignore_response?
           end
 
           protected
@@ -17,8 +17,8 @@ module Rapid
             false
           end
 
-          def do_post
-            post(player_url, id, body)
+          def do_insert
+            insert(player_url, id, body)
           end
         end
 
@@ -43,7 +43,7 @@ module Rapid
           end
 
           def ignore_response?
-            get(player_url(id)).value == state
+            find(player_url(id)).value == state
           end
 
           def body
@@ -66,7 +66,7 @@ module Rapid
           end
 
           def ignore_response?
-            get(player_url(id)).value == @response.volume
+            find(player_url(id)).value == @response.volume
           end
 
           def body
@@ -95,7 +95,7 @@ module Rapid
           end
 
           def ignore_response?
-            get(player_url(id)).value == @response.position
+            find(player_url(id)).value == @response.position
           end
 
           def body
@@ -112,8 +112,8 @@ module Rapid
           end
 
           def urls
-            { post:       player_url,
-              delete:     player_url(:item),
+            { insert:     player_url,
+              kill:       player_url(:item),
               load_state: player_url(:load_state)
             }
           end

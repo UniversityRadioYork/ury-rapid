@@ -52,14 +52,14 @@ module Rapid
       # sake of convenience.
       #
       # @param new_item [Item] The new Item.
-      def service_put(new_item)
-        parent.service_post(id, new_item)
+      def replace(new_item)
+        parent.insert(id, new_item)
       end
 
-      # Performs a DELETE on this object from the service end
+      # Kills this Item
       #
       # @return [void]
-      def service_delete
+      def kill
         # Must notify before changing parent, as the notification requires
         # a valid full URL.
         notify_delete

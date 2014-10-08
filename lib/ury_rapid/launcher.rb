@@ -230,7 +230,7 @@ module Rapid
     # The sub-model is placed into whichever part of the model this
     # ModelBuilder is viewing.
     def add_model(name, sub_model)
-      @parent_service_view.post('', name, sub_model)
+      @parent_service_view.insert('', name, sub_model)
     end
 
     def_delegator :@service_view_maker, :call, :make_service_view

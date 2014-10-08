@@ -29,7 +29,7 @@ describe Rapid::Model::Item do
     end
   end
 
-  describe '#service_delete' do
+  describe '#kill' do
     context 'when the Item is in a parent object' do
       let(:parent) { build(:playlist) }
       let(:channel) { double(:channel) }
@@ -43,35 +43,35 @@ describe Rapid::Model::Item do
 
       it 'removes the Item from that object' do
         expect(parent.children).to eq(0 => subject)
-        subject.service_delete
+        subject.kill
         expect(parent.children).to eq({})
       end
 
       it 'notifies the channel' do
         expect(channel).to receive(:notify_delete).with(subject).once
 
-        subject.service_delete
+        subject.kill
       end
 
       it 'sets the ID of the Item to nil' do
         expect(subject.id).to eq(0)
-        subject.service_delete
+        subject.kill
         expect(subject.id).to be_nil
       end
     end
   end
 
-  describe '#service_put' do
+  describe '#replace' do
     let(:parent) { build(:playlist) }
 
-    it 'calls #service_post on the parent with its current ID' do
+    it 'calls #insert on the parent with its current ID' do
       payload = double(:payload)
       subject.move_to(parent, 0)
 
-      allow(parent).to receive(:service_post)
-      expect(parent).to receive(:service_post).with(0, payload)
+      allow(parent).to receive(:insert)
+      expect(parent).to receive(:insert).with(0, payload)
 
-      subject.service_put(payload)
+      subject.replace(payload)
     end
   end
 

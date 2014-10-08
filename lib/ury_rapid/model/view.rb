@@ -32,7 +32,7 @@ module Rapid
       #
       # @return [void]
       def log(severity, message)
-        find('log') { |log| log.service_post(severity, message) }
+        find('log') { |log| log.insert(severity, message) }
       end
 
       protected
@@ -43,6 +43,7 @@ module Rapid
       #
       # @return [ModelObject]  The found model object.
       def find(url, &block)
+        block ||= ->(x) { x }
         Compo::Finders::Url.find(@root, url, &block)
       end
     end

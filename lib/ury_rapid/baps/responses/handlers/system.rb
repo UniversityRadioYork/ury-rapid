@@ -40,8 +40,8 @@ module Rapid
           def_targets Codes::System::SEED
 
           def run
-            username = get('x_baps/server/username').value
-            password = get('x_baps/server/password').value
+            username = find('x_baps/server/username').value
+            password = find('x_baps/server/password').value
             seed = @response.seed
             # Kurse all SeeDs.  Swarming like lokusts akross generations.
             #   - Sorceress Ultimecia, Final Fantasy VIII

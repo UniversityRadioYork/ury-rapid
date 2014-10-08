@@ -15,14 +15,9 @@ module Rapid
         @structure = structure
       end
 
-      # Gets a model object, given its URL relative to the model root
-      def get(url)
-        find(url) { |resource| resource }
-      end
-
-      %w(put post delete).each do |action|
+      %w(insert replace remove).each do |action|
         define_method(action) do |url, *args|
-          find(url) { |resource| resource.send("service_#{action}", *args) }
+          find(url) { |resource| resource.send(action, *args) }
         end
       end
 

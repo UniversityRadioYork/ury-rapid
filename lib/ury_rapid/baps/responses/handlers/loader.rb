@@ -52,24 +52,24 @@ module Rapid
           end
 
           def run
-            post_or_delete if @urls[:post] || @urls[:delete]
+            insert_or_kill if @urls[:insert] || @urls[:kill]
             set_load_state if @urls[:load_state]
           end
 
-          def post_or_delete
-            @item.nil? ? delete : post
+          def insert_or_kill
+            @item.nil? ? kill : insert
           end
 
-          def delete
-            @parent.delete_if_exists(@urls[:delete])
+          def kill
+            @parent.kill_if_exists(@urls[:kill])
           end
 
-          def post
-            @parent.post(@urls[:post], @id, @item)
+          def insert
+            @parent.insert(@urls[:insert], @id, @item)
           end
 
           def set_load_state
-            @parent.put(@urls[:load_state], @load_state)
+            @parent.replace(@urls[:load_state], @load_state)
           end
         end
 
