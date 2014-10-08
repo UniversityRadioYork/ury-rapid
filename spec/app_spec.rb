@@ -1,5 +1,5 @@
-require 'ury-rapid/app'
-require 'ury-rapid/model'
+require 'ury_rapid/app'
+require 'ury_rapid/model'
 
 describe Rapid::App do
   subject { Rapid::App.new(root_module, reactor) }

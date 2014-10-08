@@ -1,4 +1,4 @@
-require 'ury-rapid/model/log'
+require 'ury_rapid/model/log'
 
 describe Rapid::Model::Log do
   let(:logger) { double(:logger) }

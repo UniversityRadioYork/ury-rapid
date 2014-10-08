@@ -1,4 +1,4 @@
-require 'ury-rapid/server'
+require 'ury_rapid/server'
 
 # Used for verifying doubles.
 require 'kankri'

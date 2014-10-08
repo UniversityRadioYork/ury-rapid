@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 require 'forwardable'
-require 'ury-rapid/baps/requests/request'
-require 'ury-rapid/baps/format_strings'
+require 'ury_rapid/baps/requests/request'
+require 'ury_rapid/baps/format_strings'
 
 # Simple queue for testing requests.
 class MockQueue

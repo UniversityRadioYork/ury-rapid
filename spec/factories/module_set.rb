@@ -1,4 +1,4 @@
-require 'ury-rapid/modules/set'
+require 'ury_rapid/modules/set'
 
 # A dummy module, for test purposes.
 class DummyModule

@@ -1,4 +1,4 @@
-require 'ury-rapid/modules/set'
+require 'ury_rapid/modules/set'
 
 describe Rapid::Modules::Set do
   subject { Rapid::Modules::Set.new }

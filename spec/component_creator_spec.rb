@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'ury-rapid/model/component_creator'
-require 'ury-rapid/model'
+require 'ury_rapid/model/component_creator'
+require 'ury_rapid/model'
 
 shared_examples 'a valid symbol constant' do |type, value|
   it "returns an object whose flat representation is :#{value}" do

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ury-rapid (0.4.1)
+    ury_rapid (0.4.1)
       activesupport
       colored
       compass
@@ -126,4 +126,4 @@ DEPENDENCIES
   rspec (~> 3)
   scss-lint
   simplecov
-  ury-rapid!
+  ury_rapid!

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'ury-rapid/common/payload'
+require 'ury_rapid/common/payload'
 
 describe Rapid::Common::Payload do
   subject { Rapid::Common::Payload.new(body, privilege_set, default_id) }
