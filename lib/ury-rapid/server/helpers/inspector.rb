@@ -24,11 +24,11 @@ module Rapid
         def inspector_haml(inspector)
           render = ->(type) { haml(type, locals: { inspector: inspector }) }
           begin
-            render(inspector.resource_type)
+            render.call(inspector.resource_type)
           rescue Errno::ENOENT
             # There was no template for the resource type, so try something
             # more general.
-            render(inspector.resource_general_type)
+            render.call(inspector.resource_general_type)
           end
         end
       end
