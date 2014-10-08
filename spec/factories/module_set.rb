@@ -1,5 +1,6 @@
-require 'ury-rapid/modules/set'
+require 'ury_rapid/modules/set'
 
+# A dummy module, for test purposes.
 class DummyModule
   def new(*_args)
   end
@@ -8,6 +9,7 @@ class DummyModule
   end
 end
 
+# A dummy model builder, for test purposes.
 class DummyModelBuilder
   def new(*_args)
   end

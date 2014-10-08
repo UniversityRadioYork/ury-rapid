@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'ury-rapid/service_common/requests/null_requester'
+require 'ury_rapid/service_common/requests/null_requester'
 
 describe Rapid::ServiceCommon::Requests::NullRequester do
   describe '#add_handlers' do

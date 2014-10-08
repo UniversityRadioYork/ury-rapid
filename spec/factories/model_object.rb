@@ -1,4 +1,4 @@
-require 'ury-rapid/model'
+require 'ury_rapid/model'
 
 # A minimal mock implementation of a ModelObject.
 class MockModelObject

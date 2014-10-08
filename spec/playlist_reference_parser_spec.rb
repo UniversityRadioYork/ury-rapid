@@ -1,4 +1,4 @@
-require 'ury-rapid/service_common/requests/playlist_reference_parser'
+require 'ury_rapid/service_common/requests/playlist_reference_parser'
 
 # Mock implementation of PlaylistReferenceParser.
 class MockPrp

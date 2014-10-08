@@ -1,4 +1,4 @@
-require 'ury-rapid/service_common/requests/null_requester'
+require 'ury_rapid/service_common/requests/null_requester'
 
 FactoryGirl.define do
   factory(:null_requester,

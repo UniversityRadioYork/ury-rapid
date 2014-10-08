@@ -1,4 +1,4 @@
-require 'ury-rapid/model'
+require 'ury_rapid/model'
 
 FactoryGirl.define do
   factory :playlist, class: Rapid::Model::ListModelObject do

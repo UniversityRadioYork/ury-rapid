@@ -1,4 +1,4 @@
-require 'ury-rapid/modules/set'
+require 'ury_rapid/modules/set'
 
 describe Rapid::Modules::Set do
   subject { Rapid::Modules::Set.new }
@@ -105,14 +105,6 @@ describe Rapid::Modules::Set do
     end
 
     context 'when the module is configured' do
-      class FakeModule
-        def new(*_args)
-        end
-
-        def run
-        end
-      end
-
       it 'proceeds without error' do
         set = build(:non_empty_module_set,
                     modules: %i(foo bar),
@@ -122,16 +114,18 @@ describe Rapid::Modules::Set do
         expect { set.start(:bar) }.not_to raise_error
       end
 
+      # Note: DummyModule is defined in spec/factories/module_set.rb.
+
       it 'instantiates the DummyModule' do
         md = double(:module)
         allow(md).to receive(:run)
 
-        allow(FakeModule).to receive(:new).and_return(md)
+        allow(DummyModule).to receive(:new).and_return(md)
 
         build(:non_empty_module_set,
               modules: [:foo],
-              module_class: FakeModule).start(:foo)
-        expect(FakeModule).to have_received(:new).once
+              module_class: DummyModule).start(:foo)
+        expect(DummyModule).to have_received(:new).once
       end
 
       it 'calls #build on the model builder with a module name and instance' do
@@ -140,10 +134,10 @@ describe Rapid::Modules::Set do
 
         build(:non_empty_module_set,
               modules: [:foo],
-              module_class: FakeModule,
+              module_class: DummyModule,
               model_builder: mb).start(:foo)
         expect(mb).to have_received(:build)
-                  .once.with(:foo, a_kind_of(FakeModule))
+                  .once.with(:foo, a_kind_of(DummyModule))
       end
     end
   end

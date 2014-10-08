@@ -1,6 +1,6 @@
-require 'ury-rapid/launcher'
-require 'ury-rapid/modules/set'
-require 'ury-rapid/modules/root'
+require 'ury_rapid/launcher'
+require 'ury_rapid/modules/set'
+require 'ury_rapid/modules/root'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
