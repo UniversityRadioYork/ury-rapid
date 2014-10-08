@@ -4,6 +4,7 @@ require 'ury_rapid/service_common/requests/handler_bundle'
 module Rapid
   module Baps
     module Requests
+      # Module for BAPS request handlers
       module Handlers
         extend Rapid::ServiceCommon::Requests::HandlerBundle
 

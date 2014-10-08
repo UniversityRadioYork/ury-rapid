@@ -3,6 +3,9 @@ require 'ury_rapid/server/helpers'
 
 module Rapid
   module Server
+    # Sinatra helper sets for the Rapid HTTP server
+    #
+    # Much of the nitty-gritty of the server is in these helpers.
     module Helpers
       # Sinatra helpers for performing requests on the Rapid model
       #

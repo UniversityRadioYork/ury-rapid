@@ -43,21 +43,12 @@ module Rapid
         child id, create_model_object(:log, @logger)
       end
 
-      def hashes(set_id, set_target, child_ids, child_target, &block)
-        set(
-          set_id, set_target, HashModelObject, child_ids, child_target, &block
-        )
-      end
-
-      def lists(set_id, set_target, child_ids, child_target, &block)
-        set(
-          set_id, set_target, ListModelObject, child_ids, child_target, &block
-        )
-      end
-
-      def set(set_id, set_target, child_class, child_ids, child_target, &block)
-        hash(set_id, set_target) do
-          children(child_ids, child_class, child_target, &block)
+      SETS = [[:hashes, HashModelObject], [:lists, ListModelObject]]
+      SETS.each do |(name, child_class)|
+        define_method(name) do |set_id, set_tgt, child_ids, child_tgt, &block|
+          hash(set_id, set_tgt) do
+            children(child_ids, child_class, child_tgt, &block)
+          end
         end
       end
 
