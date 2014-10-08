@@ -13,6 +13,9 @@ module Rapid
       class Handler < Rapid::ServiceCommon::Handler
         extend Forwardable
 
+        # Initialises a responses handler
+        #
+        # @api public
         def initialize(parent, response)
           super(parent)
           @response = response
@@ -23,6 +26,10 @@ module Rapid
         def_delegators :@model, :create_model_object
 
         # Like delete, but does not fail if the resource does not exist.
+        #
+        # @api public
+        #
+        # @return [null]
         def delete_if_exists(*args)
           delete(*args)
         rescue Rapid::Common::Exceptions::MissingResource
