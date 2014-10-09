@@ -40,12 +40,10 @@ module Rapid
       #
       # @param logger [Object]
       #   An object that can be used to log messages from the service.
-      # @param view [Rapid::Model::ServerView]
-      #   A server view of the entire model.
       # @param auth [Object]
       #   An authentication provider.
-      def initialize(logger, view, auth)
-        super(logger, view, auth)
+      def initialize(logger, auth)
+        super(logger, auth)
 
         # We need a queue to hold requests to the network server.  This will
         # later need to be given to the client for reading, and also to the

@@ -78,12 +78,11 @@ module Rapid
     #
     # These can be overridden in the configuration DSL.
     def init_default_makers
-      @app_maker          = Rapid::App.method(:new)
-      @auth_maker         = Kankri.method(:authenticator_from_hash)
-      @channel_maker      = Rapid::Model::UpdateChannel.method(:new)
-      @service_view_maker = Rapid::Model::ServiceView.method(:new)
-      @server_view_maker  = Rapid::Model::ServerView.method(:new)
-      @logger_maker       = Rapid::Logger.method(:default_logger)
+      @app_maker     = Rapid::App.method(:new)
+      @auth_maker    = Kankri.method(:authenticator_from_hash)
+      @channel_maker = Rapid::Model::UpdateChannel.method(:new)
+      @logger_maker  = Rapid::Logger.method(:default_logger)
+      @view_maker    = Rapid::Model::View.method(:new)
     end
 
     # Runs the configuration passed to the Launcher
@@ -112,8 +111,8 @@ module Rapid
       logger             = make_logger
       root, builder      = prepare_root(logger)
       root.instance_eval(&@root_config)
-      global_server_view = build_root_model(root, builder)
-      prepare_root_for_submodules(root, logger, global_server_view)
+      build_root_model(root, builder)
+      prepare_root_for_submodules(root, logger)
       root
     end
 
@@ -121,9 +120,7 @@ module Rapid
     def prepare_root(logger)
       root = Rapid::Modules::Root.new(logger, @root_model_class)
 
-      builder = ModelBuilder.new(
-        nil, @update_channel, @service_view_maker, @server_view_maker
-      )
+      builder = ModelBuilder.new(nil, @update_channel, @view_maker)
 
       root.model_builder = builder
       [root, builder]
@@ -131,25 +128,23 @@ module Rapid
 
     # @api  private
     def build_root_model(root, builder)
-      _, global_server_view = builder.build(nil, root)
-      global_server_view
+      builder.build(nil, root)
     end
 
     # @api  private
-    def prepare_root_for_submodules(root, logger, global_server_view)
-      root.constructor_arguments = [logger, global_server_view, @auth]
+    def prepare_root_for_submodules(root, logger)
+      root.constructor_arguments = [logger, @auth]
     end
 
     #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,          :call, :make_app
-    def_delegator :@auth_maker,         :call, :make_auth
-    def_delegator :@channel_maker,      :call, :make_channel
-    def_delegator :@service_view_maker, :call, :make_service_view
-    def_delegator :@logger_maker,       :call, :make_logger
-    def_delegator :@server_view_maker,  :call, :make_server_view
+    def_delegator :@app_maker,     :call, :make_app
+    def_delegator :@auth_maker,    :call, :make_auth
+    def_delegator :@channel_maker, :call, :make_channel
+    def_delegator :@logger_maker,  :call, :make_logger
+    def_delegator :@view_maker,    :call, :make_view
   end
 
   # A class for building the model of a module, given a view into its parent
@@ -163,23 +158,18 @@ module Rapid
     #           model_view.
     #   mb = ModelBuilder.new(model_view)
     #
-    # @param parent_service_view [ServiceView]
-    #   A service view to use to insert the model into the model tree.
+    # @param view [View]
+    #   A View to use to insert the model into the model tree.
     #   May be null, if the model is to be the root of the tree.
     # @param update_channel [UpdateChannel]
     #   The update channel to provide to the module's model structure.
-    # @param service_view_maker [Proc]
-    #   A proc that, when called with a model and its structure, returns a
-    #   service view of that model.
-    # @param service_view_maker [Proc]
-    #   A proc that, when called with a model, returns a server view of that
-    #   model.  May be nil.
-    def initialize(service_view, update_channel, service_view_maker,
-                   server_view_maker)
-      @parent_service_view = service_view
-      @update_channel      = update_channel
-      @service_view_maker  = service_view_maker
-      @server_view_maker   = server_view_maker  || ->(_) { nil }
+    # @param view_maker [Proc]
+    #   A proc that, when called with a global model, a local model, and its
+    #   structure, returns a view of those models.
+    def initialize(parent_view, update_channel, view_maker)
+      @parent_view    = parent_view
+      @update_channel = update_channel
+      @view_maker     = view_maker
     end
 
     # Builds the model for a module, inserting it into the model tree
@@ -204,23 +194,21 @@ module Rapid
     def build(name, mod)
       return unless mod.respond_to?(:sub_model)
 
-      sub_structure, register_service_view = mod.sub_model(@update_channel)
+      sub_structure, register_view = mod.sub_model(@update_channel)
       sub_model = sub_structure.create
-      add_model(name, sub_model) unless @parent_service_view.nil?
-      sub_service_view = make_service_view(sub_model, sub_structure)
-      register_service_view.call(sub_service_view)
 
-      server_view = make_server_view(sub_model)
-      [sub_service_view, server_view]
+      sub_view = make_view(name, sub_model, sub_structure)
+      register_view.call(sub_view)
+
+      sub_view
     end
 
-    # Replaces the service view in this ModelBuilder
+    # Replaces the view in this ModelBuilder
     #
     # @return [ModelBuilder]
     #   A new ModelBuilder with the given service view.
-    def replace_service_view(new_view)
-      ModelBuilder.new(new_view, @update_channel, @service_view_maker,
-                       @server_view_maker)
+    def replace_view(new_view)
+      ModelBuilder.new(new_view, @update_channel, @view_maker)
     end
 
     private
@@ -230,10 +218,18 @@ module Rapid
     # The sub-model is placed into whichever part of the model this
     # ModelBuilder is viewing.
     def add_model(name, sub_model)
-      @parent_service_view.insert('', name, sub_model)
+      @parent_view.insert('', name, sub_model)
     end
 
-    def_delegator :@service_view_maker, :call, :make_service_view
-    def_delegator :@server_view_maker,  :call, :make_server_view
+    def make_view(name, sub_model, sub_structure)
+      if @parent_view.nil?
+        @view_maker.call(sub_model, sub_model, sub_structure)
+      else
+        add_model(name, sub_model)
+        @parent_view.with_local_model(sub_model, sub_structure)
+      end
+    end
+
+    def_delegator :@view_maker, :call, :make_view
   end
 end

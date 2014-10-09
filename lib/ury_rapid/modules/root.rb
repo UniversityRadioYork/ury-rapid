@@ -33,7 +33,7 @@ module Rapid
 
       # The root module exposes a logger, mainly for the app and launcher's
       # benefit.
-      def_delegator :@service_view, :log
+      def_delegator :@view, :log
 
       # Constructs the sub-model structure for the root module
       #

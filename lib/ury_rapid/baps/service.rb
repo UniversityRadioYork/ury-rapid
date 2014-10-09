@@ -24,8 +24,8 @@ module Rapid
       #   A server view of the entire model.
       # @param auth [Object]
       #   An authentication provider.
-      def initialize(logger, view, auth)
-        super(logger, view, auth)
+      def initialize(logger, auth)
+        super(logger, auth)
 
         @username = ''
         @password = ''
@@ -106,7 +106,7 @@ module Rapid
       # @return [Object]
       #   The BAPS responder object.
       def make_responder(requester)
-        Rapid::Baps::Responses::Responder.new(service_view, requester)
+        Rapid::Baps::Responses::Responder.new(view, requester)
       end
 
       protected

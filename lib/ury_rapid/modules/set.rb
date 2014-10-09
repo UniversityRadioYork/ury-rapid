@@ -24,7 +24,7 @@ module Rapid
         @enabled_modules = ::Set[]
         @constructor_arguments = constructor_arguments
         @model_builder = nil
-        @server_view = nil
+        @view = nil
       end
 
       # Creates a sub-group of this module set
@@ -189,10 +189,7 @@ module Rapid
       #   A tuple of the completed sub-model structure, and a proc that should
       #   be called with a ServiceView of the completed model.
       def sub_model(update_channel)
-        [sub_model_structure(update_channel),
-         method(:service_view=),
-         method(:server_view=)
-        ]
+        [sub_model_structure(update_channel), method(:view=)]
       end
 
       # Constructs the sub-model structure for this set
@@ -209,11 +206,11 @@ module Rapid
         Rapid::Model::Structures::ModuleSet.new(update_channel, nil, {})
       end
 
-      def service_view=(new_view)
-        @service_view = new_view
+      def view=(new_view)
+        @view = new_view
 
         return if @model_builder.nil?
-        @model_builder = @model_builder.replace_service_view(@service_view)
+        @model_builder = @model_builder.replace_view(@view)
       end
     end
   end

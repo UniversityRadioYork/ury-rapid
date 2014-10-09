@@ -8,14 +8,15 @@ module Rapid
     #
     # This object exposes a DSL to the Rapid configuration.
     class Launcher
-      def initialize(_logger, model_view, authenticator)
-        @model_view    = model_view
+      def initialize(logger, authenticator)
+        @logger        = logger
         @authenticator = authenticator
-        @rack = 'thin'
-        @host = '0.0.0.0'
-        @port = 8181
-        @root = '/'
-        @config = {}
+        @rack          = 'thin'
+        @host          = '0.0.0.0'
+        @port          = 8181
+        @root          = '/'
+        @config        = {}
+        @view          = nil
 
         check_server_em_compatible
       end
@@ -24,6 +25,10 @@ module Rapid
       def host(address, port)
         @host = address
         @port = port
+      end
+
+      def sub_model(update_channel)
+        [sub_model_structure(update_channel), method(:view=)]
       end
 
       # Sets the URL root of the server
@@ -86,6 +91,44 @@ module Rapid
       end
 
       COMPATIBLE_SERVERS = %w(thin hatetepe goliath)
+
+      # TODO: Flesh this out and separate it from the launcher!
+
+      attr_accessor :view
+
+      # Constructs the sub-model structure for the server
+      #
+      # @api  private
+      #
+      # @param update_channel [Rapid::Model::UpdateChannel]
+      #   The update channel that should be used when creating the sub-model
+      #   structure.
+      #
+      # @return [Object]
+      #   The sub-model structure.
+      def sub_model_structure(update_channel)
+        Structure.new(update_channel, @logger)
+      end
+
+      # The structure used by the server
+      class Structure < Rapid::Model::Creator
+        def initialize(update_channel, logger)
+          super(update_channel, logger, {})
+        end
+
+        # Create the model from the given configuration
+        #
+        # @api      semipublic
+        # @example  Create the model
+        #   struct.create
+        #
+        # @return [Constant]  The finished model.
+        def create
+          root :sub_root do
+            # TODO: Add something here?
+          end
+        end
+      end
     end
   end
 end
