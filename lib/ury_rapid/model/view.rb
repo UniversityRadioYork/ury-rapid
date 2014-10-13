@@ -98,7 +98,10 @@ module Rapid
       def_delegator :@handlers, :merge!, :add_handlers
 
       def create_component(name, *args)
-        Rapid::Model::ComponentCreator.new(method(:register)).send(name, *args)
+        Rapid::Model::ComponentCreatorWrapper.new(
+          Rapid::Model::ComponentCreator.new,
+          method(:register)
+        ).send(name, *args)
       end
 
       def insert_component(url, name, *args)

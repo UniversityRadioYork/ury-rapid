@@ -1,6 +1,7 @@
 require 'ury_rapid/model'
 require 'ury_rapid/service_common/requests/null_handler'
 require 'ury_rapid/model/component_creator'
+require 'ury_rapid/model/component_creator_wrapper'
 
 module Rapid
   module Model
@@ -32,7 +33,7 @@ module Rapid
       end
 
       def default_component_creator
-        ComponentCreator.new(@registrar)
+        ComponentCreatorWrapper.new(ComponentCreator.new, @registrar)
       end
 
       def self.insert(*args, &block)

@@ -6,26 +6,17 @@ module Rapid
     # A creator for stock model components
     #
     # ComponentCreator contains several methods for building commonly used
-    # components for models.  It also registers components built with it with
-    # a specified registrar (usually the model structure), allowing handlers and
-    # update channels to be added to the components.
-    #
-    # Interactions with ComponentCreator usually happen indirectly through a
-    # model structure's #component method.
+    # components for models.  It does not register those components with a
+    # registrar; to do this, wrap the ComponentCreator in a
+    # ComponentCreatorWrapper that calls the registrar as a hook.
     class ComponentCreator
       extend Forwardable
 
       include Rapid::Common::Types::Validators
 
       # Initialises a ComponentCreator
-      #
-      # @param registrar [Proc]
-      #   The object responsible for registering newly built components with
-      #   their handlers and update channels.
-      #
       # @return [ComponentCreator]  The initialised ComponentCreator.
-      def initialize(registrar)
-        @registrar = registrar
+      def initialize
       end
 
       # Creates a component holding a load state
@@ -103,8 +94,7 @@ module Rapid
       #   logger.
       def log(logger)
         fail('Nil logger given.') if logger.nil?
-
-        registered(Rapid::Model::Log.new(logger))
+        Rapid::Model::Log.new(logger)
       end
 
       # Creates an arbitrary constant object.
@@ -118,15 +108,15 @@ module Rapid
       #
       # @return [Constant]  A Constant model object holding the constant.
       def constant(value, handler_target)
-        registered(Rapid::Model::Constant.new(handler_target, value))
+        Rapid::Model::Constant.new(handler_target, value)
       end
 
       def tree(handler_target)
-        registered(HashModelObject.new(handler_target))
+        HashModelObject.new(handler_target)
       end
 
       def list(handler_target)
-        registered(ListModelObject.new(handler_target))
+        ListModelObject.new(handler_target)
       end
 
       private
@@ -151,11 +141,6 @@ module Rapid
 
       def validate_then_constant(validator, raw_value, handler_target)
         constant(send(validator, raw_value), handler_target)
-      end
-
-      def registered(component)
-        @registrar.call(component)
-        component
       end
     end
   end
