@@ -1,4 +1,6 @@
 require 'compo'
+require 'ury_rapid/model/component_inserter'
+require 'ury_rapid/service_common/requests/null_handler'
 
 module Rapid
   module Model
@@ -11,23 +13,31 @@ module Rapid
 
       # Initialises the model view
       #
+      # @param authenticator [Object]
+      #   An authenticator that can be used to construct privilege sets for
+      #   global root queries.
+      # @param update_channel [UpdateChannel]
+      #   The model's update channel.
       # @param global_root [ModelObject]
       #   The root of the entire Rapid model, which can be queried (but not
       #   modified) by this View.
       # @param local_root [ModelObject]
       #   The root of the part of the Rapid model that this View can modify
       #   directly.
-      # @param structure [Object]
-      #   The structure used to build the local part of the Rapid model.
-      def initialize(global_root, local_root, structure)
-        @global_root = global_root
-        @local_root  = local_root
-        @structure   = structure
+      def initialize(authenticator, update_channel, global_root, local_root)
+        @authenticator  = authenticator
+        @update_channel = update_channel
+        @global_root    = global_root
+        @local_root     = local_root
+        @handlers       = Hash.new(Rapid::ServiceCommon::Requests::NullHandler.new)
       end
 
+      attr_reader :authenticator
+      attr_reader :update_channel
+
       # Creates a View of the same global root, but a different local root
-      def with_local_model(local_root, structure)
-        View.new(@global_root, local_root, structure)
+      def with_local_root(local_root)
+        View.new(@authenticator, @update_channel, @global_root, local_root)
       end
 
       #
@@ -85,14 +95,32 @@ module Rapid
         find_in(@local_root, url, &block)
       end
 
-      #
-      # Structure access
-      #
+      def_delegator :@handlers, :merge!, :add_handlers
 
-      def_delegator :@structure, :register
-      def_delegator :@structure, :create_model_object
+      def create_component(name, *args)
+        Rapid::Model::ComponentCreator.new(method(:register)).send(name, *args)
+      end
+
+      def insert_component(url, name, *args)
+        insert(url, create_component(name, *args))
+      end
+
+      def replace_component(url, name, *args)
+        replace(url, create_component(name, *args))
+      end
+
+      # Begins inserting multiple components into the local root at the given
+      # URL
+      def insert_components(url, &block)
+        Rapid::Model::ComponentInserter.insert(url, self, method(:register), &block)
+      end
 
       private
+
+      def register(component)
+        component.register_update_channel(@update_channel)
+        component.register_handler(@handlers[component.handler_target])
+      end
 
       # Finds a model object in the global root given its URL
       #

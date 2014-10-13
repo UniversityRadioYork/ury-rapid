@@ -19,8 +19,9 @@ module Rapid
 
       # Initialises a ComponentCreator
       #
-      # @param registrar [Object]  The object responsible for registering
-      #   newly built components with their handlers and update channels.
+      # @param registrar [Proc]
+      #   The object responsible for registering newly built components with
+      #   their handlers and update channels.
       #
       # @return [ComponentCreator]  The initialised ComponentCreator.
       def initialize(registrar)
@@ -101,6 +102,8 @@ module Rapid
       # @return [Log]  A Log object that serves as a model interface to the
       #   logger.
       def log(logger)
+        fail('Nil logger given.') if logger.nil?
+
         Rapid::Model::Log.new(logger)
       end
 
@@ -143,7 +146,7 @@ module Rapid
         constant(send(validator, raw_value), handler_target)
       end
 
-      def_delegator :@registrar, :register
+      def_delegator :@registrar, :call, :register
     end
   end
 end

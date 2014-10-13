@@ -17,7 +17,7 @@ module Rapid
       #   raw responses from the server.
       # @param request_queue [EventMachine::Queue] A queue that holds raw
       #   requests to the server.
-      # @param logger [Object]  The logger, for logging errors.
+      # @param logger [Proc]  jhe logger, for logging errors.
       def initialize(reader, request_queue, logger)
         @reader         = reader
         @request_queue  = request_queue
@@ -57,7 +57,7 @@ module Rapid
       #
       def unbind
         return if @closing
-        @logger.fatal('Lost connection, dying.')
+        @logger.call(:fatal, 'Lost connection, dying.')
         EventMachine.stop
       end
 

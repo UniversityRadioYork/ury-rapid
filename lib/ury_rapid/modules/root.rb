@@ -1,4 +1,3 @@
-require 'ury_rapid/model/structures/standard'
 require 'ury_rapid/modules/set'
 
 module Rapid
@@ -14,39 +13,28 @@ module Rapid
     class Root < Rapid::Modules::Set
       extend Forwardable
 
-      # Initialises the root module
-      #
-      # @api      public
-      # @example  Create a new root module
-      #   root = Rapid::Modules::Root.new(logger)
-      #
-      # @param logger [Object]
-      #   The logger to use for this root module.
-      # @param model_class [Class]
-      #   The class to use for the root module's model structure.
-      def initialize(logger, model_class)
-        super()
-
-        @logger      = logger
-        @model_class = model_class || Rapid::Model::Structures::Standard
+      def initialize(logger, view)
+        super(view)
+        @logger = logger
       end
 
-      # The root module exposes a logger, mainly for the app and launcher's
-      # benefit.
-      def_delegator :@view, :log
+      def run
+        fail 'Nil logger provided.' if @logger.nil?
 
-      # Constructs the sub-model structure for the root module
-      #
-      # @api  private
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Object]
-      #   The sub-model structure.
-      def sub_model_structure(update_channel)
-        @model_class.new(update_channel, @logger, nil)
+        logger = @logger
+        view.insert_components('/') do
+          hash :info, :info  do
+            ver = Rapid::Common::Constants::VERSION
+            constant :version, ver, :version
+          end
+
+          log :log, logger
+        end
+
+        view.log(:info, 'Now starting Rapid.')
+        view.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
+
+        super
       end
     end
   end

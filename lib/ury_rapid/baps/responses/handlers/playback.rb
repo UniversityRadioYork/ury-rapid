@@ -47,7 +47,7 @@ module Rapid
           end
 
           def body
-            create_model_object(:play_state, state)
+            create_component(:play_state, state)
           end
 
           def state
@@ -70,7 +70,7 @@ module Rapid
           end
 
           def body
-            create_model_object(:volume, @response.volume)
+            create_component(:volume, @response.volume)
           end
         end
 
@@ -99,7 +99,7 @@ module Rapid
           end
 
           def body
-            create_model_object(:marker, id, @response.position)
+            create_component(:marker, id, @response.position)
           end
         end
 

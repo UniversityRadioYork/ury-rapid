@@ -32,45 +32,25 @@ module Rapid
         #
         # @example Initialising a Requester with an EventMachine Queue.
         #   queue = EventMachine::Queue.new
-        #   logger = Logger.new(STDOUT)
+        #   logger = ->(severity, message) { do_something }
         #   requester = Rapid::Baps::Requests::Requester.new(queue, logger)
         #
         # @param queue [Queue]  The requests queue used for sending requests to
         #   the BAPS server.
-        # @param logger [Object]  The Logger-compatible object used for logging
-        #   the handlers registered.
+        # @param logger [Proc]  A proc that takes the severity and message of a
+        #   log attempt, and logs it.
         def initialize(queue, logger)
           @queue = queue
           @logger = logger
 
-          logger.info('Initialising BAPS requester.')
+          log(:info, 'Initialising BAPS requester.')
 
           super()
         end
 
-        def_delegator :@logger, :send, :log
+        def_delegator :@logger, :call, :log
 
-        # Prepares an incoming model configuration by adding handlers
-        #
-        # This ensures that attempts by the server to update the model are
-        # re-routed towards BAPS.
-        #
-        # This returns its changes, but may or may not mutate the original
-        # model_config.
-        #
-        # @api semipublic
-        #
-        # @example Adds this Requester's handlers into the model configuration.
-        #   cfg = add_handlers(cfg)
-        #
-        # @param model_config [Config] The incoming model configuration.
-        #
-        # @return [void]
-        def add_handlers(model_config)
-          # There is no reason other than efficiency for this to be a mutating
-          # action - if needs be, merge instead of merge!.
-          model_config.add_handlers(@handlers)
-        end
+        attr_reader :handlers
 
         # Sends a request to the BAPS server
         #

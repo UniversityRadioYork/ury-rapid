@@ -118,7 +118,7 @@ module Rapid
           end
 
           def load_state_to_constant(load_state)
-            @parent.create_model_object(:load_state, load_state)
+            @parent.create_component(:load_state, load_state)
           end
 
           def normal_load_state(load_state)

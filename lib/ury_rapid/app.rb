@@ -23,9 +23,6 @@ module Rapid
 
     # Runs the Rapid application in a new EventMachine instance
     def run
-      @root.log(:info, 'Now starting Rapid.')
-      @root.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
-
       @reactor.run do
         @root.run
 

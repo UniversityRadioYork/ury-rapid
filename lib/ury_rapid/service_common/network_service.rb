@@ -32,6 +32,8 @@ module Rapid
     #   any initial requests necessary to start the session with the network
     #   server upon the service start.
     class NetworkService < Service
+      extend Forwardable
+
       # Initialises the service
       #
       # @api      semipublic
@@ -42,8 +44,8 @@ module Rapid
       #   An object that can be used to log messages from the service.
       # @param auth [Object]
       #   An authentication provider.
-      def initialize(logger, auth)
-        super(logger, auth)
+      def initialize(view)
+        super
 
         # We need a queue to hold requests to the network server.  This will
         # later need to be given to the client for reading, and also to the
@@ -83,30 +85,8 @@ module Rapid
       # End configuration DSL
       #
 
-      # Asks the service to prepare its sub-model structure
-      #
-      # This is intended to be called by the Rapid launcher when initialising
-      # the services.
-      #
-      # @api      semipublic
-      # @example  Request the sub-model structure of this Service
-      #   sub_model, register_view_proc = service.sub_model
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Array]
-      #   A tuple of the completed sub-model structure, and a proc that should
-      #   be called with a ServiceView of the completed model.
-      def sub_model(update_channel)
-        # We do the same as a normal Service, but tap into the structure before
-        # returning it so we can make sure the requester gets to install its
-        # handlers in the structure before it gets built by the launcher.
-        super(update_channel).tap do |structure, _proc|
-          @requester.add_handlers(structure)
-        end
-      end
+      # Provide access to the requester's handlers.
+      def_delegator :@requester, :handlers, :request_handlers
 
       # Begin running the service
       #

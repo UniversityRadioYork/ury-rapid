@@ -23,7 +23,7 @@ module Rapid
         end
 
         def_delegators :@model, :find, :insert, :kill, :replace, :register
-        def_delegators :@model, :create_model_object
+        def_delegators :@model, :create_component
 
         # Like kill, but does not fail if the resource does not exist.
         #
