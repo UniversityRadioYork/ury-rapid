@@ -73,14 +73,14 @@ module Rapid
           instance_eval(&Rapid::Model::Structures.playout_model(channel_ids,
                                                                 channel_ids))
 
-          hash :x_baps, :x_baps do
-            hash :server, :x_baps_server do
+          tree :x_baps, :x_baps do
+            tree :server, :x_baps_server do
               server_conf.each do |(key, value)|
                 constant key, value, :x_baps_server_constant
               end
             end
           end
-          hash :info, :info do
+          tree :info, :info do
             constant :channel_mode, true, :channel_mode
           end
         end

@@ -23,7 +23,7 @@ module Rapid
 
         logger = @logger
         view.insert_components('/') do
-          hash :info, :info  do
+          tree :info, :info  do
             ver = Rapid::Common::Constants::VERSION
             constant :version, ver, :version
           end

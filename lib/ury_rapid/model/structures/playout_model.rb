@@ -18,16 +18,22 @@ module Rapid
       def self.playout_model(players, playlists)
         ->(*) do
           fail 'Nil player set given.' if players.nil?
-          fail 'Nil playlist set given.' if players.nil?
+          fail 'Nil playlist set given.' if playlists.nil?
 
-          hashes :players, :player_set, players, :player do
-            play_state :state, :stopped
-            load_state :load_state, :empty
-            volume :volume, 0.0
-            Rapid::Common::Types::MARKERS.each { |m| marker m, m, 0 }
+          tree :players, :player_set do
+            players.each do |player|
+              tree player, :player do
+                play_state :state, :stopped
+                load_state :load_state, :empty
+                volume :volume, 0.0
+                Rapid::Common::Types::MARKERS.each { |m| marker m, m, 0 }
+              end
+            end
           end
 
-          lists :playlists, :playlist_set, playlists, :playlist
+          tree :playlists, :playlist_set do
+            playlists.each { |playlist| list playlist, :playlist }
+          end
         end
       end
     end

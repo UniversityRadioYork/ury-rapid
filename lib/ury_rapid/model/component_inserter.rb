@@ -38,23 +38,6 @@ module Rapid
       def self.insert(*args, &block)
         ComponentInserter.new(*args).instance_eval(&block)
       end
-
-      COMPOSITES = [[:hash, :hashes, HashModelObject],
-                    [:list, :lists, ListModelObject]]
-      COMPOSITES.each do |(singular, plural, composite_class)|
-        define_method(singular) do |id, handler_target, &block|
-          child(id, composite_class.new(handler_target), &block)
-        end
-
-        define_method(plural) do |set_id, set_tgt, child_ids, child_tgt, &block|
-          hash(set_id, set_tgt) do
-            child_ids.each do |id|
-              child(id, composite_class.new(child_tgt), &block)
-            end
-          end
-        end
-      end
-
       # Handles a call to a missing method
       #
       # A ComponentInserter regards any message it cannot directly handle as a
@@ -77,18 +60,14 @@ module Rapid
 
       private
 
-      def child(id, object, &block)
-        object = object.new if object.is_a?(Class)
-        @registrar.call(object)
-        child_url = "#{@url.chomp('/')}/#{id}"
-
-        @view.insert(@url, id, object)
-        build_children(child_url, object, &block) unless block.nil?
-      end
-
       # Create a stock model component using the component creator
+      # @return [void]
       def component(type, id, *args, &block)
-        child(id, @component_creator.send(type, *args, &block))
+        new_component = @component_creator.send(type, *args)
+        @view.insert(@url, id, new_component)
+
+        child_url = "#{@url.chomp('/')}/#{id}"
+        build_children(child_url, new_component, &block) unless block.nil?
       end
 
       # Recursively invokes a ComponentInserter for children of a model object

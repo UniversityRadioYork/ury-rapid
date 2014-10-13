@@ -108,9 +108,7 @@ module Rapid
       # @return [void]
       def start(name)
         module_class, module_config = @modules.fetch(name)
-        @view.insert_components('/') do
-          hash name, :sub_root
-        end
+        @view.insert_components('/') { tree(name, :sub_root) }
         module_view = @view.with_local_root(@view.find("/#{name}"))
         mod = module_class.new(module_view)
         mod.instance_eval(&module_config)

@@ -104,7 +104,7 @@ module Rapid
       def log(logger)
         fail('Nil logger given.') if logger.nil?
 
-        Rapid::Model::Log.new(logger)
+        registered(Rapid::Model::Log.new(logger))
       end
 
       # Creates an arbitrary constant object.
@@ -118,8 +118,15 @@ module Rapid
       #
       # @return [Constant]  A Constant model object holding the constant.
       def constant(value, handler_target)
-        Rapid::Model::Constant.new(handler_target, value)
-                              .tap(&method(:register))
+        registered(Rapid::Model::Constant.new(handler_target, value))
+      end
+
+      def tree(handler_target)
+        registered(HashModelObject.new(handler_target))
+      end
+
+      def list(handler_target)
+        registered(ListModelObject.new(handler_target))
       end
 
       private
@@ -146,7 +153,10 @@ module Rapid
         constant(send(validator, raw_value), handler_target)
       end
 
-      def_delegator :@registrar, :call, :register
+      def registered(component)
+        @registrar.call(component)
+        component
+      end
     end
   end
 end
