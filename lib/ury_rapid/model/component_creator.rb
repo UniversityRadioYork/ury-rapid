@@ -68,7 +68,7 @@ module Rapid
         validate_then_constant(:validate_marker, value, type)
       end
 
-      # Creates a new playlist item.
+      # Creates a new playlist item
       #
       # @param options [Hash]
       #   A hash containing the keys :type, :name, :origin, and :duration,
@@ -85,13 +85,15 @@ module Rapid
         )
       end
 
-      # Creates a new logger model interface.
+      # Creates a new logger model interface
       #
-      # @param logger [Object]  An object that implements the standard library
-      #   Logger's API.
-      #
-      # @return [Log]  A Log object that serves as a model interface to the
-      #   logger.
+      # @api public
+      # @example Creating a log component for the logger 'logger'.
+      #   creator.log(logger)
+      # @param logger [Object]
+      #   An object that implements the standard library Logger's API.
+      # @return [Log]
+      #   A Log object that serves as a model interface to the logger.
       def log(logger)
         fail('Nil logger given.') if logger.nil?
         Rapid::Model::Log.new(logger)
@@ -103,18 +105,54 @@ module Rapid
       # which validate their values before instantiation.  Use of those is
       # recommended where available.
       #
-      # @param value          [Object]  The value of the constant.
-      # @param handler_target [Symbol]  The handler target of the constant.
-      #
-      # @return [Constant]  A Constant model object holding the constant.
+      # @api public
+      # @example Creating a constant with value 3 and handler target :target.
+      #   # If any response handlers are registered as operating on :target,
+      #   # this tree will have those handlers attached to it.
+      #   creator.constant(3, :target)
+      # @param value [Object]
+      #   The value of the constant.
+      # @param handler_target [Symbol]
+      #   The handler target of the constant.
+      # @return [Constant]
+      #   A Constant component, holding the given value.
       def constant(value, handler_target)
         Rapid::Model::Constant.new(handler_target, value)
       end
 
+      # Creates an empty tree component
+      #
+      # A tree is a model object that can contain zero or more other model
+      # objects, each identified by an arbitrary ID.
+      #
+      # @api public
+      # @example Creating a tree with handler target :target.
+      #   # If any response handlers are registered as operating on :target,
+      #   # this tree will have those handlers attached to it.
+      #   creator.tree(:target)
+      # @param handler_target [Symbol]
+      #   The tag used to identify this tree to potential handlers.
+      # @return [HashModelObject]
+      #   The new tree component.
       def tree(handler_target)
         HashModelObject.new(handler_target)
       end
 
+      # Creates an empty list component
+      #
+      # A list is a model object that contains an ordered sequence of zero or
+      # more model objects.  Each child of a list takes its current index
+      # (a natural number starting from zero) as its ID, and the IDs of list
+      # children change if objects are inserted or removed before them.
+      #
+      # @example Creating a list with handler target :target.
+      #   # If any response handlers are registered as operating on :target,
+      #   # this list will have those handlers attached to it.
+      #   creator.list(:target)
+      # @param handler_target [Symbol]
+      #   The tag used to identify this list to potential handlers.
+      # @return [ListModelObject]
+      #   The new list component.
       def list(handler_target)
         ListModelObject.new(handler_target)
       end
