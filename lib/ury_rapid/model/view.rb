@@ -4,10 +4,30 @@ require 'ury_rapid/service_common/requests/null_handler'
 
 module Rapid
   module Model
-    # A view into the model
+    # A view into the Rapid model
     #
-    # This allows parts of Rapid that use the model to access it without being
-    # coupled to the actual definition of the model.
+    # A View tracks two different model roots: the 'global root', which is the
+    # top of the entire model, and the 'local root', which is the top of the
+    # part of the model the View's user is authorised to update directly.  For
+    # example, a Service generally has a View whose local root is that
+    # Service's sub-model.
+    #
+    # The global/local distinction is primarily one of security: only the owner
+    # of a section of model can actually get at it directly, and only
+    # authorised services/clients can interact with other parts of the model
+    # (and, thus, other services).
+    #
+    # From the global root, a View can perform indirect queries (#get, #post,
+    # #put, and #delete).  These are named by analogy to HTTP and REST APIs,
+    # primarily for historical reasons; they require the View's caller to have
+    # sufficient privileges (via a PrivilegeSet); and they do not directly
+    # update the model but instead request that whatever handler code is
+    # attached to the affected parts of the model is activated.
+    #
+    # From the local root, a View can grab model objects directly by URL
+    # (#find), as well as perform direct updates on the model structure
+    # (#insert, #replace, and #kill).  These do not require privileges, and
+    # directly manipulate the model without any handlers being called.
     class View
       extend Forwardable
 
@@ -25,6 +45,18 @@ module Rapid
       end
 
       # Creates a View of the same global root, but a different local root
+      #
+      # This is usually used in the situation where a service A has a view VA,
+      # and is creating a child service B.  VB should contain a reference to
+      # the same global root, as it is on the same model as A and VA, but B
+      # should not be able to update all of A's model space, so its view VB is
+      # VA but with the local root set to B's sub-model.
+      #
+      # @param local_root [ModelObject]
+      #   The new local root.
+      # @return [View]
+      #   A new View, with the same global root as this View, but the given
+      #   local root.
       def with_local_root(local_root)
         View.new(@global_root, local_root)
       end
@@ -48,6 +80,8 @@ module Rapid
         global_find('log') { |log| log.insert(severity, message) }
       end
 
+      # TODO: This is a security risk!
+      # Maybe have a GetWrapper class that restricts what can be done
       def get(url)
         global_find(url) { |object| yield object }
       end
