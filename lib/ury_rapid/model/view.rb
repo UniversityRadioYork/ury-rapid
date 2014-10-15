@@ -13,40 +13,25 @@ module Rapid
 
       # Initialises the model view
       #
-      # @param authenticator [Object]
-      #   An authenticator that can be used to construct privilege sets for
-      #   global root queries.
-      # @param update_channel [UpdateChannel]
-      #   The model's update channel.
       # @param global_root [ModelObject]
       #   The root of the entire Rapid model, which can be queried (but not
       #   modified) by this View.
       # @param local_root [ModelObject]
       #   The root of the part of the Rapid model that this View can modify
       #   directly.
-      def initialize(authenticator, update_channel, global_root, local_root)
-        @authenticator  = authenticator
-        @update_channel = update_channel
-        @global_root    = global_root
-        @local_root     = local_root
-        @handlers       = Hash.new(Rapid::ServiceCommon::Requests::NullHandler.new)
+      def initialize(global_root, local_root)
+        @global_root = global_root
+        @local_root  = local_root
       end
-
-      attr_reader :authenticator
-      attr_reader :update_channel
 
       # Creates a View of the same global root, but a different local root
       def with_local_root(local_root)
-        View.new(@authenticator, @update_channel, @global_root, local_root)
+        View.new(@global_root, local_root)
       end
 
       #
       # Global API
       #
-
-      # Allow access to the model's updates channel
-      def_delegator :@global_root, :register_for_updates
-      def_delegator :@global_root, :deregister_from_updates
 
       # Logs an error message in the Rapid log
       #
@@ -64,12 +49,12 @@ module Rapid
       end
 
       def get(url)
-        find(url) { |object| yield object }
+        global_find(url) { |object| yield object }
       end
 
       %i(put post delete).each do |action|
         define_method(action) do |url, privilege_set, raw_payload|
-          find(url) do |object|
+          global_find(url) do |object|
             payload = make_payload(action, privilege_set, raw_payload, object)
             object.send(action, payload)
           end
@@ -95,36 +80,7 @@ module Rapid
         find_in(@local_root, url, &block)
       end
 
-      def_delegator :@handlers, :merge!, :add_handlers
-
-      def create_component(name, *args)
-        Rapid::Model::ComponentCreatorWrapper.new(
-          Rapid::Model::ComponentCreator.new,
-          method(:register)
-        ).send(name, *args)
-      end
-
-      def insert_component(url, name, *args)
-        insert(url, create_component(name, *args))
-      end
-
-      def replace_component(url, name, *args)
-        replace(url, create_component(name, *args))
-      end
-
-      # Begins inserting multiple components into the local root at the given
-      # URL
-      def insert_components(url, &block)
-        Rapid::Model::ComponentInserter.insert(url, self, method(:register), &block)
-      end
-
       private
-
-      def register(component)
-        component.register_update_channel(@update_channel)
-        component.register_handler(@handlers[component.handler_target])
-        component
-      end
 
       # Finds a model object in the global root given its URL
       #

@@ -3,6 +3,7 @@ require 'ury_rapid/common/exceptions'
 require 'ury_rapid/logger'
 require 'ury_rapid/modules/root'
 require 'ury_rapid/model/composite'
+require 'ury_rapid/service_common/environment'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -64,7 +65,7 @@ module Rapid
 
     # Programmatically build 'make_X_with' DSL methods for each
     # maker.
-    %w(app auth channel service_view server_view logger).each do |m|
+    %w(app auth channel environment logger).each do |m|
       attr_writer "#{m}_maker".to_sym
       alias_method "make_#{m}_with".to_sym, "#{m}_maker=".to_sym
     end
@@ -79,11 +80,11 @@ module Rapid
     #
     # These can be overridden in the configuration DSL.
     def init_default_makers
-      @app_maker     = Rapid::App.method(:new)
-      @auth_maker    = Kankri.method(:authenticator_from_hash)
-      @channel_maker = Rapid::Model::UpdateChannel.method(:new)
-      @logger_maker  = Rapid::Logger.method(:default_logger)
-      @view_maker    = Rapid::Model::View.method(:new)
+      @app_maker         = Rapid::App.method(:new)
+      @auth_maker        = Kankri.method(:authenticator_from_hash)
+      @channel_maker     = Rapid::Model::UpdateChannel.method(:new)
+      @logger_maker      = Rapid::Logger.method(:default_logger)
+      @environment_maker = Rapid::ServiceCommon::Environment.method(:for_root)
     end
 
     # Runs the configuration passed to the Launcher
@@ -119,18 +120,19 @@ module Rapid
     def make_root(logger)
       model = Rapid::Model::HashModelObject.new(:root)
       model.register_update_channel(@update_channel)
-      view = make_view(@authenticator, @update_channel, model, model)
-      Rapid::Modules::Root.new(logger, view)
+      auth = make_auth(@user_config)
+      env = make_environment(auth, @update_channel, model)
+      Rapid::Modules::Root.new(logger, env)
     end
 
     #
     # Constructor delegators
     #
 
-    def_delegator :@app_maker,     :call, :make_app
-    def_delegator :@auth_maker,    :call, :make_auth
-    def_delegator :@channel_maker, :call, :make_channel
-    def_delegator :@logger_maker,  :call, :make_logger
-    def_delegator :@view_maker,    :call, :make_view
+    def_delegator :@app_maker,         :call, :make_app
+    def_delegator :@auth_maker,        :call, :make_auth
+    def_delegator :@channel_maker,     :call, :make_channel
+    def_delegator :@logger_maker,      :call, :make_logger
+    def_delegator :@environment_maker, :call, :make_environment
   end
 end

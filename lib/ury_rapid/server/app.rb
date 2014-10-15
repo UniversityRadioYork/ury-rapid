@@ -18,16 +18,19 @@ module Rapid
     # and routing modules.  See Rapid::Server::Helpers and
     # Rapid::Server::Routing.
     class App < Sinatra::Base
-      def initialize(config, model, authenticator)
+      def initialize(config, environment)
         super()
 
-        @model         = model
-        @config        = config
-        @authenticator = authenticator
+        fail(ArgumentError, 'Need an environment.') if environment.nil?
+
+        @environment = environment
+        @config      = config
 
         rd_key = :root_directory
         settings.set :root, config[rd_key] if config.key?(rd_key)
       end
+
+      attr_reader :environment
 
       #
       # Configuration

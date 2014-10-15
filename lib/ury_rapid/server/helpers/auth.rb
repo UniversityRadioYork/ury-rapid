@@ -16,7 +16,7 @@ module Rapid
         #   true and an authentication failure occurs, this may be nil.
         def privilege_set(suppress_error = false)
           rack_auth = Rack::Auth::Basic::Request.new(request.env)
-          AuthRequest.request(@authenticator, rack_auth)
+          AuthRequest.request(environment, rack_auth)
         rescue Kankri::AuthenticationFailure
           not_authorised unless suppress_error
         end
