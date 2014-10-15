@@ -123,6 +123,7 @@ module Rapid
       def register(component)
         component.register_update_channel(@update_channel)
         component.register_handler(@handlers[component.handler_target])
+        component
       end
 
       # Finds a model object in the global root given its URL
