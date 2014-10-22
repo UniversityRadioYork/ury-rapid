@@ -2,25 +2,30 @@ require 'ury_rapid/modules/set'
 
 # A dummy module, for test purposes.
 class DummyModule
-  def new(*_args)
+  def initialize(_environment)
   end
 
   def run
   end
 end
 
-# A dummy model builder, for test purposes.
-class DummyModelBuilder
-  def new(*_args)
+# A dummy environment, for test purposes.
+class DummyEnvironment
+  def insert_components(_url, &_block)
   end
 
-  def build(_name, _mod)
+  def find(_)
+    nil
+  end
+
+  def with_local_root(_)
+    self
   end
 end
 
 FactoryGirl.define do
   factory :module_set, class: Rapid::Modules::Set do
-    model_builder DummyModelBuilder.new
+    environment DummyEnvironment.new
 
     factory(:empty_module_set) {}
 
@@ -36,5 +41,7 @@ FactoryGirl.define do
         ev.enabled.each { |m| set.enable(m) }
       end
     end
+
+    initialize_with { new(environment) }
   end
 end

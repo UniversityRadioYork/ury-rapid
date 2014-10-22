@@ -127,18 +127,6 @@ describe Rapid::Modules::Set do
               module_class: DummyModule).start(:foo)
         expect(DummyModule).to have_received(:new).once
       end
-
-      it 'calls #build on the model builder with a module name and instance' do
-        mb = double(:model_builder)
-        allow(mb).to receive(:build)
-
-        build(:non_empty_module_set,
-              modules: [:foo],
-              module_class: DummyModule,
-              model_builder: mb).start(:foo)
-        expect(mb).to have_received(:build)
-                  .once.with(:foo, a_kind_of(DummyModule))
-      end
     end
   end
 end

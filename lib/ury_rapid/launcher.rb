@@ -120,8 +120,7 @@ module Rapid
     def make_root(logger)
       model = Rapid::Model::HashModelObject.new(:root)
       model.register_update_channel(@update_channel)
-      auth = make_auth(@user_config)
-      env = make_environment(auth, @update_channel, model)
+      env = make_environment(@auth, @update_channel, model)
       Rapid::Modules::Root.new(logger, env)
     end
 

@@ -9,19 +9,8 @@ shared_examples 'a valid symbol constant' do |type, value|
   end
 end
 
-shared_examples 'a successful factory method' do |type, value|
-  it 'sends the registrar #register with an object to register' do
-    expect(registrar).to receive(:register).once do |arg|
-      expect(arg).to be_a(Rapid::Model::ModelObject)
-    end
-    subject.send(type, value)
-  end
-end
-
 shared_examples 'a symbol constant' do |type, valid_list|
   valid_list.each do |valid|
-    it_behaves_like 'a successful factory method', type, valid
-
     context "when the argument is :#{valid}" do
       it_behaves_like 'a valid symbol constant', type, valid
     end
@@ -63,9 +52,7 @@ shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
 end
 
 describe Rapid::Model::ComponentCreator do
-  subject { Rapid::Model::ComponentCreator.new(registrar) }
-  let(:registrar) { double(:registrar) }
-  before(:each) { allow(registrar).to receive(:register) }
+  subject { Rapid::Model::ComponentCreator.new }
 
   describe '#load_state' do
     it_behaves_like(
