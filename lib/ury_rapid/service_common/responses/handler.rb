@@ -22,16 +22,16 @@ module Rapid
           @model = parent.model
         end
 
-        def_delegators :@model, :get, :put, :post, :delete, :register
-        def_delegators :@model, :create_model_object
+        def_delegators :@model, :find, :insert, :kill, :replace, :register
+        def_delegators :@model, :create_component
 
-        # Like delete, but does not fail if the resource does not exist.
+        # Like kill, but does not fail if the resource does not exist.
         #
         # @api public
         #
         # @return [null]
-        def delete_if_exists(*args)
-          delete(*args)
+        def kill_if_exists(*args)
+          kill(*args)
         rescue Rapid::Common::Exceptions::MissingResource
           nil
         end

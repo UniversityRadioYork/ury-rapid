@@ -34,7 +34,7 @@ module Rapid
       #
       # @api  public
       # @example  Posting an error message to the log.
-      #   log.service_post(:error, 'Somebody famous has died.')
+      #   log.insert(:error, 'Somebody famous has died.')
       #
       # @param id [Symbol]  The target ID: for the Log, this is overloaded
       #   to mean the severity of the error message, which must be one of those
@@ -42,7 +42,7 @@ module Rapid
       #
       # @param payload [String]  The payload: for the Log, this should be the
       #   string to log.
-      def service_post(id, payload)
+      def insert(id, payload)
         fail(ArgumentError) unless %i(debug info warn fatal error).include?(id)
         @logger.send(id, payload)
       end

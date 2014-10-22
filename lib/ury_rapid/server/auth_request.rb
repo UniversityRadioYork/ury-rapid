@@ -12,6 +12,9 @@ module Rapid
       #   which credentials should be extracted.
       #
       def initialize(authenticator, rack_request)
+        fail_authenticator_is_nil          if authenticator.nil?
+        fail_authenticator_cannot_auth unless can_auth?(authenticator)
+
         @authenticator = authenticator
         @rack_request  = rack_request
       end
@@ -31,6 +34,24 @@ module Rapid
       end
 
       private
+
+      # Checks whether an authenticaticator can auth
+      # @api private
+      def can_auth?(authenticator)
+        authenticator.respond_to?(:authenticate)
+      end
+
+      # Fails with an error stating that the authenticator is nil
+      # @api private
+      def fail_authenticator_is_nil
+        fail(ArgumentError, 'Authenticator is nil')
+      end
+
+      # Fails with an error stating that the authenticator can't authenticate
+      # @api private
+      def fail_authenticator_cannot_auth
+        fail(ArgumentError, 'Authenticator cannot auth')
+      end
 
       # Attempts to glean credentials from the Rack request
       def credentials

@@ -12,13 +12,13 @@ module Rapid
       # Depends on Rapid::Server::Helpers::Error, for #wrap.
       module Model
         def get
-          wrap { @model.get(request_url, &method(:handle_get)) }
+          wrap { environment.get(request_url, &method(:handle_get)) }
         end
 
-        %i(put post delete).each do |action|
-          define_method(action) do
+        %i(put post delete).each do |act|
+          define_method(act) do
             wrap do
-              @model.send(action, request_url, privilege_set, raw_payload)
+              environment.send(act, request_url, privilege_set, raw_payload)
               ok
             end
           end

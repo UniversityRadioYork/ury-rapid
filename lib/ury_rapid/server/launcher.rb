@@ -8,14 +8,13 @@ module Rapid
     #
     # This object exposes a DSL to the Rapid configuration.
     class Launcher
-      def initialize(_logger, model_view, authenticator)
-        @model_view    = model_view
-        @authenticator = authenticator
-        @rack = 'thin'
-        @host = '0.0.0.0'
-        @port = 8181
-        @root = '/'
-        @config = {}
+      def initialize(environment)
+        @rack        = 'thin'
+        @host        = '0.0.0.0'
+        @port        = 8181
+        @root        = '/'
+        @config      = {}
+        @environment = environment
 
         check_server_em_compatible
       end
@@ -58,7 +57,7 @@ module Rapid
       end
 
       def make_app
-        App.new(@config, @model_view, @authenticator)
+        App.new(@config, @environment)
       end
 
       def build_rack(root, app)

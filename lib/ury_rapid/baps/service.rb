@@ -1,7 +1,7 @@
 require 'eventmachine'
 
 require 'ury_rapid/baps/client'
-require 'ury_rapid/baps/models'
+require 'ury_rapid/model/structures/playout_model'
 require 'ury_rapid/baps/requests/requester'
 require 'ury_rapid/baps/responses/responder'
 require 'ury_rapid/service_common/network_service'
@@ -24,11 +24,12 @@ module Rapid
       #   A server view of the entire model.
       # @param auth [Object]
       #   An authentication provider.
-      def initialize(logger, view, auth)
-        super(logger, view, auth)
+      def initialize(view)
+        super(view)
 
         @username = ''
         @password = ''
+        @channel_ids = []
       end
 
       #
@@ -53,7 +54,37 @@ module Rapid
       # End configuration DSL
       #
 
+      def run
+        @view.log(:info, 'BAPS service launching.')
+        @view.log(:info, "BAPS server: #{@host}:#{@port}")
+
+        initialise_model
+        super
+      end
+
       private
+
+      def initialise_model
+        channel_ids = @channel_ids
+        server_conf = server_config
+
+        @view.add_handlers(request_handlers)
+        @view.insert_components('/') do
+          instance_eval(&Rapid::Model::Structures.playout_model(channel_ids,
+                                                                channel_ids))
+
+          tree :x_baps, :x_baps do
+            tree :server, :x_baps_server do
+              server_conf.each do |(key, value)|
+                constant key, value, :x_baps_server_constant
+              end
+            end
+          end
+          tree :info, :info do
+            constant :channel_mode, true, :channel_mode
+          end
+        end
+      end
 
       # Sets the default host for BAPS
       #
@@ -92,7 +123,7 @@ module Rapid
       # @return [Object]
       #   The BAPS requester object.
       def make_requester(queue)
-        Rapid::Baps::Requests::Requester.new(queue, logger)
+        Rapid::Baps::Requests::Requester.new(queue, @view.method(:log))
       end
 
       # Constructs the BAPS responder
@@ -106,10 +137,14 @@ module Rapid
       # @return [Object]
       #   The BAPS responder object.
       def make_responder(requester)
-        Rapid::Baps::Responses::Responder.new(service_view, requester)
+        Rapid::Baps::Responses::Responder.new(view, requester)
       end
 
       protected
+
+      def logger
+        @view.method(:log)
+      end
 
       # Perform any necessary initial requests to the network server
       #
@@ -129,16 +164,6 @@ module Rapid
       end
 
       private
-
-      def sub_model_structure(update_channel)
-        Rapid::Baps::Model::Creator.new(
-          update_channel,
-          @logger,
-          players: @channel_ids,
-          playlists: @channel_ids,
-          server_config: server_config
-        )
-      end
 
       def server_config
         {

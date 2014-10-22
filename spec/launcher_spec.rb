@@ -18,9 +18,8 @@ describe Rapid::Launcher do
     appm = app_maker
     authm = auth_maker
     cm = channel_maker
-    dvm = service_view_maker
+    vm = environment_maker
     lm = logger_maker
-    svm = server_view_maker
     proc do
       modules do
         configure(di, dcl) { dc }
@@ -37,14 +36,13 @@ describe Rapid::Launcher do
       make_auth_with authm
       make_channel_with cm
       make_logger_with lm
-      make_service_view_with dvm
-      make_server_view_with svm
+      make_environment_with vm
     end
   end
 
   let(:user_name) { double(:user_name) }
 
-  MAKERS = %i(app auth channel logger service_view server_view)
+  MAKERS = %i(app auth channel logger environment)
 
   MAKERS.each do |maker|
     sym = "#{maker}_maker".to_sym
@@ -54,7 +52,6 @@ describe Rapid::Launcher do
 
   let(:model)                  { double(:model)                  }
   let(:model_class)            { double(:model_class)            }
-  let(:model_structure)        { double(:model_structure)        }
 
   let(:server)                 { double(:server)                 }
   let(:server_id)              { double(:server_id)              }
@@ -63,9 +60,6 @@ describe Rapid::Launcher do
   let(:service)                 { double(:service)                 }
   let(:service_id)              { double(:service_id)              }
   let(:service_class)           { double(:service_class)           }
-  let(:service_model_structure) { double(:service_model_structure) }
-  let(:service_model)           { double(:service_model)           }
-  let(:register_service_view)   { double(:register_service_view)   }
 
   let(:service_config) { double(:service_config) }
   let(:server_config) { double(:server_config) }
@@ -78,23 +72,13 @@ describe Rapid::Launcher do
       allow(channel_maker).to receive(:call).and_return(channel)
       allow(logger_maker).to receive(:call).and_return(logger)
 
-      allow(service_view_maker).to receive(:call).and_return(service_view)
-      allow(server_view_maker).to receive(:call).and_return(server_view)
+      allow(environment_maker).to receive(:call).and_return(environment)
 
-      allow(service_view).to receive(:post)
+      allow(environment).to receive(:post)
 
       allow(app).to receive(:run)
 
-      allow(model_class).to receive(:new).and_return(model_structure)
-      allow(model_structure).to receive(:create).and_return(model)
-
       allow(service_class).to receive(:new).and_return(service)
-      allow(service).to receive(:sub_model).and_return(
-        [service_model_structure, register_service_view]
-      )
-      allow(service_model_structure).to receive(:create)
-                                    .and_return(service_model)
-      allow(register_service_view).to receive(:call)
 
       allow(server_class).to receive(:new).and_return(server)
     end

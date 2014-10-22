@@ -75,6 +75,7 @@ def auth_request_with_invalid_rack(provided, basic)
 
   authenticator = double(:authenticator)
   rake_request  = mock_rake_request(double(:u), double(:p), provided, basic)
+  allow(authenticator).to receive(:authenticate)
   auth_request(authenticator, rake_request)
 end
 

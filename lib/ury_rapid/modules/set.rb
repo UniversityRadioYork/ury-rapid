@@ -12,19 +12,13 @@ module Rapid
 
       # Initialises a Set
       #
-      # The Set, by default, passes nothing to module constructors, and
-      # does nothing with the modules after construction.  Use
-      # #constructor_arguments= and #module_builder= to override this.
-      #
       # @api      semipublic
-      # @example  Create a new Set with no constructor arguments provided.
-      #   ms = Set.new
-      def initialize(*constructor_arguments)
-        @modules = {}
+      # @example  Create a new Set.
+      #   ms = Set.new(view)
+      def initialize(view)
+        @modules         = {}
         @enabled_modules = ::Set[]
-        @constructor_arguments = constructor_arguments
-        @model_builder = nil
-        @server_view = nil
+        @view            = view
       end
 
       # Creates a sub-group of this module set
@@ -42,16 +36,7 @@ module Rapid
       #
       # @return [void]
       def group(name, &block)
-        # This needs to be a procedure as the model builder won't have been
-        # assigned to this set at the time #group is called, but it will have
-        # been when the #configure block is called.
-        builder_proc = ->() { @model_builder }
-
         configure(name, Set) do
-          builder = builder_proc.call
-          fail("Found nil model builder at group #{name}.") if builder.nil?
-
-          send(:model_builder=, builder)
           instance_eval(&block)
         end
       end
@@ -123,9 +108,10 @@ module Rapid
       # @return [void]
       def start(name)
         module_class, module_config = @modules.fetch(name)
-        mod = module_class.new(*@constructor_arguments)
+        @view.insert_components('/') { tree(name, :sub_root) }
+        module_view = @view.with_local_root(@view.find("/#{name}"))
+        mod = module_class.new(module_view)
         mod.instance_eval(&module_config)
-        @model_builder.build(name, mod)
         mod.run
       end
 
@@ -159,7 +145,6 @@ module Rapid
 
       attr_writer :constructor_arguments
       attr_writer :model_builder
-      attr_writer :server_view
 
       # Runs the module set.
       #
@@ -175,46 +160,9 @@ module Rapid
         start_enabled
       end
 
-      # Asks the module set to prepare its sub-model structure
-      #
-      # @api      semipublic
-      # @example  Request the sub-model structure of the sub-group
-      #   sub_model, register_view_proc = set.sub_model
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Array]
-      #   A tuple of the completed sub-model structure, and a proc that should
-      #   be called with a ServiceView of the completed model.
-      def sub_model(update_channel)
-        [sub_model_structure(update_channel),
-         method(:service_view=),
-         method(:server_view=)
-        ]
-      end
+      protected
 
-      # Constructs the sub-model structure for this set
-      #
-      # @api  private
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Object]
-      #   The sub-model structure.
-      def sub_model_structure(update_channel)
-        Rapid::Model::Structures::ModuleSet.new(update_channel, nil, {})
-      end
-
-      def service_view=(new_view)
-        @service_view = new_view
-
-        return if @model_builder.nil?
-        @model_builder = @model_builder.replace_service_view(@service_view)
-      end
+      attr_reader :view
     end
   end
 end

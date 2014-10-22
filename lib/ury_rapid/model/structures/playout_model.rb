@@ -8,39 +8,32 @@ module Rapid
       # This contains:
       #   - A player set, with IDs set in the model config under 'players'
       #   - A playlist set, with IDs set in the model config under 'playlists'
-      class PlayoutModel < Rapid::Model::Creator
-        include Rapid::Common::Types::Validators
+      #
+      # @param players [Array]
+      #   An array of IDs of the players available in this playout system.
+      # @param playlists [Array]
+      #   An array of IDs of the playlists available in this playout system.
+      # @return [Proc]
+      #   A proc that may be instance_eval'd into an #insert_components stanza.
+      def self.playout_model(players, playlists)
+        ->(*) do
+          fail 'Nil player set given.' if players.nil?
+          fail 'Nil playlist set given.' if playlists.nil?
 
-        # Create the model from the given configuration
-        #
-        # @return [Root]  The finished model.
-        def create
-          root :playout_root do
-            base_structure
-            playout_extensions
-          end
-        end
-
-        protected
-
-        def playout_extensions
-        end
-
-        private
-
-        def base_structure
-          hashes :players, :player_set, option(:players), :player do
-            component :state,      :play_state, :stopped
-            component :load_state, :load_state, :empty
-            component :volume,     :volume,     0.0
-            markers
+          tree :players, :player_set do
+            players.each do |player|
+              tree player, :player do
+                play_state :state, :stopped
+                load_state :load_state, :empty
+                volume :volume, 0.0
+                Rapid::Common::Types::MARKERS.each { |m| marker m, m, 0 }
+              end
+            end
           end
 
-          lists :playlists, :playlist_set, option(:playlists), :playlist
-        end
-
-        def markers
-          Rapid::Common::Types::MARKERS.each { |m| component m, :marker, m, 0 }
+          tree :playlists, :playlist_set do
+            playlists.each { |playlist| list playlist, :playlist }
+          end
         end
       end
     end

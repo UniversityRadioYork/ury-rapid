@@ -11,7 +11,7 @@ module Rapid
         # the playlist that should be deleted.
         class Delete < Handler
           def run
-            delete(playlist_url(*sub_url))
+            kill(playlist_url(*sub_url))
           end
         end
 
@@ -51,7 +51,7 @@ module Rapid
           end
 
           def urls
-            { post: playlist_url }
+            { insert: playlist_url }
           end
         end
 
@@ -65,21 +65,21 @@ module Rapid
 
           # Moves the item pointed to by response to its new index
           def move
-            # Noting that post, if applied to an existing resource, moves it
+            # Noting that insert, if applied to an existing resource, moves it
             # to its new URL.
-            item_post(item_get)
+            item_insert(item_find)
           end
 
           private
 
           # Posts the item into its new position
-          def item_post(item)
-            post(playlist_url, @response.new_index, item)
+          def item_insert(item)
+            insert(playlist_url, @response.new_index, item)
           end
 
           # Gets the item that wants to be moved
-          def item_get
-            get(playlist_url(@response.old_index))
+          def item_find
+            find(playlist_url(@response.old_index))
           end
 
           # Calculates the URL to which the item shall be posted

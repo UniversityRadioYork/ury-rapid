@@ -15,18 +15,16 @@ module Rapid
       #
       # @api      semipublic
       # @example  Create a new HelloWorldService
-      #   service = HelloWorldService.new(logger, view, auth)
+      #   service = HelloWorldService.new(view)
       #
-      # @param logger [Object]
-      #   An object that can be used to log messages from the service.
-      # @param view [Rapid::Model::ServerView]
-      #   A server view of the entire model.
+      # @param view [Rapid::Model::View]
+      #   A view of the Rapid model.
       # @param auth [Object]
       #   An authentication provider.
-      def initialize(logger, view, auth)
+      def initialize(view)
         # We need to initialise Rapid::ServiceCommon::Service with the
         # arguments provided.
-        super(logger, view, auth)
+        super(view)
 
         # The default message, overridden using #message.
         @message = 'Hello, World!'
@@ -43,6 +41,9 @@ module Rapid
       #
       # @return [void]
       def run
+        view.insert_components('/') do
+          constant :message, @message, :message
+        end
       end
 
       #
@@ -66,47 +67,6 @@ module Rapid
       #
       # End configuration DSL
       #
-
-      private
-
-      # Constructs the sub-model structure for this HelloWorldService
-      #
-      # @api  private
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Object]
-      #   The sub-model structure.
-      def sub_model_structure(update_channel)
-        Structure.new(update_channel, logger, @message)
-      end
-
-      # The structure used by this HelloWorldService
-      #
-      # Service structures need not be hidden inside the service class; we just
-      # do this for the HelloWorldService as it is such a small structure.
-      class Structure < Rapid::Model::Creator
-        def initialize(update_channel, logger, message)
-          super(update_channel, logger, {})
-
-          @message = message
-        end
-
-        # Create the model from the given configuration
-        #
-        # @api      semipublic
-        # @example  Create the model
-        #   struct.create
-        #
-        # @return [Constant]  The finished model.
-        def create
-          root :sub_root do
-            component :message, :constant, @message, :message
-          end
-        end
-      end
     end
   end
 end

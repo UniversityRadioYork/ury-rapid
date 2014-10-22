@@ -10,7 +10,7 @@ module Rapid
     # perform any actions it needs to do on the structure in this method, such
     # as adding model handlers.
     #
-    # Subclasses may use the readers #logger and #service_view to get access
+    # Subclasses may use the readers #logger and #view to get access
     # to their logger and view of the model, respectively.
     class Service
       # Initialises the service
@@ -19,71 +19,22 @@ module Rapid
       # @example  Create a new service
       #   service = Service.new(logger, view, auth)
       #
-      # @param logger [Object]
-      #   An object that can be used to log messages from the service.
-      # @param view [Rapid::Model::ServerView]
-      #   A server view of the entire model.
-      # @param auth [Object]
-      #   An authentication provider.
-      def initialize(logger, view, auth)
-        @logger = logger
+      # @param view [Rapid::Model::View]
+      #   A View of the model, with direct access to this Service's part of the
+      #   model.
+      def initialize(view)
         @view = view
-        @auth = auth
-      end
-
-      # Asks the service to prepare its sub-model structure
-      #
-      # This is intended to be called by the Rapid launcher when initialising
-      # the services.
-      #
-      # @api      semipublic
-      # @example  Request the sub-model structure of this Service
-      #   sub_model, register_view_proc = service.sub_model
-      #
-      # @param update_channel [Rapid::Model::UpdateChannel]
-      #   The update channel that should be used when creating the sub-model
-      #   structure.
-      #
-      # @return [Array]
-      #   A triple of the completed sub-model structure, a proc that should
-      #   be called with a ServiceView of the completed model, and a proc that
-      #   should be called with its ServerView.
-      def sub_model(update_channel)
-        [sub_model_structure(update_channel),
-         method(:service_view=),
-         ->(_) {}  # We don't need a server view of our own model.
-        ]
       end
 
       protected
 
-      # Gets this service's logger object
+      # Gets this service's view
       #
       # @api private
-      # @return [Object]
-      #   An object that this service can use to log.
-      attr_reader :logger
-
-      # Gets this service's server view
-      #
-      # @api private
-      # @return [Rapid::Model::ServerView]
-      #   A view that can query and request changes to the entire model.
+      # @return [Rapid::Model::View]
+      #   A view that can query the entire model, and update this service's
+      #   sub-model.
       attr_reader :view
-
-      # Gets this service's authentication provider
-      #
-      # @api private
-      # @return [Object]
-      #   This service's authentication provider.
-      attr_reader :auth
-
-      # Gets this service's service view
-      #
-      # @api private
-      # @return [Rapid::Model::ServiceView]
-      #   A view that can update this service's portion of the model.
-      attr_accessor :service_view
     end
   end
 end

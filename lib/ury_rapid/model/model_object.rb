@@ -76,25 +76,20 @@ module Rapid
           fail_if_cannot(action, payload.privilege_set)
           @handler.call(action, self, payload)
         end
-
-        # Define error-raising stubs for the service modifiers.
-        define_method("service_#{action}") do |*|
-          fail(Rapid::Common::Exceptions::NotSupportedByRapid)
-        end
       end
 
-      # Default implementation of service_put
+      # Default implementation of replace
       #
-      # This will just POST into the parent.
+      # This will just insert into the parent.
       #
       # @param resource [Object] The resource to PUT.
       #
       # @return [void]
-      def service_put(resource)
-        parent.service_post(id, resource)
+      def replace(resource)
+        parent.insert(id, resource)
       end
 
-      # Default implementation of service_post
+      # Default implementation of insert
       #
       # This will, by default, move the incoming resource to this object
       # under the given ID, replacing any existing resource.
@@ -103,21 +98,21 @@ module Rapid
       # @param resource [Object] The resource to POST.
       #
       # @return [void]
-      def service_post(id, resource)
+      def insert(id, resource)
         return if resource.nil?
         resource.move_to(self, id)
         resource.notify_update
       end
 
-      # Default implementation of DELETE on model objects
+      # Default implementation of kill on model objects
       #
-      # This instructs the object's children to delete themselves.  Since
+      # This instructs the object's children to kill themselves.  Since
       # #each is a no-op on Compo::Branches::Leaf, this is safe to use with any
       # model object.
       #
       # @return [void]
-      def service_delete
-        each { |_, value| value.service_delete }
+      def kill
+        each { |_, value| value.kill }
       end
 
       def_delegator :@parent, :id, :parent_id
