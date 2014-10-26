@@ -12,7 +12,7 @@ module Rapid
   class App
     # Initialises the Rapid application
     #
-    # @param root [Rapid::Modules::Root]
+    # @param root [Rapid::ServiceCommon::Root]
     #   The root module.
     # @param reactor [Object]
     #   An object or class that may be used as an asynchronous IO reactor.

@@ -1,6 +1,6 @@
 require 'ury_rapid/launcher'
-require 'ury_rapid/modules/set'
-require 'ury_rapid/modules/root'
+require 'ury_rapid/service_common/set'
+require 'ury_rapid/service_common/root'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
@@ -21,7 +21,7 @@ describe Rapid::Launcher do
     vm = environment_maker
     lm = logger_maker
     proc do
-      modules do
+      services do
         configure(di, dcl) { dc }
         enable di
         configure(si, scl) { sc }
@@ -88,10 +88,10 @@ describe Rapid::Launcher do
       subject.run
     end
 
-    it 'calls the app maker with the root module' do
+    it 'calls the app maker with the root service' do
       subject.run
       expect(app_maker).to have_received(:call).once.with(
-        a_kind_of(Rapid::Modules::Root)
+        a_kind_of(Rapid::ServiceCommon::Root)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(service_id) })
           .and(satisfy { |ms| ms.enabled.include?(server_id) })

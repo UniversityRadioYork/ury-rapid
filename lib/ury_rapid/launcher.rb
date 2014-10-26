@@ -1,7 +1,7 @@
 require 'ury_rapid/app'
 require 'ury_rapid/common/exceptions'
 require 'ury_rapid/logger'
-require 'ury_rapid/modules/root'
+require 'ury_rapid/service_common/root'
 require 'ury_rapid/model/composite'
 require 'ury_rapid/service_common/environment'
 
@@ -38,11 +38,11 @@ module Rapid
     # files.
     #
 
-    # Configures the modules set for this instance of Rapid
+    # Configures the services set for this instance of Rapid
     #
-    # See Rapid::Modules::Root for the DSL accepted by this method.
-    def modules(&block)
-      fail('Multiple `modules` blocks in config.') unless @root_config.nil?
+    # See Rapid::ServiceCommon::Root for the DSL accepted by this method.
+    def services(&block)
+      fail('Multiple `services` blocks in config.') unless @root_config.nil?
       @root_config = block
     end
 
@@ -121,7 +121,7 @@ module Rapid
       model = Rapid::Model::HashModelObject.new(:root)
       model.register_update_channel(@update_channel)
       env = make_environment(@auth, @update_channel, model)
-      Rapid::Modules::Root.new(logger, env)
+      Rapid::ServiceCommon::Root.new(logger, env)
     end
 
     #

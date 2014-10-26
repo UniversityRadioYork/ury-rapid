@@ -9,11 +9,11 @@ require 'ury-rapid/baps/service'
 require 'ury-rapid/server/app'
 
 #
-# Modules plug into Rapid and offer services, interfaces, and more.
-# The [modules] config section allows configuring and launch-time enabling of
-# modules.
+# Services plug into Rapid and offer various bits of functionality.
+# The [services] config section allows configuring and launch-time enabling of
+# services.
 #
-modules do
+services do
   configure :hello, Rapid::Examples::HelloWorldService do
     message 'It works!'
   end

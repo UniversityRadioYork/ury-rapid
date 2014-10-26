@@ -1,16 +1,12 @@
-require 'ury_rapid/modules/set'
+require 'ury_rapid/service_common/set'
 
 module Rapid
-  module Modules
-    # The root module
+  module ServiceCommon
+    # The root service
     #
-    # This is the main module in the Rapid system, and owns all other modules
+    # This is the main service in the Rapid system, and owns all other services
     # as well as the root of the model tree.
-    #
-    # The root module's model is different, in that it is not built using a
-    # module set's model builder.  Instead, the Launcher brings up the model
-    # in a way such that it needs no service or server views to create.
-    class Root < Rapid::Modules::Set
+    class Root < Rapid::ServiceCommon::Set
       extend Forwardable
 
       def initialize(logger, view)
