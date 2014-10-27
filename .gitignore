@@ -37,3 +37,6 @@ test.sh
 # I use ST3
 *.sublime-project
 *.sublime-workspace
+
+# Don't include the rendered gitbook
+manual/_book
