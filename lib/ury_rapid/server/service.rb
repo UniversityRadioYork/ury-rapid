@@ -7,7 +7,7 @@ module Rapid
     # Object for launching the Rapid server.
     #
     # This object exposes a DSL to the Rapid configuration.
-    class Launcher
+    class Service
       def initialize(environment)
         @rack        = 'thin'
         @host        = '0.0.0.0'

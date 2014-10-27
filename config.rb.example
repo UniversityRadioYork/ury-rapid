@@ -6,7 +6,7 @@
 require 'ury-rapid/examples/hello_world_service'
 require 'ury-rapid/model/structures/standard'
 require 'ury-rapid/baps/service'
-require 'ury-rapid/server/app'
+require 'ury-rapid/server/service'
 
 #
 # Services plug into Rapid and offer various bits of functionality.
@@ -28,7 +28,7 @@ services do
   end
   # enable :studio
 
-  configure :server, Rapid::Server::Launcher do
+  configure :server, Rapid::Server::Service do
     # The host and port on which Rapid should listen for requests
     host '0.0.0.0', 8181
 
