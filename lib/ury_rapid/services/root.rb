@@ -9,8 +9,8 @@ module Rapid
     class Root < Rapid::Services::Set
       extend Forwardable
 
-      def initialize(logger, view)
-        super(view)
+      def initialize(logger, *args)
+        super(*args)
         @logger = logger
       end
 
@@ -18,7 +18,7 @@ module Rapid
         fail 'Nil logger provided.' if @logger.nil?
 
         logger = @logger
-        view.insert_components('/') do
+        environment.insert_components('/') do
           tree :info, :info  do
             ver = Rapid::Common::Constants::VERSION
             constant :version, ver, :version
@@ -27,8 +27,8 @@ module Rapid
           log :log, logger
         end
 
-        view.log(:info, 'Now starting Rapid.')
-        view.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
+        environment.log(:info, 'Now starting Rapid.')
+        environment.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
 
         super
       end

@@ -17,14 +17,12 @@ module Rapid
       # @example  Create a new HelloWorldService
       #   service = HelloWorldService.new(view)
       #
-      # @param view [Rapid::Model::View]
-      #   A view of the Rapid model.
-      # @param auth [Object]
-      #   An authentication provider.
-      def initialize(view)
+      # @param environment [Rapid::Services::Environment]
+      #   The Service's environment.
+      def initialize(environment)
         # We need to initialise Rapid::Services::Service with the
-        # arguments provided.
-        super(view)
+        # environment
+        super(environment)
 
         # The default message, overridden using #message.
         @message = 'Hello, World!'
@@ -41,7 +39,7 @@ module Rapid
       #
       # @return [void]
       def run
-        view.insert_components('/') do
+        environment.insert_components('/') do
           constant :message, @message, :message
         end
       end

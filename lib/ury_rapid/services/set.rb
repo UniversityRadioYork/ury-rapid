@@ -1,4 +1,5 @@
 require 'ury_rapid/common/exceptions'
+require 'ury_rapid/services/service'
 
 module Rapid
   module Services
@@ -6,7 +7,7 @@ module Rapid
     #
     # A service set holds a set of configured Rapid services, as well as
     # information about which services are enabled at launch-time.
-    class Set
+    class Set < Service
       extend Forwardable
 
       # Initialises a Set
@@ -14,10 +15,11 @@ module Rapid
       # @api      semipublic
       # @example  Create a new Set.
       #   set = Set.new(view)
-      def initialize(view)
+      def initialize(*_)
+        super
+
         @services         = {}
         @enabled_services = ::Set[]
-        @view            = view
       end
 
       # Creates a sub-group of this service set
@@ -107,8 +109,8 @@ module Rapid
       # @return [void]
       def start(name)
         service_class, service_config = @services.fetch(name)
-        @view.insert_components('/') { tree(name, :sub_root) }
-        service_view = @view.with_local_root(@view.find("/#{name}"))
+        environment.insert_components('/') { tree(name, :sub_root) }
+        service_view = environment.with_local_root(environment.find("/#{name}"))
         mod = service_class.new(service_view)
         mod.instance_eval(&service_config)
         mod.run
@@ -158,10 +160,6 @@ module Rapid
       def run
         start_enabled
       end
-
-      protected
-
-      attr_reader :view
     end
   end
 end
