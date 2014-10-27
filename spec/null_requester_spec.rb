@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require 'ury_rapid/service_common/requests/null_requester'
+require 'ury_rapid/services/requests/null_requester'
 
-describe Rapid::ServiceCommon::Requests::NullRequester do
+describe Rapid::Services::Requests::NullRequester do
   describe '#add_handlers' do
     it 'does not change the model structure' do
       structure = double(:structure)

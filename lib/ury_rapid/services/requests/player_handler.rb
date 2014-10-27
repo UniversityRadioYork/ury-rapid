@@ -1,9 +1,9 @@
-require 'ury_rapid/service_common/requests/handler'
-require 'ury_rapid/service_common/requests/url_hash_handler'
-require 'ury_rapid/service_common/requests/playlist_reference_parser'
+require 'ury_rapid/services/requests/handler'
+require 'ury_rapid/services/requests/url_hash_handler'
+require 'ury_rapid/services/requests/playlist_reference_parser'
 
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Base class for handlers that handle requests on players
       #

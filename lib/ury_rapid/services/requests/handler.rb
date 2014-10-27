@@ -1,8 +1,8 @@
 require 'ury_rapid/common/exceptions'
-require 'ury_rapid/service_common/handler'
+require 'ury_rapid/services/handler'
 
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Abstract class for handlers for a given model object
       #
@@ -10,7 +10,7 @@ module Rapid
       # attempts to modify the model object, the handler translates it into a
       # playout system command to perform the actual playout system event the
       # model change represents.
-      class Handler < Rapid::ServiceCommon::Handler
+      class Handler < Rapid::Services::Handler
         extend Forwardable
 
         HOOKS = {}

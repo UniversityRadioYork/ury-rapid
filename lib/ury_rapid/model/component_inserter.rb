@@ -1,5 +1,5 @@
 require 'ury_rapid/model'
-require 'ury_rapid/service_common/requests/null_handler'
+require 'ury_rapid/services/requests/null_handler'
 require 'ury_rapid/model/component_creator'
 require 'ury_rapid/model/component_creator_wrapper'
 

@@ -1,4 +1,4 @@
-require 'ury_rapid/service_common/responses/handler'
+require 'ury_rapid/services/responses/handler'
 
 module Rapid
   module Baps
@@ -6,7 +6,7 @@ module Rapid
       module Handlers
         # Extension to normal response handlers, including BAPS specific
         # functions
-        class Handler < Rapid::ServiceCommon::Responses::Handler
+        class Handler < Rapid::Services::Responses::Handler
           protected
 
           # Generates an URL to a channel player given a BAPS response

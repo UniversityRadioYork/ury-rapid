@@ -1,11 +1,11 @@
 require 'ury_rapid/common/exceptions'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # Base class for request and response handlers.
     #
-    # See Rapid::ServiceCommon::Requests::Handler and
-    # Rapid::ServiceCommon::Responses::Handler for the more specific base
+    # See Rapid::Services::Requests::Handler and
+    # Rapid::Services::Responses::Handler for the more specific base
     # classes.
     class Handler
       extend Forwardable

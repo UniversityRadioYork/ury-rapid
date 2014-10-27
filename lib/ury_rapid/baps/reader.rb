@@ -1,5 +1,5 @@
 require 'ury_rapid/baps/format_strings'
-require 'ury_rapid/service_common/response_buffer'
+require 'ury_rapid/services/response_buffer'
 
 module Rapid
   module Baps
@@ -7,7 +7,7 @@ module Rapid
     #
     # The Reader works by operating on an internal buffer which can have
     # new data fed to it.
-    class Reader < ServiceCommon::ResponseBuffer
+    class Reader < Services::ResponseBuffer
       # Create helpers for requesting BAPS primitive types.
       # Each type results in a one-member unpacked array, so discard the
       # array before yielding.

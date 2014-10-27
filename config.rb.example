@@ -6,14 +6,14 @@
 require 'ury-rapid/examples/hello_world_service'
 require 'ury-rapid/model/structures/standard'
 require 'ury-rapid/baps/service'
-require 'ury-rapid/server/app'
+require 'ury-rapid/server/service'
 
 #
-# Modules plug into Rapid and offer services, interfaces, and more.
-# The [modules] config section allows configuring and launch-time enabling of
-# modules.
+# Services plug into Rapid and offer various bits of functionality.
+# The [services] config section allows configuring and launch-time enabling of
+# services.
 #
-modules do
+services do
   configure :hello, Rapid::Examples::HelloWorldService do
     message 'It works!'
   end
@@ -28,7 +28,7 @@ modules do
   end
   # enable :studio
 
-  configure :server, Rapid::Server::Launcher do
+  configure :server, Rapid::Server::Service do
     # The host and port on which Rapid should listen for requests
     host '0.0.0.0', 8181
 

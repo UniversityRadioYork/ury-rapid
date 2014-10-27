@@ -1,8 +1,8 @@
 require 'ury_rapid/common/exceptions'
-require 'ury_rapid/service_common/requests/handler'
+require 'ury_rapid/services/requests/handler'
 
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Null-object for request handling
       #

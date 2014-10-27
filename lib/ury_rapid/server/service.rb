@@ -1,20 +1,22 @@
 require 'rack'
 
 require 'ury_rapid/server/app'
+require 'ury_rapid/services/service'
 
 module Rapid
   module Server
     # Object for launching the Rapid server.
     #
     # This object exposes a DSL to the Rapid configuration.
-    class Launcher
-      def initialize(environment)
+    class Service < Rapid::Services::Service
+      def initialize(*_)
+        super
+
         @rack        = 'thin'
         @host        = '0.0.0.0'
         @port        = 8181
         @root        = '/'
         @config      = {}
-        @environment = environment
 
         check_server_em_compatible
       end
@@ -57,7 +59,7 @@ module Rapid
       end
 
       def make_app
-        App.new(@config, @environment)
+        App.new(@config, environment)
       end
 
       def build_rack(root, app)

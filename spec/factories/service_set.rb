@@ -1,7 +1,7 @@
-require 'ury_rapid/modules/set'
+require 'ury_rapid/services/set'
 
-# A dummy module, for test purposes.
-class DummyModule
+# A dummy service, for test purposes.
+class DummyService
   def initialize(_environment)
   end
 
@@ -24,20 +24,20 @@ class DummyEnvironment
 end
 
 FactoryGirl.define do
-  factory :module_set, class: Rapid::Modules::Set do
+  factory :service_set, class: Rapid::Services::Set do
     environment DummyEnvironment.new
 
-    factory(:empty_module_set) {}
+    factory(:empty_service_set) {}
 
-    factory :non_empty_module_set do
+    factory :non_empty_service_set do
       ignore do
-        modules %i(module1 module3 module5 module7)
+        services %i(service1 service3 service5 service7)
         enabled []
-        module_class DummyModule
+        service_class DummyService
       end
 
       after :build do |set, ev|
-        ev.modules.each { |m| set.configure(m, ev.module_class) {} }
+        ev.services.each { |m| set.configure(m, ev.service_class) {} }
         ev.enabled.each { |m| set.enable(m) }
       end
     end

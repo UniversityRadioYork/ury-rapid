@@ -1,7 +1,7 @@
-require 'ury_rapid/service_common/service'
+require 'ury_rapid/services/service'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # A base class for Rapid services that connect to a network server
     #
     # This class provides an opinionated framework for TCP-based services,
@@ -38,13 +38,11 @@ module Rapid
       #
       # @api      semipublic
       # @example  Create a new network service
-      #   service = NetworkService.new(logger, view, auth)
+      #   service = NetworkService.new(environment)
       #
-      # @param logger [Object]
-      #   An object that can be used to log messages from the service.
-      # @param auth [Object]
-      #   An authentication provider.
-      def initialize(view)
+      # @param environment [Rapid::Services::Environment]
+      #   The Service's environment.
+      def initialize(*_)
         super
 
         # We need a queue to hold requests to the network server.  This will
@@ -107,10 +105,6 @@ module Rapid
         # The responder receives responses from downstream via the client and
         # reacts on them, either updating the model or asking the requester to
         # intervene.
-        #
-        # We'd make the responder earlier, but we need access to a service
-        # view into the model, which we aren't guaranteed to have until
-        # run-time.
         responder = make_responder(@requester)
 
         # Now we can run the client, passing it the responder so it can send

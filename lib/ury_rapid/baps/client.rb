@@ -1,7 +1,7 @@
 require 'eventmachine'
 
 require 'ury_rapid/baps/codes'
-require 'ury_rapid/service_common/connection'
+require 'ury_rapid/services/connection'
 require 'ury_rapid/baps/reader'
 require 'ury_rapid/baps/responses/parser'
 

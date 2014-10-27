@@ -1,5 +1,5 @@
 module Rapid
-  module ServiceCommon
+  module Services
     # Base class for service classes that manage a set of handlers
     #
     # A handler is a class that provides some function in handling service

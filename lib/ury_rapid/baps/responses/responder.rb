@@ -1,5 +1,5 @@
 require 'ury_rapid/baps/codes'
-require 'ury_rapid/service_common/handler_set'
+require 'ury_rapid/services/handler_set'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
 # here.
@@ -19,7 +19,7 @@ module Rapid
       # The BAPS responder also has the ability to respond directly to the BAPS
       # server by sending requests to the outgoing requests queue.  This is
       # used, for example, to complete the BAPS login procedure.
-      class Responder < ServiceCommon::HandlerSet
+      class Responder < Services::HandlerSet
         extend Forwardable
 
         HANDLER_MODULE = Responses::Handlers

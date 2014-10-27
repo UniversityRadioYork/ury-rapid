@@ -4,28 +4,21 @@ require 'ury_rapid/baps/client'
 require 'ury_rapid/model/structures/playout_model'
 require 'ury_rapid/baps/requests/requester'
 require 'ury_rapid/baps/responses/responder'
-require 'ury_rapid/service_common/network_service'
+require 'ury_rapid/services/network_service'
 
 module Rapid
   module Baps
     # The top-level service interface for the BAPS Rapid service
-    class Service < Rapid::ServiceCommon::NetworkService
+    class Service < Rapid::Services::NetworkService
       extend Forwardable
 
       # Initialise the service given its service configuration
       #
       # @api      semipublic
       # @example  Create a new BAPS service
-      #   service = Service.new(logger, view, auth)
-      #
-      # @param logger [Object]
-      #   An object that can be used to log messages from the service.
-      # @param view [Rapid::Model::ServerView]
-      #   A server view of the entire model.
-      # @param auth [Object]
-      #   An authentication provider.
-      def initialize(view)
-        super(view)
+      #   service = Service.new(environment)
+      def initialize(*_)
+        super
 
         @username = ''
         @password = ''
@@ -55,8 +48,8 @@ module Rapid
       #
 
       def run
-        @view.log(:info, 'BAPS service launching.')
-        @view.log(:info, "BAPS server: #{@host}:#{@port}")
+        environment.log(:info, 'BAPS service launching.')
+        environment.log(:info, "BAPS server: #{@host}:#{@port}")
 
         initialise_model
         super
@@ -68,8 +61,8 @@ module Rapid
         channel_ids = @channel_ids
         server_conf = server_config
 
-        @view.add_handlers(request_handlers)
-        @view.insert_components('/') do
+        environment.add_handlers(request_handlers)
+        environment.insert_components('/') do
           instance_eval(&Rapid::Model::Structures.playout_model(channel_ids,
                                                                 channel_ids))
 
@@ -123,7 +116,7 @@ module Rapid
       # @return [Object]
       #   The BAPS requester object.
       def make_requester(queue)
-        Rapid::Baps::Requests::Requester.new(queue, @view.method(:log))
+        Rapid::Baps::Requests::Requester.new(queue, logger)
       end
 
       # Constructs the BAPS responder
@@ -137,13 +130,13 @@ module Rapid
       # @return [Object]
       #   The BAPS responder object.
       def make_responder(requester)
-        Rapid::Baps::Responses::Responder.new(view, requester)
+        Rapid::Baps::Responses::Responder.new(environment, requester)
       end
 
       protected
 
       def logger
-        @view.method(:log)
+        environment.method(:log)
       end
 
       # Perform any necessary initial requests to the network server
