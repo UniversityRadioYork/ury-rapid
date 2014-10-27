@@ -1,9 +1,9 @@
-require 'ury_rapid/service_common/requests/handler'
-require 'ury_rapid/service_common/requests/player_handler'
-require 'ury_rapid/service_common/requests/playlist_handler'
+require 'ury_rapid/services/requests/handler'
+require 'ury_rapid/services/requests/player_handler'
+require 'ury_rapid/services/requests/playlist_handler'
 
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Convenience module for handler bundles
       #

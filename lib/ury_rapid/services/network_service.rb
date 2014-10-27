@@ -1,7 +1,7 @@
-require 'ury_rapid/service_common/service'
+require 'ury_rapid/services/service'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # A base class for Rapid services that connect to a network server
     #
     # This class provides an opinionated framework for TCP-based services,

@@ -1,4 +1,4 @@
-require 'ury_rapid/service_common/code_table'
+require 'ury_rapid/services/code_table'
 
 module Rapid
   module Baps
@@ -10,7 +10,7 @@ module Rapid
     # For the format of responses from the BAPS server, see
     # Rapid::Baps::Responses::Structures.
     module Codes
-      extend Rapid::ServiceCommon::CodeTable
+      extend Rapid::Services::CodeTable
 
       # Response codes for the Playback section of the BAPS command set
       module Playback

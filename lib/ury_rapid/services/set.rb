@@ -1,7 +1,7 @@
 require 'ury_rapid/common/exceptions'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # A set of Rapid services
     #
     # A service set holds a set of configured Rapid services, as well as

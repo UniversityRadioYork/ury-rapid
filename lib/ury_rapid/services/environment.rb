@@ -1,9 +1,9 @@
 require 'ury_rapid/model/view'
 require 'ury_rapid/model/component_inserter'
-require 'ury_rapid/service_common/requests/null_handler'
+require 'ury_rapid/services/requests/null_handler'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # An environment object
     #
     # Every Service in Rapid is provided with an Environment, which represents
@@ -36,7 +36,7 @@ module Rapid
         @authenticator  = authenticator
         @update_channel = update_channel
         @view           = view
-        @handlers       = Hash.new(Rapid::ServiceCommon::Requests::NullHandler.new)
+        @handlers       = Hash.new(Rapid::Services::Requests::NullHandler.new)
       end
 
       # Creates an Environment for the root service

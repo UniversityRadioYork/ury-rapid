@@ -1,5 +1,5 @@
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # A Requester that installs no requests into the model structure.
       #

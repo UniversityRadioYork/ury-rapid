@@ -1,12 +1,12 @@
 require 'ury_rapid/common/types'
-require 'ury_rapid/service_common/requests/handler_bundle'
+require 'ury_rapid/services/requests/handler_bundle'
 
 module Rapid
   module Baps
     module Requests
       # Module for BAPS request handlers
       module Handlers
-        extend Rapid::ServiceCommon::Requests::HandlerBundle
+        extend Rapid::Services::Requests::HandlerBundle
 
         player_handler 'Player', :player do
           def item_from_local_playlist(index)

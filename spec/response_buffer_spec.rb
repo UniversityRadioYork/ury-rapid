@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require 'ury_rapid/service_common/response_buffer'
+require 'ury_rapid/services/response_buffer'
 
-describe Rapid::ServiceCommon::ResponseBuffer do
+describe Rapid::Services::ResponseBuffer do
   describe '#request' do
     context 'when a request callback asks for a new immediate request' do
       it 'processes the two requests in order' do

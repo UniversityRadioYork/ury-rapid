@@ -1,8 +1,8 @@
-require 'ury_rapid/service_common/requests/playlist_reference_parser'
+require 'ury_rapid/services/requests/playlist_reference_parser'
 
 # Mock implementation of PlaylistReferenceParser.
 class MockPrp
-  include Rapid::ServiceCommon::Requests::PlaylistReferenceParser
+  include Rapid::Services::Requests::PlaylistReferenceParser
 
   def local_playlist_id
     :local_id

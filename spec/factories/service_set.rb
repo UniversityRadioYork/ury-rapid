@@ -1,4 +1,4 @@
-require 'ury_rapid/service_common/set'
+require 'ury_rapid/services/set'
 
 # A dummy service, for test purposes.
 class DummyService
@@ -24,7 +24,7 @@ class DummyEnvironment
 end
 
 FactoryGirl.define do
-  factory :service_set, class: Rapid::ServiceCommon::Set do
+  factory :service_set, class: Rapid::Services::Set do
     environment DummyEnvironment.new
 
     factory(:empty_service_set) {}

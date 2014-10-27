@@ -1,18 +1,18 @@
-require 'ury_rapid/service_common/requests/handler_bundle'
+require 'ury_rapid/services/requests/handler_bundle'
 
 module Rapid
   module Baps
     module Requests
       # Module for BAPS request handlers
       module Handlers
-        extend Rapid::ServiceCommon::Requests::HandlerBundle
+        extend Rapid::Services::Requests::HandlerBundle
 
         playlist_handler 'Playlist', :playlist do
           on_delete { request Codes::Playlist::RESET, playlist_id }
 
           #
           # BAPS extensions to the Playlist API (see
-          # Rapid::ServiceCommon::Requests::PlaylistHandler for the main API)
+          # Rapid::Services::Requests::PlaylistHandler for the main API)
           #
 
           # x_baps_file

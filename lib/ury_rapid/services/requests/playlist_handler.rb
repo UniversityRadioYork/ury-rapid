@@ -1,7 +1,7 @@
-require 'ury_rapid/service_common/requests/url_hash_handler'
+require 'ury_rapid/services/requests/url_hash_handler'
 
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Base class for handlers that handle requests on playlists
       #

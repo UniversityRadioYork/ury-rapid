@@ -4,12 +4,12 @@ require 'ury_rapid/baps/client'
 require 'ury_rapid/model/structures/playout_model'
 require 'ury_rapid/baps/requests/requester'
 require 'ury_rapid/baps/responses/responder'
-require 'ury_rapid/service_common/network_service'
+require 'ury_rapid/services/network_service'
 
 module Rapid
   module Baps
     # The top-level service interface for the BAPS Rapid service
-    class Service < Rapid::ServiceCommon::NetworkService
+    class Service < Rapid::Services::NetworkService
       extend Forwardable
 
       # Initialise the service given its service configuration

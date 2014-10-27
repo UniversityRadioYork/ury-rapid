@@ -1,12 +1,12 @@
-require 'ury_rapid/service_common/set'
+require 'ury_rapid/services/set'
 
 module Rapid
-  module ServiceCommon
+  module Services
     # The root service
     #
     # This is the main service in the Rapid system, and owns all other services
     # as well as the root of the model tree.
-    class Root < Rapid::ServiceCommon::Set
+    class Root < Rapid::Services::Set
       extend Forwardable
 
       def initialize(logger, view)

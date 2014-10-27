@@ -1,8 +1,8 @@
 module Rapid
-  module ServiceCommon
+  module Services
     # A base class for Rapid services
     #
-    # Inheritance of Rapid::ServiceCommon::Service is not required for Service
+    # Inheritance of Rapid::Services::Service is not required for Service
     # classes, but is recommended.
     #
     # Subclasses must implement the #sub_model_structure method, which takes an

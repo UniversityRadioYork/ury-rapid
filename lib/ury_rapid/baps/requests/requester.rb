@@ -1,6 +1,6 @@
 require 'digest'
 
-require 'ury_rapid/service_common/handler_set'
+require 'ury_rapid/services/handler_set'
 require 'ury_rapid/baps/requests/request'
 
 # IMPORTANT: All handlers to be registered with the model tree must be required
@@ -21,7 +21,7 @@ module Rapid
       #
       # The Requester delegates the request generation to several SubRequester
       # objects, which are defined elsewhere.
-      class Requester < ServiceCommon::HandlerSet
+      class Requester < Services::HandlerSet
         extend Forwardable
 
         HANDLER_MODULE = Requests::Handlers

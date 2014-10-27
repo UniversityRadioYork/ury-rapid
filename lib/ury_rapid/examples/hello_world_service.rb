@@ -1,4 +1,4 @@
-require 'ury_rapid/service_common/service.rb'
+require 'ury_rapid/services/service.rb'
 
 module Rapid
   module Examples
@@ -10,7 +10,7 @@ module Rapid
     # Its configuration DSL exposes one configurable item, 'message', that
     # overrides the default message ('Hello, World!', of course) with the one
     # provided.
-    class HelloWorldService < Rapid::ServiceCommon::Service
+    class HelloWorldService < Rapid::Services::Service
       # Initialises the service
       #
       # @api      semipublic
@@ -22,7 +22,7 @@ module Rapid
       # @param auth [Object]
       #   An authentication provider.
       def initialize(view)
-        # We need to initialise Rapid::ServiceCommon::Service with the
+        # We need to initialise Rapid::Services::Service with the
         # arguments provided.
         super(view)
 

@@ -1,5 +1,5 @@
 module Rapid
-  module ServiceCommon
+  module Services
     module Responses
       # DSL for defining response structures
       #

@@ -1,6 +1,6 @@
 require 'ury_rapid/launcher'
-require 'ury_rapid/service_common/set'
-require 'ury_rapid/service_common/root'
+require 'ury_rapid/services/set'
+require 'ury_rapid/services/root'
 
 describe Rapid::Launcher do
   subject { Rapid::Launcher.new(config) }
@@ -91,7 +91,7 @@ describe Rapid::Launcher do
     it 'calls the app maker with the root service' do
       subject.run
       expect(app_maker).to have_received(:call).once.with(
-        a_kind_of(Rapid::ServiceCommon::Root)
+        a_kind_of(Rapid::Services::Root)
           .and(respond_to(:enabled))
           .and(satisfy { |ms| ms.enabled.include?(service_id) })
           .and(satisfy { |ms| ms.enabled.include?(server_id) })

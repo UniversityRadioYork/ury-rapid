@@ -1,4 +1,4 @@
-require 'ury_rapid/service_common/responses/structure_builder'
+require 'ury_rapid/services/responses/structure_builder'
 
 module Rapid
   module Baps
@@ -15,7 +15,7 @@ module Rapid
       # its parameters in order of receipt and their corresponding names in the
       # response hashes produced by the response parser.
       module Structures
-        extend Rapid::ServiceCommon::Responses::StructureBuilder
+        extend Rapid::Services::Responses::StructureBuilder
 
         # These are the types used in BAPS, and correspond to the types used
         # in the response parser.

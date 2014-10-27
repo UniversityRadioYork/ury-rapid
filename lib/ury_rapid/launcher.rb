@@ -1,9 +1,9 @@
 require 'ury_rapid/app'
 require 'ury_rapid/common/exceptions'
 require 'ury_rapid/logger'
-require 'ury_rapid/service_common/root'
+require 'ury_rapid/services/root'
 require 'ury_rapid/model/composite'
-require 'ury_rapid/service_common/environment'
+require 'ury_rapid/services/environment'
 
 module Rapid
   # An object that builds the dependencies for a Rapid App and runs it
@@ -40,7 +40,7 @@ module Rapid
 
     # Configures the services set for this instance of Rapid
     #
-    # See Rapid::ServiceCommon::Root for the DSL accepted by this method.
+    # See Rapid::Services::Root for the DSL accepted by this method.
     def services(&block)
       fail('Multiple `services` blocks in config.') unless @root_config.nil?
       @root_config = block
@@ -84,7 +84,7 @@ module Rapid
       @auth_maker        = Kankri.method(:authenticator_from_hash)
       @channel_maker     = Rapid::Model::UpdateChannel.method(:new)
       @logger_maker      = Rapid::Logger.method(:default_logger)
-      @environment_maker = Rapid::ServiceCommon::Environment.method(:for_root)
+      @environment_maker = Rapid::Services::Environment.method(:for_root)
     end
 
     # Runs the configuration passed to the Launcher
@@ -121,7 +121,7 @@ module Rapid
       model = Rapid::Model::HashModelObject.new(:root)
       model.register_update_channel(@update_channel)
       env = make_environment(@auth, @update_channel, model)
-      Rapid::ServiceCommon::Root.new(logger, env)
+      Rapid::Services::Root.new(logger, env)
     end
 
     #

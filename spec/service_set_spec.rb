@@ -1,7 +1,7 @@
-require 'ury_rapid/service_common/set'
+require 'ury_rapid/services/set'
 
-describe Rapid::ServiceCommon::Set do
-  subject { Rapid::ServiceCommon::Set.new }
+describe Rapid::Services::Set do
+  subject { Rapid::Services::Set.new }
 
   describe '#enable_all' do
     context 'when no services are configured' do

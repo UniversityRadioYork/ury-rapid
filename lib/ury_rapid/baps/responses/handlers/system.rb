@@ -4,7 +4,7 @@ module Rapid
       module Handlers
         # Handler for dealing with BAPS system notifications that Rapid logs
         # but otherwise ignores.
-        class Log < Rapid::ServiceCommon::Responses::Handler
+        class Log < Rapid::Services::Responses::Handler
           def_targets(
             Codes::System::CLIENT_CHANGE,
             Codes::System::LOG_MESSAGE
@@ -36,7 +36,7 @@ module Rapid
         end
 
         # Handler for BAPS responses carrying login seeds.
-        class Seed < Rapid::ServiceCommon::Responses::Handler
+        class Seed < Rapid::Services::Responses::Handler
           def_targets Codes::System::SEED
 
           def run
@@ -50,7 +50,7 @@ module Rapid
         end
 
         # Handler for BAPS responses carrying login responses.
-        class LoginResult < Rapid::ServiceCommon::Responses::Handler
+        class LoginResult < Rapid::Services::Responses::Handler
           def_targets Codes::System::LOGIN_RESULT
 
           # TODO(mattbw): Move these somewhere more relevant?

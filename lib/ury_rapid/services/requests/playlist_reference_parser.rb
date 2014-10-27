@@ -1,5 +1,5 @@
 module Rapid
-  module ServiceCommon
+  module Services
     module Requests
       # Mixin for anything that needs to parse playlist references
       #

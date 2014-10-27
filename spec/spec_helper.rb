@@ -17,7 +17,7 @@ SimpleCov.start do
   add_group 'Server', 'lib/ury_rapid/server'
   add_group 'Common', 'lib/ury_rapid/common'
   add_group 'Models', 'lib/ury_rapid/model'
-  add_group 'ServiceCommon', 'lib/ury_rapid/service_common'
+  add_group 'Services', 'lib/ury_rapid/services'
   add_group 'BAPS', 'lib/ury_rapid/baps'
   add_filter 'spec'
 end
