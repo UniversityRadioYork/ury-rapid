@@ -23,10 +23,10 @@ class HelloWorldServiceTest < Minitest::Test
   end
 
   # Tests to see if the default message is 'Hello, world!'
-  def test_message
+  def test_default_message
     @service.run
 
-    assert_equal 'Hello, world!', @env.find('/message').value
+    assert_equal 'Hello, World!', @env.find('/message').value
   end
 
   # Tests #message, to see if overriding the message works
