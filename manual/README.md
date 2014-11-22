@@ -3,7 +3,7 @@
 This is the user manual for *URY Rapid*, a playout services platform designed
 for use in the *BAPS3* playout system.
 
-URY Rapid is a Ruby-based system that allows you to:
+URY Rapid (*Rapid* for short) is a Ruby-based system that allows you to:
 
 * Plug in playout systems ([BAPS2] and [BAPS3]);
 * Add other services, such as tracklisting and track resolving, that work with

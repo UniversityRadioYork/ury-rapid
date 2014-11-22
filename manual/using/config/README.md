@@ -3,7 +3,7 @@
 Rapid is usually configured by a Ruby file called `config.rb`.  This Ruby file
 specifies, amongst other things:
 
-* Which services are to be started;
+* Which [services] are to be started;
 * The configuration for each service;
 * The users permitted to log into the Rapid server, and their permissions.
 
@@ -34,3 +34,5 @@ A `config.rb` usually contains the following sections:
   that Rapid will host;
 * Zero or more `user` blocks, which associate an external Rapid user's username
   with a password and privileges.
+
+[services]: ../services/README.md
