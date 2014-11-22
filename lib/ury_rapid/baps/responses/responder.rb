@@ -24,8 +24,8 @@ module Rapid
 
         HANDLER_MODULE = Responses::Handlers
 
-        def_delegators :@requester, :login_authenticate, :login_synchronise
-        def_delegator :@model, :log
+        delegate [:login_authenticate, :login_synchronise] => :@requester
+        delegate [:log]                                    => :@model
 
         # Retrieves the model on which this Responder will operate
         #

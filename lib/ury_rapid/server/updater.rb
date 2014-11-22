@@ -141,7 +141,7 @@ module Rapid
       #
       # @param model [Model]
       #   The model to which this Updater will subscribe for updates.
-      # @param websocket [Object]
+      # @param in_websocket [Object]
       #   The WebSocket to which this Updater will send updates, and from which
       #   this Updater will receive requests.
       # @param authenticator [Object]
@@ -150,18 +150,20 @@ module Rapid
       # @param init_privileges [Object]
       #   The initial set of privileges to give to this Updater.  These may be
       #   replaced by the client by sending an authentication request.
-      def initialize(model, websocket, authenticator, init_privileges)
+      def initialize(model, in_websocket, authenticator, init_privileges)
         super(model)
         @privileges = init_privileges
         @authenticator = authenticator
-        @websocket = websocket
+        @websocket = in_websocket
       end
 
-      def_delegator :@websocket, :send
-      def_delegator :@websocket, :onmessage, :on_message
-      def_delegator :@websocket, :onclose, :on_close
+      def_delegator :websocket, :send
+      def_delegator :websocket, :onmessage, :on_message
+      def_delegator :websocket, :onclose, :on_close
 
       private
+
+      attr_reader :websocket
 
       # Determines whether the WebSocketUpdater is running
       #
@@ -169,7 +171,7 @@ module Rapid
       #
       # @return [void]
       def running
-        super() && @websocket.state == :connected
+        super() && websocket.state == :connected
       end
 
       # Handles a WebSocket request

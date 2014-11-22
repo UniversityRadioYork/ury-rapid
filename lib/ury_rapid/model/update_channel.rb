@@ -87,21 +87,26 @@ module Rapid
     class EmUpdateChannel < UpdateChannel
       extend Forwardable
 
-      def initialize(em_channel = nil)
+      delegate [:subscribe,
+                :unsubscribe,
+                :register_for_updates,
+                :deregister_from_updates] => :em_channel
+
+      def initialize(in_em_channel = nil)
         super()
-        @em_channel = em_channel || EventMachine::Channel.new
+        @em_channel = in_em_channel || EventMachine::Channel.new
       end
 
-      def_delegator :@em_channel, :subscribe, :register_for_updates
-      def_delegator :@em_channel, :unsubscribe, :deregister_from_updates
-
       private
+
+      attr_reader :em_channel
+
+      delegate :push => :em_channel
 
       def notify(object, repr)
         push([object, repr])
       end
 
-      def_delegator :@em_channel, :push
     end
   end
 end

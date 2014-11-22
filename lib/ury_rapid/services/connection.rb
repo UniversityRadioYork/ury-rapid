@@ -13,13 +13,13 @@ module Rapid
       # @example Initialises the Connection.
       #   conn = Connection.new(parser, request_queue)
       #
-      # @param reader [Reader] An object that interprets and acts upon
+      # @param in_reader [Reader] An object that interprets and acts upon
       #   raw responses from the server.
       # @param request_queue [EventMachine::Queue] A queue that holds raw
       #   requests to the server.
       # @param logger [Proc]  jhe logger, for logging errors.
-      def initialize(reader, request_queue, logger)
-        @reader         = reader
+      def initialize(in_reader, request_queue, logger)
+        @reader         = in_reader
         @request_queue  = request_queue
         @logger         = logger
         @closing        = false
@@ -31,7 +31,7 @@ module Rapid
       end
 
       # Send all data to the parser.
-      def_delegator :@reader, :receive_data
+      delegate :receive_data => :reader
 
       # Handles a successful connection completion
       #
@@ -62,6 +62,8 @@ module Rapid
       end
 
       private
+
+      attr_reader :reader
 
       # Callback to fire when the queue is popped
       #

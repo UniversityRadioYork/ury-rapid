@@ -125,7 +125,7 @@ module Rapid
             load_state == :ok
           end
 
-          def_delegators :@response, :type, :title, :duration
+          delegate [:type, :title, :duration] => :@response
 
           def decide_load_state
             expecting_abnormal_load_state? ? load_state_from_title : :ok
