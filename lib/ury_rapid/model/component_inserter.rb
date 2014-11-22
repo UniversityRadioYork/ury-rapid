@@ -68,11 +68,11 @@ module Rapid
         @view.insert(@url, id, new_component)
 
         child_url = "#{@url.chomp('/')}/#{id}"
-        build_children(child_url, new_component, &block) unless block.nil?
+        build_children(child_url, &block) unless block.nil?
       end
 
       # Recursively invokes a ComponentInserter for children of a model object
-      def build_children(child_url, child, &block)
+      def build_children(child_url, &block)
         child_ci = ComponentInserter.new(child_url, @view, @registrar, @options)
         child_ci.instance_eval(&block)
       end

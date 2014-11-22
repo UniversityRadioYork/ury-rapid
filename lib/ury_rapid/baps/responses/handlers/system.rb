@@ -55,7 +55,7 @@ module Rapid
 
           # TODO(mattbw): Move these somewhere more relevant?
           module LoginErrors
-            OK = 0
+            SUCCESS = 0
             INCORRECT_USER = 1
             EMPTY_USER = 2
             INCORRECT_PASSWORD = 3
@@ -67,7 +67,7 @@ module Rapid
           end
 
           def ok?(code)
-            code == LoginErrors::OK
+            code == LoginErrors::SUCCESS
           end
 
           def continue

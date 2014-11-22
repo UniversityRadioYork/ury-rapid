@@ -5,7 +5,7 @@
 
   %div.set_contents
     - if inspector.resource
-      - inspector.resource.each do |id, item|
+      - inspector.resource.each do |id, _item|
         = child(inspector, id)
 
   = navigation(inspector)

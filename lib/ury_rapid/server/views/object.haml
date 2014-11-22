@@ -1,4 +1,4 @@
-- if request.params.key? "json"
+- if request.params.key? 'json'
   = haml(:json, locals: { resource_url: resource_url, resource: resource })
 - else
   = haml(resource_type, locals: { inner: inner,

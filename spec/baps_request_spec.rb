@@ -12,8 +12,7 @@ class MockQueue
     @contents = []
   end
 
-  def_delegator :@contents, :push
-  def_delegator :@contents, :shift, :pop
+  delegate %i(push shift pop) => :@contents
 end
 
 describe Rapid::Baps::Requests::Request do

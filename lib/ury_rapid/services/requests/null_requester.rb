@@ -13,7 +13,7 @@ module Rapid
         #   nr = NullRequester.new
         #   nr.add_handlers(structure)
         #
-        # @param structure [Rapid::Model::Creator]
+        # @param _structure [Rapid::Model::Creator]
         #   A model structure; ignored.
         #
         # @return [void]
