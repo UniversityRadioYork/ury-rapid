@@ -36,34 +36,60 @@ module Rapid
       end
     end
 
-    # A null object signifying an absence of update channel
-    class NoUpdateChannel
-      def notify_update(object)
-        fail(Rapid::Common::Exceptions::MissingUpdateChannel, object)
-      end
 
-      def notify_delete(object)
-        fail(Rapid::Common::Exceptions::MissingUpdateChannel, object)
-      end
-    end
 
-    # An update channel
+    # Abstract base class for update channels
     #
-    # By default, the update channel sends to a newly constructed, internal
-    # EventMachine Channel; this can be changed.
+    # You probably want EmUpdateChannel or DummyUpdateChannel instead.
     class UpdateChannel
-      extend Forwardable
-
-      def initialize(em_channel = nil)
-        @em_channel = em_channel || EventMachine::Channel.new
-      end
-
       def notify_update(object)
         notify(object, object.flat)
       end
 
       def notify_delete(object)
         notify(object, nil)
+      end
+    end
+
+    # A null object signifying an absence of update channel
+    #
+    # This sends an error on any attempt to use an update channel.
+    # If an update channel that works, but ignores any updates, is wanted, use
+    # DummyUpdateChannel.
+    class NoUpdateChannel < UpdateChannel
+      def notify(object, _repr)
+        fail(Rapid::Common::Exceptions::MissingUpdateChannel, object)
+      end
+    end
+
+    # An update channel that ignores all updates and registrations
+    #
+    # Not to be confused with NoUpdateChannel, which fires an error on any
+    # attempt to use the event channel.
+    class DummyUpdateChannel < UpdateChannel
+      private
+
+      # Does nothing.
+      def nop(*_)
+      end
+
+      public
+
+      alias_method :notify, :nop
+      alias_method :register_for_updates, :nop
+      alias_method :deregister_from_updates, :nop
+    end
+
+    # An EventMachine-based update channel
+    #
+    # By default, the update channel sends to a newly constructed, internal
+    # EventMachine Channel; this can be changed.
+    class EmUpdateChannel < UpdateChannel
+      extend Forwardable
+
+      def initialize(em_channel = nil)
+        super()
+        @em_channel = em_channel || EventMachine::Channel.new
       end
 
       def_delegator :@em_channel, :subscribe, :register_for_updates

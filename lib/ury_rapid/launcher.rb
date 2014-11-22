@@ -82,7 +82,7 @@ module Rapid
     def init_default_makers
       @app_maker         = Rapid::App.method(:new)
       @auth_maker        = Kankri.method(:authenticator_from_hash)
-      @channel_maker     = Rapid::Model::UpdateChannel.method(:new)
+      @channel_maker     = Rapid::Model::EmUpdateChannel.method(:new)
       @logger_maker      = Rapid::Logger.method(:default_logger)
       @environment_maker = Rapid::Services::Environment.method(:for_root)
     end
