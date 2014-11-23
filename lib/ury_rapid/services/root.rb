@@ -17,20 +17,24 @@ module Rapid
       def run
         fail 'Nil logger provided.' if @logger.nil?
 
+        make_model
+
+        environment.log(:info, 'Now starting Rapid.')
+        environment.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
+
+        super
+      end
+
+      def make_model
         logger = @logger
         environment.insert_components('/') do
-          tree :info, :info  do
+          tree :info, :info do
             ver = Rapid::Common::Constants::VERSION
             constant :version, ver, :version
           end
 
           log :log, logger
         end
-
-        environment.log(:info, 'Now starting Rapid.')
-        environment.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
-
-        super
       end
     end
   end

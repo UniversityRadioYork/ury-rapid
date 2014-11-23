@@ -27,7 +27,7 @@ module Rapid
 
       # It's the handler set's responsibility to provide a way for the handler
       # to log things.
-      delegate :log => :parent
+      delegate %i(log) => :parent
 
       def targets
         self.class::TARGETS

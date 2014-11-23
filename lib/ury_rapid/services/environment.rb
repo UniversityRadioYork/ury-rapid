@@ -69,15 +69,12 @@ module Rapid
       # Re-exports from components
       #
 
-      delegate %i(authenticate
-                 ) => :authenticator
+      delegate %i(authenticate)             => :authenticator
       delegate %i(log
                   get put post delete
-                  find insert replace kill
-                 ) => :view
+                  find insert replace kill) => :view
       delegate %i(register_for_updates
-                  deregister_from_updates
-                 ) => :update_channel
+                  deregister_from_updates)  => :update_channel
 
       #
       # Components API

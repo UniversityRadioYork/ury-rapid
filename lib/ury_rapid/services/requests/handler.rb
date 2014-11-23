@@ -101,7 +101,7 @@ module Rapid
         def_delegator :object, :parent, :caller_parent
         def_delegator :payload, :id, :payload_id
 
-        delegate :request => :parent
+        delegate %i(request) => :parent
 
         # Default to a 'not supported' exception on all actions.
         %i(put post delete).each do |a|

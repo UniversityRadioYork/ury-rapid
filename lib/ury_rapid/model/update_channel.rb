@@ -36,8 +36,6 @@ module Rapid
       end
     end
 
-
-
     # Abstract base class for update channels
     #
     # You probably want EmUpdateChannel or DummyUpdateChannel instead.
@@ -87,10 +85,10 @@ module Rapid
     class EmUpdateChannel < UpdateChannel
       extend Forwardable
 
-      delegate [:subscribe,
-                :unsubscribe,
-                :register_for_updates,
-                :deregister_from_updates] => :em_channel
+      delegate %i(subscribe
+                  unsubscribe
+                  register_for_updates
+                  deregister_from_updates) => :em_channel
 
       def initialize(in_em_channel = nil)
         super()
@@ -101,12 +99,11 @@ module Rapid
 
       attr_reader :em_channel
 
-      delegate :push => :em_channel
+      delegate %i(push) => :em_channel
 
       def notify(object, repr)
         push([object, repr])
       end
-
     end
   end
 end

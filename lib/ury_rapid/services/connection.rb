@@ -31,7 +31,7 @@ module Rapid
       end
 
       # Send all data to the parser.
-      delegate :receive_data => :reader
+      delegate %i(receive_data) => :reader
 
       # Handles a successful connection completion
       #

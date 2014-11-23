@@ -3,6 +3,33 @@ require 'ury_rapid/model'
 module Rapid
   module Model
     module Structures
+      def self.player_tree(players)
+        fail 'Nil player set given.' if players.nil?
+
+        lambda do |*|
+          tree :players, :player_set do
+            players.each do |player|
+              tree player, :player do
+                play_state :state, :stopped
+                load_state :load_state, :empty
+                volume :volume, 0.0
+                Rapid::Common::Types::MARKERS.each { |m| marker m, m, 0 }
+              end
+            end
+          end
+        end
+      end
+
+      def self.playlist_tree(playlists)
+        fail 'Nil playlist set given.' if playlists.nil?
+
+        lambda do |*|
+           tree :playlists, :playlist_set do
+            playlists.each { |playlist| list playlist, :playlist }
+          end
+        end
+      end
+
       # A basic model structure for playout system services
       #
       # This contains:
@@ -16,24 +43,12 @@ module Rapid
       # @return [Proc]
       #   A proc that may be instance_eval'd into an #insert_components stanza.
       def self.playout_model(players, playlists)
-        ->(*) do
-          fail 'Nil player set given.' if players.nil?
-          fail 'Nil playlist set given.' if playlists.nil?
+        player_tree = Structures.player_tree(players)
+        playlist_tree = Structures.playlist_tree(playlists)
 
-          tree :players, :player_set do
-            players.each do |player|
-              tree player, :player do
-                play_state :state, :stopped
-                load_state :load_state, :empty
-                volume :volume, 0.0
-                Rapid::Common::Types::MARKERS.each { |m| marker m, m, 0 }
-              end
-            end
-          end
-
-          tree :playlists, :playlist_set do
-            playlists.each { |playlist| list playlist, :playlist }
-          end
+        lambda do |*|
+          instance_eval(&player_tree)
+          instance_eval(&playlist_tree)
         end
       end
     end
