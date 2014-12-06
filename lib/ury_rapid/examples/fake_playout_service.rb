@@ -1,16 +1,16 @@
 require 'ury_rapid/services/service.rb'
+require 'ury_rapid/model/structures/playout_model'
 
 module Rapid
   module Examples
-    # A simple example service
+    # A fake playout service
     #
-    # The HelloWorldService does nothing except provide a sub-model with one
-    # item, a constant called 'message' that shows a programmable message.
+    # The FakePlayoutService builds up a model that looks like a playout
+    # service, but cannot be controlled.
     #
-    # Its configuration DSL exposes one configurable item, 'message', that
-    # overrides the default message ('Hello, World!', of course) with the one
-    # provided.
-    class HelloWorldService < Rapid::Services::Service
+    # Its configuration DSL exposes the following methods:
+    # - 'channels': Takes a list of valid channel IDs.
+    class FakePlayoutService < Rapid::Services::Service
       # Initialises the service
       #
       # @api      semipublic
@@ -24,8 +24,8 @@ module Rapid
         # environment
         super(environment)
 
-        # The default message, overridden using #message.
-        @message = 'Hello, World!'
+        # The default channel set, overridden by #channels.
+        @channels = {}
       end
 
       # Runs the service on the EventMachine loop
@@ -41,10 +41,11 @@ module Rapid
       def run
         # #insert_components is an instance-exec, so this won't be available
         # as an instance variable.
-        m = @message
+        c = @channels
+        pm = Rapid::Model::Structures.playout_model(c)
 
         environment.insert_components('/') do
-          constant :message, m, :message
+          instance_eval(&pm)
         end
       end
 
@@ -52,19 +53,19 @@ module Rapid
       # Begin configuration DSL
       #
 
-      # Sets the message exposed by this HelloWorldService
+      # Sets the list of channel IDs.
       #
       # @api      public
-      # @example  Set the message to 'Good Morning, Vietnam!'
+      # @example  Set the channel IDs to ['0', '1', '2', '3']
       #   # In config.rb
-      #   message 'Good Morning, Vietnam!'
+      #   channels ['0', '1', '2', '3']
       #
-      # @param new_message [String]
-      #   The message to substitute for the original message.
+      # @param ids [Array]
+      #   The array of channel IDs to use.
       #
       # @return [void]
-      attr_writer :message
-      alias_method :message, :message=
+      attr_writer :channels
+      alias_method :channels, :channels=
 
       #
       # End configuration DSL
