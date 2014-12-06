@@ -20,7 +20,7 @@ module Rapid
           #
           # @return [String] The full model URL.
           def player_url(*args)
-            channel_url('players', *args)
+            channel_url('player', *args)
           end
 
           # Generates an URL to a channel playlist given a BAPS response
@@ -34,7 +34,7 @@ module Rapid
           #
           # @return [String] The full model URL.
           def playlist_url(*args)
-            channel_url('playlists', *args)
+            channel_url('playlist', *args)
           end
 
           # Generates an URL to a channel-related object given a BAPS response
@@ -43,13 +43,12 @@ module Rapid
           #
           # @api private
           #
-          # @param root [String] The prefix for the URL.
           # @param args [Array] A splat of additional model object IDs to form
-          #   a sub-URL of the player URL; optional.
+          #   a sub-URL of the channel URL; optional.
           #
           # @return [String] The full model URL.
-          def channel_url(root, *args)
-            [root, @response.subcode, *args].join('/')
+          def channel_url(*args)
+            ['channels', @response.subcode, *args].join('/')
           end
         end
       end
