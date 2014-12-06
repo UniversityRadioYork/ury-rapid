@@ -4,16 +4,16 @@
 // Any changes to the set of fonts should be reflected in the `@import url`
 // directive below.
 
-@import url(//fonts.googleapis.com/css?family=Anonymous+Pro|Merriweather|Rokkitt:700);
+@import url(//fonts.googleapis.com/css?family=Roboto|Anonymous+Pro|Roboto+Condensed:700);
 
 // Mixin for anything using the default, body-text font.
 @mixin font-normal {
-  font-family: Merriweather, helvetica, arial, sans-serif;
+  font-family: Roboto, helvetica, arial, sans-serif;
 }
 
 // Mixin for anything using the title font.
 @mixin font-title {
-  font-family: Rokkitt, helvetica, arial, sans-serif;
+  font-family: "Roboto Condensed", helvetica, arial, sans-serif;
 }
 
 // Mixin for anything using the console font.

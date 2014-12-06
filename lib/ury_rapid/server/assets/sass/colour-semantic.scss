@@ -5,19 +5,23 @@
 
 @import 'colour-palette';
 
+// Semantic colour sets
+$colour-main:    $colour-purple;    // App colour scheme
+$colour-console: $colour-blue-grey; // Console colour scheme
+
+// Single colours
 $colour-outer-fg:        #000;
-$colour-outer-bg:        map-get($colour-purple, 50);
+$colour-outer-bg:        map-get($colour-main, 50);
 
-$colour-header-fg:       map-get($colour-purple, 50);
-$colour-header-bg:       map-get($colour-purple, 700);
+$colour-header-fg:       map-get($colour-main, 50);
+$colour-header-bg:       map-get($colour-main, 500);
 
-$colour-toolbar-fg:      map-get($colour-purple, 50);
-$colour-toolbar-bg:      map-get($colour-purple, 500);
+$colour-toolbar-fg:      map-get($colour-main, 50);
+$colour-toolbar-bg:      map-get($colour-main, 700);
+$colour-toolbar-select:  map-get($colour-main, 500);
 
-$colour-root-playout-fg: map-get($colour-pink, 50);
-$colour-root-playout-bg: map-get($colour-pink, 500);
-
-$colour-console-bg:      map-get($colour-blue-grey, 700);
-$colour-console-fg:      map-get($colour-blue-grey, 50);
+$colour-console-bg:      map-get($colour-console, 700);
+$colour-console-fg:      map-get($colour-console, 50);
 
 $colour-general-fg:      rgba(0, 0, 0, .87);
+$colour-shadow:          rgba(0, 0, 0, .12);
