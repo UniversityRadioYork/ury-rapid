@@ -45,7 +45,7 @@ module Rapid
       # @return [Proc]
       #   A proc that may be instance_eval'd into an #insert_components stanza.
       def self.playlist
-        lambda { |*| list playlist, :playlist }
+        lambda { |*| list :playlist, :playlist }
       end
 
       # Returns a proc for generating a channel set
@@ -54,14 +54,14 @@ module Rapid
       #   An array of the IDs of the channels available in this playout system.
       # @return [Proc]
       #   A proc that may be instance_eval'd into an #insert_components stanza.
-      def self.channel_list_tree(channel_ids)
+      def self.channel_set_tree(channel_ids)
         fail 'Nil channel IDs array given.' if channel_ids.nil?
 
         channel_body = Structures.channel_body
 
         lambda do |*|
           tree :channels, :channel_set do
-            channels.each do |channel_id|
+            channel_ids.each do |channel_id|
               tree(channel_id, :channel) { instance_eval(&channel_body) }
             end
           end
