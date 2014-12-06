@@ -1,5 +1,14 @@
 NOTE: When changing the API version, change Rapid::Common::Constants.
 
+0.5.0
+  - Playlists and players are now grouped per-channel instead of into sets;
+    URLs of the form '/service/players/X/' and '/service/playlists/X/' are now
+    '/service/channels/X/player/' and '/service/channels/X/playlist/'
+    respectively.  This is to accommodate BAPS-style playout systems in a more
+    natural and easy-to-work-with manner.  For playout systems with a difference
+    in player-playlist counts, consider having separate player-only and
+    playlist-only channels.
+
 0.4.1
   - New type for playlist POSTing, move, which takes a playlist reference
     and moves the referenced item to the POST location.
