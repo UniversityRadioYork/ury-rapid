@@ -68,8 +68,7 @@ module Rapid
 
       def create_model_components
         x_baps_maker  = make_x_baps
-        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids,
-                                                               @channel_ids)
+        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids)
 
         environment.insert_components('/') do
           instance_eval(&playout_maker)
