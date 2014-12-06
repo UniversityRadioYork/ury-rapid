@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ury_rapid (0.4.1)
+    ury_rapid (0.5.0)
       activesupport
       colored
       compass
@@ -51,7 +51,6 @@ GEM
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
     ffi (1.9.6)
-    ffi (1.9.6-x86-mingw32)
     haml (4.0.5)
       tilt
     i18n (0.6.11)
