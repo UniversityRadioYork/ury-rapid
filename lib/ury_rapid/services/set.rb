@@ -86,9 +86,6 @@ module Rapid
       # @example  Enable a service
       #   set.enable(:a_service_name)
       #
-      # @param name [Symbol]
-      #   The name of the service to enable at load-time.
-      #
       # @return [void]
       def enable_all
         @services.each_key(&method(:enable))

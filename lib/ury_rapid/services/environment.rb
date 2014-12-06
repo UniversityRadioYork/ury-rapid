@@ -45,15 +45,15 @@ module Rapid
       # local and global root.
       def self.for_root(authenticator, update_channel, root)
         Environment.new(authenticator,
-                        update_channel, 
+                        update_channel,
                         Rapid::Model::View.new(root, root))
       end
 
       # Creates a new Environment from this one, substituting the View
       #
       # The new Environment will have no handlers registered.
-      def with_view(view)
-        Environment.new(@authenticator, @update_channel, view)
+      def with_view(new_view)
+        Environment.new(authenticator, update_channel, new_view)
       end
 
       # Creates a new Environment from this one, substituting the local root
@@ -62,33 +62,24 @@ module Rapid
       # existing Service: fork off the parent Service's Environment, changing
       # the View to point to the child Service's model.
       def with_local_root(local_root)
-        with_view(@view.with_local_root(local_root))
+        with_view(view.with_local_root(local_root))
       end
 
       #
-      # Re-exports from Authenticator
+      # Re-exports from components
       #
 
-      def_delegator :@authenticator, :authenticate
-
-      #
-      # Re-exports from View
-      #
-
-      def_delegators :@view, :log
-      def_delegators :@view, :get, :put, :post, :delete
-      def_delegators :@view, :find, :insert, :replace, :kill
-
-      #
-      # Re-exports from UpdateChannel
-      #
-      
-      def_delegator :@update_channel, :register_for_updates
-      def_delegator :@update_channel, :deregister_from_updates
+      delegate %i(authenticate)             => :authenticator
+      delegate %i(log
+                  get put post delete
+                  find insert replace kill) => :view
+      delegate %i(register_for_updates
+                  deregister_from_updates)  => :update_channel
 
       #
       # Components API
       #
+
       def_delegator :@handlers, :merge!, :add_handlers
 
       def create_component(name, *args)
@@ -114,8 +105,12 @@ module Rapid
 
       private
 
+      attr_reader :authenticator
+      attr_reader :update_channel
+      attr_reader :view
+
       def register(component)
-        component.register_update_channel(@update_channel)
+        component.register_update_channel(update_channel)
         component.register_handler(@handlers[component.handler_target])
         component
       end

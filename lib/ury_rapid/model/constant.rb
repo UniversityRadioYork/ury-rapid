@@ -9,7 +9,8 @@ module Rapid
       include ModelObject
 
       alias_method :flat, :value
-      def_delegator :@value, :to_s
+
+      delegate %i(to_s) => :value
     end
   end
 end

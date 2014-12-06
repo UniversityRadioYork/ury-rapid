@@ -17,14 +17,14 @@ tmp
 .sass-cache
 *.css
 
-# YARD artifacts
+# YARD artefacts
 .yardoc
 _yardoc
 doc/
 
 # Config and secrets
 config.rb
-!lib/ury-rapid/model/config.rb
+!lib/ury_rapid/model/config.rb
 test.sh
 
 # Backups and swapfiles
@@ -37,3 +37,6 @@ test.sh
 # I use ST3
 *.sublime-project
 *.sublime-workspace
+
+# I use RubyMine
+.idea

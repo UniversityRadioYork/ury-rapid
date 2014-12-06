@@ -58,23 +58,40 @@ module Rapid
       private
 
       def initialise_model
-        channel_ids = @channel_ids
-        server_conf = server_config
+        add_handlers_to_env
+        create_model_components
+      end
 
+      def add_handlers_to_env
         environment.add_handlers(request_handlers)
-        environment.insert_components('/') do
-          instance_eval(&Rapid::Model::Structures.playout_model(channel_ids,
-                                                                channel_ids))
+      end
 
+      def create_model_components
+        x_baps_maker  = make_x_baps
+        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids,
+                                                               @channel_ids)
+
+        environment.insert_components('/') do
+          instance_eval(&playout_maker)
+          instance_eval(&x_baps_maker)
+
+          tree :info, :info do
+            constant :channel_mode, true, :channel_mode
+          end
+        end
+      end
+
+      # @return [Proc]
+      #   A lambda, to be instance_eval'd into Environment#insert_components.
+      def make_x_baps
+        server_conf = server_config
+        lambda do
           tree :x_baps, :x_baps do
             tree :server, :x_baps_server do
               server_conf.each do |(key, value)|
                 constant key, value, :x_baps_server_constant
               end
             end
-          end
-          tree :info, :info do
-            constant :channel_mode, true, :channel_mode
           end
         end
       end

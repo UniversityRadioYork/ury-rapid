@@ -39,8 +39,12 @@ module Rapid
       #
       # @return [void]
       def run
+        # #insert_components is an instance-exec, so this won't be available
+        # as an instance variable.
+        m = @message
+
         environment.insert_components('/') do
-          constant :message, @message, :message
+          constant :message, m, :message
         end
       end
 

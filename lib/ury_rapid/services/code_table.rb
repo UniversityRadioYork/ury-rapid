@@ -9,13 +9,14 @@ module Rapid
       #
       # @api semipublic
       #
-      # @example Find the name of a BAPS code.
+      # @example Find the name of a command code.
+      #   # Assuming Rapid::Baps::Codes includes CodeTable,
       #   Rapid::Baps::Codes.code_symbol(Rapid::Baps::Codes::Playback::PLAY)
       #   #=> "Rapid::Baps::Codes::Playback::PLAY"
       #
-      # @param code [Integer] One of the codes from Rapid::Baps::Codes.
+      # @param code [Integer] A code in the code table.
       #
-      # @return [String] The (semi) human-readable name for the BAPS code.
+      # @return [String] The (semi) human-readable name for the code.
       def code_symbol(code)
         # Assume that the only constants defined in Codes are code groups...
         submodules = constants.map(&method(:const_get))
@@ -29,15 +30,17 @@ module Rapid
 
       private
 
-      # Attempts to find the name of a BAPS code in a submodule
+      # Attempts to find the name of a command code in a submodule
       #
       # @api private
       #
-      # @param submodule [Module] The submodule to search for the BAPS code's
-      #   name.
-      # @param code [Integer] One of the codes from Rapid::Baps::Codes.
+      # @param submodule [Module]
+      #   The submodule to search for the code's name.
+      # @param code [Integer]
+      #   One of the codes from Rapid::Baps::Codes.
       #
-      # @return [String] The (semi) human-readable name for the BAPS code.
+      # @return [String]
+      #   The (semi) human-readable name for the command code.
       #
       def find_code_in(submodule, code)
         submodule.constants

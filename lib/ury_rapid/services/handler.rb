@@ -19,15 +19,15 @@ module Rapid
       #   requester = Rapid::Baps::Requests::Requester.new(queue)
       #   handler = Rapid::Baps::Requests::Handler.new(requester)
       #
-      # @param parent [Requester] The main Requester to which requests shall
-      #   be sent.
-      def initialize(parent)
-        @parent = parent
+      # @param in_parent [Requester]
+      #   The main Requester to which requests shall be sent.
+      def initialize(in_parent)
+        @parent = in_parent
       end
 
       # It's the handler set's responsibility to provide a way for the handler
       # to log things.
-      def_delegator :@parent, :log
+      delegate %i(log) => :parent
 
       def targets
         self.class::TARGETS
@@ -58,6 +58,8 @@ module Rapid
       end
 
       protected
+
+      attr_reader :parent
 
       # Raises an error signifying an action is unimplemented by Rapid
       def unimplemented_by_bra

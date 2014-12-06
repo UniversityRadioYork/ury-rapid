@@ -16,9 +16,11 @@ module Rapid
         populate(handler_classes)
       end
 
-      def_delegator :@handlers, :[]=, :register_handler
+      def_delegator :handlers, :[]=, :register_handler
 
       protected
+
+      attr_reader :handlers
 
       # Populates a hash mapping handler targets to their handlers in this set
       def populate(classes)

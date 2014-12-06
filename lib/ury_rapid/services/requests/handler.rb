@@ -19,22 +19,22 @@ module Rapid
           self.class.name
         end
 
-        def initialize(parent, action, object, payload)
-          super(parent)
-          @action  = action
-          @object  = object
-          @payload = payload
+        def initialize(in_parent, in_action, in_object, in_payload)
+          super(in_parent)
+          @action  = in_action
+          @object  = in_object
+          @payload = in_payload
         end
 
         def run
-          send(@action)
+          send(action)
         end
 
         # Requests that a DELETE on this handler be sent to the item's children
         def self.delete_by_deleting_children
           class_eval do
             def delete
-              @object.children.each { |_, child| child.delete(@payload) }
+              object.children.each { |_, child| child.delete(@payload) }
             end
           end
         end
@@ -91,25 +91,27 @@ module Rapid
 
         protected
 
-        def_delegator :@object, :id, :caller_id
-        def_delegator :@object, :parent_id, :caller_parent_id
-        def_delegator :@object, :parent, :caller_parent
-        def_delegator :@payload, :id, :payload_id
-        def_delegator :@parent, :request
+        attr_reader :action
+        attr_reader :object
+        attr_reader :parent
+        attr_reader :payload
+
+        def_delegator :object, :id, :caller_id
+        def_delegator :object, :parent_id, :caller_parent_id
+        def_delegator :object, :parent, :caller_parent
+        def_delegator :payload, :id, :payload_id
+
+        delegate %i(request) => :parent
 
         # Default to a 'not supported' exception on all actions.
-        %i(put post delete).each do |action|
-          define_method(action) do |*|
-            run_hooks(action) || fail(
-              Rapid::Common::Exceptions::NotSupportedByRapid
-            )
+        %i(put post delete).each do |a|
+          define_method(a) do |*|
+            run_hooks(a) || fail(Rapid::Common::Exceptions::NotSupportedByRapid)
           end
         end
 
         def run_hooks(action)
-          HOOKS.fetch(action, []).any? do |block|
-            block.call(self, @object, @payload)
-          end
+          HOOKS.fetch(action, []).any? { |b| b.call(self, object, payload) }
         end
       end
 
@@ -135,10 +137,8 @@ module Rapid
         #
         # @return (see #put)
         def delete(variable, payload)
-          put(
-            variable,
-            payload.with_body(variable.id => variable.initial_value)
-          )
+          put(variable,
+              payload.with_body(variable.id => variable.initial_value))
         end
       end
     end

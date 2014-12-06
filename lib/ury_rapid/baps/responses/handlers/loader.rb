@@ -104,8 +104,6 @@ module Rapid
           #
           # @api private
           #
-          # @param response [Hash] The loaded response to convert.
-          #
           # @return [Array] The following items:
           #   - The loading state (:ok, :loading, :empty or :failed);
           #   - Either nil (no loaded item) or an Item representing the loaded
@@ -125,7 +123,7 @@ module Rapid
             load_state == :ok
           end
 
-          def_delegators :@response, :type, :title, :duration
+          delegate [:type, :title, :duration] => :@response
 
           def decide_load_state
             expecting_abnormal_load_state? ? load_state_from_title : :ok

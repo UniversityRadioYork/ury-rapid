@@ -50,8 +50,6 @@ module Rapid
 
         def_delegator :@logger, :call, :log
 
-        attr_reader :handlers
-
         # Sends a request to the BAPS server
         #
         # @api public

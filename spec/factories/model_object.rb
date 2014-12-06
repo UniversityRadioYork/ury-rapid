@@ -3,6 +3,10 @@ require 'ury_rapid/model'
 # A minimal mock implementation of a ModelObject.
 class MockModelObject
   include Rapid::Model::ModelObject
+
+  def children
+    {}
+  end
 end
 
 FactoryGirl.define do

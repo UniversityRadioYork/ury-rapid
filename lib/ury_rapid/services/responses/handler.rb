@@ -22,8 +22,8 @@ module Rapid
           @model = parent.model
         end
 
-        def_delegators :@model, :find, :insert, :kill, :replace, :register
-        def_delegators :@model, :create_component
+        delegate %i(find insert kill replace register
+                    create_component) => :model
 
         # Like kill, but does not fail if the resource does not exist.
         #
@@ -35,6 +35,10 @@ module Rapid
         rescue Rapid::Common::Exceptions::MissingResource
           nil
         end
+
+        private
+
+        attr_reader :model
       end
     end
   end

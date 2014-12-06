@@ -4,7 +4,7 @@
 
 - if inspector.inner
   -# If we're in the playlist we want a very short item summary...
-  = item[:type] == :null ? "(No item)" : item[:name]
+  = item[:type] == :null ? '(No item)' : item[:name]
   = haml(:in_links, locals: { resource_url: inspector.resource_url })
 - else
   -# ...otherwise, we want a full standalone section.

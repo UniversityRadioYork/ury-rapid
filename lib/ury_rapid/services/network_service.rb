@@ -39,9 +39,6 @@ module Rapid
       # @api      semipublic
       # @example  Create a new network service
       #   service = NetworkService.new(environment)
-      #
-      # @param environment [Rapid::Services::Environment]
-      #   The Service's environment.
       def initialize(*_)
         super
 
@@ -125,7 +122,7 @@ module Rapid
       #
       # @api  private
       #
-      # @param requester [Object]
+      # @param _requester [Object]
       #   The requester object to which requests should be made.
       #
       # @return [void]
