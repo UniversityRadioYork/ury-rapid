@@ -1,5 +1,6 @@
 // Toolbar styling for the API inspector
 
+@import 'base';
 @import 'colour-semantic';
 @import 'fonts';
 @import 'sizes';
@@ -10,6 +11,7 @@
   color: $colour-toolbar-fg;
   display: flex;
   padding: 0;
+  height: 1.1rem + (2 * $size-padding-thin);
 
   h1,
   .toolbar-button {
@@ -40,12 +42,25 @@
 
   .toolbar-button {
     cursor: pointer;
+
+    // This could very well be replaced with padding, but we use a border
+    // here to set up the rounded corners on the highlight.
+    border: ($size-padding-thin / 2) solid $colour-toolbar-bg;
+    border-radius: 0.25rem;
+
+    height: 1.1rem;
     flex: 1;
-    padding: $size-padding-thin;
+
     text-align: center;
+    color: $colour-toolbar-fg;
 
     &:not(:first-child) {
       margin-right: $size-padding-thin;
+    }
+
+    &:hover, &:active {
+      border-color: $colour-toolbar-select;
+      background: $colour-toolbar-select;
     }
   }
 }

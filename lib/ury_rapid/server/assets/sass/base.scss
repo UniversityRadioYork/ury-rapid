@@ -7,6 +7,17 @@
 @import 'fonts';
 @import 'sizes';
 
+// Mixin for anything needing a drop-shadow.
+@mixin shadowed {
+  box-shadow: 0 $size-border $size-border $size-border $colour-shadow;
+}
+
+// Mixin for any hovering pieces of paper.
+@mixin floater {
+  background-color: white;
+  @include shadowed;
+}
+
 a {
   @include link-colors(
     map-get($colour-light-blue, 500),
@@ -40,6 +51,8 @@ body {
   }
 
   >header {
+    @include shadowed;
+
     background-color: $colour-header-bg;
     color: $colour-header-fg;
     text-align: left;
@@ -50,6 +63,9 @@ body {
       line-height: .8em;
       margin: 0;
       padding: $size-padding-thin;
+
+      // Allow room for the extender on the 'p' in Rapid.
+      padding-bottom: $size-padding;
     }
 
     >h2 {
@@ -72,7 +88,8 @@ h3 {
 
 section,
 nav {
-  font-size: .9em;
+  // Make sections _gradually_ get smaller.
+  font-size: .95em;
   padding: $size-padding;
   position: relative;
 
@@ -83,10 +100,7 @@ nav {
     margin-left: -($size-padding);
     margin-right: -($size-padding);
     margin-top: -($size-padding);
-    padding-bottom: $size-padding-thin;
-    padding-left: $size-padding-thin;
-    padding-right: $size-padding-thin;
-    padding-top: $size-padding-thin;
+    padding: $size-padding-thin;
   }
 }
 
@@ -112,8 +126,7 @@ section>section {
       display: inline;
       font-size: 1em;
       font-weight: bold;
-      margin: 4pt;
-      margin-right: $size-padding-thin;
+      margin: 4pt 4pt 4pt $size-padding-thin;
       padding: 0 !important;
     }
 
@@ -149,5 +162,11 @@ dt {
 
 dd {
   margin-left: $size-padding;
+}
+
+// Specific stuff that probably needs a new home.
+
+.index, .updates {
+  @include floater;
 }
 

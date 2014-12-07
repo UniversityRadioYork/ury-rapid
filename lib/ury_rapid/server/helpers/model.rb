@@ -33,11 +33,11 @@ module Rapid
           }
 
           respond_with :json, get_repr do |f|
-            f.html { inspect(request, target, privilege_set) }
+            f.html { html_inspect(request, target, privilege_set) }
           end
         end
 
-        def inspect(request, target, privilege_set)
+        def html_inspect(request, target, privilege_set)
           inspector_haml(Rapid::Server::Inspector.new(request,
                                                       target,
                                                       privilege_set))

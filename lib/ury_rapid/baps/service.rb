@@ -68,8 +68,7 @@ module Rapid
 
       def create_model_components
         x_baps_maker  = make_x_baps
-        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids,
-                                                               @channel_ids)
+        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids)
 
         environment.insert_components('/') do
           instance_eval(&playout_maker)
@@ -85,7 +84,7 @@ module Rapid
       #   A lambda, to be instance_eval'd into Environment#insert_components.
       def make_x_baps
         server_conf = server_config
-        lambda do
+        lambda do |*|
           tree :x_baps, :x_baps do
             tree :server, :x_baps_server do
               server_conf.each do |(key, value)|
