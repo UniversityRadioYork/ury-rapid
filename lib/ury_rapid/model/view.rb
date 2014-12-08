@@ -1,5 +1,4 @@
 require 'compo'
-require 'ury_rapid/model/component_inserter'
 require 'ury_rapid/services/requests/null_handler'
 
 module Rapid

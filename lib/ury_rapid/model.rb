@@ -1,6 +1,5 @@
 require 'ury_rapid/model/composite'
-require 'ury_rapid/model/component_creator'
-require 'ury_rapid/model/component_inserter'
+require 'ury_rapid/model/components'
 require 'ury_rapid/model/constant'
 require 'ury_rapid/model/item'
 require 'ury_rapid/model/log'

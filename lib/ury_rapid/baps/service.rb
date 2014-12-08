@@ -1,7 +1,7 @@
 require 'eventmachine'
 
 require 'ury_rapid/baps/client'
-require 'ury_rapid/model/structures/playout_model'
+require 'ury_rapid/model/components/playout_model'
 require 'ury_rapid/baps/requests/requester'
 require 'ury_rapid/baps/responses/responder'
 require 'ury_rapid/services/network_service'
@@ -68,7 +68,7 @@ module Rapid
 
       def create_model_components
         x_baps_maker  = make_x_baps
-        playout_maker = Rapid::Model::Structures.playout_model(@channel_ids)
+        playout_maker = Rapid::Model::Components.playout_model(@channel_ids)
 
         environment.insert_components('/') do
           instance_eval(&playout_maker)

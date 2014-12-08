@@ -1,5 +1,5 @@
 require 'ury_rapid/services/service.rb'
-require 'ury_rapid/model/structures/playout_model'
+require 'ury_rapid/model/components/playout_model'
 
 module Rapid
   module Examples
@@ -42,7 +42,7 @@ module Rapid
         # #insert_components is an instance-exec, so this won't be available
         # as an instance variable.
         c = @channels
-        pm = Rapid::Model::Structures.playout_model(c)
+        pm = Rapid::Model::Components.playout_model(c)
 
         environment.insert_components('/') do
           instance_eval(&pm)

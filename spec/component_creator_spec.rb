@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'ury_rapid/model/component_creator'
+require 'ury_rapid/model/components/creator'
 require 'ury_rapid/model'
 
 shared_examples 'a valid symbol constant' do |type, value|
@@ -51,8 +51,8 @@ shared_examples 'an item field' do |symbol, valid_value_hash, invalid_values|
   end
 end
 
-describe Rapid::Model::ComponentCreator do
-  subject { Rapid::Model::ComponentCreator.new }
+describe Rapid::Model::Components::Creator do
+  subject { Rapid::Model::Components::Creator.new }
 
   describe '#load_state' do
     it_behaves_like(

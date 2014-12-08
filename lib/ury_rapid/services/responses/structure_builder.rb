@@ -1,15 +1,15 @@
 module Rapid
   module Services
     module Responses
-      # DSL for defining response structures
+      # DSL for defining response components
       #
-      # Response structures are useful when dealing with the output of a
+      # Response components are useful when dealing with the output of a
       # playout system that speaks a binary protocol.  They allow the mapping
       # of a received command word to a list of expected following arguments.
       module StructureBuilder
         extend Forwardable
 
-        # Defines the types over which the structures are defined
+        # Defines the types over which the components are defined
         #
         # Types are, effectively, symbols that are understood by the response
         # parser as indicating a specific parsing pattern to use to parse
@@ -90,11 +90,11 @@ module Rapid
           end
         end
 
-        # Allows response structures to be defined
+        # Allows response components to be defined
         #
         # @api      public
-        # @example  An example structures block.
-        #   structures do
+        # @example  An example components block.
+        #   components do
         #     # See the documentation for #group for more explanation about
         #     # what this is doing
         #     group Codes::Playlist do
@@ -119,7 +119,7 @@ module Rapid
         # This effectively takes a module containing response structure codes
         # as constants and, for the duration of the #group block, brings those
         # codes into the global namespace.  It also serves as a nice way of
-        # grouping structures by the same structure used in the code table.
+        # grouping components by the same structure used in the code table.
         #
         # @api      public
         # @example  An example group block.

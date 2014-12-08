@@ -1,5 +1,5 @@
 require 'ury_rapid/model/view'
-require 'ury_rapid/model/component_inserter'
+require 'ury_rapid/model/components/inserter'
 require 'ury_rapid/services/requests/null_handler'
 
 module Rapid
@@ -14,7 +14,7 @@ module Rapid
     # - Query (get/put/post/delete) any part of the Rapid model, as long as the
     #   Service can authenticate with enough privileges to perform the query;
     # - Directly modify (insert/replace/kill) its own part of the Rapid model;
-    # - Insert components (pre-made model sub-structures) into its own part of
+    # - Insert components (pre-made model sub-components) into its own part of
     #   the Rapid model;
     # - Perform authentication, either for itself or on behalf of an external
     #   client;
@@ -83,8 +83,8 @@ module Rapid
       def_delegator :@handlers, :merge!, :add_handlers
 
       def create_component(name, *args)
-        Rapid::Model::ComponentCreatorWrapper.new(
-          Rapid::Model::ComponentCreator.new,
+        Rapid::Model::Components::CreatorWrapper.new(
+          Rapid::Model::Components::Creator.new,
           method(:register)
         ).send(name, *args)
       end
@@ -100,7 +100,7 @@ module Rapid
       # Begins inserting multiple components into the local root at the given
       # URL
       def insert_components(url, &block)
-        Rapid::Model::ComponentInserter.insert(url, self, method(:register), &block)
+        Rapid::Model::Components::Inserter.insert(url, self, method(:register), &block)
       end
 
       private

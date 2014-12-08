@@ -2,7 +2,7 @@ require 'ury_rapid/model'
 
 module Rapid
   module Model
-    module Structures
+    module Components
       # Many of these methods are designed in a weird way - they return lambdas
       # that do the actual work.  Why?  Because the lambdas will be instance
       # evaluated, and, thus will lose all context other than the local
@@ -16,8 +16,8 @@ module Rapid
       # @return [Proc]
       #   A proc that may be instance_eval'd into an #insert_components stanza.
       def self.channel_body
-        player   = Structures.player
-        playlist = Structures.playlist
+        player   = Components.player
+        playlist = Components.playlist
 
         lambda do |*|
           instance_eval(&player)
@@ -57,7 +57,7 @@ module Rapid
       def self.channel_set_tree(channel_ids)
         fail 'Nil channel IDs array given.' if channel_ids.nil?
 
-        channel_body = Structures.channel_body
+        channel_body = Components.channel_body
 
         lambda do |*|
           tree :channels, :channel_set do
@@ -79,7 +79,7 @@ module Rapid
       # @return [Proc]
       #   A proc that may be instance_eval'd into an #insert_components stanza.
       def self.playout_model(channel_ids)
-        channel_set_tree = Structures.channel_set_tree(channel_ids)
+        channel_set_tree = Components.channel_set_tree(channel_ids)
 
         lambda do |*|
           instance_eval(&channel_set_tree)
