@@ -1,4 +1,5 @@
-require 'ury_rapid/services/service.rb'
+require 'ury_rapid/services/service'
+require 'ury_rapid/model/constant'
 
 module Rapid
   module Examples
@@ -39,13 +40,7 @@ module Rapid
       #
       # @return [void]
       def run
-        # #insert_components is an instance-exec, so this won't be available
-        # as an instance variable.
-        m = @message
-
-        environment.insert_components('/') do
-          constant :message, m, :message
-        end
+        insert('/', Rapid::Model::Constant.new(:message, @message))
       end
 
       #

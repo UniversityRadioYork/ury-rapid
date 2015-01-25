@@ -17,19 +17,16 @@ module Rapid
       #
       # Usually you will want to subclass this and override #create, to create a
       # model structure definition.
-      class Inserter
+      class Creator
         extend Forwardable
 
         # Initialise a Creator
-        def initialize(url, view, registrar, options = {})
+        def initialize(url, view, registrar)
           fail('Registrar must be callable.') unless registrar.respond_to?(:call)
 
           @url = url
           @view = view
-          @options = options
           @registrar = registrar
-
-          @creator = options.fetch(:component_creator, default_component_creator)
         end
 
         def default_component_creator

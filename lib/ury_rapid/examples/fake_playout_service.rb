@@ -39,14 +39,8 @@ module Rapid
       #
       # @return [void]
       def run
-        # #insert_components is an instance-exec, so this won't be available
-        # as an instance variable.
-        c = @channels
-        pm = Rapid::Model::Components.playout_model(c)
-
-        environment.insert_components('/') do
-          instance_eval(&pm)
-        end
+        pm = Rapid::Model::Components::PlayoutModel.new({})
+        insert(:channels, pm.channel_set_tree(@channels))
       end
 
       #
