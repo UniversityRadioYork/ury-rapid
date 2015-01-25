@@ -42,6 +42,9 @@ module Rapid
         self
       end
 
+      # TODO(mattbw): Is this necessary for updating model objects?
+      attr_reader :handler
+
       # GETs this model object
       #
       # A GET is the retrieval of a flattened representation of a model object.

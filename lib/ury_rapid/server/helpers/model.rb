@@ -68,17 +68,17 @@ module Rapid
         else
           json.deep_symbolize_keys!
         end
-      end
 
-      # Renders a 'request sent OK' message
-      #
-      # This should be used for PUT, POST and DELETE responses.  There is a
-      # special handler for GET, and OPTIONS returns CORS headers.
-      #
-      # @return [String]  The OK message, rendered according to the client's
-      #   Accept headers.
-      def ok
-        respond_with :ok, status: :ok
+        # Renders a 'request sent OK' message
+        #
+        # This should be used for PUT, POST and DELETE responses.  There is a
+        # special handler for GET, and OPTIONS returns CORS headers.
+        #
+        # @return [String]  The OK message, rendered according to the client's
+        #   Accept headers.
+        def ok
+          respond_with :ok, status: :ok
+        end
       end
     end
   end
