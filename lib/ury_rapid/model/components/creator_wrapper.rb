@@ -16,16 +16,17 @@ module Rapid
         #
         # @api public
         # @example Construct a useless CreatorWrapper that does nothing.
-        #   CreatorWrapper.new(creator, ->(x) { x })
+        #   CreatorWrapper.new(creator, ->(_, x) { x })
         # @param creator [Creator]
         #   The component creator to wrap.  Any messages not responded to directly
         #   by this CreatorWrapper are forwarded verbatim to the creator, with the
         #   hook invoked on the return value.
         # @param hook [Object]
         #   An object (usually a Proc) that responds to a #call message
-        #   containing a component by performing some action and returning back a
-        #   component.  The component may be the original, or some transformation
-        #   thereof.  The hook is invoked silently on any component created.
+        #   containing the constructor method symbol constructed component by
+        #   performing some action and returning back a component.  The
+        #   component may be the original, or some transformation thereof.
+        #   The hook is invoked silently on any component created.
         def initialize(creator, hook)
           fail(ArgumentError, 'Hook not callable') unless hook.respond_to?(:call)
 
@@ -34,8 +35,8 @@ module Rapid
         end
 
         # Delegates missing methods to the creator, invoking the hook on return
-        def method_missing(*args)
-          @hook.call(super(*args))
+        def method_missing(meth, *args)
+          @hook.call(meth, super(meth, *args))
         end
       end
     end

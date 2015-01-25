@@ -9,7 +9,7 @@ describe Rapid::Model::Components::CreatorWrapper do
   end
 
   it 'forwards messages to the ComponentCreator verbatim' do
-    subject = Rapid::Model::Components::CreatorWrapper.new(@creator, ->(x) { x })
+    subject = Rapid::Model::Components::CreatorWrapper.new(@creator, ->(_, x) { x })
 
     @creator.expect :a_component_named_sue, @component, [:arg1, :arg2]
     subject.a_component_named_sue(:arg1, :arg2)
@@ -18,7 +18,7 @@ describe Rapid::Model::Components::CreatorWrapper do
 
   it 'sends resulting components through the hook' do
     @creator.expect :a_component_named_steve, @component
-    @hook.expect :call, :hooked_component, [@component]
+    @hook.expect :call, :hooked_component, [:a_component_named_steve, @component]
 
     subject = Rapid::Model::Components::CreatorWrapper.new(@creator, @hook)
     subject.a_component_named_steve.must_equal(:hooked_component)
