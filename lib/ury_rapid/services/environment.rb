@@ -82,27 +82,6 @@ module Rapid
 
       def_delegator :@handlers, :merge!, :add_handlers
 
-      def create_component(name, *args)
-        Rapid::Model::Components::CreatorWrapper.new(
-          Rapid::Model::Components::Creator.new,
-          method(:register)
-        ).send(name, *args)
-      end
-
-      def insert_component(url, name, *args)
-        insert(url, create_component(name, *args))
-      end
-
-      def replace_component(url, name, *args)
-        replace(url, create_component(name, *args))
-      end
-
-      # Begins inserting multiple components into the local root at the given
-      # URL
-      def insert_components(url, &block)
-        Rapid::Model::Components::Inserter.insert(url, self, method(:register), &block)
-      end
-
       private
 
       attr_reader :authenticator
