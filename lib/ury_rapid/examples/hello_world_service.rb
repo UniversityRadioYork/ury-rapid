@@ -40,7 +40,7 @@ module Rapid
       #
       # @return [void]
       def run
-        insert('/', Rapid::Model::Constant.new(:message, @message))
+        environment.insert('/', :message, Rapid::Model::Constant.new(:message, @message))
       end
 
       #

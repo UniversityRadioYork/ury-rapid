@@ -8,17 +8,22 @@ module Rapid
       class PlayoutModel
         include Rapid::Common::Types::Validators
 
-        # Constructs a PlayoutCreator
+        # Constructs a PlayoutModel
         #
+        # @param update_channel [UpdateChannel]
+        #   The update channel to which items will be subscribed after
+        #   construction.
         # @param callbacks [Hash]
         #   A dictionary which maps the names of components to procs which,
         #   given the new component and this PlayoutCreator, perform duties
         #   such as assigning handlers.
-        def initialize(callbacks)
+        def initialize(update_channel, callbacks)
+          @update_channel = update_channel
           @callbacks = callbacks
           @callbacks.default_proc = proc do |_, key|
             proc do |component|
               puts "no callback for type #{key} when constructing #{component}"
+              component
             end
           end
         end
@@ -82,7 +87,7 @@ module Rapid
           channel_set = Rapid::Model::HashModelObject.new(:channel_set)
 
           channel_ids.each do |channel_id|
-            channel_set.insert(channel_id, channel_body)
+            channel_set.insert(channel_id, channel)
           end
 
           through_callback(:channel_set, channel_set)
@@ -181,6 +186,7 @@ module Rapid
         # @return [ModelObject]
         #   The result of the callback, if one was registered.
         def through_callback(key, item)
+          item.register_update_channel(@update_channel)
           @callbacks[key].call(item, self)
         end
 

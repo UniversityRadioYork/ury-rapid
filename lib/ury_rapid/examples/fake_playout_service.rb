@@ -39,8 +39,11 @@ module Rapid
       #
       # @return [void]
       def run
-        pm = Rapid::Model::Components::PlayoutModel.new({})
-        insert(:channels, pm.channel_set_tree(@channels))
+        pm = Rapid::Model::Components::PlayoutModel.new(
+          environment.update_channel,
+          {}
+        )
+        environment.insert('/', :channels, pm.channel_set_tree(@channels))
       end
 
       #

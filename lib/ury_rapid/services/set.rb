@@ -106,7 +106,7 @@ module Rapid
       # @return [void]
       def start(name)
         service_class, service_config = @services.fetch(name)
-        environment.insert_components('/') { tree(name, :sub_root) }
+        environment.insert('/', name, Rapid::Model::HashModelObject.new(:sub_root))
         service_view = environment.with_local_root(environment.find("/#{name}"))
         mod = service_class.new(service_view)
         mod.instance_eval(&service_config)

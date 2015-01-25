@@ -56,7 +56,7 @@ module Rapid
     # DummyUpdateChannel.
     class NoUpdateChannel < UpdateChannel
       def notify(object, _repr)
-        fail(Rapid::Common::Exceptions::MissingUpdateChannel, object)
+        puts("No update channel assigned to updating object #{object}")
       end
     end
 

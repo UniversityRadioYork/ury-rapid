@@ -72,27 +72,29 @@ module Rapid
       delegate %i(authenticate)             => :authenticator
       delegate %i(log
                   get put post delete
-                  find insert replace kill) => :view
+                  find kill)                => :view
       delegate %i(register_for_updates
                   deregister_from_updates)  => :update_channel
 
-      #
-      # Components API
-      #
+      # We patch insert and replace so that they register the inserted/replaced
+      # object with the updates channel if it isn't already.
 
-      def_delegator :@handlers, :merge!, :add_handlers
+      def insert(url, id, item)
+        item.register_update_channel(update_channel)
+        view.insert(url, id, item)
+      end
+
+      def replace(url, item)
+        item.register_update_channel(update_channel)
+        view.replace(url, item)
+      end
+
+      attr_reader :update_channel
 
       private
 
       attr_reader :authenticator
-      attr_reader :update_channel
       attr_reader :view
-
-      def register(component)
-        component.register_update_channel(update_channel)
-        component.register_handler(@handlers[component.handler_target])
-        component
-      end
     end
   end
 end

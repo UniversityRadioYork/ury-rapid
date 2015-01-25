@@ -26,15 +26,11 @@ module Rapid
       end
 
       def make_model
-        logger = @logger
-        environment.insert_components('/') do
-          tree :info, :info do
-            ver = Rapid::Common::Constants::VERSION
-            constant :version, ver, :version
-          end
+        ver = Rapid::Common::Constants::VERSION
 
-          log :log, logger
-        end
+        environment.insert('/', :info, Rapid::Model::HashModelObject.new(:info))
+        environment.insert('/info', :version, Rapid::Model::Constant.new(:version, ver))
+        environment.insert('/', :log, Rapid::Model::Log.new(@logger))
       end
     end
   end
