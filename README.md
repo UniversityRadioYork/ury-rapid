@@ -1,6 +1,6 @@
 rapid
 =====
-![Travis build status](https://travis-ci.org/UniversityRadioYork/rapid.svg)
+![Travis build status](https://travis-ci.org/UniversityRadioYork/ury-rapid.svg)
 
 * For more extensive narrative documentation, see https://github.com/UniversityRadioYork/ury-rapid/wiki.
 * For auto-generated YARD documentation, see http://rubydoc.info/github/UniversityRadioYork/rapid.
