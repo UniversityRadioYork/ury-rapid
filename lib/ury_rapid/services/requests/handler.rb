@@ -114,33 +114,6 @@ module Rapid
           HOOKS.fetch(action, []).any? { |b| b.call(self, object, payload) }
         end
       end
-
-      # Extension of Handler implementing default behaviour for Variables.
-      #
-      # By default, the semantics of DELETE on a Variable is that it PUTs the
-      # Variable's default initial state.
-      class VariableHandler < Handler
-        # Requests a DELETE of the given Variable via the BAPS server
-        #
-        # This effectively sets the Variable to its default value.
-        #
-        # @api semipublic
-        #
-        # @example DELETE a Variable
-        #   variable_handler.delete(variable)
-        #
-        # @param variable [Variable] A model object representing a mutable
-        #   variable.
-        #
-        # @param payload [Payload] A payload (whose value is meaningless, as
-        #   this is a DELETE).
-        #
-        # @return (see #put)
-        def delete(variable, payload)
-          put(variable,
-              payload.with_body(variable.id => variable.initial_value))
-        end
-      end
     end
   end
 end
