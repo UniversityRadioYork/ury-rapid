@@ -12,6 +12,7 @@ module Rapid
       def initialize(logger, *args)
         super(*args)
         @logger = logger
+        @ver    = Rapid::Common::Constants::VERSION
       end
 
       def run
@@ -20,16 +21,14 @@ module Rapid
         make_model
 
         environment.log(:info, 'Now starting Rapid.')
-        environment.log(:info, "Version: #{Rapid::Common::Constants::VERSION}.")
+        environment.log(:info, "Version: #{@ver}.")
 
         super
       end
 
       def make_model
-        ver = Rapid::Common::Constants::VERSION
-
         environment.insert('/', :info, Rapid::Model::HashModelObject.new(:info))
-        environment.insert('/info', :version, Rapid::Model::Constant.new(:version, ver))
+        environment.insert('/info', :version, Rapid::Model::Constant.new(:version, @ver))
         environment.insert('/', :log, Rapid::Model::Log.new(@logger))
       end
     end
