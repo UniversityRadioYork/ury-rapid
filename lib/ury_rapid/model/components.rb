@@ -1,6 +1,4 @@
-require 'ury_rapid/model/components/creator'
-require 'ury_rapid/model/components/creator_wrapper'
-require 'ury_rapid/model/components/inserter'
+require 'ury_rapid/model/components/playout_model'
 
 module Rapid
   module Model

@@ -186,7 +186,7 @@ module Rapid
         # @return [ModelObject]
         #   The result of the callback, if one was registered.
         def through_callback(key, item)
-          item.register_update_channel(@update_channel)
+
           @callbacks[key].call(item, self)
         end
 

@@ -1,5 +1,4 @@
 require 'ury_rapid/model/view'
-require 'ury_rapid/model/components/inserter'
 require 'ury_rapid/services/requests/null_handler'
 
 module Rapid
