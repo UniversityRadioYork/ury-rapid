@@ -39,10 +39,19 @@ module Rapid
       #
       # @return [void]
       def run
+        # Rapid contains a class for quickly building bits of playout model,
+        # attaching handlers and an update channel to them on the way.
+        # We use this to create the playout service model very quickly.
         pm = Rapid::Model::Components::PlayoutModel.new(
           environment.update_channel,
           {}
         )
+
+        # Since this is a read-only service, we don't register any handlers.
+        # But, if we did, they would be added into the empty hash above.
+        # Said callbacks are passed pm, making them able to attach handlers
+        # that construct or replace model objects using its services.
+
         environment.insert('/', :channels, pm.channel_set_tree(@channels))
       end
 
